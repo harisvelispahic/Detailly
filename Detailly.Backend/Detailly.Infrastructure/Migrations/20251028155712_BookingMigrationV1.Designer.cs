@@ -4,6 +4,7 @@ using Detailly.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251028155712_BookingMigrationV1")]
+    partial class BookingMigrationV1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,11 +51,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("ServicePackageId")
                         .HasColumnType("int");
 
+                    b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TimeSlotId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
@@ -61,8 +64,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ServicePackageId");
-
-                    b.HasIndex("TimeSlotId");
 
                     b.ToTable("Bookings", (string)null);
                 });
@@ -433,15 +434,7 @@ namespace Detailly.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Detailly.Domain.Entities.Booking.TimeSlotEntity", "TimeSlot")
-                        .WithMany("Bookings")
-                        .HasForeignKey("TimeSlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ServicePackage");
-
-                    b.Navigation("TimeSlot");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
@@ -527,11 +520,6 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", b =>
                 {
                     b.Navigation("ServicePackageItemAssignments");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.TimeSlotEntity", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", b =>

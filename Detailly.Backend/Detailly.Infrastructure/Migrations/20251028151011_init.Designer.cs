@@ -4,6 +4,7 @@ using Detailly.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251028151011_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,11 +51,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("ServicePackageId")
                         .HasColumnType("int");
 
+                    b.Property<int>("SlotId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TimeSlotId")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
@@ -62,34 +65,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ServicePackageId");
 
-                    b.HasIndex("TimeSlotId");
-
                     b.ToTable("Bookings", (string)null);
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AddressId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Locations");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
@@ -140,8 +116,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EstimatedDurationHours")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("EstimatedDuration")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -223,45 +199,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServicePackageItems");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.TimeSlotEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("TimeSlots");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", b =>
@@ -433,15 +370,7 @@ namespace Detailly.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Detailly.Domain.Entities.Booking.TimeSlotEntity", "TimeSlot")
-                        .WithMany("Bookings")
-                        .HasForeignKey("TimeSlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("ServicePackage");
-
-                    b.Navigation("TimeSlot");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
@@ -474,17 +403,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("ServicePackageItem");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.TimeSlotEntity", b =>
-                {
-                    b.HasOne("Detailly.Domain.Entities.Booking.LocationEntity", "Location")
-                        .WithMany("TimeSlots")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-                });
-
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", "Category")
@@ -512,11 +430,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Review");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
-                {
-                    b.Navigation("TimeSlots");
-                });
-
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>
                 {
                     b.Navigation("Bookings");
@@ -527,11 +440,6 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", b =>
                 {
                     b.Navigation("ServicePackageItemAssignments");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.TimeSlotEntity", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", b =>

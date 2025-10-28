@@ -10,4 +10,14 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\Payment\" />
+    <Folder Include="Entities\Sales\" />
+    <Folder Include="Common\Enums\" />
+    <Folder Include="Common\CommonModels\" />
+    <Folder Include="Common\ValueObjects\" />
+    <Folder Include="Entities\Shared\" />
+    <Folder Include="Entities\Vehicle\" />
+  </ItemGroup>
+
 </Project>

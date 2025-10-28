@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Entities.Booking;
 using Detailly.Infrastructure.Database.Seeders;
 using System.Linq.Expressions;
 
@@ -44,9 +45,50 @@ public partial class DatabaseContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // ---------- ServicePackageItemAssignment (N:M medjutabela) ----------
+        modelBuilder.Entity<ServicePackageItemAssignmentEntity>(entity =>
+        {
+            entity.ToTable("ServicePackageItemAssignments"); // ime tabele
+
+            entity.HasKey(e => e.Id); // surogat ključ
+
+            entity.HasOne(e => e.ServicePackage)
+                  .WithMany(p => p.ServicePackageItemAssignments)
+                  .HasForeignKey(e => e.ServicePackageId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.ServicePackageItem)
+                  .WithMany(i => i.ServicePackageItemAssignments)
+                  .HasForeignKey(e => e.ServicePackageItemId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ---------- Booking - Review (1:1, shared PK) ----------
+        modelBuilder.Entity<BookingEntity>(entity =>
+        {
+            entity.ToTable("Bookings"); // ime tabele
+
+            entity.HasOne(b => b.Review)
+                  .WithOne(r => r.Booking)
+                  .HasForeignKey<ReviewEntity>(r => r.BookingId) // shared PK i FK
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ReviewEntity>(entity =>
+        {
+            entity.ToTable("Reviews"); // ime tabele
+            entity.HasKey(r => r.BookingId); // shared PK
+        });
+
+        // ---------- Decimal precision ----------
+        //modelBuilder.Properties<decimal>().HavePrecision(18, 2);
+        //modelBuilder.Properties<decimal?>().HavePrecision(18, 2);
+
+        // ---------- Global soft-delete filter ----------
         ApplyGlobalFielters(modelBuilder);
 
-        StaticDataSeeder.Seed(modelBuilder); // static data
+        // ---------- Static seed data ----------
+        StaticDataSeeder.Seed(modelBuilder);
     }
 
     private void ApplyGlobalFielters(ModelBuilder modelBuilder)
