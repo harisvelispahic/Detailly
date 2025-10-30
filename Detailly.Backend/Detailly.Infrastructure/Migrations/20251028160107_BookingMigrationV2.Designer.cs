@@ -340,7 +340,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Identity.MarketUserEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -501,7 +501,7 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.RefreshTokenEntity", b =>
                 {
-                    b.HasOne("Detailly.Domain.Entities.Identity.MarketUserEntity", "User")
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -542,7 +542,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Identity.MarketUserEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

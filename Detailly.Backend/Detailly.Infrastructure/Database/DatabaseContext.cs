@@ -8,7 +8,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Identity
     public DbSet<ProductCategoryEntity> ProductCategories => Set<ProductCategoryEntity>();
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
-    public DbSet<MarketUserEntity> Users => Set<MarketUserEntity>();
+    public DbSet<ApplicationUserEntity> Users => Set<ApplicationUserEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
     // Other tables
