@@ -36,7 +36,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<Applicati
 
         // Navigation
         b.HasMany(x => x.RefreshTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId);
+            .WithOne(x => x.ApplicationUser)
+            .HasForeignKey(x => x.ApplicationUserId);
     }
 }

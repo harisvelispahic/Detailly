@@ -1,10 +1,12 @@
-﻿
+﻿using Detailly.Domain.Common;
+
 namespace Detailly.Domain.Entities.Payment
 {
-    public class PaymentTransactionStatusEntity
+    public class PaymentTransactionStatusEntity : BaseEntity
     {
-        public int PaymentTransactionId { get; set; }
-        public PaymentTransactionEntity? PaymentTransaction { get; set; }
-        public string? StatusCode { get; set; } // Pending, Completed, Failed -> prebaciti u enum
+        public string? Name { get; set; } // Pending, Completed, Failed -> prebaciti u enum
+
+        // Foreign keys
+        public IReadOnlyCollection<PaymentTransactionEntity> PaymentTransactions { get; private set; } = new List<PaymentTransactionEntity>();
     }
 }

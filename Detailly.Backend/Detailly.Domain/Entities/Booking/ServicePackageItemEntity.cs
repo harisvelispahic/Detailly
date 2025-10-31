@@ -1,14 +1,14 @@
 ﻿using Detailly.Domain.Common;
-using Detailly.Domain.Entities.Catalog;
 
 namespace Detailly.Domain.Entities.Booking
 {
     public class ServicePackageItemEntity : BaseEntity
     {
-        public string? ItemName { get; set; }
+        public string? Name { get; set; }
         public string? Description { get; set; }
         public decimal Price { get; set; }
 
+        // Foreign keys
         public IReadOnlyCollection<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; private set; } = new List<ServicePackageItemAssignmentEntity>();
     }
 }

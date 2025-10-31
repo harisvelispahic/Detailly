@@ -1,14 +1,14 @@
-﻿namespace Detailly.Domain.Entities.Vehicle
+﻿using Detailly.Domain.Common;
+
+namespace Detailly.Domain.Entities.Vehicle
 {
-    public class VehicleCategoryEntity
+    public class VehicleCategoryEntity : BaseEntity
     {
-        public int VehicleId { get; set; }
-        public VehicleEntity? Vehicle { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public decimal BasePriceMultiplier{ get; set; }
 
-
+        // Foreign keys
         public IReadOnlyCollection<VehicleEntity> Vehicles { get; private set; } = new List<VehicleEntity>();
     }
 }

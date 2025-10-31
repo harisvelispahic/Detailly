@@ -80,6 +80,20 @@ public partial class DatabaseContext
             entity.HasKey(r => r.BookingId); // shared PK
         });
 
+        // dodano
+        modelBuilder.Entity<BookingVehicleAssignmentEntity>()
+        .HasOne(bva => bva.Vehicle)
+        .WithMany(v => (IEnumerable<BookingVehicleAssignmentEntity>)v.BookingVehicleAssignments)
+        .HasForeignKey(bva => bva.VehicleId)
+        .OnDelete(DeleteBehavior.Restrict); // or DeleteBehavior.NoAction
+
+        modelBuilder.Entity<BookingVehicleAssignmentEntity>()
+            .HasOne(bva => bva.Booking)
+            .WithMany(b => (IEnumerable<BookingVehicleAssignmentEntity>)b.BookingVehicleAssignments)
+            .HasForeignKey(bva => bva.BookingId)
+            .OnDelete(DeleteBehavior.Restrict); // also optional
+        // do ovdje
+
         // ---------- Decimal precision ----------
         //modelBuilder.Properties<decimal>().HavePrecision(18, 2);
         //modelBuilder.Properties<decimal?>().HavePrecision(18, 2);

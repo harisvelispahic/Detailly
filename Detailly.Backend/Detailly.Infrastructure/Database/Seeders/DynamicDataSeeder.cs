@@ -56,6 +56,7 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
             IsAdmin = true,
             IsEnabled = true,
+            AddressId = null
         };
 
         var user = new ApplicationUserEntity
@@ -64,6 +65,7 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "User123!"),
             IsManager = true,
             IsEnabled = true,
+            AddressId = null
         };
 
         var dummyForSwagger = new ApplicationUserEntity
@@ -72,6 +74,7 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "string"),
             IsEmployee = true,
             IsEnabled = true,
+            AddressId = null
         };
         var dummyForTests = new ApplicationUserEntity
         {
@@ -79,6 +82,7 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEmployee = true,
             IsEnabled = true,
+            AddressId = null
         };
         context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();

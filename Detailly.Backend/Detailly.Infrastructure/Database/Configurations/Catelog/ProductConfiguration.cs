@@ -20,9 +20,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
             .Property(x => x.Price)
             .HasPrecision(18, 2);
 
-        builder
-            .Property(x => x.StockQuantity)
-            .IsRequired();
+        //builder
+        //    .Property(x => x.StockQuantity)
+        //    .IsRequired();
 
         builder
             .HasOne(x => x.Category)

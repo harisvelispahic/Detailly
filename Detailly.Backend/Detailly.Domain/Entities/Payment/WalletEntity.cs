@@ -1,8 +1,10 @@
-﻿using Detailly.Domain.Entities.Booking;
+﻿using Detailly.Domain.Common;
+using Detailly.Domain.Entities.Booking;
+using Detailly.Domain.Entities.Identity;
 
 namespace Detailly.Domain.Entities.Payment
 {
-    public class WalletEntity
+    public class WalletEntity : BaseEntity
     {
         public decimal Balance { get; set; }
         public string? Currency { get; set; }   // prebaciti u enum
@@ -10,7 +12,11 @@ namespace Detailly.Domain.Entities.Payment
         public int PercentageAdded { get; set; }
 
 
-        public IReadOnlyCollection<BookingVehicleAssignmentEntity> BookingVehicleAssignments { get; private set; } = new List<BookingVehicleAssignmentEntity>();
+        // Foreign keys
+        public int ApplicationUserId { get; set; }   // FK to ApplicationUser
+        public ApplicationUserEntity ApplicationUser { get; set; } = null!;
+
+        public IReadOnlyCollection<PaymentTransactionEntity> PaymentTransactions { get; private set; } = new List<PaymentTransactionEntity>();
 
     }
 }
