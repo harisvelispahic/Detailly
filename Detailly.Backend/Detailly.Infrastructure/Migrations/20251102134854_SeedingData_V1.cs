@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration_v11 : Migration
+    public partial class SeedingData_V1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AddressEntity",
+                name: "Address",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -30,11 +30,26 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AddressEntity", x => x.Id);
+                    table.PrimaryKey("PK_Address", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderStatusEntity",
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderStatus",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -46,11 +61,11 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderStatusEntity", x => x.Id);
+                    table.PrimaryKey("PK_OrderStatus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PaymentTransactionStatusEntity",
+                name: "PaymentTransactionStatus",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -62,7 +77,7 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PaymentTransactionStatusEntity", x => x.Id);
+                    table.PrimaryKey("PK_PaymentTransactionStatus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,7 +136,7 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VehicleCategoryEntity",
+                name: "VehicleCategories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -135,35 +150,11 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VehicleCategoryEntity", x => x.Id);
+                    table.PrimaryKey("PK_VehicleCategories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Locations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AddressId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Locations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Locations_AddressEntity_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "AddressEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
+                name: "ApplicationUsers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -188,12 +179,36 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_ApplicationUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_AddressEntity_AddressId",
+                        name: "FK_ApplicationUsers_Address_AddressId",
                         column: x => x.AddressId,
-                        principalTable: "AddressEntity",
+                        principalTable: "Address",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Locations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Locations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Locations_Address_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Address",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -257,6 +272,181 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cart",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IsEmpty = table.Column<bool>(type: "bit", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cart", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cart_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ShipToAddressId = table.Column<int>(type: "int", nullable: false),
+                    OrderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Address_ShipToAddressId",
+                        column: x => x.ShipToAddressId,
+                        principalTable: "Address",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_OrderStatus_OrderStatusId",
+                        column: x => x.OrderStatusId,
+                        principalTable: "OrderStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TokenHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    Fingerprint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RevokedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    YearOfManufacture = table.Column<int>(type: "int", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    VehicleCategoryId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_VehicleCategories_VehicleCategoryId",
+                        column: x => x.VehicleCategoryId,
+                        principalTable: "VehicleCategories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallet",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalDeposited = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PercentageAdded = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Wallet_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TimeSlots",
                 columns: table => new
                 {
@@ -283,182 +473,7 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CartEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IsEmpty = table.Column<bool>(type: "bit", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CartEntity_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "NotificationEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_NotificationEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_NotificationEntity_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ShipToAddressId = table.Column<int>(type: "int", nullable: false),
-                    OrderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    OrderStatusId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderEntity_AddressEntity_ShipToAddressId",
-                        column: x => x.ShipToAddressId,
-                        principalTable: "AddressEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderEntity_OrderStatusEntity_OrderStatusId",
-                        column: x => x.OrderStatusId,
-                        principalTable: "OrderStatusEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderEntity_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RefreshTokens",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TokenHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
-                    Fingerprint = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RevokedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RefreshTokens_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "VehicleEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Model = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    YearOfManufacture = table.Column<int>(type: "int", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    VehicleCategoryId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VehicleEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_VehicleEntity_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VehicleEntity_VehicleCategoryEntity_VehicleCategoryId",
-                        column: x => x.VehicleCategoryId,
-                        principalTable: "VehicleCategoryEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WalletEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalDeposited = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    PercentageAdded = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WalletEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WalletEntity_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "InventoryEntity",
+                name: "Inventory",
                 columns: table => new
                 {
                     ProductId = table.Column<int>(type: "int", nullable: false),
@@ -468,9 +483,9 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InventoryEntity", x => x.ProductId);
+                    table.PrimaryKey("PK_Inventory", x => x.ProductId);
                     table.ForeignKey(
-                        name: "FK_InventoryEntity_Products_ProductId",
+                        name: "FK_Inventory_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -478,7 +493,7 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItemEntity",
+                name: "OrderItems",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -491,11 +506,75 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItemEntity", x => x.Id);
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItemEntity_Products_ProductId",
+                        name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CartItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    CartId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Cart_CartId",
+                        column: x => x.CartId,
+                        principalTable: "Cart",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CartItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PaymentTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WalletId = table.Column<int>(type: "int", nullable: false),
+                    PaymentTransactionStatusId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_PaymentTransactionStatus_PaymentTransactionStatusId",
+                        column: x => x.PaymentTransactionStatusId,
+                        principalTable: "PaymentTransactionStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_Wallet_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "Wallet",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -520,6 +599,12 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Bookings", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Bookings_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Bookings_ServicePackages_ServicePackageId",
                         column: x => x.ServicePackageId,
                         principalTable: "ServicePackages",
@@ -531,80 +616,10 @@ namespace Detailly.Infrastructure.Migrations
                         principalTable: "TimeSlots",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CartItemEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    CartId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CartItemEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CartItemEntity_CartEntity_CartId",
-                        column: x => x.CartId,
-                        principalTable: "CartEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CartItemEntity_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PaymentTransactionEntity",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    TransactionType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WalletId = table.Column<int>(type: "int", nullable: false),
-                    PaymentTransactionStatusId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PaymentTransactionEntity", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PaymentTransactionEntity_PaymentTransactionStatusEntity_PaymentTransactionStatusId",
-                        column: x => x.PaymentTransactionStatusId,
-                        principalTable: "PaymentTransactionStatusEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PaymentTransactionEntity_WalletEntity_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "WalletEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderItemAssignmentEntity",
+                name: "OrderItemAssignments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -620,23 +635,23 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderItemAssignmentEntity", x => x.Id);
+                    table.PrimaryKey("PK_OrderItemAssignments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_OrderItemAssignmentEntity_OrderEntity_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "OrderEntity",
+                        name: "FK_OrderItemAssignments_OrderItems_OrderItemId",
+                        column: x => x.OrderItemId,
+                        principalTable: "OrderItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderItemAssignmentEntity_OrderItemEntity_OrderItemId",
-                        column: x => x.OrderItemId,
-                        principalTable: "OrderItemEntity",
+                        name: "FK_OrderItemAssignments_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookingVehicleAssignmentEntity",
+                name: "BookingVehicleAssignments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -649,17 +664,17 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BookingVehicleAssignmentEntity", x => x.Id);
+                    table.PrimaryKey("PK_BookingVehicleAssignments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BookingVehicleAssignmentEntity_Bookings_BookingId",
+                        name: "FK_BookingVehicleAssignments_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_BookingVehicleAssignmentEntity_VehicleEntity_VehicleId",
+                        name: "FK_BookingVehicleAssignments_Vehicles_VehicleId",
                         column: x => x.VehicleId,
-                        principalTable: "VehicleEntity",
+                        principalTable: "Vehicles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -686,6 +701,11 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUsers_AddressId",
+                table: "ApplicationUsers",
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_ApplicationUserId",
                 table: "Bookings",
                 column: "ApplicationUserId");
@@ -701,30 +721,30 @@ namespace Detailly.Infrastructure.Migrations
                 column: "TimeSlotId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingVehicleAssignmentEntity_BookingId",
-                table: "BookingVehicleAssignmentEntity",
+                name: "IX_BookingVehicleAssignments_BookingId",
+                table: "BookingVehicleAssignments",
                 column: "BookingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingVehicleAssignmentEntity_VehicleId",
-                table: "BookingVehicleAssignmentEntity",
+                name: "IX_BookingVehicleAssignments_VehicleId",
+                table: "BookingVehicleAssignments",
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartEntity_ApplicationUserId",
-                table: "CartEntity",
+                name: "IX_Cart_ApplicationUserId",
+                table: "Cart",
                 column: "ApplicationUserId",
                 unique: true,
                 filter: "[ApplicationUserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItemEntity_CartId",
-                table: "CartItemEntity",
+                name: "IX_CartItems_CartId",
+                table: "CartItems",
                 column: "CartId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItemEntity_ProductId",
-                table: "CartItemEntity",
+                name: "IX_CartItems_ProductId",
+                table: "CartItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -733,48 +753,48 @@ namespace Detailly.Infrastructure.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NotificationEntity_ApplicationUserId",
-                table: "NotificationEntity",
+                name: "IX_Notifications_ApplicationUserId",
+                table: "Notifications",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderEntity_ApplicationUserId",
-                table: "OrderEntity",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderEntity_OrderStatusId",
-                table: "OrderEntity",
-                column: "OrderStatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderEntity_ShipToAddressId",
-                table: "OrderEntity",
-                column: "ShipToAddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItemAssignmentEntity_OrderId",
-                table: "OrderItemAssignmentEntity",
+                name: "IX_OrderItemAssignments_OrderId",
+                table: "OrderItemAssignments",
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItemAssignmentEntity_OrderItemId",
-                table: "OrderItemAssignmentEntity",
+                name: "IX_OrderItemAssignments_OrderItemId",
+                table: "OrderItemAssignments",
                 column: "OrderItemId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItemEntity_ProductId",
-                table: "OrderItemEntity",
+                name: "IX_OrderItems_ProductId",
+                table: "OrderItems",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymentTransactionEntity_PaymentTransactionStatusId",
-                table: "PaymentTransactionEntity",
+                name: "IX_Orders_ApplicationUserId",
+                table: "Orders",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_OrderStatusId",
+                table: "Orders",
+                column: "OrderStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_ShipToAddressId",
+                table: "Orders",
+                column: "ShipToAddressId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_PaymentTransactionStatusId",
+                table: "PaymentTransactions",
                 column: "PaymentTransactionStatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PaymentTransactionEntity_WalletId",
-                table: "PaymentTransactionEntity",
+                name: "IX_PaymentTransactions_WalletId",
+                table: "PaymentTransactions",
                 column: "WalletId");
 
             migrationBuilder.CreateIndex(
@@ -803,23 +823,18 @@ namespace Detailly.Infrastructure.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_AddressId",
-                table: "Users",
-                column: "AddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VehicleEntity_ApplicationUserId",
-                table: "VehicleEntity",
+                name: "IX_Vehicles_ApplicationUserId",
+                table: "Vehicles",
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VehicleEntity_VehicleCategoryId",
-                table: "VehicleEntity",
+                name: "IX_Vehicles_VehicleCategoryId",
+                table: "Vehicles",
                 column: "VehicleCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WalletEntity_ApplicationUserId",
-                table: "WalletEntity",
+                name: "IX_Wallet_ApplicationUserId",
+                table: "Wallet",
                 column: "ApplicationUserId",
                 unique: true);
         }
@@ -828,22 +843,25 @@ namespace Detailly.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BookingVehicleAssignmentEntity");
+                name: "BookingVehicleAssignments");
 
             migrationBuilder.DropTable(
-                name: "CartItemEntity");
+                name: "CartItems");
 
             migrationBuilder.DropTable(
-                name: "InventoryEntity");
+                name: "Images");
 
             migrationBuilder.DropTable(
-                name: "NotificationEntity");
+                name: "Inventory");
 
             migrationBuilder.DropTable(
-                name: "OrderItemAssignmentEntity");
+                name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "PaymentTransactionEntity");
+                name: "OrderItemAssignments");
+
+            migrationBuilder.DropTable(
+                name: "PaymentTransactions");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
@@ -855,22 +873,22 @@ namespace Detailly.Infrastructure.Migrations
                 name: "ServicePackageItemAssignments");
 
             migrationBuilder.DropTable(
-                name: "VehicleEntity");
+                name: "Vehicles");
 
             migrationBuilder.DropTable(
-                name: "CartEntity");
+                name: "Cart");
 
             migrationBuilder.DropTable(
-                name: "OrderEntity");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
-                name: "OrderItemEntity");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "PaymentTransactionStatusEntity");
+                name: "PaymentTransactionStatus");
 
             migrationBuilder.DropTable(
-                name: "WalletEntity");
+                name: "Wallet");
 
             migrationBuilder.DropTable(
                 name: "Bookings");
@@ -879,13 +897,16 @@ namespace Detailly.Infrastructure.Migrations
                 name: "ServicePackageItems");
 
             migrationBuilder.DropTable(
-                name: "VehicleCategoryEntity");
-
-            migrationBuilder.DropTable(
-                name: "OrderStatusEntity");
+                name: "VehicleCategories");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "OrderStatus");
+
+            migrationBuilder.DropTable(
+                name: "ApplicationUsers");
 
             migrationBuilder.DropTable(
                 name: "ServicePackages");
@@ -894,16 +915,13 @@ namespace Detailly.Infrastructure.Migrations
                 name: "TimeSlots");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "ProductCategories");
 
             migrationBuilder.DropTable(
                 name: "Locations");
 
             migrationBuilder.DropTable(
-                name: "AddressEntity");
+                name: "Address");
         }
     }
 }

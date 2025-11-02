@@ -10,7 +10,7 @@ public sealed class LoginCommandHandler(
     {
         var email = request.Email.Trim().ToLowerInvariant();
 
-        var user = await ctx.Users
+        var user = await ctx.ApplicationUsers
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsEnabled && !x.IsDeleted, ct)
             ?? throw new MarketNotFoundException("Korisnik nije pronađen ili je onemogućen.");
 

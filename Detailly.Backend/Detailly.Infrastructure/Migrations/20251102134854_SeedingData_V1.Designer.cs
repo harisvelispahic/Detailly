@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251031204506_Migration_v11")]
-    partial class Migration_v11
+    [Migration("20251102134854_SeedingData_V1")]
+    partial class SeedingData_V1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,7 +101,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("BookingVehicleAssignmentEntity");
+                    b.ToTable("BookingVehicleAssignments");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
@@ -313,7 +313,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("InventoryEntity");
+                    b.ToTable("Inventory");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", b =>
@@ -467,7 +467,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("AddressId");
 
-                    b.ToTable("Users");
+                    b.ToTable("ApplicationUsers");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.RefreshTokenEntity", b =>
@@ -555,7 +555,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("PaymentTransactionEntity");
+                    b.ToTable("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.PaymentTransactionStatusEntity", b =>
@@ -580,7 +580,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentTransactionStatusEntity");
+                    b.ToTable("PaymentTransactionStatus");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.WalletEntity", b =>
@@ -622,7 +622,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("WalletEntity");
+                    b.ToTable("Wallet");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.CartEntity", b =>
@@ -664,7 +664,7 @@ namespace Detailly.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[ApplicationUserId] IS NOT NULL");
 
-                    b.ToTable("CartEntity");
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.CartItemEntity", b =>
@@ -703,7 +703,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItemEntity");
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderEntity", b =>
@@ -753,7 +753,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ShipToAddressId");
 
-                    b.ToTable("OrderEntity");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemAssignmentEntity", b =>
@@ -796,7 +796,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("OrderItemId");
 
-                    b.ToTable("OrderItemAssignmentEntity");
+                    b.ToTable("OrderItemAssignments");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
@@ -826,7 +826,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItemEntity");
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderStatusEntity", b =>
@@ -851,7 +851,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrderStatusEntity");
+                    b.ToTable("OrderStatus");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>
@@ -896,7 +896,29 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AddressEntity");
+                    b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.NotificationEntity", b =>
@@ -931,7 +953,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("NotificationEntity");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Vehicle.VehicleCategoryEntity", b =>
@@ -963,7 +985,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VehicleCategoryEntity");
+                    b.ToTable("VehicleCategories");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Vehicle.VehicleEntity", b =>
@@ -1007,7 +1029,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("VehicleCategoryId");
 
-                    b.ToTable("VehicleEntity");
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>

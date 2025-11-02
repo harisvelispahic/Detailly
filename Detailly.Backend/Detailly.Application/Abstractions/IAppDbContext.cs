@@ -1,12 +1,61 @@
-﻿namespace Detailly.Application.Abstractions;
+﻿using Detailly.Domain.Entities.Booking;
+using Detailly.Domain.Entities.Payment;
+using Detailly.Domain.Entities.Sales;
+using Detailly.Domain.Entities.Shared;
+using Detailly.Domain.Entities.Vehicle;
+
+namespace Detailly.Application.Abstractions;
 
 // Application layer
 public interface IAppDbContext
 {
-    DbSet<ProductEntity> Products { get; }
-    DbSet<ProductCategoryEntity> ProductCategories { get; }
-    DbSet<ApplicationUserEntity> Users { get; }
+    //DbSet<ProductEntity> Products { get; }
+    //DbSet<ProductCategoryEntity> ProductCategories { get; }
+    //DbSet<ApplicationUserEntity> ApplicationUsers { get; }
+    //DbSet<RefreshTokenEntity> RefreshTokens { get; }
+
+    // Identity
+    DbSet<ApplicationUserEntity> ApplicationUsers { get; }
     DbSet<RefreshTokenEntity> RefreshTokens { get; }
+
+    // Sales
+    DbSet<OrderEntity> Orders { get; }
+    DbSet<OrderItemAssignmentEntity> OrderItemAssignments { get; }
+    DbSet<OrderItemEntity> OrderItems { get; }
+    DbSet<OrderStatusEntity> OrderStatus { get; }
+    DbSet<CartEntity> Cart { get; }
+    DbSet<CartItemEntity> CartItems { get; }
+
+    // Catalog
+    DbSet<ProductCategoryEntity> ProductCategories { get; }
+    DbSet<ProductEntity> Products { get; }
+    DbSet<InventoryEntity> Inventory { get; }
+
+    // Booking
+    DbSet<BookingEntity> Bookings { get; }
+    DbSet<BookingEntity> Reviews { get; }
+    DbSet<ServicePackageEntity> ServicePackages { get; }
+    DbSet<ServicePackageItemEntity> ServicePackageItems { get; }
+    DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; }
+    DbSet<LocationEntity> Locations { get; }
+    DbSet<TimeSlotEntity> TimeSlots { get; }
+
+    DbSet<BookingVehicleAssignmentEntity> BookingVehicleAssignments { get; }
+
+    // Vehicle
+    DbSet<VehicleEntity> Vehicles { get; }
+    DbSet<VehicleCategoryEntity> VehicleCategories { get; }
+
+    // Payment
+    DbSet<WalletEntity> Wallet { get; }
+    DbSet<PaymentTransactionEntity> PaymentTransactions { get; }
+    DbSet<PaymentTransactionStatusEntity> PaymentTransactionStatus { get; }
+
+    // Shared
+    DbSet<AddressEntity> Address { get; }
+    DbSet<ImageEntity> Images { get; }
+    DbSet<NotificationEntity> Notifications { get; }
+
 
     Task<int> SaveChangesAsync(CancellationToken ct);
 }

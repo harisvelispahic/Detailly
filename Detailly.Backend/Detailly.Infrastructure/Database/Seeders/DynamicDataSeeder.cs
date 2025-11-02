@@ -1,4 +1,6 @@
-﻿namespace Detailly.Infrastructure.Database.Seeders;
+﻿using Detailly.Domain.Entities.Vehicle;
+
+namespace Detailly.Infrastructure.Database.Seeders;
 
 /// <summary>
 /// Dynamic seeder koji se pokreće u runtime-u,
@@ -14,6 +16,7 @@ public static class DynamicDataSeeder
 
         await SeedProductCategoriesAsync(context);
         await SeedUsersAsync(context);
+        await SeedVehicleCategoriesAsync(context);
     }
 
     private static async Task SeedProductCategoriesAsync(DatabaseContext context)
@@ -45,7 +48,7 @@ public static class DynamicDataSeeder
     /// </summary>
     private static async Task SeedUsersAsync(DatabaseContext context)
     {
-        if (await context.Users.AnyAsync())
+        if (await context.ApplicationUsers.AnyAsync())
             return;
 
         var hasher = new PasswordHasher<ApplicationUserEntity>();
@@ -84,9 +87,63 @@ public static class DynamicDataSeeder
             IsEnabled = true,
             AddressId = null
         };
-        context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
+        context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
+    }
+
+    private static async Task SeedVehicleCategoriesAsync(DatabaseContext context)
+    {
+        if (!await context.VehicleCategories.AnyAsync())
+        {
+            context.VehicleCategories.AddRange(
+                new VehicleCategoryEntity
+                {
+                    Name = "SUV",
+                    Description = "",
+                    BasePriceMultiplier = 1.0m,
+                    CreatedAtUtc = DateTime.UtcNow
+                },
+                new VehicleCategoryEntity
+                {
+                    Name = "Sedan",
+                    Description = "",
+                    BasePriceMultiplier = 0.9m,
+                    CreatedAtUtc = DateTime.UtcNow
+                },
+                new VehicleCategoryEntity
+                {
+                    Name = "Roadster",
+                    Description = "",
+                    BasePriceMultiplier = 0.9m,
+                    CreatedAtUtc = DateTime.UtcNow
+                },
+                new VehicleCategoryEntity
+                {
+                    Name = "Hatchback",
+                    Description = "",
+                    BasePriceMultiplier = 0.9m,
+                    CreatedAtUtc = DateTime.UtcNow
+                },
+                new VehicleCategoryEntity
+                {
+                    Name = "Van",
+                    Description = "",
+                    BasePriceMultiplier = 0.9m,
+                    CreatedAtUtc = DateTime.UtcNow
+                },
+                new VehicleCategoryEntity
+                {
+                    Name = "Sports car",
+                    Description = "",
+                    BasePriceMultiplier = 0.9m,
+                    CreatedAtUtc = DateTime.UtcNow
+                }
+            );
+
+            await context.SaveChangesAsync();
+            Console.WriteLine("✅ Dynamic seed: vehicle categories added.");
+        }
     }
 }

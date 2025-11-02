@@ -1,24 +1,25 @@
-﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
-
-public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductCategoryByIdQuery, GetProductCategoryByIdQueryDto>
+﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById
 {
-    public async Task<GetProductCategoryByIdQueryDto> Handle(GetProductCategoryByIdQuery request, CancellationToken cancellationToken)
+    public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductCategoryByIdQuery, GetProductCategoryByIdQueryDto>
     {
-        var category = await context.ProductCategories
-            .Where(c => c.Id == request.Id)
-            .Select(x => new GetProductCategoryByIdQueryDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                IsEnabled = x.IsEnabled
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (category == null)
+        public async Task<GetProductCategoryByIdQueryDto> Handle(GetProductCategoryByIdQuery request, CancellationToken cancellationToken)
         {
-            throw new MarketNotFoundException($"Product category with Id {request.Id} not found.");
-        }
+            var category = await context.ProductCategories
+                .Where(c => c.Id == request.Id)
+                .Select(x => new GetProductCategoryByIdQueryDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    IsEnabled = x.IsEnabled
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
-        return category;
+            if (category == null)
+            {
+                throw new MarketNotFoundException($"Product category with Id {request.Id} not found.");
+            }
+
+            return category;
+        }
     }
 }
