@@ -8,7 +8,7 @@ public sealed class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<R
 
         b.HasKey(x => x.Id);
 
-        b.HasIndex(x => new { x.UserId, x.TokenHash })
+        b.HasIndex(x => new { x.ApplicationUserId, x.TokenHash })
             .IsUnique();
 
         b.Property(x => x.TokenHash)

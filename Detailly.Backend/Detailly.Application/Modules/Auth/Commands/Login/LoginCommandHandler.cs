@@ -3,7 +3,7 @@
 public sealed class LoginCommandHandler(
     IAppDbContext ctx,
     IJwtTokenService jwt,
-    IPasswordHasher<MarketUserEntity> hasher)
+    IPasswordHasher<ApplicationUserEntity> hasher)
     : IRequestHandler<LoginCommand, LoginCommandDto>
 {
     public async Task<LoginCommandDto> Handle(LoginCommand request, CancellationToken ct)
@@ -24,7 +24,7 @@ public sealed class LoginCommandHandler(
         {
             TokenHash = tokens.RefreshTokenHash,
             ExpiresAtUtc = tokens.RefreshTokenExpiresAtUtc,
-            UserId = user.Id,
+            ApplicationUserId = user.Id,
             Fingerprint = request.Fingerprint
         });
 

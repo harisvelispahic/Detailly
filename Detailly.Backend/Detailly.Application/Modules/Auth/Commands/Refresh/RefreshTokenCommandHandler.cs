@@ -13,7 +13,7 @@ public sealed class RefreshTokenCommandHandler(
 
         // 2) Find the valid refresh token in the database (TRACKING because we will modify it)
         var rt = await ctx.RefreshTokens
-            .Include(x => x.User)
+            .Include(x => x.ApplicationUser)
             .FirstOrDefaultAsync(x =>
                 x.TokenHash == incomingHash &&
                 !x.IsRevoked &&
@@ -32,7 +32,7 @@ public sealed class RefreshTokenCommandHandler(
             throw new MarketConflictException("Neispravan klijentski otisak.");
         }
 
-        var user = rt.User;
+        var user = rt.ApplicationUser;
         if (user is null || !user.IsEnabled || user.IsDeleted)
             throw new MarketConflictException("Korisnički nalog je nevažeći.");
 
@@ -48,7 +48,7 @@ public sealed class RefreshTokenCommandHandler(
         {
             TokenHash = pair.RefreshTokenHash,
             ExpiresAtUtc = pair.RefreshTokenExpiresAtUtc,
-            UserId = user.Id,
+            ApplicationUserId = user.Id,
             Fingerprint = request.Fingerprint,
         };
 

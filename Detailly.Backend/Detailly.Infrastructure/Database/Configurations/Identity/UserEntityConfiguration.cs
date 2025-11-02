@@ -1,8 +1,8 @@
 ﻿namespace Detailly.Infrastructure.Database.Configurations.Identity;
 
-public sealed class UserEntityConfiguration : IEntityTypeConfiguration<MarketUserEntity>
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
 {
-    public void Configure(EntityTypeBuilder<MarketUserEntity> b)
+    public void Configure(EntityTypeBuilder<ApplicationUserEntity> b)
     {
         b.ToTable("Users");
 
@@ -36,7 +36,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<MarketUse
 
         // Navigation
         b.HasMany(x => x.RefreshTokens)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId);
+            .WithOne(x => x.ApplicationUser)
+            .HasForeignKey(x => x.ApplicationUserId);
     }
 }

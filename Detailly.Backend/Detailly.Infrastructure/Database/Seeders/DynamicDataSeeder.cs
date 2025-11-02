@@ -48,37 +48,41 @@ public static class DynamicDataSeeder
         if (await context.Users.AnyAsync())
             return;
 
-        var hasher = new PasswordHasher<MarketUserEntity>();
+        var hasher = new PasswordHasher<ApplicationUserEntity>();
 
-        var admin = new MarketUserEntity
+        var admin = new ApplicationUserEntity
         {
             Email = "admin@market.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
             IsAdmin = true,
             IsEnabled = true,
+            AddressId = null
         };
 
-        var user = new MarketUserEntity
+        var user = new ApplicationUserEntity
         {
             Email = "manager@market.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
             IsManager = true,
             IsEnabled = true,
+            AddressId = null
         };
 
-        var dummyForSwagger = new MarketUserEntity
+        var dummyForSwagger = new ApplicationUserEntity
         {
             Email = "string",
             PasswordHash = hasher.HashPassword(null!, "string"),
             IsEmployee = true,
             IsEnabled = true,
+            AddressId = null
         };
-        var dummyForTests = new MarketUserEntity
+        var dummyForTests = new ApplicationUserEntity
         {
             Email = "test",
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEmployee = true,
             IsEnabled = true,
+            AddressId = null
         };
         context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();

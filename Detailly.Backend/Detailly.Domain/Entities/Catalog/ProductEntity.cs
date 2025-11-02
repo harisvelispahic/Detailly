@@ -1,46 +1,32 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Domain.Entities.Catalog;
 
-/// <summary>
-/// Represents a product in the system.
-/// </summary>
 public class ProductEntity : BaseEntity
 {
-    /// <summary>
-    /// Name of the product.
-    /// </summary>
-    public string Name { get; set; }
-
-    /// <summary>
-    /// Product description. (optional)
-    /// </summary>
+    public string? Name { get; set; }
     public string? Description { get; set; }
-
-    /// <summary>
-    /// Price of the product.
-    /// </summary>
+    public string? ProductNumber { get; set; }
     public decimal Price { get; set; }
-
-    /// <summary>
-    /// Quantity of the product available in stock.
-    /// </summary>
-    public int StockQuantity { get; set; }
-
-    /// <summary>
-    /// Identifier of the category to which the product belongs.
-    /// </summary>
-    public int CategoryId { get; set; }
-
-    /// <summary>
-    /// Navigation reference to the product's category.
-    /// </summary>
-    public ProductCategoryEntity? Category { get; set; }
-
-    /// <summary>
-    /// IsEnabled
-    /// </summary>
+    public decimal Weight { get; set; }
+    public decimal Volume { get; set; }
+    public string? UnitOfMeasure { get; set; }  // moze biti enum u buducnosti
+    // image
+    // thumbnail
+    public string? Tags { get; set; } // comma-separated tags
     public bool IsEnabled { get; set; }
+
+
+    // Foreign keys
+    public int CategoryId { get; set; }
+    public ProductCategoryEntity Category { get; set; } = null!;
+    public InventoryEntity Inventory { get; set; } = null!;
+
+    public IReadOnlyCollection<OrderItemEntity> OrderItems { get; private set; } = new List<OrderItemEntity>();
+    public IReadOnlyCollection<CartItemEntity> CartItems { get; private set; } = new List<CartItemEntity>();
+
+
 
     /// <summary>
     /// Single source of truth for technical/business constraints.
