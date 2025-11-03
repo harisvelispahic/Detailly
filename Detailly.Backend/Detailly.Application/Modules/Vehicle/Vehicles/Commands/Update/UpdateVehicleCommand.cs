@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update
+public class UpdateVehicleCommand : IRequest<Unit>
 {
-    public class UpdateVehicleCommand : IRequest<Unit>
-    {
-        public required int Id { get; set; }
-        public string? Model { get; set; }
-        public string? Brand { get; set; }
-        public int? YearOfManufacture { get; set; }
+    public required int Id { get; set; }
+    public string? Model { get; set; }
+    public string? Brand { get; set; }
+    public int? YearOfManufacture { get; set; }
     }
-}
+

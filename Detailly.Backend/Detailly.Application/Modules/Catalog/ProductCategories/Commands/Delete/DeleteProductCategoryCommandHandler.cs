@@ -1,4 +1,5 @@
-﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Delete;
+﻿
+namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Delete;
 
 public class DeleteProductCategoryCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
       : IRequestHandler<DeleteProductCategoryCommand, Unit>

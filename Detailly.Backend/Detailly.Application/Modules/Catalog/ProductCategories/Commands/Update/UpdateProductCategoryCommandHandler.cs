@@ -1,4 +1,5 @@
-﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Update;
+﻿
+namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Update;
 
 public sealed class UpdateProductCategoryCommandHandler(IAppDbContext ctx)
             : IRequestHandler<UpdateProductCategoryCommand, Unit>

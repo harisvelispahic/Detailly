@@ -1,4 +1,5 @@
-﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Status.Enable;
+﻿
+namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Status.Enable;
 
 public sealed class EnableProductCategoryCommandHandler(IAppDbContext ctx)
     : IRequestHandler<EnableProductCategoryCommand, Unit>
