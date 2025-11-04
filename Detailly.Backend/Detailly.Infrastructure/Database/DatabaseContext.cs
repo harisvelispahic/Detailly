@@ -17,7 +17,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<OrderEntity> Orders => Set<OrderEntity>();
     public DbSet<OrderItemAssignmentEntity> OrderItemAssignments => Set<OrderItemAssignmentEntity>();
     public DbSet<OrderItemEntity> OrderItems => Set<OrderItemEntity>();
-    public DbSet<OrderStatusEntity> OrderStatus => Set<OrderStatusEntity>();
+ 
     public DbSet<CartEntity> Cart => Set<CartEntity>();
     public DbSet<CartItemEntity> CartItems => Set<CartItemEntity>();
 
@@ -44,8 +44,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Payment
     public DbSet<WalletEntity> Wallet => Set<WalletEntity>();
     public DbSet<PaymentTransactionEntity> PaymentTransactions => Set<PaymentTransactionEntity>();
-    public DbSet<PaymentTransactionStatusEntity> PaymentTransactionStatus => Set<PaymentTransactionStatusEntity>();
-
+   
     // Shared
     public DbSet<AddressEntity> Address => Set<AddressEntity>();
     public DbSet<ImageEntity> Images => Set<ImageEntity>();

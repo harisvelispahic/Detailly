@@ -22,7 +22,6 @@ public interface IAppDbContext
     DbSet<OrderEntity> Orders { get; }
     DbSet<OrderItemAssignmentEntity> OrderItemAssignments { get; }
     DbSet<OrderItemEntity> OrderItems { get; }
-    DbSet<OrderStatusEntity> OrderStatus { get; }
     DbSet<CartEntity> Cart { get; }
     DbSet<CartItemEntity> CartItems { get; }
 
@@ -49,7 +48,6 @@ public interface IAppDbContext
     // Payment
     DbSet<WalletEntity> Wallet { get; }
     DbSet<PaymentTransactionEntity> PaymentTransactions { get; }
-    DbSet<PaymentTransactionStatusEntity> PaymentTransactionStatus { get; }
 
     // Shared
     DbSet<AddressEntity> Address { get; }

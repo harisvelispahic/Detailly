@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Entities\Payment\" />
-    <Folder Include="Common\Enums\" />
     <Folder Include="Common\CommonModels\" />
     <Folder Include="Common\ValueObjects\" />
   </ItemGroup>
