@@ -1,10 +1,10 @@
 ﻿namespace Detailly.Infrastructure.Database.Configurations.Identity;
 
-public sealed class UserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
+public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
 {
     public void Configure(EntityTypeBuilder<ApplicationUserEntity> b)
     {
-        b.ToTable("Users");
+        b.ToTable("ApplicationUsers");
 
         b.HasKey(x => x.Id);
 

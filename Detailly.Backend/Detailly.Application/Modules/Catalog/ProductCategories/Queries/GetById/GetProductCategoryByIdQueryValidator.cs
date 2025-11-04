@@ -1,4 +1,5 @@
-﻿using Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
+﻿
+using Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
 
 public sealed class GetProductCategoryByIdQueryValidator : AbstractValidator<GetProductCategoryByIdQuery>
 {

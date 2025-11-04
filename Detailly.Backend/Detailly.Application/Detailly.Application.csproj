@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Detailly.Shared\Detailly.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Modules\Vehicle\Vehicles\Commands\Status\" />
+  </ItemGroup>
+
 </Project>
