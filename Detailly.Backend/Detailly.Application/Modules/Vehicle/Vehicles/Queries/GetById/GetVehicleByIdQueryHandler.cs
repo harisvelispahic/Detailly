@@ -18,7 +18,7 @@ public class GetVehicleByIdQueryHandler(IAppDbContext context) : IRequestHandler
 
         if (vehicle == null)
         {
-            throw new MarketNotFoundException($"Vehicle with Id {request.Id} not found.");
+            throw new DetaillyNotFoundException($"Vehicle with Id {request.Id} not found.");
         }
 
         return vehicle;

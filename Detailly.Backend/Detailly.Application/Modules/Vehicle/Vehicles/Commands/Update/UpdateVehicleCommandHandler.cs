@@ -11,7 +11,7 @@ public class UpdateVehicleCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (entity is null)
-            throw new MarketNotFoundException($"Vehicle (ID={request.Id}) was not found.");
+            throw new DetaillyNotFoundException($"Vehicle (ID={request.Id}) was not found.");
 
         // Optional: Check for duplicate Brand+Model+Year if all three are provided
         if (request.Brand is not null && request.Model is not null && request.YearOfManufacture.HasValue)
@@ -24,7 +24,7 @@ public class UpdateVehicleCommandHandler(IAppDbContext ctx)
                 ct);
 
             if (exists)
-                throw new MarketConflictException("A vehicle with the same Brand, Model, and Year already exists.");
+                throw new DetaillyConflictException("A vehicle with the same Brand, Model, and Year already exists.");
         }
 
         // Update only the properties that were sent

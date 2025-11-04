@@ -13,8 +13,8 @@ namespace Detailly.Infrastructure.Common;
 /// Global exception handler for unhandled exceptions.
 /// Keeps the same ErrorDto format as the previous middleware.
 /// </summary>
-public sealed class MarketExceptionHandler(
-    ILogger<MarketExceptionHandler> logger,
+public sealed class DetaillyExceptionHandler(
+    ILogger<DetaillyExceptionHandler> logger,
     IHostEnvironment env
 ) : IExceptionHandler
 {
@@ -40,8 +40,8 @@ public sealed class MarketExceptionHandler(
         ctx.Response.ContentType = "application/json";
         ctx.Response.StatusCode = ex switch
         {
-            MarketNotFoundException => StatusCodes.Status404NotFound,
-            MarketConflictException or MarketBusinessRuleException => StatusCodes.Status409Conflict,
+            DetaillyNotFoundException => StatusCodes.Status404NotFound,
+            DetaillyConflictException or DetaillyBusinessRuleException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
@@ -59,9 +59,9 @@ public sealed class MarketExceptionHandler(
 
         switch (ex)
         {
-            case MarketNotFoundException:
-            case MarketConflictException:
-            case MarketBusinessRuleException:
+            case DetaillyNotFoundException:
+            case DetaillyConflictException:
+            case DetaillyBusinessRuleException:
                 code = "entity.error";
                 message = ex.Message;
                 break;

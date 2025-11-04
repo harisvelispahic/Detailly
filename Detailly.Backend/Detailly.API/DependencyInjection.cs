@@ -74,7 +74,7 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Market API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Detailly API", Version = "v1" });
             var xml = Path.Combine(AppContext.BaseDirectory, "Detailly.API.xml");
             if (File.Exists(xml))
                 c.IncludeXmlComments(xml, includeControllerXmlComments: true);
@@ -93,7 +93,7 @@ public static class DependencyInjection
             c.AddSecurityRequirement(new OpenApiSecurityRequirement { { bearer, Array.Empty<string>() } });
         });
 
-        services.AddExceptionHandler<MarketExceptionHandler>();
+        services.AddExceptionHandler<DetaillyExceptionHandler>();
         services.AddProblemDetails();
 
         return services;

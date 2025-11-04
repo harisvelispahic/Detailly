@@ -73,7 +73,7 @@ public partial class Program
             // Database migrations + seeding
             await app.Services.InitializeDatabaseAsync(app.Environment);
 
-            Log.Information("Market API started successfully.");
+            Log.Information("Detailly API started successfully.");
             app.Run();
         }
         catch (HostAbortedException)
@@ -85,7 +85,7 @@ public partial class Program
         catch (Exception ex)
         {
             // Any startup failure will be logged here
-            Log.Fatal(ex, "Market API terminated unexpectedly.");
+            Log.Fatal(ex, "Detailly API terminated unexpectedly.");
         }
         finally
         {
