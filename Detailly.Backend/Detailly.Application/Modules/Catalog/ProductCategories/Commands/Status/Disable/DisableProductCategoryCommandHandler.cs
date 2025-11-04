@@ -11,7 +11,7 @@ public sealed class DisableProductCategoryCommandHandler(IAppDbContext ctx)
 
         if (cat is null)
         {
-            throw new MarketNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new DetaillyNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
         }
 
         if (!cat.IsEnabled) return Unit.Value; // idempotent
@@ -22,7 +22,7 @@ public sealed class DisableProductCategoryCommandHandler(IAppDbContext ctx)
 
         if (hasActiveProducts)
         {
-            throw new MarketBusinessRuleException("category.disable.blocked.activeProducts",
+            throw new DetaillyBusinessRuleException("category.disable.blocked.activeProducts",
                 $"Category {cat.Name} cannot be disabled because it contains active products.");
         }
 

@@ -55,7 +55,7 @@ public static class DynamicDataSeeder
 
         var admin = new ApplicationUserEntity
         {
-            Email = "admin@market.local",
+            Email = "admin@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
             IsAdmin = true,
             IsEnabled = true,
@@ -64,7 +64,7 @@ public static class DynamicDataSeeder
 
         var user = new ApplicationUserEntity
         {
-            Email = "manager@market.local",
+            Email = "manager@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
             IsManager = true,
             IsEnabled = true,

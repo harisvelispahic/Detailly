@@ -12,11 +12,11 @@ public sealed class LoginCommandHandler(
 
         var user = await ctx.ApplicationUsers
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsEnabled && !x.IsDeleted, ct)
-            ?? throw new MarketNotFoundException("Korisnik nije pronađen ili je onemogućen.");
+            ?? throw new DetaillyNotFoundException("Korisnik nije pronađen ili je onemogućen.");
 
         var verify = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verify == PasswordVerificationResult.Failed)
-            throw new MarketConflictException("Pogrešni kredencijali.");
+            throw new DetaillyConflictException("Pogrešni kredencijali.");
 
         var tokens = jwt.IssueTokens(user);
 

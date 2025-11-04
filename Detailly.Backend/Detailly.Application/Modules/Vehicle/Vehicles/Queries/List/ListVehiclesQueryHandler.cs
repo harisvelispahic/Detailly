@@ -25,7 +25,7 @@ public class ListVehiclesQueryHandler(IAppDbContext ctx)
             });
 
         if (!vehicles.Any())
-            throw new MarketNotFoundException("No vehicles found.");
+            throw new DetaillyNotFoundException("No vehicles found.");
 
         return await vehicles.ToListAsync(ct);
     }

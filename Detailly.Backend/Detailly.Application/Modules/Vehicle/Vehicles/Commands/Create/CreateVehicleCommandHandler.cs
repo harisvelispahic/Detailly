@@ -35,7 +35,7 @@ public class CreateVehicleCommandHandler(IAppDbContext context)
 
         if (exists)
         {
-            throw new MarketConflictException("Vehicle already exists.");
+            throw new DetaillyConflictException("Vehicle already exists.");
         }
 
         var vehicle = new VehicleEntity
