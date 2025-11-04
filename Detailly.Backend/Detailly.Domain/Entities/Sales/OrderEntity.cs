@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Identity;
 using Detailly.Domain.Entities.Shared;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +8,7 @@ namespace Detailly.Domain.Entities.Sales
 {
     public class OrderEntity : BaseEntity
     {
-        
+
         [ForeignKey(nameof(ShipToAddressId))]
         public int ShipToAddressId { get; set; }
         public AddressEntity ShipToAddress { get; set; } = null!;
@@ -20,8 +21,7 @@ namespace Detailly.Domain.Entities.Sales
         public int ApplicationUserId { get; set; }
         public ApplicationUserEntity ApplicationUser { get; set; } = null!;
         public int OrderStatusId { get; set; }
-        public OrderStatusEntity OrderStatus { get; set; } = null!;
-        
+        public OrderStatus Status { get; set; } = OrderStatus.Draft;
         public IReadOnlyCollection<OrderItemAssignmentEntity> OrderItemAssignments { get; private set; } = new List<OrderItemAssignmentEntity>();
     }
 }

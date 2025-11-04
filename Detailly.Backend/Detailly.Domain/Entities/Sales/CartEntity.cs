@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Identity;
 
 namespace Detailly.Domain.Entities.Sales
@@ -8,7 +9,7 @@ namespace Detailly.Domain.Entities.Sales
         public bool IsEmpty { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Notes { get; set; }
-        public string? Status { get; set; }     // implementirati enum
+        public CartStatus Status { get; set; } = CartStatus.Active; 
 
         // Foreign keys
         public int? ApplicationUserId { get; set; } // oicionalna 0,1 veza sa ApplicationUser-om
