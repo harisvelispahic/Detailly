@@ -1,5 +1,5 @@
 ﻿using Detailly.API;
-using Detailly.API.Middlewares;
+using Detailly.API.Middleware;
 using Detailly.Application;
 using Detailly.Infrastructure;
 using Serilog;

@@ -12,7 +12,7 @@ namespace Detailly.Domain.Entities.Sales
         public CartStatus Status { get; set; } = CartStatus.Active; 
 
         // Foreign keys
-        public int? ApplicationUserId { get; set; } // oicionalna 0,1 veza sa ApplicationUser-om
+        public int? ApplicationUserId { get; set; } // opcionalna 0,1 veza sa ApplicationUser-om
         public ApplicationUserEntity ApplicationUser { get; set; } = null!;
         
         public IReadOnlyCollection<CartItemEntity> CartItems { get; private set; } = new List<CartItemEntity>();

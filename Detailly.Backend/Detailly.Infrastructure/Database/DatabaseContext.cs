@@ -18,7 +18,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<OrderItemAssignmentEntity> OrderItemAssignments => Set<OrderItemAssignmentEntity>();
     public DbSet<OrderItemEntity> OrderItems => Set<OrderItemEntity>();
  
-    public DbSet<CartEntity> Cart => Set<CartEntity>();
+    public DbSet<CartEntity> Carts => Set<CartEntity>();
     public DbSet<CartItemEntity> CartItems => Set<CartItemEntity>();
 
     // Catalog
@@ -28,7 +28,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
 
     // Booking
     public DbSet<BookingEntity> Bookings => Set<BookingEntity>();
-    public DbSet<BookingEntity> Reviews => Set<BookingEntity>();
+    public DbSet<ReviewEntity> Reviews => Set<ReviewEntity>();
     public DbSet<ServicePackageEntity> ServicePackages => Set<ServicePackageEntity>();
     public DbSet<ServicePackageItemEntity> ServicePackageItems => Set<ServicePackageItemEntity>();
     public DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments => Set<ServicePackageItemAssignmentEntity>();

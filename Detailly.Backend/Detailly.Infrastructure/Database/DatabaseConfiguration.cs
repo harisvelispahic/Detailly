@@ -99,13 +99,13 @@ public partial class DatabaseContext
         //modelBuilder.Properties<decimal?>().HavePrecision(18, 2);
 
         // ---------- Global soft-delete filter ----------
-        ApplyGlobalFielters(modelBuilder);
+        ApplyGlobalFilters(modelBuilder);
 
         // ---------- Static seed data ----------
         StaticDataSeeder.Seed(modelBuilder);
     }
 
-    private void ApplyGlobalFielters(ModelBuilder modelBuilder)
+    private void ApplyGlobalFilters(ModelBuilder modelBuilder)
     {
         // Apply a global filter to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
