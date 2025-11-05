@@ -1,14 +1,16 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Entities.Shared;
 
-namespace Detailly.Domain.Entities.Booking
+namespace Detailly.Domain.Entities.Booking;
+
+public class ServicePackageItemEntity : BaseEntity
 {
-    public class ServicePackageItemEntity : BaseEntity
-    {
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public decimal Price { get; set; }
+    public required string Name { get; set; }
+    public required decimal Price { get; set; }
+    public string? Description { get; set; }
 
-        // Foreign keys
-        public IReadOnlyCollection<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; private set; } = new List<ServicePackageItemAssignmentEntity>();
-    }
+    // Foreign keys
+    public IReadOnlyCollection<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; private set; } = new List<ServicePackageItemAssignmentEntity>();
+    public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
+
 }

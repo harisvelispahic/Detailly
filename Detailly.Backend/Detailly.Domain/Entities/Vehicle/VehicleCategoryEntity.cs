@@ -1,14 +1,13 @@
 ﻿using Detailly.Domain.Common;
 
-namespace Detailly.Domain.Entities.Vehicle
-{
-    public class VehicleCategoryEntity : BaseEntity
-    {
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public decimal BasePriceMultiplier{ get; set; }
+namespace Detailly.Domain.Entities.Vehicle;
 
-        // Foreign keys
-        public IReadOnlyCollection<VehicleEntity> Vehicles { get; private set; } = new List<VehicleEntity>();
-    }
+public class VehicleCategoryEntity : BaseEntity
+{
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+    public decimal BasePriceMultiplier{ get; set; }
+
+    // Foreign keys
+    public IReadOnlyCollection<VehicleEntity> Vehicles { get; private set; } = new List<VehicleEntity>();
 }

@@ -39,6 +39,7 @@ public sealed class ApplicationUserEntity : BaseEntity
     public IReadOnlyCollection<OrderEntity> Orders { get; private set; } = new List<OrderEntity>();
     public IReadOnlyCollection<VehicleEntity> Vehicles { get; private set; } = new List<VehicleEntity>();
     public IReadOnlyCollection<NotificationEntity> Notifications { get; private set; } = new List<NotificationEntity>();
+    public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
 
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
 }
