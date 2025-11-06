@@ -4,25 +4,30 @@ using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Sales;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
+using System.ComponentModel.DataAnnotations;
 
 namespace Detailly.Domain.Entities.Identity;
 
 public sealed class ApplicationUserEntity : BaseEntity
 {    
-    public bool IsManager { get; set; }
     public int TokenVersion { get; set; } = 0;  // For global revocation
+    
+    public bool IsManager { get; set; }
     public bool IsEnabled { get; set; }
-
-
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public string? Username { get; set; }
-    public string? Email { get; set; }
-    public string? PasswordHash { get; set; }
-    public string? Phone { get; set; }
     public bool IsFleet { get; set; }
-    public bool IsEmployee { get; set; }
     public bool IsAdmin { get; set; }
+    public bool IsEmployee { get; set; }
+
+
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required string Username { get; set; }
+     
+    [MaxLength(200)] 
+    [EmailAddress]
+    public required string Email { get; set; }
+    public required string PasswordHash { get; set; }
+    public string? Phone { get; set; }
     public string? CompanyName { get; set; }
 
     // Foreign keys
@@ -34,6 +39,7 @@ public sealed class ApplicationUserEntity : BaseEntity
     public IReadOnlyCollection<OrderEntity> Orders { get; private set; } = new List<OrderEntity>();
     public IReadOnlyCollection<VehicleEntity> Vehicles { get; private set; } = new List<VehicleEntity>();
     public IReadOnlyCollection<NotificationEntity> Notifications { get; private set; } = new List<NotificationEntity>();
+    public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
 
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
 }
