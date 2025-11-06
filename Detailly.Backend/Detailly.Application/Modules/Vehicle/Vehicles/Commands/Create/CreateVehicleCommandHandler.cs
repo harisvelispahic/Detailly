@@ -3,35 +3,16 @@ using Detailly.Domain.Entities.Vehicle;
 
 namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
 
-public class CreateVehicleCommandHandler(IAppDbContext context)
+public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
     : IRequestHandler<CreateVehicleCommand, int>
 {
     public async Task<int> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
     {
-        var normalizedModel = request.Model?.Trim();
-        if (string.IsNullOrWhiteSpace(normalizedModel))
-            throw new ValidationException("Model is required.");
 
-        var normalizedBrand = request.Brand?.Trim();
-        if (string.IsNullOrWhiteSpace(normalizedBrand))
-            throw new ValidationException("Brand is required.");
-
-        var yearOfManufacture = request.YearOfManufacture;
-        if (string.IsNullOrWhiteSpace(normalizedBrand))
-            throw new ValidationException("Year of manufacture is required.");
-
-        var vehicleCategory = request.VehicleCategoryId;
-        if (string.IsNullOrWhiteSpace(normalizedBrand))
-            throw new ValidationException("Vehicle category is required.");
-
-        var applicationUser = request.ApplicationUserId;
-        if (string.IsNullOrWhiteSpace(normalizedBrand))
-            throw new ValidationException("Application user is required.");
-
-
-        // Check if a category with the same name already exists.
+        // duplicates are checked by licence plate
         bool exists = await context.Vehicles
-            .AnyAsync(x => x.Model == normalizedModel, cancellationToken);
+            .AnyAsync(x => x.LicencePlate.ToUpper() == request.LicencePlate.Trim().ToUpper(), cancellationToken);
+        //.AnyAsync(x => x.Model == request.Model.Trim() && x.Brand == request.Brand.Trim(), cancellationToken);
 
         if (exists)
         {
@@ -40,11 +21,13 @@ public class CreateVehicleCommandHandler(IAppDbContext context)
 
         var vehicle = new VehicleEntity
         {
-            Model = normalizedModel,
-            Brand = normalizedBrand,
-            YearOfManufacture = yearOfManufacture,
-            ApplicationUserId = applicationUser,
-            VehicleCategoryId = vehicleCategory
+            Brand = request.Brand.Trim()!,
+            Model = request.Model.Trim()!,
+            YearOfManufacture = request.YearOfManufacture,
+            ApplicationUserId = appCurrentUser.ApplicationUserId!.Value,
+            VehicleCategoryId = request.VehicleCategoryId,
+            LicencePlate = request.LicencePlate.Trim(),
+            Notes = request.Notes?.Trim()
         };
 
         context.Vehicles.Add(vehicle);

@@ -13,19 +13,23 @@ public class ListVehiclesQueryHandler(IAppDbContext ctx)
             q = q.Where(x => x.Model.Contains(request.Search) || x.Brand.Contains(request.Search));
         }
 
-        var vehicles = q.OrderBy(x => x.Model)
+        var vehicles = q.OrderBy(x => x.Brand)
             .Select(x => new ListVehiclesQueryDto
             {
                 Id = x.Id,
-                Model = x.Model,
                 Brand = x.Brand,
-                ApplicationUserId = x.ApplicationUserId,
-                VehicleCategoryId = x.VehicleCategoryId,
-                YearOfManufacture = x.YearOfManufacture
+                Model = x.Model,
+                YearOfManufacture = x.YearOfManufacture,
+                LicencePlate = x.LicencePlate,
+                Notes = x.Notes,
+                VehicleCategory = new ListVehiclesQueryDtoVehicleCategory
+                {
+                    Name = x.VehicleCategory.Name
+                },
             });
 
-        if (!vehicles.Any())
-            throw new DetaillyNotFoundException("No vehicles found.");
+        //if (!vehicles.Any())
+        //    throw new DetaillyNotFoundException("No vehicles found.");
 
         return await vehicles.ToListAsync(ct);
     }

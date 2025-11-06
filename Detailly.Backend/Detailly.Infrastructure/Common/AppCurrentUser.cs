@@ -12,7 +12,7 @@ public sealed class AppCurrentUser(IHttpContextAccessor httpContextAccessor)
 {
     private readonly ClaimsPrincipal? _user = httpContextAccessor.HttpContext?.User;
 
-    public int? UserId =>
+    public int? ApplicationUserId =>
         int.TryParse(_user?.FindFirstValue(ClaimTypes.NameIdentifier), out var id)
             ? id
             : null;

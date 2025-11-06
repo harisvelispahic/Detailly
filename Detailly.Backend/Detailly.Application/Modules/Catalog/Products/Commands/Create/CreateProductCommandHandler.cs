@@ -1,4 +1,6 @@
 ﻿
+using Detailly.Domain.Common.Enums;
+
 namespace Detailly.Application.Modules.Catalog.Products.Commands.Create;
 
 public class CreateProductCommandHandler(IAppDbContext context)
@@ -35,7 +37,8 @@ public class CreateProductCommandHandler(IAppDbContext context)
             Price = request.Price,
             ProductNumber = Guid.NewGuid().ToString(),
             CategoryId= request.CategoryId,
-            IsEnabled = true // deault IsEnabled
+            Currency = request.Currency ?? CurrencyName.BAM
+            //IsEnabled = true, // deault IsEnabled
         };
 
         context.Products.Add(product);

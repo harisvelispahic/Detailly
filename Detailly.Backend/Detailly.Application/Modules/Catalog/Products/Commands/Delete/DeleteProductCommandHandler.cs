@@ -6,7 +6,7 @@ public class DeleteProductCategoryHandler(IAppDbContext context, IAppCurrentUser
 {
     public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        if (appCurrentUser.UserId is null)
+        if (appCurrentUser.ApplicationUserId is null)
             throw new DetaillyBusinessRuleException("123", "Korisnik nije autentifikovan.");
 
         var product = await context.Products

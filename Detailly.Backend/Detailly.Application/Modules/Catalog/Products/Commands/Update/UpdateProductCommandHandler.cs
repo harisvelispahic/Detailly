@@ -2,9 +2,9 @@
 namespace Detailly.Application.Modules.Catalog.Products.Commands.Update;
 
 public sealed class UpdateProductCategoryCommandHandler(IAppDbContext ctx)
-            : IRequestHandler<UpdateProductCategoryCommand, Unit>
+            : IRequestHandler<UpdateProductCommand, Unit>
 {
-    public async Task<Unit> Handle(UpdateProductCategoryCommand request, CancellationToken ct)
+    public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken ct)
     {
         var entity = await ctx.ProductCategories
             .Where(x => x.Id == request.Id)
