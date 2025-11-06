@@ -22,7 +22,7 @@ public interface IAppDbContext
     DbSet<OrderEntity> Orders { get; }
     DbSet<OrderItemAssignmentEntity> OrderItemAssignments { get; }
     DbSet<OrderItemEntity> OrderItems { get; }
-    DbSet<CartEntity> Cart { get; }
+    DbSet<CartEntity> Carts { get; }
     DbSet<CartItemEntity> CartItems { get; }
 
     // Catalog
@@ -32,7 +32,7 @@ public interface IAppDbContext
 
     // Booking
     DbSet<BookingEntity> Bookings { get; }
-    DbSet<BookingEntity> Reviews { get; }
+    DbSet<ReviewEntity> Reviews { get; }
     DbSet<ServicePackageEntity> ServicePackages { get; }
     DbSet<ServicePackageItemEntity> ServicePackageItems { get; }
     DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; }

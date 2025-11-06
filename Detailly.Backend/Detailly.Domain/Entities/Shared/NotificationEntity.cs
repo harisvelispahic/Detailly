@@ -1,17 +1,21 @@
 ﻿using Detailly.Domain.Common;
 using Detailly.Domain.Entities.Identity;
+using System.ComponentModel.DataAnnotations;
 
-namespace Detailly.Domain.Entities.Shared
+namespace Detailly.Domain.Entities.Shared;
+
+public class NotificationEntity : BaseEntity
 {
-    public class NotificationEntity : BaseEntity
-    {
-        public string Title { get; set; } = null!;
-        public string Message { get; set; } = null!;
+    [MaxLength(200)]
+    public required string Title { get; set; }
 
-        //public bool IsRead { get; set; } = false;
+    [MaxLength(2000)]
+    public required string Message { get; set; }
 
-        // Foreign keys
-        public int ApplicationUserId { get; set; }   // FK to ApplicationUser
-        public ApplicationUserEntity ApplicationUser { get; set; } = null!;
-    }
+    //public bool IsRead { get; set; } = false;
+
+
+    // Foreign keys
+    public required int ApplicationUserId { get; set; }   // FK to ApplicationUser
+    public ApplicationUserEntity ApplicationUser { get; set; } = null!;
 }

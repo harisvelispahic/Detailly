@@ -59,7 +59,10 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
             IsAdmin = true,
             IsEnabled = true,
-            AddressId = null
+            AddressId = null,
+            FirstName = "Admin",
+            LastName = "Admin",
+            Username = "admin"
         };
 
         var user = new ApplicationUserEntity
@@ -68,7 +71,10 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "User123!"),
             IsManager = true,
             IsEnabled = true,
-            AddressId = null
+            AddressId = null,
+            FirstName = "Admin",
+            LastName = "Admin",
+            Username = "admin"
         };
 
         var dummyForSwagger = new ApplicationUserEntity
@@ -77,7 +83,10 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "string"),
             IsEmployee = true,
             IsEnabled = true,
-            AddressId = null
+            AddressId = null,
+            FirstName = "Admin",
+            LastName = "Admin",
+            Username = "admin"
         };
         var dummyForTests = new ApplicationUserEntity
         {
@@ -85,7 +94,34 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEmployee = true,
             IsEnabled = true,
-            AddressId = null
+            AddressId = null,
+            FirstName = "Admin",
+            LastName = "Admin",
+            Username = "admin"
+        };
+        var haris = new ApplicationUserEntity
+        {
+            Email = "haris.velispahic@edu.fit.ba",
+            PasswordHash = hasher.HashPassword(null!, "test123"),
+            IsAdmin = true,
+            IsEmployee = true,
+            IsEnabled = true,
+            AddressId = null,
+            FirstName = "Haris",
+            LastName = "Velispahic",
+            Username = "haris123"
+        };
+        var danis = new ApplicationUserEntity
+        {
+            Email = "danis.music@edu.fit.ba",
+            PasswordHash = hasher.HashPassword(null!, "danis123"),
+            IsAdmin = true,
+            IsEmployee = true,
+            IsEnabled = true,
+            AddressId = null,
+            FirstName = "Danis",
+            LastName = "Music",
+            Username = "danis123"
         };
         context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();
