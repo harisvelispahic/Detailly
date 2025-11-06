@@ -7,40 +7,46 @@ public class UpdateVehicleCommandHandler(IAppDbContext ctx)
     public async Task<Unit> Handle(UpdateVehicleCommand request, CancellationToken ct)
     {
         // Find the vehicle
-        var entity = await ctx.Vehicles
+        var vehicle = await ctx.Vehicles
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
-        if (entity is null)
+        if (vehicle is null)
             throw new DetaillyNotFoundException($"Vehicle (ID={request.Id}) was not found.");
 
-        // Optional: Check for duplicate Brand+Model+Year if all three are provided
-        if (request.Brand is not null && request.Model is not null && request.YearOfManufacture.HasValue)
-        {
-            var exists = await ctx.Vehicles.AnyAsync(x =>
-                x.Id != request.Id &&
-                x.Brand.ToLower() == request.Brand.ToLower() &&
-                x.Model.ToLower() == request.Model.ToLower() &&
-                x.YearOfManufacture == request.YearOfManufacture.Value,
-                ct);
+        if (vehicle.IsDeleted)
+            throw new DetaillyConflictException("Cannot update a deleted vehicle.");
 
-            if (exists)
-                throw new DetaillyConflictException("A vehicle with the same Brand, Model, and Year already exists.");
+
+        var newLicencePlate = request.LicencePlate?.Trim().ToUpper();
+
+        // --- Check for duplicate licence plate if updated ---
+        if (newLicencePlate is not null && vehicle.LicencePlate.ToUpper() != newLicencePlate)
+        {
+            var licenceExists = await ctx.Vehicles
+                .AnyAsync(x => x.LicencePlate.ToUpper() == newLicencePlate, ct);
+
+            if (licenceExists)
+                throw new DetaillyConflictException("A vehicle with this licence plate already exists.");
         }
 
-        // Update only the properties that were sent
-        if (!string.IsNullOrWhiteSpace(request.Brand))
-            entity.Brand = request.Brand.Trim();
+        // Update only provided fields
+        if (request.Brand != null)
+            vehicle.Brand = request.Brand.Trim();
 
-        if (!string.IsNullOrWhiteSpace(request.Model))
-            entity.Model = request.Model.Trim();
+        if (request.Model != null)
+            vehicle.Model = request.Model.Trim();
 
         if (request.YearOfManufacture.HasValue)
-        {
-            if (request.YearOfManufacture.Value < 1886 || request.YearOfManufacture.Value > 2100)
-                throw new ArgumentException("Invalid Year of Manufacture.");
+            vehicle.YearOfManufacture = request.YearOfManufacture.Value;
 
-            entity.YearOfManufacture = request.YearOfManufacture.Value;
-        }
+        if (newLicencePlate != null)
+            vehicle.LicencePlate = newLicencePlate.Trim();
+
+        if (request.Notes != null)
+            vehicle.Notes = request.Notes.Trim();
+
+        if (request.VehicleCategoryId.HasValue)
+            vehicle.VehicleCategoryId = request.VehicleCategoryId.Value;
 
         await ctx.SaveChangesAsync(ct);
 

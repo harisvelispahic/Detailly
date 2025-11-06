@@ -8,7 +8,7 @@ public interface IAppCurrentUser
     /// <summary>
     /// User identifier (UserId).
     /// </summary>
-    int? UserId { get; }
+    int? ApplicationUserId { get; }
 
     /// <summary>
     /// User Email. (optional)
