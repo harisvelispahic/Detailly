@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Disable;
 
-namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Disable
+public sealed class DisableProductCommand : IRequest<Unit>
 {
-    public class DisableProductCommand
-    {
-    }
+    public required int Id { get; set; }
 }
