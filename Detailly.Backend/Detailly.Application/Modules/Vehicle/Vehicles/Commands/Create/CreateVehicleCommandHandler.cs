@@ -11,8 +11,10 @@ public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser 
 
         // duplicates are checked by licence plate
         bool exists = await context.Vehicles
-            .AnyAsync(x => x.LicencePlate.ToUpper() == request.LicencePlate.Trim().ToUpper(), cancellationToken);
-        //.AnyAsync(x => x.Model == request.Model.Trim() && x.Brand == request.Brand.Trim(), cancellationToken);
+            .AnyAsync(x =>
+                x.LicencePlate.ToUpper() == request.LicencePlate.Trim().ToUpper() &&
+                x.ApplicationUserId == appCurrentUser.ApplicationUserId,
+                cancellationToken);
 
         if (exists)
         {
