@@ -1,28 +1,51 @@
 ﻿
 namespace Detailly.Application.Modules.Catalog.Products.Commands.Update;
 
-public sealed class UpdateProductCategoryCommandHandler(IAppDbContext ctx)
-            : IRequestHandler<UpdateProductCategoryCommand, Unit>
+public sealed class UpdateProductCommandHandler(IAppDbContext ctx)
+            : IRequestHandler<UpdateProductCommand, Unit>
 {
-    public async Task<Unit> Handle(UpdateProductCategoryCommand request, CancellationToken ct)
+    public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken ct)
     {
-        var entity = await ctx.ProductCategories
+        var product = await ctx.Products
             .Where(x => x.Id == request.Id)
             .FirstOrDefaultAsync(ct);
 
-        if (entity is null)
-            throw new DetaillyNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+        if (product is null)
+            throw new DetaillyNotFoundException($"Product (ID={request.Id}) was not found.");
+        if (product.IsDeleted)
+            throw new DetaillyNotFoundException("Cannot update a deleted product.");
 
-        // Check for duplicate name (case-insensitive, except for the same ID)
-        var exists = await ctx.ProductCategories
-            .AnyAsync(x => x.Id != request.Id && x.Name.ToLower() == request.Name.ToLower(), ct);
+        //product details 
+        if (request.Name != null)
+            product.Name = request.Name.Trim();
 
-        if (exists)
-        {
-            throw new DetaillyConflictException("Name already exists.");
-        }
+        if (request.Description != null)
+            product.Description = request.Description.Trim();
 
-        entity.Name = request.Name.Trim();
+        if (request.Price.HasValue)
+            product.Price = request.Price.Value;
+
+        if (request.Tags != null)
+            product.Tags = request.Tags.Trim();
+
+        //inventoy details
+        if (request.Inventory.QuantityInStock.HasValue)
+            product.Inventory.QuantityInStock = request.Inventory.QuantityInStock.Value;
+
+        if (request.Inventory.ReorderLevel.HasValue)
+            product.Inventory.ReorderLevel = request.Inventory.ReorderLevel.Value;
+
+        if (request.Inventory.ReorderQuantity.HasValue)
+            product.Inventory.ReorderQuantity = request.Inventory.ReorderQuantity.Value;
+
+        ////images details
+        //if (request.Images is not null)
+        //{
+        //    foreach (var image in request.Images)
+        //    {
+
+        //    }
+        //}
 
         await ctx.SaveChangesAsync(ct);
 

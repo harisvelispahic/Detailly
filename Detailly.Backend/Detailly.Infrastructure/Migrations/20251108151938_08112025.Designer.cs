@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251104135404_updateDanis")]
-    partial class updateDanis
+    [Migration("20251108151938_08112025")]
+    partial class _08112025
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,8 +51,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("ServicePackageId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int>("TimeSlotId")
                         .HasColumnType("int");
@@ -128,6 +128,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -142,16 +143,25 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int>("ValueForMoney")
+                    b.Property<int?>("ValueForMoney")
                         .HasColumnType("int");
 
                     b.HasKey("BookingId");
@@ -183,6 +193,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
@@ -247,6 +258,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
@@ -302,6 +314,15 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("QuantityInStock")
                         .HasColumnType("int");
 
@@ -340,6 +361,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -361,8 +383,13 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Currency")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -374,28 +401,20 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ProductNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tags")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UnitOfMeasure")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Volume")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Weight")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -422,9 +441,12 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdmin")
@@ -446,12 +468,14 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
@@ -461,6 +485,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -537,9 +562,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentTransactionStatusId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -609,7 +631,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ApplicationUserId")
+                    b.Property<int>("ApplicationUserId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
@@ -637,10 +659,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique()
-                        .HasFilter("[ApplicationUserId] IS NOT NULL");
+                        .IsUnique();
 
-                    b.ToTable("Cart");
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.CartItemEntity", b =>
@@ -708,11 +729,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("OrderName")
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrderStatusId")
-                        .HasColumnType("int");
 
                     b.Property<int>("ShipToAddressId")
                         .HasColumnType("int");
@@ -796,8 +815,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitPrice")
-                        .HasColumnType("int");
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -815,10 +835,14 @@ namespace Detailly.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
@@ -838,13 +862,19 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PostalCode")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Region")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Street")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
@@ -859,16 +889,49 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AltText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ApplicationUserId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsThumbnail")
                         .HasColumnType("bit");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ServicePackageItemId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("ServicePackageItemId");
 
                     b.ToTable("Images");
                 });
@@ -892,14 +955,16 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -933,6 +998,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -952,6 +1018,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Brand")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAtUtc")
@@ -960,7 +1027,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<string>("LicencePlate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Model")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
@@ -1150,7 +1221,9 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
                         .WithOne("Cart")
-                        .HasForeignKey("Detailly.Domain.Entities.Sales.CartEntity", "ApplicationUserId");
+                        .HasForeignKey("Detailly.Domain.Entities.Sales.CartEntity", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
                 });
@@ -1223,6 +1296,33 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
+                        .WithMany("Images")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId");
+
+                    b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", "Review")
+                        .WithMany("Images")
+                        .HasForeignKey("ReviewId");
+
+                    b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", "ServicePackageItem")
+                        .WithMany("Images")
+                        .HasForeignKey("ServicePackageItemId");
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Review");
+
+                    b.Navigation("ServicePackageItem");
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.NotificationEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
@@ -1265,6 +1365,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("TimeSlots");
                 });
 
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>
                 {
                     b.Navigation("Bookings");
@@ -1274,6 +1379,8 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("ServicePackageItemAssignments");
                 });
 
@@ -1291,6 +1398,8 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.Navigation("CartItems");
 
+                    b.Navigation("Images");
+
                     b.Navigation("Inventory")
                         .IsRequired();
 
@@ -1302,6 +1411,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Bookings");
 
                     b.Navigation("Cart");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Notifications");
 
