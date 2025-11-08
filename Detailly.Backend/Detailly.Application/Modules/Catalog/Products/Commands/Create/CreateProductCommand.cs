@@ -7,6 +7,7 @@ public class CreateProductCommand : IRequest<int>
 {
     public required string Name { get; set; }
     public required string Description { get; set; }
+    public required string ProductNumber { get; set; }
     public required decimal Price { get; set; }
     public required int CategoryId { get; set; }
     public CurrencyName? Currency { get; set; } = default(CurrencyName?);
@@ -25,7 +26,6 @@ public class CreateProductCommandInventory
 public class CreateProductCommandImages
 {
     public required string ImageUrl { get; set; }
-    public required int ProductId { get; set; }
     public string? AltText { get; set; }
     public bool? IsThumbnail { get; set; }
     public int? DisplayOrder { get; set; }
