@@ -10,9 +10,15 @@ public class GetVehicleByIdQueryHandler(IAppDbContext context) : IRequestHandler
             .Select(x => new GetVehicleByIdQueryDto
             {
                 Id = x.Id,
-                Model = x.Model,
                 Brand = x.Brand,
-                YearOfManufacture = x.YearOfManufacture
+                Model = x.Model,
+                YearOfManufacture = x.YearOfManufacture,
+                LicencePlate = x.LicencePlate,
+                Notes = x.Notes,
+                VehicleCategory = new GetVehicleByIdQueryDtoVehicleCategory
+                {
+                    Name = x.VehicleCategory.Name
+                },
             })
             .FirstOrDefaultAsync(cancellationToken);
 

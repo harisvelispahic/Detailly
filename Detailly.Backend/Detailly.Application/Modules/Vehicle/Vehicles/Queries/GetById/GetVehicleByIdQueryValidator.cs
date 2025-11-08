@@ -1,7 +1,12 @@
 ﻿
 namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 
-public class GetVehicleByIdQueryValidator
+public sealed class ListVehiclesQueryValidator : AbstractValidator<GetVehicleByIdQuery>
 {
+    public ListVehiclesQueryValidator()
+    {
+        RuleFor(x => x.Id)
+            .GreaterThan(0)
+            .WithMessage("Vehicle ID must be greater than zero.");
+    }
 }
-

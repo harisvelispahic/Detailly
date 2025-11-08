@@ -1,4 +1,6 @@
 ﻿
+using Detailly.Domain.Common.Enums;
+
 namespace Detailly.Application.Modules.Catalog.Products.Commands.Create;
 
 using Detailly.Domain.Common.Enums;
