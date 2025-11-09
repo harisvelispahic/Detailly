@@ -1,4 +1,4 @@
-﻿//using Detailly.Application.Modules.Sales.Orders.Commands.Delete;
+﻿using Detailly.Application.Modules.Sales.Orders.Commands.Delete;
 using Detailly.Application.Modules.Sales.Orders.Commands.Create;
 //using Detailly.Application.Modules.Sales.Orders.Commands.Update;
 using Detailly.Application.Modules.Sales.Orders.Queries.GetById;
@@ -27,12 +27,12 @@ public class OrdersController(ISender sender) : ControllerBase
     //    // no return -> 204 No Content
     //}
 
-    //[HttpDelete("{id:int}")]
-    //public async Task Delete(int id, CancellationToken ct)
-    //{
-    //    await sender.Send(new DeleteOrderCommand { Id = id }, ct);
-    //    // no return -> 204 No Content
-    //}
+    [HttpDelete("{id:int}")]
+    public async Task Delete(int id, CancellationToken ct)
+    {
+        await sender.Send(new DeleteOrderCommand { Id = id }, ct);
+        // no return -> 204 No Content
+    }
 
     [HttpGet("{id:int}")]
     public async Task<GetOrderByIdQueryDto> GetById(int id, CancellationToken ct)

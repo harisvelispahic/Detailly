@@ -24,8 +24,6 @@
     <Folder Include="Modules\Catalog\Products\Commands\Delete\" />
     <Folder Include="Modules\Catalog\Products\Commands\Update\" />
     <Folder Include="Modules\Catalog\Products\Commands\Status\" />
-    <Folder Include="Modules\Sales\Orders\Commands\Delete\" />
-    <Folder Include="Modules\Sales\Orders\Commands\Update\" />
   </ItemGroup>
 
 </Project>
