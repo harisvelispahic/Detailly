@@ -7,6 +7,8 @@ public class CartItemEntity : BaseEntity
 {
     public required decimal UnitPrice { get; set; }
     public required int Quantity { get; set; }
+    public decimal LineTotal { get; set; }
+
 
     // Foreign keys
     public required int ProductId { get; set; }

@@ -1,4 +1,6 @@
-﻿using Detailly.Domain.Entities.Vehicle;
+﻿using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Entities.Shared;
+using Detailly.Domain.Entities.Vehicle;
 
 namespace Detailly.Infrastructure.Database.Seeders;
 
@@ -17,6 +19,8 @@ public static class DynamicDataSeeder
         await SeedProductCategoriesAsync(context);
         await SeedUsersAsync(context);
         await SeedVehicleCategoriesAsync(context);
+        await SeedProductsAsync(context);
+        await SeedAddressesAsync(context);
     }
 
     private static async Task SeedProductCategoriesAsync(DatabaseContext context)
@@ -180,6 +184,66 @@ public static class DynamicDataSeeder
 
             await context.SaveChangesAsync();
             Console.WriteLine("✅ Dynamic seed: vehicle categories added.");
+        }
+    }
+
+    private static async Task SeedProductsAsync(DatabaseContext context)
+    {
+        if (!await context.Products.AnyAsync())
+        {
+            context.Products.AddRange(
+                new ProductEntity
+                {
+                    //Id = 1,
+                    Name = "Proizvod 1",
+                    Description = "...",
+                    ProductNumber = new Guid().ToString(),
+                    Price = 100m,
+                    Currency = CurrencyName.BAM,
+                    CategoryId = 1
+                },
+                new ProductEntity
+                {
+                    //Id = 2,
+                    Name = "Proizvod 2",
+                    Description = "...",
+                    ProductNumber = new Guid().ToString(),
+                    Price = 200m,
+                    Currency = CurrencyName.EUR,
+                    CategoryId = 2
+                }
+            );
+
+            await context.SaveChangesAsync();
+            Console.WriteLine("✅ Dynamic seed: products added.");
+        }
+    }
+
+    private static async Task SeedAddressesAsync(DatabaseContext context)
+    {
+        if (!await context.Address.AnyAsync())
+        {
+            context.Address.AddRange(
+                new AddressEntity
+                {
+                    Country="Bosnia and Herzegovina",
+                    Region="Zeničko-dobojski kanton",
+                    City="Kakanj",
+                    PostalCode="72240",
+                    Street="Alije Izetbegovića, bb"
+                },
+                new AddressEntity
+                {
+                    Country = "Bosnia and Herzegovina",
+                    Region = "Hercegovačko-neretvanski kanton",
+                    City = "Mostar",
+                    PostalCode = "88000",
+                    Street = "Maršala Tita, bb"
+                }
+            );
+
+            await context.SaveChangesAsync();
+            Console.WriteLine("✅ Dynamic seed: products added.");
         }
     }
 }

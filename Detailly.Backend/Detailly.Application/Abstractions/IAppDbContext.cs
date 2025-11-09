@@ -3,16 +3,17 @@ using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Sales;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Detailly.Application.Abstractions;
 
 // Application layer
 public interface IAppDbContext
 {
-    //DbSet<ProductEntity> Products { get; }
-    //DbSet<ProductCategoryEntity> ProductCategories { get; }
-    //DbSet<ApplicationUserEntity> ApplicationUsers { get; }
-    //DbSet<RefreshTokenEntity> RefreshTokens { get; }
+    // reference to the Database data type, for transactions
+    DatabaseFacade Database { get; }
+
+
 
     // Identity
     DbSet<ApplicationUserEntity> ApplicationUsers { get; }
@@ -20,7 +21,6 @@ public interface IAppDbContext
 
     // Sales
     DbSet<OrderEntity> Orders { get; }
-    DbSet<OrderItemAssignmentEntity> OrderItemAssignments { get; }
     DbSet<OrderItemEntity> OrderItems { get; }
     DbSet<CartEntity> Carts { get; }
     DbSet<CartItemEntity> CartItems { get; }

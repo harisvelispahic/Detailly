@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Haris_06112025 : Migration
+    public partial class _07112025_v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -278,13 +278,13 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ShipToAddressId = table.Column<int>(type: "int", nullable: false),
                     OrderNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    ShipToAddressId = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -339,10 +339,10 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     YearOfManufacture = table.Column<int>(type: "int", nullable: false),
-                    LicencePlate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LicencePlate = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     VehicleCategoryId = table.Column<int>(type: "int", nullable: false),
@@ -443,29 +443,6 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderItems",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CartItems",
                 columns: table => new
                 {
@@ -473,6 +450,7 @@ namespace Detailly.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
+                    LineTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     CartId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -490,6 +468,41 @@ namespace Detailly.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CartItems_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Currency = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    LineSubtotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    LineTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -558,38 +571,6 @@ namespace Detailly.Infrastructure.Migrations
                         name: "FK_Bookings_TimeSlots_TimeSlotId",
                         column: x => x.TimeSlotId,
                         principalTable: "TimeSlots",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderItemAssignments",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    LineTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    OrderItemId = table.Column<int>(type: "int", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderItemAssignments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderItemAssignments_OrderItems_OrderItemId",
-                        column: x => x.OrderItemId,
-                        principalTable: "OrderItems",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderItemAssignments_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -767,14 +748,9 @@ namespace Detailly.Infrastructure.Migrations
                 column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderItemAssignments_OrderId",
-                table: "OrderItemAssignments",
+                name: "IX_OrderItems_OrderId",
+                table: "OrderItems",
                 column: "OrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItemAssignments_OrderItemId",
-                table: "OrderItemAssignments",
-                column: "OrderItemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_ProductId",
@@ -857,7 +833,7 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "OrderItemAssignments");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
                 name: "PaymentTransactions");
@@ -878,10 +854,10 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Reviews");
 
             migrationBuilder.DropTable(
-                name: "OrderItems");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Wallet");
@@ -896,7 +872,7 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Bookings");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "ProductCategories");
 
             migrationBuilder.DropTable(
                 name: "ApplicationUsers");
@@ -906,9 +882,6 @@ namespace Detailly.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "TimeSlots");
-
-            migrationBuilder.DropTable(
-                name: "ProductCategories");
 
             migrationBuilder.DropTable(
                 name: "Locations");

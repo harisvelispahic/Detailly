@@ -678,6 +678,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -749,7 +753,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemAssignmentEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -760,8 +764,19 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Currency")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DiscountPercentage")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("LineSubtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("LineTotal")
                         .HasPrecision(18, 2)
@@ -773,7 +788,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderItemId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
@@ -786,37 +801,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
-
-                    b.HasIndex("OrderItemId");
-
-                    b.ToTable("OrderItemAssignments");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
@@ -1025,6 +1009,7 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LicencePlate")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
@@ -1263,32 +1248,21 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("ShipToAddress");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemAssignmentEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
-                        .WithMany("OrderItemAssignments")
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Detailly.Domain.Entities.Sales.OrderItemEntity", "OrderItem")
-                        .WithMany("OrderItemAssignments")
-                        .HasForeignKey("OrderItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("OrderItem");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
-                {
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
                         .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
@@ -1434,12 +1408,7 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderEntity", b =>
                 {
-                    b.Navigation("OrderItemAssignments");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
-                {
-                    b.Navigation("OrderItemAssignments");
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>

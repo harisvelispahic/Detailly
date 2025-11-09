@@ -15,7 +15,6 @@ public partial class DatabaseContext : DbContext, IAppDbContext
 
     // Sales
     public DbSet<OrderEntity> Orders => Set<OrderEntity>();
-    public DbSet<OrderItemAssignmentEntity> OrderItemAssignments => Set<OrderItemAssignmentEntity>();
     public DbSet<OrderItemEntity> OrderItems => Set<OrderItemEntity>();
  
     public DbSet<CartEntity> Carts => Set<CartEntity>();
