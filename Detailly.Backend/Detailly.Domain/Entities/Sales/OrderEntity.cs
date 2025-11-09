@@ -1,6 +1,7 @@
 ﻿using Detailly.Domain.Common;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Identity;
+using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Shared;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -22,5 +23,7 @@ public class OrderEntity : BaseEntity
     public AddressEntity ShipToAddress { get; set; } = null!;
     public required int ApplicationUserId { get; set; }
     public ApplicationUserEntity ApplicationUser { get; set; } = null!;
+    public PaymentTransactionEntity? PaymentTransaction { get; set; }
+
     public IReadOnlyCollection<OrderItemEntity> OrderItems { get; private set; } = new List<OrderItemEntity>();
 }

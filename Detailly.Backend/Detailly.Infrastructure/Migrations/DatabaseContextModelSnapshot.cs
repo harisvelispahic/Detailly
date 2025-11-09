@@ -98,7 +98,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("BookingVehicleAssignments");
+                    b.ToTable("BookingVehicleAssignments", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
@@ -359,11 +359,12 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductCategories");
+                    b.ToTable("ProductCategories", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Catalog.ProductEntity", b =>
@@ -417,7 +418,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
@@ -447,22 +448,30 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsEmployee")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<bool>("IsFleet")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsManager")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -479,7 +488,9 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TokenVersion")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -489,7 +500,10 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("AddressId");
 
-                    b.ToTable("ApplicationUsers");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("ApplicationUsers", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.RefreshTokenEntity", b =>
@@ -510,13 +524,16 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Fingerprint")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsRevoked")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
@@ -526,13 +543,14 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<string>("TokenHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserId", "TokenHash")
+                        .IsUnique();
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", b =>
@@ -559,6 +577,15 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderTransactionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -572,6 +599,10 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId")
+                        .IsUnique()
+                        .HasFilter("[OrderId] IS NOT NULL");
 
                     b.HasIndex("WalletId");
 
@@ -750,7 +781,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("ShipToAddressId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderItemEntity", b =>
@@ -1151,7 +1182,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductCategoryEntity", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -1179,11 +1210,18 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", b =>
                 {
+                    b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
+                        .WithOne("PaymentTransaction")
+                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "OrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Wallet");
                 });
@@ -1409,6 +1447,8 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.OrderEntity", b =>
                 {
                     b.Navigation("OrderItems");
+
+                    b.Navigation("PaymentTransaction");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>

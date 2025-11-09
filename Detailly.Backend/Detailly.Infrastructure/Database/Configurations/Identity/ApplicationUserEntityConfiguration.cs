@@ -1,5 +1,5 @@
-﻿namespace Detailly.Infrastructure.Database.Configurations.Identity;
-
+﻿
+namespace Detailly.Infrastructure.Database.Configurations.Identity;
 public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
 {
     public void Configure(EntityTypeBuilder<ApplicationUserEntity> b)

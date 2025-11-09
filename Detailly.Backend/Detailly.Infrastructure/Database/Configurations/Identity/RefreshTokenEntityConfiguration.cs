@@ -1,5 +1,5 @@
-﻿namespace Detailly.Infrastructure.Database.Configurations.Identity;
-
+﻿
+namespace Detailly.Infrastructure.Database.Configurations.Identity;
 public sealed class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<RefreshTokenEntity>
 {
     public void Configure(EntityTypeBuilder<RefreshTokenEntity> b)

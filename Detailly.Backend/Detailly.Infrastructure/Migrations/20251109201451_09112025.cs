@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class _07112025_v1 : Migration
+    public partial class _09112025 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,7 +39,7 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsEnabled = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -112,12 +112,12 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TokenVersion = table.Column<int>(type: "int", nullable: false),
-                    IsManager = table.Column<bool>(type: "bit", nullable: false),
-                    IsEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    TokenVersion = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    IsManager = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsEnabled = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     IsFleet = table.Column<bool>(type: "bit", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: false),
-                    IsEmployee = table.Column<bool>(type: "bit", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsEmployee = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -190,7 +190,7 @@ namespace Detailly.Infrastructure.Migrations
                         column: x => x.CategoryId,
                         principalTable: "ProductCategories",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -312,10 +312,10 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TokenHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TokenHash = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
-                    Fingerprint = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Fingerprint = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     RevokedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ApplicationUserId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
@@ -517,10 +517,13 @@ namespace Detailly.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TransactionType = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     TransactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WalletId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: true),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProviderTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -528,6 +531,12 @@ namespace Detailly.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PaymentTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PaymentTransactions_Wallet_WalletId",
                         column: x => x.WalletId,
@@ -677,6 +686,12 @@ namespace Detailly.Infrastructure.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUsers_Email",
+                table: "ApplicationUsers",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_ApplicationUserId",
                 table: "Bookings",
                 column: "ApplicationUserId");
@@ -768,6 +783,13 @@ namespace Detailly.Infrastructure.Migrations
                 column: "ShipToAddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_OrderId",
+                table: "PaymentTransactions",
+                column: "OrderId",
+                unique: true,
+                filter: "[OrderId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_WalletId",
                 table: "PaymentTransactions",
                 column: "WalletId");
@@ -778,9 +800,10 @@ namespace Detailly.Infrastructure.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RefreshTokens_ApplicationUserId",
+                name: "IX_RefreshTokens_ApplicationUserId_TokenHash",
                 table: "RefreshTokens",
-                column: "ApplicationUserId");
+                columns: new[] { "ApplicationUserId", "TokenHash" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServicePackageItemAssignments_ServicePackageId",
@@ -854,10 +877,10 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Reviews");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Products");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Wallet");

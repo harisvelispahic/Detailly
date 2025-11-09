@@ -1,4 +1,5 @@
-﻿namespace Detailly.Infrastructure.Database.Configurations.Catelog;
+﻿
+namespace Detailly.Infrastructure.Database.Configurations.Catalog;
 
 public class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
 {

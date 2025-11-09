@@ -1,5 +1,5 @@
-﻿using Detailly.Domain.Common;
-using Detailly.Domain.Entities.Booking;
+﻿
+using Detailly.Domain.Common;
 using Detailly.Infrastructure.Database.Seeders;
 using System.Linq.Expressions;
 
@@ -45,54 +45,9 @@ public partial class DatabaseContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // ---------- ServicePackageItemAssignment (N:M medjutabela) ----------
-        modelBuilder.Entity<ServicePackageItemAssignmentEntity>(entity =>
-        {
-            entity.ToTable("ServicePackageItemAssignments"); // ime tabele
 
-            entity.HasKey(e => e.Id); // surogat ključ
-
-            entity.HasOne(e => e.ServicePackage)
-                  .WithMany(p => p.ServicePackageItemAssignments)
-                  .HasForeignKey(e => e.ServicePackageId)
-                  .OnDelete(DeleteBehavior.Cascade);
-
-            entity.HasOne(e => e.ServicePackageItem)
-                  .WithMany(i => i.ServicePackageItemAssignments)
-                  .HasForeignKey(e => e.ServicePackageItemId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        // ---------- Booking - Review (1:1, shared PK) ----------
-        modelBuilder.Entity<BookingEntity>(entity =>
-        {
-            entity.ToTable("Bookings"); // ime tabele
-
-            entity.HasOne(b => b.Review)
-                  .WithOne(r => r.Booking)
-                  .HasForeignKey<ReviewEntity>(r => r.BookingId) // shared PK i FK
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<ReviewEntity>(entity =>
-        {
-            entity.ToTable("Reviews"); // ime tabele
-            entity.HasKey(r => r.BookingId); // shared PK
-        });
-
-        // dodano
-        modelBuilder.Entity<BookingVehicleAssignmentEntity>()
-        .HasOne(bva => bva.Vehicle)
-        .WithMany(v => (IEnumerable<BookingVehicleAssignmentEntity>)v.BookingVehicleAssignments)
-        .HasForeignKey(bva => bva.VehicleId)
-        .OnDelete(DeleteBehavior.Restrict); // or DeleteBehavior.NoAction
-
-        modelBuilder.Entity<BookingVehicleAssignmentEntity>()
-            .HasOne(bva => bva.Booking)
-            .WithMany(b => (IEnumerable<BookingVehicleAssignmentEntity>)b.BookingVehicleAssignments)
-            .HasForeignKey(bva => bva.BookingId)
-            .OnDelete(DeleteBehavior.Restrict); // also optional
-        // do ovdje
+        // Include all entity configuration files from this assembly
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
 
         // ---------- Decimal precision ----------
         //modelBuilder.Properties<decimal>().HavePrecision(18, 2);
