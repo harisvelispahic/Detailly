@@ -1313,7 +1313,8 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
                         .WithMany("Images")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", "Review")
                         .WithMany("Images")

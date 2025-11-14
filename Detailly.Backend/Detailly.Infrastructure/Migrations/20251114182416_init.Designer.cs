@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251109201451_09112025")]
-    partial class _09112025
+    [Migration("20251114182416_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1316,7 +1316,8 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
                         .WithMany("Images")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", "Review")
                         .WithMany("Images")
