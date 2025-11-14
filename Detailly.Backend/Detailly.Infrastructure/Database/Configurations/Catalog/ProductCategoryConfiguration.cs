@@ -1,5 +1,6 @@
-﻿
-namespace Detailly.Infrastructure.Database.Configurations.Catalog;
+
+﻿namespace Detailly.Infrastructure.Database.Configurations.Catalog;
+
 public class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCategoryEntity>
 {
     public void Configure(EntityTypeBuilder<ProductCategoryEntity> builder)

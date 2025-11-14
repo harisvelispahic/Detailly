@@ -21,9 +21,18 @@ public class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
             .Property(x => x.Price)
             .HasPrecision(18, 2);
 
-        //builder
-        //    .Property(x => x.StockQuantity)
-        //    .IsRequired();
+
+        // Product → Inventory (1:1)
+        builder.HasOne(p => p.Inventory)
+            .WithOne(i => i.Product)
+            .HasForeignKey<InventoryEntity>(i => i.ProductId)
+            .OnDelete(DeleteBehavior.Cascade); // ✅ cascade delete
+
+        // Product → Images (1:N)
+        builder.HasMany(p => p.Images)
+            .WithOne(i => i.Product)
+            .HasForeignKey(i => i.ProductId)
+            .OnDelete(DeleteBehavior.Cascade); // ✅ cascade delete
 
         builder
             .HasOne(x => x.Category)
