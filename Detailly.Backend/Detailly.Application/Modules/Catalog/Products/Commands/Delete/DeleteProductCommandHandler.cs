@@ -4,7 +4,7 @@ namespace Detailly.Application.Modules.Catalog.Products.Commands.Delete;
 public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
       : IRequestHandler<DeleteProductCommand, Unit>
 {
-    public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken ct)
     {
         if (appCurrentUser.ApplicationUserId is null)
             throw new DetaillyBusinessRuleException("123", "Korisnik nije autentifikovan.");
@@ -12,7 +12,7 @@ public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurr
         var product = await context.Products
             .Include(p => p.Inventory)
             .Include(p => p.Images)
-            .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (product is null)
             throw new DetaillyNotFoundException("Proizvod nije pronađen.");
@@ -32,7 +32,7 @@ public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurr
             image.ModifiedAtUtc = DateTime.UtcNow;
         }
 
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(ct);
 
         return Unit.Value;
     }

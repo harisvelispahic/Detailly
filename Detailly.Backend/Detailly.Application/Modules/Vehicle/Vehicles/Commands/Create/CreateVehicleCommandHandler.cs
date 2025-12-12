@@ -6,7 +6,7 @@ namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
 public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
     : IRequestHandler<CreateVehicleCommand, int>
 {
-    public async Task<int> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateVehicleCommand request, CancellationToken ct)
     {
 
         // duplicates are checked by licence plate
@@ -14,7 +14,7 @@ public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser 
             .AnyAsync(x =>
                 x.LicencePlate.ToUpper() == request.LicencePlate.Trim().ToUpper() &&
                 x.ApplicationUserId == appCurrentUser.ApplicationUserId,
-                cancellationToken);
+                ct);
 
         if (exists)
         {
@@ -33,7 +33,7 @@ public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser 
         };
 
         context.Vehicles.Add(vehicle);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(ct);
 
         return vehicle.Id;
     }

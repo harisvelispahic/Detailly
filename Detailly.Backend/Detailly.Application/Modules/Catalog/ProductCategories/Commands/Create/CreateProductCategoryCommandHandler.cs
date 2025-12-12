@@ -4,7 +4,7 @@ namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Create
 public class CreateProductCategoryCommandHandler(IAppDbContext context)
     : IRequestHandler<CreateProductCategoryCommand, int>
 {
-    public async Task<int> Handle(CreateProductCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateProductCategoryCommand request, CancellationToken ct)
     {
         var normalized = request.Name?.Trim();
 
@@ -13,7 +13,7 @@ public class CreateProductCategoryCommandHandler(IAppDbContext context)
 
         // Check if a category with the same name already exists.
         bool exists = await context.ProductCategories
-            .AnyAsync(x => x.Name == normalized, cancellationToken);
+            .AnyAsync(x => x.Name == normalized, ct);
 
         if (exists)
         {
@@ -27,7 +27,7 @@ public class CreateProductCategoryCommandHandler(IAppDbContext context)
         };
 
         context.ProductCategories.Add(category);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(ct);
 
         return category.Id;
     }

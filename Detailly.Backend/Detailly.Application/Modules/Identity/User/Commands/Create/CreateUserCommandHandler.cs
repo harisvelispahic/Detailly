@@ -8,7 +8,7 @@ public sealed class CreateUserCommandHandler
     (IAppDbContext context, IPasswordHasher<ApplicationUserEntity> passwordHasher)
     : IRequestHandler<CreateUserCommand, int>
 {
-    public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateUserCommand request, CancellationToken ct)
     {
         // Normalize values
         var email = request.Email.Trim().ToLower();
@@ -16,14 +16,14 @@ public sealed class CreateUserCommandHandler
 
         // Business rule: Email must be unique
         var emailExists = await context.ApplicationUsers
-            .AnyAsync(x => x.Email == email, cancellationToken);
+            .AnyAsync(x => x.Email == email, ct);
 
         if (emailExists)
             throw new DetaillyConflictException("Email already exists.");
 
         // Business rule: Username must be unique
         var usernameExists = await context.ApplicationUsers
-            .AnyAsync(x => x.Username == username, cancellationToken);
+            .AnyAsync(x => x.Username == username, ct);
 
         if (usernameExists)
             throw new DetaillyConflictException("Username already exists.");
@@ -65,7 +65,7 @@ public sealed class CreateUserCommandHandler
         };
 
         context.ApplicationUsers.Add(user);
-        await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(ct);
 
         return user.Id;
     }

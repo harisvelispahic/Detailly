@@ -3,7 +3,7 @@ namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById
 
 public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductCategoryByIdQuery, GetProductCategoryByIdQueryDto>
 {
-    public async Task<GetProductCategoryByIdQueryDto> Handle(GetProductCategoryByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductCategoryByIdQueryDto> Handle(GetProductCategoryByIdQuery request, CancellationToken ct)
     {
         var category = await context.ProductCategories
             .Where(c => c.Id == request.Id)
@@ -13,7 +13,7 @@ public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IReques
                 Name = x.Name,
                 IsEnabled = x.IsEnabled
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(ct);
 
         if (category == null)
         {
