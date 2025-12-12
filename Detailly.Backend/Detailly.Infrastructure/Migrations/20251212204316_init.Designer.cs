@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251114182416_init")]
+    [Migration("20251212204316_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -147,9 +147,6 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -850,12 +847,10 @@ namespace Detailly.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -865,11 +860,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Latitude")
+                    b.Property<decimal?>("Latitude")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Longitude")
+                    b.Property<decimal?>("Longitude")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -877,17 +872,14 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PostalCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Region")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
@@ -940,7 +932,9 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.HasIndex("ProductId");
 
@@ -1311,8 +1305,8 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
-                        .WithMany("Images")
-                        .HasForeignKey("ApplicationUserId");
+                        .WithOne("Image")
+                        .HasForeignKey("Detailly.Domain.Entities.Shared.ImageEntity", "ApplicationUserId");
 
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
                         .WithMany("Images")
@@ -1425,7 +1419,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Navigation("Cart");
 
-                    b.Navigation("Images");
+                    b.Navigation("Image");
 
                     b.Navigation("Notifications");
 

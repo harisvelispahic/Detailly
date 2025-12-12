@@ -11,7 +11,6 @@ public class ReviewEntity
     [Range(1, 5)]
     public required int Rating { get; set; }
     public string? Description { get; set; }
-    public string? Image { get; set; }
     public int? ValueForMoney { get; set; }
 
     // Foreign keys

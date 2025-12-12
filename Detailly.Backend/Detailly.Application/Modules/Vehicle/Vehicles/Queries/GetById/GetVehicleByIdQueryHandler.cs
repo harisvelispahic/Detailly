@@ -3,7 +3,7 @@ namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 
 public class GetVehicleByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetVehicleByIdQuery, GetVehicleByIdQueryDto>
 {
-    public async Task<GetVehicleByIdQueryDto> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetVehicleByIdQueryDto> Handle(GetVehicleByIdQuery request, CancellationToken ct)
     {
         var vehicle = await context.Vehicles
             .Where(c => c.Id == request.Id)
@@ -20,7 +20,7 @@ public class GetVehicleByIdQueryHandler(IAppDbContext context) : IRequestHandler
                     Name = x.VehicleCategory.Name
                 },
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(ct);
 
         if (vehicle == null)
         {

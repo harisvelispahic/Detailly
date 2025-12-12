@@ -1,7 +1,10 @@
-﻿using Detailly.API;
+﻿
+using Detailly.API;
 using Detailly.API.Middleware;
 using Detailly.Application;
+using Detailly.Domain.Entities.Identity;
 using Detailly.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 public partial class Program
@@ -24,6 +27,9 @@ public partial class Program
             //    environment variables, user-secrets (Dev), and command-line args)
             //
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddScoped<IPasswordHasher
+                <ApplicationUserEntity>, PasswordHasher<ApplicationUserEntity>>();
 
             // 2) Promote Serilog to full configuration from builder.Configuration
             //    (reads "Serilog" section from appsettings + ENV overrides)

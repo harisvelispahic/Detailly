@@ -61,73 +61,77 @@ public static class DynamicDataSeeder
         {
             Email = "admin@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            IsAdmin = true,
-            IsEnabled = true,
             AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
-            Username = "admin"
+            Username = "admin",
+
+            IsAdmin = true,
+            IsFleet = false,
         };
 
         var user = new ApplicationUserEntity
         {
             Email = "manager@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
-            IsManager = true,
-            IsEnabled = true,
             AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
-            Username = "admin"
+            Username = "admin",
+
+            IsManager = true,
+            IsFleet = false
         };
 
         var dummyForSwagger = new ApplicationUserEntity
         {
             Email = "string",
             PasswordHash = hasher.HashPassword(null!, "string"),
-            IsEmployee = true,
-            IsEnabled = true,
             AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
-            Username = "admin"
+            Username = "admin",
+
+            IsAdmin = true,
+            IsFleet = false
         };
         var dummyForTests = new ApplicationUserEntity
         {
             Email = "test",
             PasswordHash = hasher.HashPassword(null!, "test123"),
-            IsEmployee = true,
-            IsEnabled = true,
             AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
-            Username = "admin"
+            Username = "admin",
+
+            IsEmployee = true,
+            IsFleet = true
         };
         var haris = new ApplicationUserEntity
         {
             Email = "haris.velispahic@edu.fit.ba",
-            PasswordHash = hasher.HashPassword(null!, "test123"),
-            IsAdmin = true,
-            IsEmployee = true,
-            IsEnabled = true,
+            PasswordHash = hasher.HashPassword(null!, "haris123"),
             AddressId = null,
             FirstName = "Haris",
             LastName = "Velispahic",
-            Username = "haris123"
+            Username = "haris123",
+
+            IsAdmin = true,
+            IsFleet = false
         };
         var danis = new ApplicationUserEntity
         {
             Email = "danis.music@edu.fit.ba",
             PasswordHash = hasher.HashPassword(null!, "danis123"),
-            IsAdmin = true,
-            IsEmployee = true,
-            IsEnabled = true,
             AddressId = null,
             FirstName = "Danis",
             LastName = "Music",
-            Username = "danis123"
+            Username = "danis123",
+
+            IsAdmin = true,
+            IsFleet = false
         };
-        context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests);
+        context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests, haris, danis);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
@@ -226,11 +230,11 @@ public static class DynamicDataSeeder
             context.Address.AddRange(
                 new AddressEntity
                 {
-                    Country="Bosnia and Herzegovina",
-                    Region="Zeničko-dobojski kanton",
-                    City="Kakanj",
-                    PostalCode="72240",
-                    Street="Alije Izetbegovića, bb"
+                    Country = "Bosnia and Herzegovina",
+                    Region = "Zeničko-dobojski kanton",
+                    City = "Kakanj",
+                    PostalCode = "72240",
+                    Street = "Alije Izetbegovića, bb"
                 },
                 new AddressEntity
                 {

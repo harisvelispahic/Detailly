@@ -3,7 +3,7 @@ namespace Detailly.Application.Modules.Catalog.Products.Queries.GetById;
 
 public class GetProductByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductByIdQuery, GetProductByIdQueryDto>
 {
-    public async Task<GetProductByIdQueryDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductByIdQueryDto> Handle(GetProductByIdQuery request, CancellationToken ct)
     {
         var product = await context.Products
             .Where(c => c.Id == request.Id)
@@ -15,7 +15,7 @@ public class GetProductByIdQueryHandler(IAppDbContext context) : IRequestHandler
                 Price = x.Price,
                 IsEnabled = x.IsEnabled
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(ct);
 
         if (product == null)
         {
