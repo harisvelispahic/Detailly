@@ -11,7 +11,7 @@ public sealed class UpdateProductCategoryCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(ct);
 
         if (entity is null)
-            throw new DetaillyNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new DetaillyNotFoundException($"Product category (ID={request.Id} ) was not found.");
 
         // Check for duplicate name (case-insensitive, except for the same ID)
         var exists = await ctx.ProductCategories

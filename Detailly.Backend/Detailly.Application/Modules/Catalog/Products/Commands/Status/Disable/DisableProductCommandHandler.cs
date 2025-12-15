@@ -11,7 +11,7 @@ public sealed class DisableProductCommandHandler(IAppDbContext ctx)
 
         if (pro is null)
         {
-            throw new DetaillyNotFoundException($"Proizvod (ID={request.Id}) nije pronađen.");
+            throw new DetaillyNotFoundException($"Product (ID={request.Id}) was not found.");
         }
 
         if (!pro.IsEnabled) return Unit.Value; // idempotent

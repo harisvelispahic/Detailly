@@ -28,6 +28,18 @@ public partial class Program
             //
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("FrontendPolicy", policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             builder.Services.AddScoped<IPasswordHasher
                 <ApplicationUserEntity>, PasswordHasher<ApplicationUserEntity>>();
 
@@ -71,6 +83,10 @@ public partial class Program
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
             app.UseHttpsRedirection();
+            app.UseCors("FrontendPolicy");
+
+            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

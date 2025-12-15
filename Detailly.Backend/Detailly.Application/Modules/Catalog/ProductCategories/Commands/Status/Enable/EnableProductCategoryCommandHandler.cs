@@ -10,7 +10,7 @@ public sealed class EnableProductCategoryCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (entity is null)
-            throw new DetaillyNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new DetaillyNotFoundException($"Product category (ID={request.Id}) was not found.");
 
         if (!entity.IsEnabled)
         {

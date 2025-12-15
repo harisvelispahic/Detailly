@@ -13,7 +13,7 @@ public class DeleteProductCategoryCommandHandler(IAppDbContext context, IAppCurr
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (category is null)
-            throw new DetaillyNotFoundException("Kategorija nije pronađena.");
+            throw new DetaillyNotFoundException("Product category was not found.");
 
         category.IsDeleted = true; // Soft delete
         await context.SaveChangesAsync(ct);

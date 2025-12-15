@@ -11,7 +11,7 @@ public sealed class DisableProductCategoryCommandHandler(IAppDbContext ctx)
 
         if (cat is null)
         {
-            throw new DetaillyNotFoundException($"Kategorija (ID={request.Id}) nije pronađena.");
+            throw new DetaillyNotFoundException($"Product category (ID={request.Id}) was not found.");
         }
 
         if (!cat.IsEnabled) return Unit.Value; // idempotent

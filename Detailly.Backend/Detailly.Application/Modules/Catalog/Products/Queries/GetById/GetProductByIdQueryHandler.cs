@@ -19,7 +19,7 @@ public class GetProductByIdQueryHandler(IAppDbContext context) : IRequestHandler
 
         if (product == null)
         {
-            throw new DetaillyNotFoundException($"Product with Id {request.Id} not found.");
+            throw new DetaillyNotFoundException($"Product with (ID = {request.Id}) not found.");
         }
 
         return product;
