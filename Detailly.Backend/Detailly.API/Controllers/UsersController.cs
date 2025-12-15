@@ -12,7 +12,7 @@ namespace Detailly.API.Controllers;
 public class UsersController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<int>> CreateUser(CreateUserCommand command, CancellationToken ct)
+    public async Task<ActionResult<int>> Create(CreateUserCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
 

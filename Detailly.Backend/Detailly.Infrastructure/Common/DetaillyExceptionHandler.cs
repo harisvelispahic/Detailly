@@ -38,11 +38,26 @@ public sealed class DetaillyExceptionHandler(
 
 
         ctx.Response.ContentType = "application/json";
+
         ctx.Response.StatusCode = ex switch
         {
-            DetaillyNotFoundException => StatusCodes.Status404NotFound,
-            DetaillyConflictException or DetaillyBusinessRuleException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status400BadRequest,
+
+            DetaillyUnauthorizedException => StatusCodes.Status401Unauthorized,
+            
+            DetaillyForbiddenException => StatusCodes.Status403Forbidden,
+
+            DetaillyNotFoundException => StatusCodes.Status404NotFound,
+
+            DetaillyGoneException => StatusCodes.Status410Gone,
+
+            DetaillyConflictException
+            or DetaillyBusinessRuleException => StatusCodes.Status409Conflict,
+
+            DetaillyExternalServiceException => StatusCodes.Status502BadGateway,
+            
+            DetaillyTimeoutException => StatusCodes.Status504GatewayTimeout,
+
             _ => StatusCodes.Status500InternalServerError
         };
 
@@ -59,17 +74,55 @@ public sealed class DetaillyExceptionHandler(
 
         switch (ex)
         {
+            case DetaillyUnauthorizedException:
+                code = "auth.unauthorized";
+                message = ex.Message;
+                break;
+
+            case DetaillyForbiddenException:
+                code = "auth.forbidden";
+                message = ex.Message;
+                break;
+
             case DetaillyNotFoundException:
+                code = "entity.not_found";
+                message = ex.Message;
+                break;
+
+            case DetaillyGoneException:
+                code = "entity.gone";
+                message = ex.Message;
+                break;
+
             case DetaillyConflictException:
+                code = "entity.conflict";
+                message = ex.Message;
+                break;
+
             case DetaillyBusinessRuleException:
-                code = "entity.error";
+                code = "business.rule";
                 message = ex.Message;
                 break;
 
             case ValidationException vex:
                 code = "validation.error";
-                message = "Validation failed: " +
-                          string.Join("; ", vex.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                message = string.Join("; ",
+                    vex.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                break;
+
+            case DetaillyExternalServiceException:
+                code = "external.service_error";
+                message = ex.Message;
+                break;
+
+            case DetaillyTimeoutException:
+                code = "external.timeout";
+                message = ex.Message;
+                break;
+
+            default:
+                code = "internal.error";
+                message = "An unexpected error occurred. Please try again.";
                 break;
         }
 

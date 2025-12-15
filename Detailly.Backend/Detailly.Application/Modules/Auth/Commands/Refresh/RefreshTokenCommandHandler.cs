@@ -22,19 +22,19 @@ public sealed class RefreshTokenCommandHandler(
         var nowUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         if (rt is null || rt.ExpiresAtUtc <= nowUtc)
-            throw new DetaillyConflictException("Refresh token je nevažeći ili je istekao.");
+            throw new DetaillyConflictException("Refresh token is invalid or has expired.");
 
         // (optional) Fingerprint check
         if (rt.Fingerprint is not null &&
             request.Fingerprint is not null &&
             rt.Fingerprint != request.Fingerprint)
         {
-            throw new DetaillyConflictException("Neispravan klijentski otisak.");
+            throw new DetaillyConflictException("Fingerprint is invalid.");
         }
 
         var user = rt.ApplicationUser;
         if (user is null || !user.IsEnabled || user.IsDeleted)
-            throw new DetaillyConflictException("Korisnički nalog je nevažeći.");
+            throw new DetaillyConflictException("User account is invalid.");
 
         // 3) Rotation: revoke the old one
         rt.IsRevoked = true;

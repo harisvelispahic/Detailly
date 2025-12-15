@@ -20,8 +20,8 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return Ok(await mediator.Send(command, ct));
     }
 
-    [Authorize]
     [HttpPost("logout")]
+    [AllowAnonymous]
     public async Task Logout([FromBody] LogoutCommand command, CancellationToken ct)
     {
         await mediator.Send(command, ct);

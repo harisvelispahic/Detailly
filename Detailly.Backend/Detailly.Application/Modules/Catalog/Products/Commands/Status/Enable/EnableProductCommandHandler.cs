@@ -10,7 +10,7 @@ public sealed class EnableProductCommandHandler(IAppDbContext ctx)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (entity is null)
-            throw new DetaillyNotFoundException($"Proizvod (ID={request.Id}) nije pronađen.");
+            throw new DetaillyNotFoundException($"Product (ID={request.Id}) was not found.");
 
         if (!entity.IsEnabled)
         {

@@ -13,7 +13,7 @@ namespace Detailly.API.Controllers;
 public class ProductCategoriesController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<int>> CreateProductCategory(CreateProductCategoryCommand command, CancellationToken ct)
+    public async Task<ActionResult<int>> Create(CreateProductCategoryCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
 

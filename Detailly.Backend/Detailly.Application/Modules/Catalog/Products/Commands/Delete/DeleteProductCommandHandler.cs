@@ -15,7 +15,7 @@ public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurr
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (product is null)
-            throw new DetaillyNotFoundException("Proizvod nije pronađen.");
+            throw new DetaillyNotFoundException("Product was not found.");
 
         product.IsDeleted = true; // Soft delete
 

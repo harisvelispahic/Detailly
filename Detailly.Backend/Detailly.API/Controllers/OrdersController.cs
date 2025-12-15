@@ -11,7 +11,7 @@ namespace Detailly.API.Controllers;
 public class OrdersController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<int>> CreateVehicle(CreateOrderCommand command, CancellationToken ct)
+    public async Task<ActionResult<int>> Create(CreateOrderCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
 

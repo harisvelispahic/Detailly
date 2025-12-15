@@ -13,7 +13,7 @@ public class ReviewsController(ISender sender) : ControllerBase
 {
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<int>> CreateReview(CreateReviewCommand command, CancellationToken ct)
+    public async Task<ActionResult<int>> Create(CreateReviewCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
 
