@@ -225,9 +225,9 @@ public static class DynamicDataSeeder
 
     private static async Task SeedAddressesAsync(DatabaseContext context)
     {
-        if (!await context.Address.AnyAsync())
+        if (!await context.Addresses.AnyAsync())
         {
-            context.Address.AddRange(
+            context.Addresses.AddRange(
                 new AddressEntity
                 {
                     Country = "Bosnia and Herzegovina",
