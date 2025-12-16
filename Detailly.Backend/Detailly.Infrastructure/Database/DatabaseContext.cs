@@ -12,6 +12,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Identity
     public DbSet<ApplicationUserEntity> ApplicationUsers => Set<ApplicationUserEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
+    public DbSet<UserExternalLoginEntity> UserExternalLogins => Set<UserExternalLoginEntity>();
 
     // Sales
     public DbSet<OrderEntity> Orders => Set<OrderEntity>();

@@ -61,6 +61,13 @@ public static class DependencyInjection
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
+        })
+        .AddCookie("External") // <— TEMP cookie for external login
+        .AddGoogle("Google", options =>
+        {
+            options.ClientId = configuration["Authentication:Google:ClientId"]!;
+            options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
+            options.SignInScheme = "External"; // <— IMPORTANT, TEMP
         });
 
         services.AddAuthorization(o =>

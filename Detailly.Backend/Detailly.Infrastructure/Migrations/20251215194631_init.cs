@@ -334,6 +334,31 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserExternalLoginEntity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProviderUserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserExternalLoginEntity", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserExternalLoginEntity_ApplicationUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Vehicles",
                 columns: table => new
                 {
@@ -823,6 +848,11 @@ namespace Detailly.Infrastructure.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserExternalLoginEntity_ApplicationUserId",
+                table: "UserExternalLoginEntity",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_ApplicationUserId",
                 table: "Vehicles",
                 column: "ApplicationUserId");
@@ -868,6 +898,9 @@ namespace Detailly.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ServicePackageItemAssignments");
+
+            migrationBuilder.DropTable(
+                name: "UserExternalLoginEntity");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");

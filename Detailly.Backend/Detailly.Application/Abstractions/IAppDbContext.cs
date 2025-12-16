@@ -18,6 +18,7 @@ public interface IAppDbContext
     // Identity
     DbSet<ApplicationUserEntity> ApplicationUsers { get; }
     DbSet<RefreshTokenEntity> RefreshTokens { get; }
+    DbSet<UserExternalLoginEntity> UserExternalLogins { get; }
 
     // Sales
     DbSet<OrderEntity> Orders { get; }
