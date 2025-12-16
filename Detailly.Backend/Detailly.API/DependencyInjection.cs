@@ -70,7 +70,9 @@ public static class DependencyInjection
         {
             options.ClientId = configuration["Authentication:Google:ClientId"]!;
             options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
-            options.SignInScheme = "External"; // <— IMPORTANT, TEMP
+            options.CallbackPath = "/api/auth/external/google/callback";
+
+            options.SignInScheme = "External";
         });
 
         services.AddAuthorization(o =>
