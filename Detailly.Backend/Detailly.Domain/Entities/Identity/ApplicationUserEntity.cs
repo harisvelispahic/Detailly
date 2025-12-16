@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Detailly.Domain.Entities.Identity;
 
 public sealed class ApplicationUserEntity : BaseEntity
-{    
+{
     public int TokenVersion { get; set; } = 0;  // For global revocation
 
     public bool IsManager { get; set; } = false;
@@ -24,8 +24,8 @@ public sealed class ApplicationUserEntity : BaseEntity
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string Username { get; set; }
-     
-    [MaxLength(200)] 
+
+    [MaxLength(200)]
     [EmailAddress]
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
@@ -47,4 +47,5 @@ public sealed class ApplicationUserEntity : BaseEntity
     
 
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
+    public ICollection<UserExternalLoginEntity> ExternalLogins { get; private set; } = new List<UserExternalLoginEntity>();
 }

@@ -1360,6 +1360,44 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("UserExternalLoginEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplicationUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("UserExternalLoginEntity");
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Customer")
@@ -1747,6 +1785,17 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("VehicleCategory");
                 });
 
+            modelBuilder.Entity("UserExternalLoginEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
+                        .WithMany("ExternalLogins")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
                     b.Navigation("BookingItems");
@@ -1807,6 +1856,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Bookings");
 
                     b.Navigation("Cart");
+
+                    b.Navigation("Image");
 
                     b.Navigation("Notifications");
 
