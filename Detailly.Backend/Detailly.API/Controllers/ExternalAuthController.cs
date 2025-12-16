@@ -18,9 +18,12 @@ public sealed class ExternalAuthController : ControllerBase
             values: new { returnUrl },
             protocol: Request.Scheme);
 
-        Console.WriteLine("=== GOOGLE REDIRECT URI ===");
-        Console.WriteLine(callbackUrl);
-        Console.WriteLine("==========================");
+        Console.WriteLine("=== REQUEST INFO ===");
+        Console.WriteLine($"Scheme: {Request.Scheme}");
+        Console.WriteLine($"Host: {Request.Host}");
+        Console.WriteLine($"PathBase: {Request.PathBase}");
+        Console.WriteLine($"Path: {Request.Path}");
+        Console.WriteLine("====================");
 
         var props = new AuthenticationProperties
         {
