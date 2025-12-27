@@ -1,6 +1,10 @@
 ﻿
+using Detailly.Domain.Entities.Booking;
+
 namespace Detailly.Infrastructure.Database.Configurations.Identity;
-public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
+
+public sealed class ApplicationUserEntityConfiguration
+    : IEntityTypeConfiguration<ApplicationUserEntity>
 {
     public void Configure(EntityTypeBuilder<ApplicationUserEntity> b)
     {
@@ -34,7 +38,24 @@ public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguratio
         b.Property(x => x.IsEnabled)
             .HasDefaultValue(true);
 
-        // Navigation
+        // =========================
+        // Navigation relationships
+        // =========================
+
+        // Customer → Bookings
+        b.HasMany(x => x.Bookings)
+            .WithOne(x => x.ApplicationUser)
+            .HasForeignKey(x => x.ApplicationUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Employee → Assigned Bookings
+        // (no collection on ApplicationUser side)
+        b.HasMany<BookingEntity>()
+            .WithOne(x => x.Employee)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Refresh tokens
         b.HasMany(x => x.RefreshTokens)
             .WithOne(x => x.ApplicationUser)
             .HasForeignKey(x => x.ApplicationUserId);

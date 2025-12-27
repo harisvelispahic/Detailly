@@ -36,6 +36,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -61,6 +64,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("ServicePackageId");
 
@@ -562,6 +567,9 @@ namespace Detailly.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -592,10 +600,14 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int?>("WalletId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique()
+                        .HasFilter("[BookingId] IS NOT NULL");
 
                     b.HasIndex("OrderId")
                         .IsUnique()
@@ -1067,8 +1079,13 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
                         .WithMany("Bookings")
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageEntity", "ServicePackage")
                         .WithMany("Bookings")
@@ -1083,6 +1100,8 @@ namespace Detailly.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("ServicePackage");
 
@@ -1204,6 +1223,10 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", b =>
                 {
+                    b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
+                        .WithOne("PaymentTransaction")
+                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "BookingId");
+
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
                         .WithOne("PaymentTransaction")
                         .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "OrderId")
@@ -1211,9 +1234,9 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
                         .WithMany("PaymentTransactions")
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WalletId");
+
+                    b.Navigation("Booking");
 
                     b.Navigation("Order");
 
@@ -1360,6 +1383,8 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
                     b.Navigation("BookingVehicleAssignments");
+
+                    b.Navigation("PaymentTransaction");
 
                     b.Navigation("Review");
                 });
