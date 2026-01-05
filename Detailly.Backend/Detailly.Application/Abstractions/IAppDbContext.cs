@@ -48,6 +48,7 @@ public interface IAppDbContext
     // Payment
     DbSet<WalletEntity> Wallet { get; }
     DbSet<PaymentTransactionEntity> PaymentTransactions { get; }
+    DbSet<ProcessedWebhookEventEntity> ProcessedWebhookEvents { get; }
 
     // Shared
     DbSet<AddressEntity> Address { get; }

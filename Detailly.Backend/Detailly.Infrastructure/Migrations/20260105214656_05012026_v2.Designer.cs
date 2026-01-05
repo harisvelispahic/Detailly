@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20251216144639_init")]
-    partial class init
+    [Migration("20260105214656_05012026_v2")]
+    partial class _05012026_v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -618,7 +618,33 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("PaymentTransactions");
+                    b.ToTable("PaymentTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Payment.ProcessedWebhookEventEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProcessedWebhookEvents");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.WalletEntity", b =>
@@ -660,7 +686,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Wallet");
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.CartEntity", b =>
@@ -1228,7 +1254,8 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
                         .WithOne("PaymentTransaction")
-                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "BookingId");
+                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "BookingId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
                         .WithOne("PaymentTransaction")
@@ -1237,7 +1264,8 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
                         .WithMany("PaymentTransactions")
-                        .HasForeignKey("WalletId");
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Booking");
 
@@ -1251,7 +1279,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
                         .WithOne("Wallet")
                         .HasForeignKey("Detailly.Domain.Entities.Payment.WalletEntity", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");

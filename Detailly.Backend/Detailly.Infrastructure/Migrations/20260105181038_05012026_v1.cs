@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class _05012026_v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -368,7 +368,7 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Wallet",
+                name: "Wallets",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -384,13 +384,13 @@ namespace Detailly.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Wallet", x => x.Id);
+                    table.PrimaryKey("PK_Wallets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Wallet_ApplicationUsers_ApplicationUserId",
+                        name: "FK_Wallets_ApplicationUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "ApplicationUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -611,7 +611,8 @@ namespace Detailly.Infrastructure.Migrations
                         name: "FK_PaymentTransactions_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PaymentTransactions_Orders_OrderId",
                         column: x => x.OrderId,
@@ -619,10 +620,11 @@ namespace Detailly.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_PaymentTransactions_Wallet_WalletId",
+                        name: "FK_PaymentTransactions_Wallets_WalletId",
                         column: x => x.WalletId,
-                        principalTable: "Wallet",
-                        principalColumn: "Id");
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -857,8 +859,8 @@ namespace Detailly.Infrastructure.Migrations
                 column: "VehicleCategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Wallet_ApplicationUserId",
-                table: "Wallet",
+                name: "IX_Wallets_ApplicationUserId",
+                table: "Wallets",
                 column: "ApplicationUserId",
                 unique: true);
         }
@@ -909,7 +911,7 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Wallet");
+                name: "Wallets");
 
             migrationBuilder.DropTable(
                 name: "ServicePackageItems");
