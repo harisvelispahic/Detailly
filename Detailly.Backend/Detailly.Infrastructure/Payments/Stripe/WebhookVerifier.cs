@@ -11,23 +11,28 @@ public class WebhookVerifier : IWebhookVerifier
         if (string.IsNullOrWhiteSpace(signatureHeader))
             return false;
 
-        // Stripe signature format:
+        // Parse signature header:
         // t=timestamp,v1=hash
         var parts = signatureHeader.Split(',');
 
-        var v1 = parts
-            .FirstOrDefault(p => p.StartsWith("v1="))
-            ?.Split('=')[1];
+        var timestampPart = parts.FirstOrDefault(p => p.StartsWith("t="));
+        var v1Part = parts.FirstOrDefault(p => p.StartsWith("v1="));
 
-        if (v1 is null)
+        if (timestampPart is null || v1Part is null)
             return false;
 
-        // Compute HMAC: HMAC_SHA256(secret, payload)
+        var timestamp = timestampPart.Split('=')[1];
+        var v1 = v1Part.Split('=')[1];
+
+        // Construct signed payload (THIS is the key!)
+        var signedPayload = $"{timestamp}.{payload}";
+
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(webhookSecret));
-        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
+        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signedPayload));
 
         var expected = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 
         return expected == v1;
     }
+
 }

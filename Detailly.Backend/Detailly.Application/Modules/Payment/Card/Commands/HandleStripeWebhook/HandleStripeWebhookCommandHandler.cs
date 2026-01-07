@@ -37,9 +37,15 @@ public class HandleStripeWebhookCommandHandler
         //
         var secret = _config["Stripe:WebhookSecret"];
 
+        Console.WriteLine("WEBHOOK RECEIVED");
+        Console.WriteLine("SIGNATURE: " + request.SignatureHeader);
+        Console.WriteLine("SECRET: " + secret);
+
+
         if (!_verifier.Verify(request.Payload, request.SignatureHeader ?? "", secret!))
             return Unit.Value;
 
+        Console.WriteLine("WEBHOOK: signature OK");
 
         //
         // 1️⃣ Parse webhook (abstracted — no Stripe SDK in Application)
@@ -49,7 +55,10 @@ public class HandleStripeWebhookCommandHandler
         if (parsed is null)
             return Unit.Value;
 
+
         var (eventId, eventType, providerTransactionId) = parsed.Value;
+
+        Console.WriteLine($"WEBHOOK: parsed {eventType} / {providerTransactionId}");
 
 
         //
@@ -61,6 +70,7 @@ public class HandleStripeWebhookCommandHandler
         if (alreadyProcessed)
             return Unit.Value;
 
+        Console.WriteLine($"WEBHOOK: idempotency check — new event {eventId}");
 
         //
         // 3️⃣ Look up our payment
@@ -74,6 +84,7 @@ public class HandleStripeWebhookCommandHandler
         if (payment is null)
             return Unit.Value;
 
+        Console.WriteLine($"WEBHOOK: found payment {payment.Id}");
 
         //
         // 4️⃣ Apply transitions

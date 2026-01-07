@@ -1,0 +1,13 @@
+<h2>Pay Booking</h2>
+
+@if (isLoading) {
+<div>Loading...</div>
+} @if (cardError) {
+<div style="color: red">
+  {{ cardError }}
+</div>
+}
+
+<div id="card-element"></div>
+
+<button (click)="pay()" [disabled]="isLoading">Pay now</button>
