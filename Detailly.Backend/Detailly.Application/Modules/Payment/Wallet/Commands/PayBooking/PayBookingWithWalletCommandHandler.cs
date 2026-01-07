@@ -1,6 +1,7 @@
 ﻿using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 
+namespace Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 public class PayBookingWithWalletCommandHandler
     : IRequestHandler<PayBookingWithWalletCommand, Unit>
 {

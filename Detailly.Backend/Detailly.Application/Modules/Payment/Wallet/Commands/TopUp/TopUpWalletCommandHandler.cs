@@ -1,6 +1,8 @@
 ﻿using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 
+namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
+
 public class TopUpWalletCommandHandler
     : IRequestHandler<TopUpWalletCommand, Unit>
 {

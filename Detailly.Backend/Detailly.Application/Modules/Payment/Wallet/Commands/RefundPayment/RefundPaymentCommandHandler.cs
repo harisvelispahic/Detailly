@@ -1,5 +1,6 @@
 ﻿using Detailly.Domain.Common.Enums;
 
+namespace Detailly.Application.Modules.Payment.Wallet.Commands.RefundPayment;
 public class RefundPaymentCommandHandler
     : IRequestHandler<RefundPaymentCommand, Unit>
 {

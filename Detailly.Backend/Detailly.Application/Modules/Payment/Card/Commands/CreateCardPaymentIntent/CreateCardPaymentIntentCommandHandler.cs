@@ -25,6 +25,14 @@ public class CreateCardPaymentIntentCommandHandler
         CreateCardPaymentIntentCommand request,
         CancellationToken ct)
     {
+        // TEMP DEBUG ✨
+        
+
+        var bookingCount = await _context.Bookings.CountAsync(ct);
+        Console.WriteLine("EF SEES BOOKINGS COUNT = " + bookingCount);
+
+        Console.WriteLine($"Incoming BookingId = {request.BookingId}");
+
         // 1) Load booking
         var booking = await _context.Bookings
             .Include(b => b.PaymentTransaction)
