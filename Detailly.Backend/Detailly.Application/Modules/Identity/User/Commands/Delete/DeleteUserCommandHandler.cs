@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Identity.User.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Identity.User.Commands.Delete;
 public class DeleteUserCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
         : IRequestHandler<DeleteUserCommand, Unit>
 {

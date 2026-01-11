@@ -51,7 +51,7 @@ public interface IAppDbContext
     DbSet<ProcessedWebhookEventEntity> ProcessedWebhookEvents { get; }
 
     // Shared
-    DbSet<AddressEntity> Address { get; }
+    DbSet<AddressEntity> Addresses { get; }
     DbSet<ImageEntity> Images { get; }
     DbSet<NotificationEntity> Notifications { get; }
 

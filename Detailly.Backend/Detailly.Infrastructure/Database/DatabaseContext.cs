@@ -46,7 +46,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<ProcessedWebhookEventEntity> ProcessedWebhookEvents => Set<ProcessedWebhookEventEntity>();
 
     // Shared
-    public DbSet<AddressEntity> Address => Set<AddressEntity>();
+    public DbSet<AddressEntity> Addresses => Set<AddressEntity>();
     public DbSet<ImageEntity> Images => Set<ImageEntity>();
     public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
 

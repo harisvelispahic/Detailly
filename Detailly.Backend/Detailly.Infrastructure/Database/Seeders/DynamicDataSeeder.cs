@@ -2,6 +2,9 @@
 using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
+using Detailly.Domain.Entities.Booking; // ✅ DODANO
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Detailly.Infrastructure.Database.Seeders;
 
@@ -22,6 +25,7 @@ public static class DynamicDataSeeder
         await SeedVehicleCategoriesAsync(context);
         await SeedProductsAsync(context);
         await SeedAddressesAsync(context);
+        await SeedServicePackageItemsAsync(context); 
     }
 
     private static async Task SeedProductCategoriesAsync(DatabaseContext context)
@@ -120,7 +124,6 @@ public static class DynamicDataSeeder
             PercentageAdded = 20,
             ApplicationUser = dummyForSwagger,
         };
-
         var dummyForTests = new ApplicationUserEntity
         {
             Email = "test",
@@ -141,7 +144,6 @@ public static class DynamicDataSeeder
             PercentageAdded = 20,
             ApplicationUser = dummyForTests,
         };
-
         var haris = new ApplicationUserEntity
         {
             Email = "haris.velispahic@edu.fit.ba",
@@ -162,15 +164,14 @@ public static class DynamicDataSeeder
             PercentageAdded = 20,
             ApplicationUser = haris,
         };
-
         var danis = new ApplicationUserEntity
         {
             Email = "danis.music@edu.fit.ba",
             PasswordHash = hasher.HashPassword(null!, "danis123"),
             AddressId = null,
-            FirstName = "Danis",
-            LastName = "Music",
-            Username = "danis123",
+            FirstName = "Admin",
+            LastName = "Admin",
+            Username = "admin",
 
             IsAdmin = true,
             IsFleet = false
@@ -183,7 +184,6 @@ public static class DynamicDataSeeder
             PercentageAdded = 20,
             ApplicationUser = danis,
         };
-
         context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests, haris, danis);
         await context.SaveChangesAsync();
 
@@ -251,7 +251,6 @@ public static class DynamicDataSeeder
             context.Products.AddRange(
                 new ProductEntity
                 {
-                    //Id = 1,
                     Name = "Proizvod 1",
                     Description = "...",
                     ProductNumber = new Guid().ToString(),
@@ -261,7 +260,6 @@ public static class DynamicDataSeeder
                 },
                 new ProductEntity
                 {
-                    //Id = 2,
                     Name = "Proizvod 2",
                     Description = "...",
                     ProductNumber = new Guid().ToString(),
@@ -278,9 +276,9 @@ public static class DynamicDataSeeder
 
     private static async Task SeedAddressesAsync(DatabaseContext context)
     {
-        if (!await context.Address.AnyAsync())
+        if (!await context.Addresses.AnyAsync())
         {
-            context.Address.AddRange(
+            context.Addresses.AddRange(
                 new AddressEntity
                 {
                     Country = "Bosnia and Herzegovina",
@@ -302,5 +300,34 @@ public static class DynamicDataSeeder
             await context.SaveChangesAsync();
             Console.WriteLine("✅ Dynamic seed: products added.");
         }
+    }
+
+    
+    private static async Task SeedServicePackageItemsAsync(DatabaseContext context)
+    {
+        
+        if (await context.ServicePackageItems.AnyAsync())
+            return;
+
+        context.ServicePackageItems.AddRange(
+            new ServicePackageItemEntity { Name = "Prewash / Snow Foam", Price = 10.00m, Description = "Predpranje pjenom za sigurnije ručno pranje." },
+            new ServicePackageItemEntity { Name = "Ručni wash (2-bucket)", Price = 20.00m, Description = "Ručno pranje metodom 2 kante + safe drying." },
+            new ServicePackageItemEntity { Name = "Decontamination – Iron Remover", Price = 15.00m, Description = "Uklanjanje metalnih čestica s laka i felgi." },
+            new ServicePackageItemEntity { Name = "Decontamination – Tar Remover", Price = 15.00m, Description = "Uklanjanje katrana i tvrdokornih mrlja." },
+            new ServicePackageItemEntity { Name = "Clay bar tretman", Price = 25.00m, Description = "Mehanička dekontaminacija za glatku površinu." },
+            new ServicePackageItemEntity { Name = "Poliranje – One-step (light correction)", Price = 80.00m, Description = "Jednostepeno poliranje za sjaj i blagu korekciju." },
+            new ServicePackageItemEntity { Name = "Poliranje – Two-step (medium correction)", Price = 140.00m, Description = "Dvostepeno poliranje za jaču korekciju i finiš." },
+            new ServicePackageItemEntity { Name = "Zaštita laka – Sealant (6–8 sedmica)", Price = 25.00m, Description = "Brza zaštita i hidrofobnost." },
+            new ServicePackageItemEntity { Name = "Zaštita laka – Carnauba Wax", Price = 30.00m, Description = "Topli sjaj + zaštita (kraći vijek)." },
+            new ServicePackageItemEntity { Name = "Keramički premaz – 1 godina", Price = 180.00m, Description = "Keramička zaštita s pripremom (osnovni nivo)." },
+            new ServicePackageItemEntity { Name = "Keramički premaz – 3 godine", Price = 320.00m, Description = "Naprednija keramika + bolja trajnost." },
+            new ServicePackageItemEntity { Name = "Felge – dubinsko čišćenje + zaštita", Price = 30.00m, Description = "Detaljno čišćenje felgi i zaštitni sloj." },
+            new ServicePackageItemEntity { Name = "Gume – dressing", Price = 10.00m, Description = "Obnova izgleda guma (saten/shine)." },
+            new ServicePackageItemEntity { Name = "Enterijer – dubinsko čišćenje", Price = 60.00m, Description = "Usisavanje + čišćenje plastika + tekstil." },
+            new ServicePackageItemEntity { Name = "Koža – čišćenje + kondicioniranje", Price = 45.00m, Description = "Čišćenje kože + zaštita/kondicioner." }
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Dynamic seed: service package items added.");
     }
 }

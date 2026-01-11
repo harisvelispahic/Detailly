@@ -920,7 +920,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
