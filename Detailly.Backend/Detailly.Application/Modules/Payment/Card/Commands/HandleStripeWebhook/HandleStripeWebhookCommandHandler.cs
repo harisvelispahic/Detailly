@@ -77,9 +77,8 @@ public class HandleStripeWebhookCommandHandler
         //
         var payment = await _context.PaymentTransactions
             .Include(x => x.Booking)
-            .FirstOrDefaultAsync(
-                x => x.ProviderTransactionId == providerTransactionId,
-                ct);
+            .Include(x => x.Wallet)
+            .FirstOrDefaultAsync(x => x.ProviderTransactionId == providerTransactionId, ct);
 
         if (payment is null)
             return Unit.Value;
@@ -91,18 +90,41 @@ public class HandleStripeWebhookCommandHandler
         //
         if (eventType == "payment_intent.succeeded")
         {
-            payment.Status = PaymentTransactionStatus.Paid;
+            // prevent double-applying if already paid
+            if (payment.Status != PaymentTransactionStatus.Paid)
+            {
+                payment.Status = PaymentTransactionStatus.Paid;
 
-            if (payment.Booking is not null)
-                payment.Booking.Status = BookingStatus.Confirmed;
+                // booking flow
+                if (payment.Booking is not null)
+                    payment.Booking.Status = BookingStatus.Confirmed;
+
+                // wallet top-up flow
+                if (payment.Wallet is not null && payment.TransactionType == TransactionType.Deposit)
+                {
+                    var wallet = payment.Wallet;
+
+                    var bonus = (wallet.PercentageAdded / 100m) * payment.Amount;
+
+                    wallet.Balance += payment.Amount + bonus;
+                    wallet.TotalDeposited += payment.Amount;
+
+                    // optional: store bonus info into description
+                    payment.Description = (payment.Description ?? "Wallet top-up") + $" (+{bonus:0.00} bonus)";
+                }
+            }
         }
         else if (eventType == "payment_intent.payment_failed")
         {
-            payment.Status = PaymentTransactionStatus.Failed;
+            if (payment.Status != PaymentTransactionStatus.Failed)
+            {
+                payment.Status = PaymentTransactionStatus.Failed;
 
-            if (payment.Booking is not null)
-                payment.Booking.Status = BookingStatus.Cancelled;
+                if (payment.Booking is not null)
+                    payment.Booking.Status = BookingStatus.Cancelled;
+            }
         }
+
 
 
         //

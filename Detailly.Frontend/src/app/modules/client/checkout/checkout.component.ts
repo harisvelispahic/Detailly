@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { loadStripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../api-services/payments/payments.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
+  standalone: false,
 })
 export class CheckoutComponent implements OnInit {
   bookingId!: number;
@@ -17,8 +19,7 @@ export class CheckoutComponent implements OnInit {
   private stripe: any;
   private card!: StripeCardElement;
 
-  private stripePublicKey =
-    'pk_test_51SmMLOPNRubBTw6ncrcLkJsa4oCrLODXvVnHfwy2BxvrRG2ftkeaquWU8WBUmanMgih4fqH7byvbXqIyHnXIw5w400hNaftNVn'; // temporary
+  private stripePublicKey = environment.stripePublishableKey;
 
   constructor(private route: ActivatedRoute, private payments: PaymentsService) {}
 
@@ -51,14 +52,29 @@ export class CheckoutComponent implements OnInit {
   async pay() {
     if (!this.stripe || !this.clientSecret) return;
 
+    this.isLoading = true;
+    this.cardError = undefined;
+
     const result = await this.stripe.confirmCardPayment(this.clientSecret, {
       payment_method: {
         card: this.card,
       },
     });
 
+    this.isLoading = false;
+
     if (result.error) {
-      this.cardError = result.error.message ?? 'Payment failed';
+      const msg = result.error.message ?? 'Payment failed';
+      this.cardError = msg;
+      alert(`❌ Payment failed: ${msg}`);
+      return;
+    }
+
+    // If no error, Stripe returned a PaymentIntent
+    if (result.paymentIntent?.status === 'succeeded') {
+      alert('✅ Payment successful! Thank you.');
+    } else {
+      alert(`ℹ️ Payment status: ${result.paymentIntent?.status ?? 'unknown'}`);
     }
   }
 }

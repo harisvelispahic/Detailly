@@ -15,4 +15,18 @@ export class PaymentsService {
       {}
     );
   }
+
+  createWalletTopUpCardIntent(
+    body: CreateWalletTopUpIntentRequest
+  ): Observable<{ clientSecret: string }> {
+    return this.http.post<{ clientSecret: string }>(
+      `${this.baseUrl}/wallet/top-up/card-intent`,
+      body
+    );
+  }
+}
+
+export interface CreateWalletTopUpIntentRequest {
+  amount: number;
+  description?: string | null;
 }

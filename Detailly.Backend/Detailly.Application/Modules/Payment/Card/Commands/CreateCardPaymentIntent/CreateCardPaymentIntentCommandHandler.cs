@@ -25,13 +25,17 @@ public class CreateCardPaymentIntentCommandHandler
         CreateCardPaymentIntentCommand request,
         CancellationToken ct)
     {
-        // TEMP DEBUG ✨
-        
 
+
+        // TEMP DEBUG
+        
         var bookingCount = await _context.Bookings.CountAsync(ct);
         Console.WriteLine("EF SEES BOOKINGS COUNT = " + bookingCount);
 
         Console.WriteLine($"Incoming BookingId = {request.BookingId}");
+
+
+
 
         // 1) Load booking
         var booking = await _context.Bookings
@@ -48,7 +52,7 @@ public class CreateCardPaymentIntentCommandHandler
         if (booking.PaymentTransaction is not null)
             throw new Exception("Payment already exists for this booking.");
 
-        // 2) Call Stripe service (fake for now)
+        // 2) Call Stripe service
         var (providerTransactionId, clientSecret) =
             await _stripe.CreatePaymentIntentAsync(
                 booking.TotalPrice,

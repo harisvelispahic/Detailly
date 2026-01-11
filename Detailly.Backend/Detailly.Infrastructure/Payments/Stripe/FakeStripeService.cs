@@ -3,7 +3,9 @@ using Detailly.Application.Abstractions.Payments;
 
 namespace Detailly.Infrastructure.Payments.Stripe;
 
-public class FakeStripeService : IStripeService
+
+//public class FakeStripeService : IStripeService
+public class FakeStripeService
 {
     public Task<(string ProviderTransactionId, string ClientSecret)> CreatePaymentIntentAsync(
         decimal amount,

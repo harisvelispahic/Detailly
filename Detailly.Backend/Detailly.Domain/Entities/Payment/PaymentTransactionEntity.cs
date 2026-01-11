@@ -9,12 +9,12 @@ public class PaymentTransactionEntity : BaseEntity
 {
     // Core payment data
     public required decimal Amount { get; set; }
-    public required TransactionType TransactionType { get; set; } // Credit / Debit
+    public required TransactionType TransactionType { get; set; }
     public PaymentTransactionStatus Status { get; set; } = PaymentTransactionStatus.Unpaid;
     public required DateTime TransactionDate { get; set; }
 
     // Provider info
-    public string? Provider { get; set; }               // Wallet, Stripe, PayPal
+    public string? Provider { get; set; }               // Wallet, Stripe
     public string? ProviderTransactionId { get; set; }  // External reference
     public string? Description { get; set; }
 

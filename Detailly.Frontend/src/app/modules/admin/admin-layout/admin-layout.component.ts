@@ -6,7 +6,7 @@ import { AuthFacadeService } from '../../../core/services/auth/auth-facade.servi
   selector: 'app-admin-layout',
   standalone: false,
   templateUrl: './admin-layout.component.html',
-  styleUrl: './admin-layout.component.scss'
+  styleUrl: './admin-layout.component.scss',
 })
 export class AdminLayoutComponent {
   private translate = inject(TranslateService);
@@ -16,7 +16,7 @@ export class AdminLayoutComponent {
 
   languages = [
     { code: 'bs', name: 'Bosanski', flag: '🇧🇦' },
-    { code: 'en', name: 'English', flag: '🇬🇧' }
+    { code: 'en', name: 'English', flag: '🇬🇧' },
   ];
 
   constructor() {
@@ -30,6 +30,6 @@ export class AdminLayoutComponent {
   }
 
   getCurrentLanguage() {
-    return this.languages.find(lang => lang.code === this.currentLang);
+    return this.languages.find((lang) => lang.code === this.currentLang);
   }
 }

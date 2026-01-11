@@ -3,6 +3,7 @@ using Detailly.Application.Modules.Payment.Card.Commands.CreateCardPaymentIntent
 using Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundPayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
+using Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,4 +79,23 @@ public class PaymentsController : ControllerBase
         await _mediator.Send(new RefundPaymentCommand(paymentId));
         return Ok();
     }
+
+
+    [HttpPost("wallet/top-up/card-intent")]
+    [Authorize]
+    public async Task<IActionResult> CreateWalletTopUpCardIntent([FromBody] WalletTopUpIntentRequest req)
+    {
+        if (_currentUser.ApplicationUserId is null)
+            return Unauthorized();
+
+        var userId = _currentUser.ApplicationUserId.Value;
+
+        var result = await _mediator.Send(
+            new CreateWalletTopUpCardIntentCommand(userId, req.Amount, req.Description)
+        );
+
+        return Ok(result);
+    }
 }
+
+public record WalletTopUpIntentRequest(decimal Amount, string? Description);

@@ -31,4 +31,24 @@ public class StripeService : IStripeService
 
         return (intent.Id, intent.ClientSecret);
     }
+
+    public async Task<(string ProviderTransactionId, string ClientSecret)>
+    CreateWalletTopUpPaymentIntentAsync(decimal amount, int walletId, int userId, CancellationToken ct)
+    {
+        var options = new PaymentIntentCreateOptions
+        {
+            Amount = (long)(amount * 100),
+            Currency = "bam",
+            Metadata = new Dictionary<string, string>
+        {
+            { "walletId", walletId.ToString() },
+            { "userId", userId.ToString() },
+            { "purpose", "wallet_topup" }
+        }
+        };
+
+        var intent = await _paymentIntentService.CreateAsync(options, cancellationToken: ct);
+        return (intent.Id, intent.ClientSecret);
+    }
+
 }
