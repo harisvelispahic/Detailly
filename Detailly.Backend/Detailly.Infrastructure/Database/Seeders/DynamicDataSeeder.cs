@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
 using Detailly.Domain.Entities.Booking; // ✅ DODANO
@@ -24,7 +25,6 @@ public static class DynamicDataSeeder
         await SeedVehicleCategoriesAsync(context);
         await SeedProductsAsync(context);
         await SeedAddressesAsync(context);
-
         await SeedServicePackageItemsAsync(context); 
     }
 
@@ -74,6 +74,14 @@ public static class DynamicDataSeeder
             IsAdmin = true,
             IsFleet = false,
         };
+        admin.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = admin,
+        };
 
         var user = new ApplicationUserEntity
         {
@@ -86,6 +94,14 @@ public static class DynamicDataSeeder
 
             IsManager = true,
             IsFleet = false
+        };
+        user.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = user,
         };
 
         var dummyForSwagger = new ApplicationUserEntity
@@ -100,7 +116,14 @@ public static class DynamicDataSeeder
             IsAdmin = true,
             IsFleet = false
         };
-
+        dummyForSwagger.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = dummyForSwagger,
+        };
         var dummyForTests = new ApplicationUserEntity
         {
             Email = "test",
@@ -113,7 +136,14 @@ public static class DynamicDataSeeder
             IsEmployee = true,
             IsFleet = true
         };
-
+        dummyForTests.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = dummyForTests,
+        };
         var haris = new ApplicationUserEntity
         {
             Email = "haris.velispahic@edu.fit.ba",
@@ -126,7 +156,14 @@ public static class DynamicDataSeeder
             IsAdmin = true,
             IsFleet = false
         };
-
+        haris.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = haris,
+        };
         var danis = new ApplicationUserEntity
         {
             Email = "danis.music@edu.fit.ba",
@@ -139,7 +176,14 @@ public static class DynamicDataSeeder
             IsAdmin = true,
             IsFleet = false
         };
-
+        danis.Wallet = new WalletEntity
+        {
+            Balance = 1000m,
+            Currency = CurrencyName.BAM,
+            TotalDeposited = 1000m,
+            PercentageAdded = 20,
+            ApplicationUser = danis,
+        };
         context.ApplicationUsers.AddRange(admin, user, dummyForSwagger, dummyForTests, haris, danis);
         await context.SaveChangesAsync();
 

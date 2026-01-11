@@ -43,7 +43,8 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Payment
     public DbSet<WalletEntity> Wallet => Set<WalletEntity>();
     public DbSet<PaymentTransactionEntity> PaymentTransactions => Set<PaymentTransactionEntity>();
-   
+    public DbSet<ProcessedWebhookEventEntity> ProcessedWebhookEvents => Set<ProcessedWebhookEventEntity>();
+
     // Shared
     public DbSet<AddressEntity> Addresses => Set<AddressEntity>();
     public DbSet<ImageEntity> Images => Set<ImageEntity>();

@@ -1,0 +1,29 @@
+<h2>Wallet Top Up</h2>
+
+@if (isLoading) {
+<div>Loading...</div>
+} @if (cardError) {
+<div style="color: red">
+  {{ cardError }}
+</div>
+} @if (successMessage) {
+<div style="color: green">
+  {{ successMessage }}
+</div>
+}
+
+<div style="margin-top: 12px">
+  <label>Amount</label>
+  <input type="number" min="1" step="0.01" [(ngModel)]="amount" placeholder="e.g. 50.00" />
+</div>
+
+<div style="margin-top: 12px">
+  <label>Description (optional)</label>
+  <input type="text" [(ngModel)]="description" placeholder="Top up wallet" />
+</div>
+
+<hr />
+
+<div id="card-element" style="padding: 12px; border: 1px solid #ddd"></div>
+
+<button (click)="pay()" [disabled]="isLoading || !isReady" style="margin-top: 12px">Pay now</button>

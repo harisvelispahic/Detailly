@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260105191758_Init")]
-    partial class Init
+    [Migration("20260105214656_05012026_v2")]
+    partial class _05012026_v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,6 +38,9 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -64,6 +67,8 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("ServicePackageId");
 
@@ -565,6 +570,9 @@ namespace Detailly.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -595,10 +603,14 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int?>("WalletId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique()
+                        .HasFilter("[BookingId] IS NOT NULL");
 
                     b.HasIndex("OrderId")
                         .IsUnique()
@@ -606,7 +618,33 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("PaymentTransactions");
+                    b.ToTable("PaymentTransactions", (string)null);
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Payment.ProcessedWebhookEventEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProcessedWebhookEvents");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.WalletEntity", b =>
@@ -648,7 +686,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("Wallet");
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Sales.CartEntity", b =>
@@ -885,7 +923,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
@@ -1070,8 +1108,13 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
                         .WithMany("Bookings")
                         .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageEntity", "ServicePackage")
                         .WithMany("Bookings")
@@ -1086,6 +1129,8 @@ namespace Detailly.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("ServicePackage");
 
@@ -1207,6 +1252,11 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", b =>
                 {
+                    b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
+                        .WithOne("PaymentTransaction")
+                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "BookingId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
                         .WithOne("PaymentTransaction")
                         .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "OrderId")
@@ -1215,8 +1265,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
                         .WithMany("PaymentTransactions")
                         .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Booking");
 
                     b.Navigation("Order");
 
@@ -1228,7 +1279,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
                         .WithOne("Wallet")
                         .HasForeignKey("Detailly.Domain.Entities.Payment.WalletEntity", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1363,6 +1414,8 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
                     b.Navigation("BookingVehicleAssignments");
+
+                    b.Navigation("PaymentTransaction");
 
                     b.Navigation("Review");
                 });

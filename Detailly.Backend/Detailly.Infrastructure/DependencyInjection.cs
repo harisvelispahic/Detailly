@@ -1,6 +1,8 @@
 ﻿using Detailly.Application.Abstractions;
+using Detailly.Application.Abstractions.Payments;
 using Detailly.Infrastructure.Common;
 using Detailly.Infrastructure.Database;
+using Detailly.Infrastructure.Payments.Stripe;
 using Detailly.Shared.Constants;
 using Detailly.Shared.Options;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +36,9 @@ public static class DependencyInjection
             }
 
             var cs = sp.GetRequiredService<IOptions<ConnectionStringsOptions>>().Value.Main;
+
+            Console.WriteLine($"🚨 USING CONNECTION STRING: {cs}");
+
             options.UseSqlServer(cs);
         });
 
@@ -49,6 +54,17 @@ public static class DependencyInjection
         // HttpContext accessor + current user
         services.AddHttpContextAccessor();
         services.AddScoped<IAppCurrentUser, AppCurrentUser>();
+
+        // Stripe service
+        //services.AddScoped<IStripeService, FakeStripeService>();
+        services.AddScoped<IStripeService, StripeService>();
+
+        // Webhook verifier
+        services.AddScoped<IWebhookVerifier, WebhookVerifier>();
+
+        // Stripe webhook parser
+        services.AddScoped<IStripeWebhookParser, StripeWebhookParser>();
+
 
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);
