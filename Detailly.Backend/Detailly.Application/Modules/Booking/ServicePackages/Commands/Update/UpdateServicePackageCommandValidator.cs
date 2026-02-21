@@ -28,18 +28,12 @@ public sealed class UpdateServicePackageCommandValidator : AbstractValidator<Upd
                 .GreaterThanOrEqualTo(0);
         });
 
-        When(x => x.EstimatedDurationHours.HasValue, () =>
+        When(x => x.ServicePackageItemIds is not null, () =>
         {
-            RuleFor(x => x.EstimatedDurationHours!.Value)
-                .GreaterThan(0);
-        });
-
-        When(x => x.ItemIds is not null, () =>
-        {
-            RuleForEach(x => x.ItemIds!)
+            RuleForEach(x => x.ServicePackageItemIds!)
                 .GreaterThan(0);
 
-            RuleFor(x => x.ItemIds!)
+            RuleFor(x => x.ServicePackageItemIds!)
                 .Must(list => list.Distinct().Count() == list.Count)
                 .WithMessage("ItemIds must not contain duplicates.");
         });

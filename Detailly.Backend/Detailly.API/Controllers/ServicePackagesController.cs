@@ -1,6 +1,7 @@
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Create;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Update;
+using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetAvailableAddons;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 
@@ -45,5 +46,13 @@ public class ServicePackagesController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(query, ct);
         return result;
+    }
+
+    [HttpGet("AvailableAddons/{id:int}")]
+    public async Task<ActionResult<GetAvailableAddonsQueryDto>> GetAvailableAddons(int id, CancellationToken ct)
+    {
+        var aa = await sender.Send(new GetAvailableAddonsQuery { ServicePackageId = id }, ct);
+
+        return Ok(aa);
     }
 }

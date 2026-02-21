@@ -7,7 +7,9 @@ public class ServicePackageEntity : BaseEntity
     public required string Name { get; set; }
     public string? Description { get; set; }
     public required decimal Price { get; set; }
-    public required int EstimatedDurationHours { get; set; } // In hours, will be converted to Days on FE if needed
+
+    public int? BaseDurationMinutes { get; set; }
+    public int? BaseRequiredEmployees { get; set; }        // required staff for base package
 
     // Foreign keys
     public IReadOnlyCollection<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; private set; } = new List<ServicePackageItemAssignmentEntity>();

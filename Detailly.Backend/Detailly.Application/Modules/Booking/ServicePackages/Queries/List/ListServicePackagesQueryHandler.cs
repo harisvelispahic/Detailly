@@ -28,7 +28,8 @@ public class ListServicePackagesQueryHandler(IAppDbContext ctx)
                 Name = sp.Name,
                 Description = sp.Description,
                 Price = sp.Price,
-                EstimatedDurationHours = sp.EstimatedDurationHours,
+                //EstimatedDurationHours = sp.EstimatedDurationHours,
+                EstimatedDurationHours = 1,
 
                 Items = ctx.ServicePackageItemAssignments
                     .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted && !a.ServicePackageItem.IsDeleted)

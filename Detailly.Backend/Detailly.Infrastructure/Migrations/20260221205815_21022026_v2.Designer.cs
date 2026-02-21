@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260105214656_05012026_v2")]
-    partial class _05012026_v2
+    [Migration("20260221205815_21022026_v2")]
+    partial class _21022026_v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,6 +25,88 @@ namespace Detailly.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingAddonEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DurationMinutesDeltaSnapshot")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceDeltaSnapshot")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RequiredEmployeesDeltaSnapshot")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceAddonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceAddonId");
+
+                    b.HasIndex("BookingId", "ServiceAddonId")
+                        .IsUnique();
+
+                    b.ToTable("BookingAddons", (string)null);
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEmployeeAssignmentEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AssignedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsLead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("BookingId", "EmployeeId")
+                        .IsUnique();
+
+                    b.ToTable("BookingEmployeeAssignments", (string)null);
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -33,14 +115,14 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApplicationUserId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("EmployeeId")
+                    b.Property<int>("CustomerId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("EndUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -51,13 +133,34 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RequiredBays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RequiredEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReservationExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ServiceAddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ServiceMode")
+                        .HasColumnType("int");
+
                     b.Property<int>("ServicePackageId")
                         .HasColumnType("int");
+
+                    b.Property<int>("ShopLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartUtc")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int>("TimeSlotId")
+                    b.Property<int?>("TimeSlotEntityId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
@@ -66,13 +169,19 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("ServiceAddressId");
 
                     b.HasIndex("ServicePackageId");
 
-                    b.HasIndex("TimeSlotId");
+                    b.HasIndex("TimeSlotEntityId");
+
+                    b.HasIndex("Status", "ReservationExpiresAtUtc");
+
+                    b.HasIndex("ServiceMode", "StartUtc", "EndUtc");
+
+                    b.HasIndex("ShopLocationId", "StartUtc", "EndUtc");
 
                     b.ToTable("Bookings", (string)null);
                 });
@@ -109,6 +218,47 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("BookingVehicleAssignments", (string)null);
                 });
 
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.EmployeeShiftEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeWorkMode")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ShopLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ShopLocationId", "EmployeeWorkMode", "StartUtc", "EndUtc");
+
+                    b.ToTable("EmployeeShifts", (string)null);
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -134,13 +284,18 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TotalBays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
 
-                    b.ToTable("Locations");
+                    b.HasIndex("Name");
+
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
@@ -171,7 +326,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("Reviews", (string)null);
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServiceAddonEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -185,8 +340,60 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EstimatedDurationHours")
+                    b.Property<int>("DurationMinutesDelta")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal>("PriceDelta")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RequiredEmployeesDelta")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("ServiceAddons", (string)null);
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("BaseDurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BaseRequiredEmployees")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -253,6 +460,15 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAddon")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -266,6 +482,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RequiredEmployees")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -448,6 +667,9 @@ namespace Detailly.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int?>("EmployeeWorkMode")
+                        .HasColumnType("int");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -463,7 +685,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsEmployee")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasDefaultValue(false);
 
                     b.Property<bool>("IsEnabled")
                         .ValueGeneratedOnAdd()
@@ -507,6 +729,8 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("IsEmployee", "EmployeeWorkMode", "IsEnabled");
 
                     b.ToTable("ApplicationUsers", (string)null);
                 });
@@ -923,7 +1147,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Address");
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
@@ -1103,17 +1327,55 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("Vehicles");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingAddonEntity", b =>
                 {
-                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
-                        .WithMany("Bookings")
-                        .HasForeignKey("ApplicationUserId")
+                    b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
+                        .WithMany("BookingAddons")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Booking.ServiceAddonEntity", "ServiceAddon")
+                        .WithMany("BookingAddons")
+                        .HasForeignKey("ServiceAddonId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("ServiceAddon");
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEmployeeAssignmentEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
+                        .WithMany("EmployeeAssignments")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Customer")
+                        .WithMany("Bookings")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Shared.AddressEntity", "ServiceAddress")
+                        .WithMany()
+                        .HasForeignKey("ServiceAddressId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageEntity", "ServicePackage")
@@ -1122,19 +1384,23 @@ namespace Detailly.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Detailly.Domain.Entities.Booking.TimeSlotEntity", "TimeSlot")
-                        .WithMany("Bookings")
-                        .HasForeignKey("TimeSlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Detailly.Domain.Entities.Booking.LocationEntity", "ShopLocation")
+                        .WithMany()
+                        .HasForeignKey("ShopLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ApplicationUser");
+                    b.HasOne("Detailly.Domain.Entities.Booking.TimeSlotEntity", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("TimeSlotEntityId");
 
-                    b.Navigation("Employee");
+                    b.Navigation("Customer");
+
+                    b.Navigation("ServiceAddress");
 
                     b.Navigation("ServicePackage");
 
-                    b.Navigation("TimeSlot");
+                    b.Navigation("ShopLocation");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingVehicleAssignmentEntity", b =>
@@ -1156,12 +1422,31 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.EmployeeShiftEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Booking.LocationEntity", "ShopLocation")
+                        .WithMany()
+                        .HasForeignKey("ShopLocationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ShopLocation");
+                });
+
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Shared.AddressEntity", "Address")
                         .WithMany("Locations")
                         .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Address");
@@ -1200,7 +1485,7 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.TimeSlotEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Booking.LocationEntity", "Location")
-                        .WithMany("TimeSlots")
+                        .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1413,21 +1698,25 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.BookingEntity", b =>
                 {
+                    b.Navigation("BookingAddons");
+
                     b.Navigation("BookingVehicleAssignments");
+
+                    b.Navigation("EmployeeAssignments");
 
                     b.Navigation("PaymentTransaction");
 
                     b.Navigation("Review");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
-                {
-                    b.Navigation("TimeSlots");
-                });
-
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServiceAddonEntity", b =>
+                {
+                    b.Navigation("BookingAddons");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>

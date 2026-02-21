@@ -25,7 +25,7 @@ public static class DynamicDataSeeder
         await SeedVehicleCategoriesAsync(context);
         await SeedProductsAsync(context);
         await SeedAddressesAsync(context);
-        await SeedServicePackageItemsAsync(context); 
+        await SeedServicePackageItemsAsync(context);
     }
 
     private static async Task SeedProductCategoriesAsync(DatabaseContext context)
@@ -302,29 +302,29 @@ public static class DynamicDataSeeder
         }
     }
 
-    
+
     private static async Task SeedServicePackageItemsAsync(DatabaseContext context)
     {
-        
+
         if (await context.ServicePackageItems.AnyAsync())
             return;
 
         context.ServicePackageItems.AddRange(
-            new ServicePackageItemEntity { Name = "Prewash / Snow Foam", Price = 10.00m, Description = "Predpranje pjenom za sigurnije ručno pranje." },
-            new ServicePackageItemEntity { Name = "Ručni wash (2-bucket)", Price = 20.00m, Description = "Ručno pranje metodom 2 kante + safe drying." },
-            new ServicePackageItemEntity { Name = "Decontamination – Iron Remover", Price = 15.00m, Description = "Uklanjanje metalnih čestica s laka i felgi." },
-            new ServicePackageItemEntity { Name = "Decontamination – Tar Remover", Price = 15.00m, Description = "Uklanjanje katrana i tvrdokornih mrlja." },
-            new ServicePackageItemEntity { Name = "Clay bar tretman", Price = 25.00m, Description = "Mehanička dekontaminacija za glatku površinu." },
-            new ServicePackageItemEntity { Name = "Poliranje – One-step (light correction)", Price = 80.00m, Description = "Jednostepeno poliranje za sjaj i blagu korekciju." },
-            new ServicePackageItemEntity { Name = "Poliranje – Two-step (medium correction)", Price = 140.00m, Description = "Dvostepeno poliranje za jaču korekciju i finiš." },
-            new ServicePackageItemEntity { Name = "Zaštita laka – Sealant (6–8 sedmica)", Price = 25.00m, Description = "Brza zaštita i hidrofobnost." },
-            new ServicePackageItemEntity { Name = "Zaštita laka – Carnauba Wax", Price = 30.00m, Description = "Topli sjaj + zaštita (kraći vijek)." },
-            new ServicePackageItemEntity { Name = "Keramički premaz – 1 godina", Price = 180.00m, Description = "Keramička zaštita s pripremom (osnovni nivo)." },
-            new ServicePackageItemEntity { Name = "Keramički premaz – 3 godine", Price = 320.00m, Description = "Naprednija keramika + bolja trajnost." },
-            new ServicePackageItemEntity { Name = "Felge – dubinsko čišćenje + zaštita", Price = 30.00m, Description = "Detaljno čišćenje felgi i zaštitni sloj." },
-            new ServicePackageItemEntity { Name = "Gume – dressing", Price = 10.00m, Description = "Obnova izgleda guma (saten/shine)." },
-            new ServicePackageItemEntity { Name = "Enterijer – dubinsko čišćenje", Price = 60.00m, Description = "Usisavanje + čišćenje plastika + tekstil." },
-            new ServicePackageItemEntity { Name = "Koža – čišćenje + kondicioniranje", Price = 45.00m, Description = "Čišćenje kože + zaštita/kondicioner." }
+            new ServicePackageItemEntity { Name = "Prewash / Snow Foam", Price = 10.00m, Description = "Predpranje pjenom za sigurnije ručno pranje.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Ručni wash (2-bucket)", Price = 20.00m, Description = "Ručno pranje metodom 2 kante + safe drying.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Decontamination – Iron Remover", Price = 15.00m, Description = "Uklanjanje metalnih čestica s laka i felgi.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Decontamination – Tar Remover", Price = 15.00m, Description = "Uklanjanje katrana i tvrdokornih mrlja.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Clay bar tretman", Price = 25.00m, Description = "Mehanička dekontaminacija za glatku površinu.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Poliranje – One-step (light correction)", Price = 80.00m, Description = "Jednostepeno poliranje za sjaj i blagu korekciju.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Poliranje – Two-step (medium correction)", Price = 140.00m, Description = "Dvostepeno poliranje za jaču korekciju i finiš.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Zaštita laka – Sealant (6–8 sedmica)", Price = 25.00m, Description = "Brza zaštita i hidrofobnost.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Zaštita laka – Carnauba Wax", Price = 30.00m, Description = "Topli sjaj + zaštita (kraći vijek).", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Keramički premaz – 1 godina", Price = 180.00m, Description = "Keramička zaštita s pripremom (osnovni nivo).", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Keramički premaz – 3 godine", Price = 320.00m, Description = "Naprednija keramika + bolja trajnost.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Felge – dubinsko čišćenje + zaštita", Price = 30.00m, Description = "Detaljno čišćenje felgi i zaštitni sloj.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Gume – dressing", Price = 10.00m, Description = "Obnova izgleda guma (saten/shine).", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Enterijer – dubinsko čišćenje", Price = 60.00m, Description = "Usisavanje + čišćenje plastika + tekstil.", DurationMinutes = 30, RequiredEmployees = 1 },
+            new ServicePackageItemEntity { Name = "Koža – čišćenje + kondicioniranje", Price = 45.00m, Description = "Čišćenje kože + zaštita/kondicioner.", DurationMinutes = 30, RequiredEmployees = 1 }
         );
 
         await context.SaveChangesAsync();

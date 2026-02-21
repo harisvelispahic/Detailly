@@ -16,7 +16,7 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
             throw new DetaillyNotFoundException("Booking not found.");
 
         // Authorization check: user must own the booking
-        if (booking.ApplicationUserId != currentUser.ApplicationUserId)
+        if (booking.CustomerId != currentUser.ApplicationUserId)
             throw new DetaillyForbiddenException("You are not allowed to review this booking.");
 
         // Check if a review already exists

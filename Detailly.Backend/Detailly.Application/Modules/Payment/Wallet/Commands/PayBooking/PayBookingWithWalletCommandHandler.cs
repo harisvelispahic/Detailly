@@ -19,7 +19,7 @@ public class PayBookingWithWalletCommandHandler
             .FirstOrDefaultAsync(x => x.Id == request.BookingId, ct)
             ?? throw new Exception("Booking not found.");
 
-        if (booking.ApplicationUserId != request.UserId)
+        if (booking.CustomerId != request.UserId)
             throw new Exception("Forbidden.");
 
         if (booking.Status != BookingStatus.PendingPayment)
