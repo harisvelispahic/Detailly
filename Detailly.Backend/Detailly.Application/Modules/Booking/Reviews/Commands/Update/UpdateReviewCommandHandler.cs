@@ -20,7 +20,7 @@ public class UpdateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
             throw new DetaillyNotFoundException("Review not found.");
 
         // Authorization
-        if (review.Booking.ApplicationUserId != currentUser.ApplicationUserId)
+        if (review.Booking.CustomerId != currentUser.ApplicationUserId)
             throw new DetaillyForbiddenException("You are not allowed to update this review.");
 
         // -------- PARTIAL UPDATE --------

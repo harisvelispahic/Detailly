@@ -15,26 +15,26 @@ public class CreateServicePackageCommandHandler(IAppDbContext context)
             Name = request.Name.Trim(),
             Description = request.Description?.Trim(),
             Price = request.Price,
-            EstimatedDurationHours = request.EstimatedDurationHours,
             CreatedAtUtc = DateTime.UtcNow
         };
 
         context.ServicePackages.Add(package);
-        await context.SaveChangesAsync(ct); // da dobijemo package.Id
+        await context.SaveChangesAsync(ct);
 
-        if (request.ItemIds is not null && request.ItemIds.Count > 0)
+        var distinctIds = (request.ServicePackageItemIds ?? new List<int>()).Distinct().ToList();
+
+        if (distinctIds.Count > 0)
         {
-            var distinctIds = request.ItemIds.Distinct().ToList();
-
-            // Validate items exist (and are not deleted)
-            var existingItemIds = await context.ServicePackageItems
-                .Where(x => distinctIds.Contains(x.Id) && !x.IsDeleted)
-                .Select(x => x.Id)
+            // Load full items so we can compute totals
+            var items = await context.ServicePackageItems
+                .Where(x => distinctIds.Contains(x.Id) && !x.IsDeleted /* && x.IsActive */)
                 .ToListAsync(ct);
 
-            if (existingItemIds.Count != distinctIds.Count)
-                throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_ITEM_INVALID", "One or more ServicePackageItem ids are invalid.");
+            if (items.Count != distinctIds.Count)
+                throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_ITEM_INVALID",
+                    "One or more ServicePackageItem ids are invalid.");
 
+            // Create assignments
             var assignments = distinctIds.Select(itemId => new ServicePackageItemAssignmentEntity
             {
                 ServicePackageId = package.Id,
@@ -43,6 +43,11 @@ public class CreateServicePackageCommandHandler(IAppDbContext context)
             });
 
             context.ServicePackageItemAssignments.AddRange(assignments);
+
+            // Cache totals on package
+            package.BaseDurationMinutes = items.Sum(i => i.DurationMinutes);
+            package.BaseRequiredEmployees = items.Max(i => i.RequiredEmployees);
+
             await context.SaveChangesAsync(ct);
         }
 

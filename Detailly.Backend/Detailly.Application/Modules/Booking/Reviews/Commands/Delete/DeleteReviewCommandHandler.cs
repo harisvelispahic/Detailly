@@ -18,7 +18,7 @@ public class DeleteReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
             throw new DetaillyNotFoundException("Review not found.");
 
         // Authorization: check user owns the booking
-        if (review.Booking.ApplicationUserId != currentUser.ApplicationUserId)
+        if (review.Booking.CustomerId != currentUser.ApplicationUserId)
             throw new DetaillyForbiddenException("You are not allowed to delete this review.");
 
         // Soft delete

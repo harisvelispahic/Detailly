@@ -17,15 +17,13 @@ public sealed class CreateServicePackageCommandValidator : AbstractValidator<Cre
         RuleFor(x => x.Price)
             .GreaterThanOrEqualTo(0);
 
-        RuleFor(x => x.EstimatedDurationHours)
-            .GreaterThan(0);
 
-        When(x => x.ItemIds is not null, () =>
+        When(x => x.ServicePackageItemIds is not null, () =>
         {
-            RuleForEach(x => x.ItemIds!)
+            RuleForEach(x => x.ServicePackageItemIds!)
                 .GreaterThan(0);
 
-            RuleFor(x => x.ItemIds!)
+            RuleFor(x => x.ServicePackageItemIds!)
                 .Must(list => list.Distinct().Count() == list.Count)
                 .WithMessage("ItemIds must not contain duplicates.");
         });
