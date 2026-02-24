@@ -32,6 +32,9 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<ServicePackageItemEntity> ServicePackageItems => Set<ServicePackageItemEntity>();
     public DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments => Set<ServicePackageItemAssignmentEntity>();
     public DbSet<LocationEntity> Locations => Set<LocationEntity>();
+    public DbSet<BookingItemEntity> BookingItems => Set<BookingItemEntity>();
+    public DbSet<EmployeeShiftEntity> EmployeeShifts => Set<EmployeeShiftEntity>();
+    public DbSet<BookingEmployeeAssignmentEntity> BookingEmployeeAssignments => Set<BookingEmployeeAssignmentEntity>();
     public DbSet<TimeSlotEntity> TimeSlots => Set<TimeSlotEntity>();
 
     public DbSet<BookingVehicleAssignmentEntity> BookingVehicleAssignments => Set<BookingVehicleAssignmentEntity>();

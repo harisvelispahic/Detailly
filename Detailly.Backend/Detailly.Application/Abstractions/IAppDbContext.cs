@@ -37,9 +37,11 @@ public interface IAppDbContext
     DbSet<ServicePackageItemEntity> ServicePackageItems { get; }
     DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; }
     DbSet<LocationEntity> Locations { get; }
-    DbSet<TimeSlotEntity> TimeSlots { get; }
-
+    DbSet<BookingItemEntity> BookingItems { get; }
+    DbSet<EmployeeShiftEntity> EmployeeShifts { get; }
+    DbSet<BookingEmployeeAssignmentEntity> BookingEmployeeAssignments { get; }
     DbSet<BookingVehicleAssignmentEntity> BookingVehicleAssignments { get; }
+    DbSet<TimeSlotEntity> TimeSlots { get; }
 
     // Vehicle
     DbSet<VehicleEntity> Vehicles { get; }
