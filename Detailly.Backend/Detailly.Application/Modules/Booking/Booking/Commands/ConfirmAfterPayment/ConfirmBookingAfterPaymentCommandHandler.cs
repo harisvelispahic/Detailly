@@ -10,8 +10,6 @@ public sealed class ConfirmBookingAfterPaymentCommandHandler(IAppDbContext conte
     {
         var now = DateTime.UtcNow;
 
-        await using var tx = await context.Database.BeginTransactionAsync(ct);
-
         var payment = await context.PaymentTransactions
             .Include(x => x.Booking)
             .FirstOrDefaultAsync(x => x.Id == request.PaymentTransactionId && !x.IsDeleted, ct);
@@ -24,7 +22,6 @@ public sealed class ConfirmBookingAfterPaymentCommandHandler(IAppDbContext conte
 
         if (payment.Booking is null)
         {
-            await tx.CommitAsync(ct);
             return Unit.Value; // not a booking payment
         }
 
@@ -33,7 +30,6 @@ public sealed class ConfirmBookingAfterPaymentCommandHandler(IAppDbContext conte
         // idempotent
         if (booking.Status == BookingStatus.Confirmed)
         {
-            await tx.CommitAsync(ct);
             return Unit.Value;
         }
 
@@ -48,7 +44,6 @@ public sealed class ConfirmBookingAfterPaymentCommandHandler(IAppDbContext conte
         booking.ModifiedAtUtc = now;
 
         await context.SaveChangesAsync(ct);
-        await tx.CommitAsync(ct);
 
         return Unit.Value;
     }

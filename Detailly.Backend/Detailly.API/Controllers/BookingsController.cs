@@ -1,4 +1,5 @@
 ﻿using Detailly.Application.Modules.Booking.Bookings.Commands.Cancel;
+using Detailly.Application.Modules.Booking.Bookings.Commands.Complete;
 using Detailly.Application.Modules.Booking.Bookings.Commands.CreateHold;
 using Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 using Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
@@ -62,5 +63,16 @@ public class BookingsController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(query, ct);
         return result;
+    }
+
+    // ---------------------------------------
+    // COMPLETE BOOKING (Employee, Manager or Admin)
+    // ---------------------------------------
+    [HttpPut("{id:int}/complete")]
+    public async Task Complete(int id, CompleteBookingCommand command, CancellationToken ct)
+    {
+        command.BookingId = id; // Route ID precedence
+        await sender.Send(command, ct);
+        // no return -> 204 No Content
     }
 }

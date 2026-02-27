@@ -1,5 +1,6 @@
 ﻿using Detailly.Application.Abstractions;
 using Detailly.Application.Abstractions.Payments;
+using Detailly.Infrastructure.Background;
 using Detailly.Infrastructure.Common;
 using Detailly.Infrastructure.Database;
 using Detailly.Infrastructure.Payments.Stripe;
@@ -65,6 +66,7 @@ public static class DependencyInjection
         // Stripe webhook parser
         services.AddScoped<IStripeWebhookParser, StripeWebhookParser>();
 
+        services.AddHostedService<BookingHoldExpiryCleanupService>();
 
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);

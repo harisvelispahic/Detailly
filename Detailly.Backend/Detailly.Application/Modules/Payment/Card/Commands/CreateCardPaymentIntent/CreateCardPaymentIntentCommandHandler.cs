@@ -8,6 +8,9 @@ namespace Detailly.Application.Modules.Payment.Card.Commands.CreateCardPaymentIn
 public class CreateCardPaymentIntentCommandHandler
     : IRequestHandler<CreateCardPaymentIntentCommand, CreateCardPaymentIntentResult>
 {
+    // If a PaymentIntent has been Pending for longer than this, allow replacing it with a new one.
+    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(2);
+
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;
 
@@ -41,7 +44,7 @@ public class CreateCardPaymentIntentCommandHandler
         if (booking.ReservationExpiresAtUtc is null || booking.ReservationExpiresAtUtc <= now)
             throw new Exception("Booking reservation expired.");
 
-        // 5) Payment idempotency / retry rules
+        // 5) Payment idempotency / retry / stale-pending replacement rules
         if (booking.PaymentTransaction is not null)
         {
             var existing = booking.PaymentTransaction;
@@ -50,23 +53,35 @@ public class CreateCardPaymentIntentCommandHandler
                 throw new Exception("Booking is already paid.");
 
             if (existing.Status == PaymentTransactionStatus.Pending)
-                throw new Exception("Payment is already in progress.");
+            {
+                var age = now - existing.TransactionDate;
+
+                // Still fresh -> treat as in-progress and block creating new intent
+                if (age < PendingReplaceAfter)
+                    throw new Exception("Payment is already in progress.");
+
+                // Stale pending -> auto-fail and allow creating a new intent
+                existing.Status = PaymentTransactionStatus.Failed;
+                existing.Description = (existing.Description ?? "Card payment")
+                                       + " (auto-failed due to stale pending intent)";
+
+                // Break link so we can attach a new payment transaction
+                booking.PaymentTransaction = null;
+            }
 
             // Failed/Unpaid -> allow retry by creating a new payment intent
             if (existing.Status is PaymentTransactionStatus.Failed or PaymentTransactionStatus.Unpaid)
             {
-                // Break the link so we can attach a new transaction to the booking.
-                // Keep the old transaction row for audit/history.
                 booking.PaymentTransaction = null;
             }
-            else
+            else if (existing.Status != PaymentTransactionStatus.Pending)
             {
                 // Future-proof: if a new status is added and not handled above
                 throw new Exception("Booking cannot start a new payment at this time.");
             }
         }
 
-        // 6) Call Stripe service to create a new PaymentIntent
+        // 6) Create Stripe PaymentIntent
         var (providerTransactionId, clientSecret) =
             await _stripe.CreatePaymentIntentAsync(
                 booking.TotalPrice,
@@ -90,7 +105,7 @@ public class CreateCardPaymentIntentCommandHandler
 
         _context.PaymentTransactions.Add(transaction);
 
-        // attach to booking
+        // Attach as the current payment attempt
         booking.PaymentTransaction = transaction;
 
         await _context.SaveChangesAsync(ct);
