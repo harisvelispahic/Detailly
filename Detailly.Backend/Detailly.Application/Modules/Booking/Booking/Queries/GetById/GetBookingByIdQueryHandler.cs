@@ -1,4 +1,6 @@
 ﻿
+using Detailly.Domain.Common.Enums;
+
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 
 public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
@@ -11,22 +13,31 @@ public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurren
 
         var customerId = appCurrentUser.ApplicationUserId.Value;
 
-        var booking = await context.Bookings
+        var b = await context.Bookings
             .AsNoTracking()
-            .Where(b => b.Id == request.Id && !b.IsDeleted)
-            .Select(b => new
+            .Where(x => x.Id == request.Id && !x.IsDeleted)
+            .Select(x => new
             {
-                Booking = b,
-                PackageName = b.ServicePackage.Name,
-                PaymentTransactionId = b.PaymentTransaction != null ? (int?)b.PaymentTransaction.Id : null,
-                PaymentStatus = b.PaymentTransaction != null ? (Detailly.Domain.Common.Enums.PaymentTransactionStatus?)b.PaymentTransaction.Status : null
+                x.Id,
+                x.Status,
+                x.ServiceMode,
+                x.StartUtc,
+                x.EndUtc,
+                x.TotalPrice,
+                x.RequiredEmployees,
+                x.RequiredBays,
+                x.ReservationExpiresAtUtc,
+                x.Notes,
+                x.ServicePackageId,
+                PackageName = x.ServicePackage.Name,
+                x.CustomerId
             })
             .FirstOrDefaultAsync(ct);
 
-        if (booking is null)
+        if (b is null)
             throw new DetaillyNotFoundException("Booking not found.");
 
-        if (booking.Booking.CustomerId != customerId)
+        if (b.CustomerId != customerId)
             throw new DetaillyBusinessRuleException("BOOKING_FORBIDDEN", "You can only view your own booking.");
 
         var addons = await context.BookingItems
@@ -48,7 +59,17 @@ public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurren
             .Select(x => x.VehicleId)
             .ToListAsync(ct);
 
-        var b = booking.Booking;
+        // ✅ latest PAYMENT attempt (not refunds)
+        var latestPaymentAttempt = await context.PaymentTransactions
+            .AsNoTracking()
+            .Where(x =>
+                !x.IsDeleted &&
+                x.BookingId == request.Id &&
+                x.TransactionType == TransactionType.Payment)
+            .OrderByDescending(x => x.TransactionDate)
+            .ThenByDescending(x => x.Id)
+            .Select(x => new { x.Id, x.Status })
+            .FirstOrDefaultAsync(ct);
 
         return new GetBookingByIdQueryDto
         {
@@ -63,11 +84,11 @@ public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurren
             ReservationExpiresAtUtc = b.ReservationExpiresAtUtc,
             Notes = b.Notes,
             ServicePackageId = b.ServicePackageId,
-            ServicePackageName = booking.PackageName,
+            ServicePackageName = b.PackageName,
             Addons = addons,
             VehicleIds = vehicleIds,
-            PaymentTransactionId = booking.PaymentTransactionId,
-            PaymentStatus = booking.PaymentStatus
+            PaymentTransactionId = latestPaymentAttempt?.Id,
+            PaymentStatus = latestPaymentAttempt is null ? null : (PaymentTransactionStatus?)latestPaymentAttempt.Status
         };
     }
 }

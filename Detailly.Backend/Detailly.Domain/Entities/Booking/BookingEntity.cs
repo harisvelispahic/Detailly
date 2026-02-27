@@ -31,10 +31,6 @@ public class BookingEntity : BaseEntity
     public required ServiceMode ServiceMode { get; set; }
 
 
-    // PAYMENT (optional until paid)
-    public PaymentTransactionEntity? PaymentTransaction { get; set; }
-
-
     // CUSTOMER
     public required int CustomerId { get; set; }
     public ApplicationUserEntity Customer { get; set; } = null!;
@@ -66,4 +62,5 @@ public class BookingEntity : BaseEntity
 
     public IReadOnlyCollection<BookingItemEntity> BookingItems { get; private set; } = new List<BookingItemEntity>();
 
+    public IReadOnlyCollection<PaymentTransactionEntity> PaymentTransactions { get; private set; } = new List<PaymentTransactionEntity>();
 }

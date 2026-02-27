@@ -23,10 +23,10 @@ public sealed class PaymentTransactionConfiguration
         builder.Property(x => x.Status)
             .IsRequired();
 
-        // BOOKING (1 : 0..1)
+        // BOOKING (1 : N)
         builder.HasOne(x => x.Booking)
-            .WithOne(x => x.PaymentTransaction)
-            .HasForeignKey<PaymentTransactionEntity>(x => x.BookingId)
+            .WithMany(b => b.PaymentTransactions)
+            .HasForeignKey(x => x.BookingId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // WALLET (1 : many)

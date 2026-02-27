@@ -55,20 +55,21 @@ public class StripeService : IStripeService
     }
 
     // NEW: Refund Stripe PaymentIntent (partial or full)
-    public async Task RefundPaymentIntentAsync(string providerTransactionId, decimal amount, CancellationToken ct)
+    public async Task<string> RefundPaymentIntentAsync(string paymentIntentId, decimal amount, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(providerTransactionId))
-            throw new ArgumentException("ProviderTransactionId is required.", nameof(providerTransactionId));
+        if (string.IsNullOrWhiteSpace(paymentIntentId))
+            throw new ArgumentException("ProviderTransactionId is required.", nameof(paymentIntentId));
 
         if (amount <= 0)
             throw new ArgumentOutOfRangeException(nameof(amount), "Refund amount must be greater than zero.");
 
-        var options = new RefundCreateOptions
+        var refundService = new RefundService();
+        var refund = await refundService.CreateAsync(new RefundCreateOptions
         {
-            PaymentIntent = providerTransactionId,
+            PaymentIntent = paymentIntentId,
             Amount = (long)Math.Round(amount * 100m, 0, MidpointRounding.AwayFromZero) // cents
-        };
+        }, cancellationToken: ct);
 
-        await _refundService.CreateAsync(options, cancellationToken: ct);
+        return refund.Id; // re_...
     }
 }

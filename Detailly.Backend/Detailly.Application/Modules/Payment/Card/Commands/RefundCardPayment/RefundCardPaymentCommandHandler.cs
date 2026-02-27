@@ -35,6 +35,8 @@ public sealed class RefundCardPaymentCommandHandler(IAppDbContext context, IStri
         await stripe.RefundPaymentIntentAsync(payment.ProviderTransactionId!, request.Amount, ct);
 
         // Record refund transaction (audit-safe)
+        var refundId = await stripe.RefundPaymentIntentAsync(payment.ProviderTransactionId!, request.Amount, ct);
+
         var refundTx = new PaymentTransactionEntity
         {
             Amount = request.Amount,
@@ -43,7 +45,7 @@ public sealed class RefundCardPaymentCommandHandler(IAppDbContext context, IStri
             TransactionDate = now,
 
             Provider = "Stripe",
-            ProviderTransactionId = payment.ProviderTransactionId,
+            ProviderTransactionId = refundId, // ✅ re_... not pi_...
             Description = $"Stripe refund ({request.Amount:0.00}) for payment #{payment.Id}",
 
             BookingId = payment.BookingId,

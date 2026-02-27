@@ -1,7 +1,9 @@
-﻿
+﻿using Detailly.Application.Abstractions;
 using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 
@@ -21,10 +23,9 @@ public class PayBookingWithWalletCommandHandler
     {
         var now = DateTime.UtcNow;
 
-        await using var tx = await _context.Database.BeginTransactionAsync(ct);
+        // ✅ No explicit tx here (ConfirmAfterPayment may start its own)
 
         var booking = await _context.Bookings
-            .Include(x => x.PaymentTransaction)
             .FirstOrDefaultAsync(x => x.Id == request.BookingId && !x.IsDeleted, ct)
             ?? throw new Exception("Booking not found.");
 
@@ -33,20 +34,33 @@ public class PayBookingWithWalletCommandHandler
 
         // idempotent success
         if (booking.Status == BookingStatus.Confirmed)
-        {
-            await tx.CommitAsync(ct);
             return Unit.Value;
-        }
 
         if (booking.Status != BookingStatus.PendingPayment)
             throw new Exception("Booking is not awaiting payment.");
 
-        // HOLD EXPIRY CHECK
         if (booking.ReservationExpiresAtUtc is null || booking.ReservationExpiresAtUtc <= now)
             throw new Exception("Booking reservation expired.");
 
-        if (booking.PaymentTransaction is not null)
-            throw new Exception("Payment already exists for this booking.");
+        // ✅ Check existing latest PAYMENT attempt
+        var latestAttempt = await _context.PaymentTransactions
+            .Where(x =>
+                !x.IsDeleted &&
+                x.BookingId == booking.Id &&
+                x.TransactionType == TransactionType.Payment)
+            .OrderByDescending(x => x.TransactionDate)
+            .ThenByDescending(x => x.Id)
+            .FirstOrDefaultAsync(ct);
+
+        if (latestAttempt is not null)
+        {
+            if (latestAttempt.Status == PaymentTransactionStatus.Paid)
+                return Unit.Value; // already paid, treat as idempotent
+
+            if (latestAttempt.Status == PaymentTransactionStatus.Pending)
+                throw new Exception("Payment is already in progress.");
+            // Failed/Unpaid -> allow wallet payment
+        }
 
         var wallet = await _context.Wallet
             .FirstOrDefaultAsync(x => x.ApplicationUserId == request.UserId && !x.IsDeleted, ct)
@@ -63,6 +77,7 @@ public class PayBookingWithWalletCommandHandler
             TransactionType = TransactionType.Payment,
             Status = PaymentTransactionStatus.Paid,
             TransactionDate = now,
+
             Provider = "Wallet",
             Description = "Booking paid with wallet",
 
@@ -71,14 +86,11 @@ public class PayBookingWithWalletCommandHandler
         };
 
         _context.PaymentTransactions.Add(payment);
-        booking.PaymentTransaction = payment;
-
         await _context.SaveChangesAsync(ct);
 
-        // Centralized booking confirmation logic (clears expiry, enforces rules)
+        // Centralized confirmation (clears expiry, enforces hold rules, idempotent)
         await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
 
-        await tx.CommitAsync(ct);
         return Unit.Value;
     }
 }

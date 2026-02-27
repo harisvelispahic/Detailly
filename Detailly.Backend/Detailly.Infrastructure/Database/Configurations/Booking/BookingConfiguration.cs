@@ -17,9 +17,9 @@ public sealed class BookingConfiguration : IEntityTypeConfiguration<BookingEntit
             .HasForeignKey<ReviewEntity>(r => r.BookingId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(b => b.PaymentTransaction)
+        builder.HasMany(b => b.PaymentTransactions)
             .WithOne(p => p.Booking)
-            .HasForeignKey<PaymentTransactionEntity>(p => p.BookingId)
+            .HasForeignKey(p => p.BookingId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Customer)

@@ -17,10 +17,9 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurre
 
         var customerId = appCurrentUser.ApplicationUserId.Value;
 
-        await using var tx = await context.Database.BeginTransactionAsync(ct);
+        // ✅ No explicit DB transaction here (refund handlers may start their own)
 
         var booking = await context.Bookings
-            .Include(b => b.PaymentTransaction)
             .FirstOrDefaultAsync(b => b.Id == request.BookingId && !b.IsDeleted, ct);
 
         if (booking is null)
@@ -31,10 +30,7 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurre
 
         // Terminal states (idempotent)
         if (booking.Status is BookingStatus.Cancelled or BookingStatus.Completed or BookingStatus.Expired)
-        {
-            await tx.CommitAsync(ct);
             return Unit.Value;
-        }
 
         // Allowed: Draft, PendingPayment, Confirmed
         if (booking.Status is not (BookingStatus.Draft or BookingStatus.PendingPayment or BookingStatus.Confirmed))
@@ -43,27 +39,41 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurre
         // Refund policy applies ONLY if already paid/confirmed
         if (booking.Status == BookingStatus.Confirmed)
         {
-            var payment = booking.PaymentTransaction;
+            // ✅ Find the latest PAID PAYMENT attempt for this booking (not refund rows)
+            var paidPayment = await context.PaymentTransactions
+                .AsNoTracking()
+                .Where(x =>
+                    !x.IsDeleted &&
+                    x.BookingId == booking.Id &&
+                    x.TransactionType == TransactionType.Payment &&
+                    x.Status == PaymentTransactionStatus.Paid)
+                .OrderByDescending(x => x.TransactionDate)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefaultAsync(ct);
 
-            if (payment is null || payment.Status != PaymentTransactionStatus.Paid)
-                throw new DetaillyBusinessRuleException("BOOKING_PAYMENT_MISSING", "Cannot refund: booking has no paid payment transaction.");
+            if (paidPayment is null)
+                throw new DetaillyBusinessRuleException("BOOKING_PAYMENT_MISSING",
+                    "Cannot refund: booking has no paid payment transaction.");
 
             var refundPercent = GetRefundPercent(now, booking.StartUtc);
             var refundAmount = Math.Round(booking.TotalPrice * refundPercent, 2, MidpointRounding.AwayFromZero);
 
             if (refundAmount > 0)
             {
-                if (payment.WalletId is not null || string.Equals(payment.Provider, "Wallet", StringComparison.OrdinalIgnoreCase))
+                // Wallet payment
+                if (paidPayment.WalletId is not null || string.Equals(paidPayment.Provider, "Wallet", StringComparison.OrdinalIgnoreCase))
                 {
-                    await mediator.Send(new RefundWalletPaymentCommand(payment.Id, refundAmount), ct);
+                    await mediator.Send(new RefundWalletPaymentCommand(paidPayment.Id, refundAmount), ct);
                 }
-                else if (string.Equals(payment.Provider, "Stripe", StringComparison.OrdinalIgnoreCase))
+                // Stripe payment
+                else if (string.Equals(paidPayment.Provider, "Stripe", StringComparison.OrdinalIgnoreCase))
                 {
-                    await mediator.Send(new RefundCardPaymentCommand(payment.Id, refundAmount), ct);
+                    await mediator.Send(new RefundCardPaymentCommand(paidPayment.Id, refundAmount), ct);
                 }
                 else
                 {
-                    throw new DetaillyBusinessRuleException("PAYMENT_PROVIDER_UNKNOWN", "Unknown payment provider; cannot refund.");
+                    throw new DetaillyBusinessRuleException("PAYMENT_PROVIDER_UNKNOWN",
+                        "Unknown payment provider; cannot refund.");
                 }
             }
         }
@@ -72,11 +82,7 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurre
         booking.ReservationExpiresAtUtc = null;
         booking.ModifiedAtUtc = now;
 
-        // If you have a field for cancellation reason, store it (otherwise remove)
-        // booking.CancellationReason = request.Reason?.Trim();
-
         await context.SaveChangesAsync(ct);
-        await tx.CommitAsync(ct);
 
         return Unit.Value;
     }
