@@ -1,86 +1,81 @@
 ﻿
+using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 
-public sealed class GetAvailabilityQueryHandler(IAppDbContext context)
+public sealed class GetAvailabilityQueryHandler(
+    IAppDbContext context,
+    IBookingQuoteService quoteService)
     : IRequestHandler<GetAvailabilityQuery, List<GetAvailabilityQueryDto>>
 {
-    private static readonly TimeSpan DayStart = new(8, 0, 0);
-    private static readonly TimeSpan DayEnd = new(20, 0, 0); // last start will be (DayEnd - duration)
-
     public async Task<List<GetAvailabilityQueryDto>> Handle(GetAvailabilityQuery request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        // validate package exists
-        var package = await context.ServicePackages
-            .FirstOrDefaultAsync(x => x.Id == request.ServicePackageId && !x.IsDeleted, ct);
+        // 1) Quote (single source of truth for duration/employees/bays)
+        var quote = await quoteService.CalculateAsync(
+            request.ServicePackageId,
+            request.AddonItemIds,
+            request.ServiceMode,
+            ct);
 
-        if (package is null)
-            throw new DetaillyNotFoundException("Service package not found.");
-
-        // base totals
-        var baseDuration = package.BaseDurationMinutes ?? 0;
-        var baseEmployees = package.BaseRequiredEmployees ?? 1;
-
-        // addon validation + totals
-        var addonIds = (request.AddonItemIds ?? new List<int>())
-            .Distinct()
-            .ToList();
-
-        // prevent selecting addon that exists in package base items
-        if (addonIds.Count > 0)
-        {
-            var baseItemIds = await context.ServicePackageItemAssignments
-                .Where(a => a.ServicePackageId == request.ServicePackageId && !a.IsDeleted)
-                .Select(a => a.ServicePackageItemId)
-                .ToListAsync(ct);
-
-            if (addonIds.Intersect(baseItemIds).Any())
-                throw new DetaillyBusinessRuleException("BOOKING_ADDON_DUPLICATE",
-                    "One or more add-ons are already included in the selected package.");
-        }
-
-        int addonsDuration = 0;
-        int addonsEmployeesMax = 0;
-
-        if (addonIds.Count > 0)
-        {
-            var addons = await context.ServicePackageItems
-                .Where(i => addonIds.Contains(i.Id) && !i.IsDeleted && i.IsAddon && i.IsActive)
-                .ToListAsync(ct);
-
-            if (addons.Count != addonIds.Count)
-                throw new DetaillyBusinessRuleException("BOOKING_ADDON_INVALID",
-                    "One or more add-on items are invalid or inactive.");
-
-            addonsDuration = addons.Sum(x => x.DurationMinutes);
-            addonsEmployeesMax = addons.Max(x => x.RequiredEmployees);
-        }
-
-        var totalDurationMinutes = baseDuration + addonsDuration;
-        if (totalDurationMinutes <= 0)
-            throw new DetaillyBusinessRuleException("BOOKING_DURATION_INVALID",
-                "Package duration is invalid.");
-
-        var requiredEmployees = Math.Max(baseEmployees, addonsEmployeesMax);
-        var requiredBays = request.ServiceMode == ServiceMode.InShop ? 1 : 0;
-
-        // build day window
+        // 2) Opening hours (per location + day)
         var date = request.DateUtc.Date;
-        var windowStart = date.Add(DayStart);
-        var windowEnd = date.Add(DayEnd);
+        var dayOfWeek = (int)date.DayOfWeek; // Sunday=0 ... Saturday=6
 
-        // prefetch bookings that can overlap this day (for performance)
+        var opening = await context.LocationOpeningHours
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x =>
+                !x.IsDeleted &&
+                x.ShopLocationId == request.ShopLocationId &&
+                x.DayOfWeek == dayOfWeek,
+                ct);
+
+        // If no row exists OR explicitly closed -> no availability
+        if (opening is null || opening.IsClosed)
+            return new List<GetAvailabilityQueryDto>();
+
+        // Build the daily window from opening hours, if missing assume 8am-8pm UTC (can be configured per location + day)
+        var windowStart = date.Add(opening.OpenTimeUtc ?? new TimeSpan(8, 0, 0));
+        var windowEnd = date.Add(opening.CloseTimeUtc ?? new TimeSpan(20, 0, 0));
+
+        // Safety: invalid config
+        if (windowEnd <= windowStart)
+            return new List<GetAvailabilityQueryDto>();
+
+        // For convenience
+        var totalDurationMinutes = quote.TotalDurationMinutes;
+        var requiredEmployees = quote.RequiredEmployees;
+        var requiredBays = quote.RequiredBays;
+
+        // 3) Fetch total bays ONCE if InShop
+        int totalBays = 0;
+        if (request.ServiceMode == ServiceMode.InShop)
+        {
+            totalBays = await context.Locations
+                .AsNoTracking()
+                .Where(l => l.Id == request.ShopLocationId && !l.IsDeleted)
+                .Select(l => l.TotalBays)
+                .FirstOrDefaultAsync(ct);
+
+            // If location missing or configured as 0 bays -> no availability
+            if (totalBays <= 0)
+                return new List<GetAvailabilityQueryDto>();
+        }
+
+        // 4) Prefetch blocking bookings for the day-window
         var blockingBookings = await context.Bookings
+            .AsNoTracking()
             .Where(b =>
                 !b.IsDeleted &&
                 b.ShopLocationId == request.ShopLocationId &&
                 b.ServiceMode == request.ServiceMode &&
                 (
                     b.Status == BookingStatus.Confirmed ||
-                    (b.Status == BookingStatus.PendingPayment && b.ReservationExpiresAtUtc != null && b.ReservationExpiresAtUtc > now)
+                    (b.Status == BookingStatus.PendingPayment &&
+                     b.ReservationExpiresAtUtc != null &&
+                     b.ReservationExpiresAtUtc > now)
                 ) &&
                 b.EndUtc > windowStart &&
                 b.StartUtc < windowEnd
@@ -94,11 +89,15 @@ public sealed class GetAvailabilityQueryHandler(IAppDbContext context)
             })
             .ToListAsync(ct);
 
-        // prefetch shifts that can cover (filter by mode)
+        // 5) Prefetch shifts (filter by mode)
         var shifts = await context.EmployeeShifts
+            .AsNoTracking()
             .Where(s =>
+                !s.IsDeleted &&
                 s.ShopLocationId == request.ShopLocationId &&
-                s.EmployeeWorkMode == (request.ServiceMode == ServiceMode.InShop ? EmployeeWorkMode.InShop : EmployeeWorkMode.Mobile) &&
+                s.EmployeeWorkMode == (request.ServiceMode == ServiceMode.InShop
+                    ? EmployeeWorkMode.InShop
+                    : EmployeeWorkMode.Mobile) &&
                 s.EndUtc > windowStart &&
                 s.StartUtc < windowEnd
             )
@@ -107,46 +106,45 @@ public sealed class GetAvailabilityQueryHandler(IAppDbContext context)
 
         var results = new List<GetAvailabilityQueryDto>();
 
-        // candidate start times every 30 minutes
+        // 6) Generate candidate start times every 30 minutes
         for (var start = windowStart; start < windowEnd; start = start.AddMinutes(30))
         {
+            // Optional UX: don't show past starts
+            if (start < now) continue;
+
             var end = start.AddMinutes(totalDurationMinutes);
             if (end > windowEnd) break;
 
-            // supply: employees with shift fully covering interval
+            // Supply: employees whose shift fully covers [start, end)
             var availableEmployees = shifts
                 .Where(s => s.StartUtc <= start && s.EndUtc >= end)
                 .Select(s => s.EmployeeId)
                 .Distinct()
                 .Count();
 
-            // demand: overlapping bookings
+            // Demand: employees used by overlapping blocking bookings
             var usedEmployees = blockingBookings
                 .Where(b => b.StartUtc < end && b.EndUtc > start)
                 .Sum(b => b.RequiredEmployees);
 
-            var freeEmployees = availableEmployees - usedEmployees;
-            if (freeEmployees < requiredEmployees) continue;
+            if (availableEmployees - usedEmployees < requiredEmployees)
+                continue;
 
             if (request.ServiceMode == ServiceMode.InShop)
             {
-                var totalBays = await context.Locations
-                    .Where(l => l.Id == request.ShopLocationId && !l.IsDeleted)
-                    .Select(l => l.TotalBays)
-                    .FirstOrDefaultAsync(ct);
-
                 var usedBays = blockingBookings
                     .Where(b => b.StartUtc < end && b.EndUtc > start)
                     .Sum(b => b.RequiredBays);
 
-                var freeBays = totalBays - usedBays;
-                if (freeBays < requiredBays) continue;
+                if (totalBays - usedBays < requiredBays)
+                    continue;
             }
 
-            // Don’t show times in the past (optional UX)
-            if (start < now) continue;
-
-            results.Add(new GetAvailabilityQueryDto { StartUtc = start, EndUtc = end });
+            results.Add(new GetAvailabilityQueryDto
+            {
+                StartUtc = start,
+                EndUtc = end
+            });
         }
 
         return results;

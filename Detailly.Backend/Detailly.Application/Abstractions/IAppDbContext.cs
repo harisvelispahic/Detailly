@@ -41,7 +41,9 @@ public interface IAppDbContext
     DbSet<EmployeeShiftEntity> EmployeeShifts { get; }
     DbSet<BookingEmployeeAssignmentEntity> BookingEmployeeAssignments { get; }
     DbSet<BookingVehicleAssignmentEntity> BookingVehicleAssignments { get; }
-    DbSet<TimeSlotEntity> TimeSlots { get; }
+    DbSet<LocationOpeningHoursEntity> LocationOpeningHours { get; }
+
+    //DbSet<TimeSlotEntity> TimeSlots { get; }
 
     // Vehicle
     DbSet<VehicleEntity> Vehicles { get; }

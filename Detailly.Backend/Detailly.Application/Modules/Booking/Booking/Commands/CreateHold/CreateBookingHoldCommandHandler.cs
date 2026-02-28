@@ -1,10 +1,14 @@
 ﻿
+using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.CreateHold;
 
-public sealed class CreateBookingHoldCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class CreateBookingHoldCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser,
+    IBookingQuoteService quoteService)
     : IRequestHandler<CreateBookingHoldCommand, int>
 {
     private static readonly TimeSpan HoldDuration = TimeSpan.FromMinutes(10);
@@ -31,59 +35,27 @@ public sealed class CreateBookingHoldCommandHandler(IAppDbContext context, IAppC
             throw new DetaillyBusinessRuleException("BOOKING_ADDRESS_REQUIRED",
                 "Service address is required for mobile bookings.");
 
+        // Quote = single source of truth for duration/employees/bays/price + validated addon set
+        var quote = await quoteService.CalculateAsync(
+            request.ServicePackageId,
+            request.AddonItemIds,
+            request.ServiceMode,
+            ct);
+
+        var endUtc = request.StartUtc.AddMinutes(quote.TotalDurationMinutes);
+        var totalPrice = quote.TotalPrice;
+        var requiredEmployees = quote.RequiredEmployees;
+        var requiredBays = quote.RequiredBays;
+
         await using var tx = await context.Database.BeginTransactionAsync(ct);
 
-        var package = await context.ServicePackages
-            .FirstOrDefaultAsync(x => x.Id == request.ServicePackageId && !x.IsDeleted, ct);
+        // Ensure location exists (and read total bays once if needed)
+        var location = await context.Locations
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == request.ShopLocationId && !l.IsDeleted, ct);
 
-        if (package is null)
-            throw new DetaillyNotFoundException("Service package not found.");
-
-        var baseDuration = package.BaseDurationMinutes ?? 0;
-        var baseEmployees = package.BaseRequiredEmployees ?? 1;
-
-        var addonIds = (request.AddonItemIds ?? new List<int>())
-            .Distinct()
-            .ToList();
-
-        // Prevent selecting add-ons already in base package
-        if (addonIds.Count > 0)
-        {
-            var baseItemIds = await context.ServicePackageItemAssignments
-                .Where(a => a.ServicePackageId == request.ServicePackageId && !a.IsDeleted)
-                .Select(a => a.ServicePackageItemId)
-                .ToListAsync(ct);
-
-            if (addonIds.Intersect(baseItemIds).Any())
-                throw new DetaillyBusinessRuleException("BOOKING_ADDON_DUPLICATE",
-                    "One or more add-ons are already included in the selected package.");
-        }
-
-        var addons = new List<ServicePackageItemEntity>();
-        if (addonIds.Count > 0)
-        {
-            addons = await context.ServicePackageItems
-                .Where(i => addonIds.Contains(i.Id) && !i.IsDeleted && i.IsAddon && i.IsActive)
-                .ToListAsync(ct);
-
-            if (addons.Count != addonIds.Count)
-                throw new DetaillyBusinessRuleException("BOOKING_ADDON_INVALID",
-                    "One or more add-on items are invalid or inactive.");
-        }
-
-        var addonsDuration = addons.Sum(x => x.DurationMinutes);
-        var addonsEmployeesMax = addons.Count == 0 ? 0 : addons.Max(x => x.RequiredEmployees);
-        var addonsPrice = addons.Sum(x => x.Price);
-
-        var totalDurationMinutes = baseDuration + addonsDuration;
-        if (totalDurationMinutes <= 0)
-            throw new DetaillyBusinessRuleException("BOOKING_DURATION_INVALID", "Package duration is invalid.");
-
-        var requiredEmployees = Math.Max(baseEmployees, addonsEmployeesMax);
-        var requiredBays = request.ServiceMode == ServiceMode.InShop ? 1 : 0;
-
-        var endUtc = request.StartUtc.AddMinutes(totalDurationMinutes);
-        var totalPrice = package.Price + addonsPrice;
+        if (location is null)
+            throw new DetaillyNotFoundException("Location not found.");
 
         // --- Capacity check (atomic) ---
         var shiftMode = request.ServiceMode == ServiceMode.InShop
@@ -125,13 +97,8 @@ public sealed class CreateBookingHoldCommandHandler(IAppDbContext context, IAppC
 
         if (request.ServiceMode == ServiceMode.InShop)
         {
-            var totalBaysAtLocation = await context.Locations
-                .Where(l => l.Id == request.ShopLocationId && !l.IsDeleted)
-                .Select(l => l.TotalBays)
-                .FirstOrDefaultAsync(ct);
-
             var usedBays = blockingBookings.Sum(b => b.RequiredBays);
-            if (totalBaysAtLocation - usedBays < requiredBays)
+            if (location.TotalBays - usedBays < requiredBays)
                 throw new DetaillyBusinessRuleException("BOOKING_NO_BAYS",
                     "No bays available for the selected time.");
         }
@@ -157,15 +124,15 @@ public sealed class CreateBookingHoldCommandHandler(IAppDbContext context, IAppC
         };
 
         context.Bookings.Add(booking);
-        await context.SaveChangesAsync(ct); // get booking.Id
+        await context.SaveChangesAsync(ct); // booking.Id
 
-        // Add BookingItems snapshots (add-ons)
-        if (addons.Count > 0)
+        // Add BookingItems snapshots (add-ons) from the quote result
+        if (quote.Addons.Count > 0)
         {
-            var bookingItems = addons.Select(a => new BookingItemEntity
+            var bookingItems = quote.Addons.Select(a => new BookingItemEntity
             {
                 BookingId = booking.Id,
-                ServicePackageItemId = a.Id,
+                ServicePackageItemId = a.ServicePackageItemId,
                 PriceSnapshot = a.Price,
                 DurationMinutesSnapshot = a.DurationMinutes,
                 RequiredEmployeesSnapshot = a.RequiredEmployees,
