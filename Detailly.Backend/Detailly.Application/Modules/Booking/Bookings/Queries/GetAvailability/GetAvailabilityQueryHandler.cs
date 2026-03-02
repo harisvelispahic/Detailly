@@ -18,6 +18,9 @@ public sealed class GetAvailabilityQueryHandler(
             request.ServicePackageId,
             request.AddonItemIds,
             request.ServiceMode,
+            vehicleIds: null,
+            customerId: null,
+            isFleet: false,
             ct);
 
         // 2) Opening hours (per location + day)

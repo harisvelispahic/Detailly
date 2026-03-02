@@ -40,6 +40,9 @@ public sealed class CreateBookingHoldCommandHandler(
             request.ServicePackageId,
             request.AddonItemIds,
             request.ServiceMode,
+            request.VehicleIds,
+            customerId,
+            appCurrentUser.IsFleet,
             ct);
 
         var endUtc = request.StartUtc.AddMinutes(quote.TotalDurationMinutes);

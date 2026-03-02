@@ -8,5 +8,8 @@ public interface IBookingQuoteService
         int servicePackageId,
         List<int>? addonItemIds,
         ServiceMode serviceMode,
+        List<int>? vehicleIds,
+        int? customerId,
+        bool isFleet,
         CancellationToken ct);
 }

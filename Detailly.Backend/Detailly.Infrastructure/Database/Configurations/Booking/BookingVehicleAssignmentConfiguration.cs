@@ -1,24 +1,27 @@
-﻿
-using Detailly.Domain.Entities.Booking;
+﻿using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Infrastructure.Database.Configurations.Booking;
-public class BookingVehicleAssignmentConfiguration: IEntityTypeConfiguration<BookingVehicleAssignmentEntity>
+
+public sealed class BookingVehicleAssignmentConfiguration : IEntityTypeConfiguration<BookingVehicleAssignmentEntity>
 {
     public void Configure(EntityTypeBuilder<BookingVehicleAssignmentEntity> builder)
     {
-        builder
-            .ToTable("BookingVehicleAssignments");
+        builder.ToTable("BookingVehicleAssignments");
+        builder.HasKey(x => x.Id);
 
-        builder
-            .HasOne(bva => bva.Vehicle)
-            .WithMany(v => (IEnumerable<BookingVehicleAssignmentEntity>)v.BookingVehicleAssignments)
-            .HasForeignKey(bva => bva.VehicleId)
-            .OnDelete(DeleteBehavior.Restrict); // or DeleteBehavior.NoAction
+        builder.HasOne(x => x.Booking)
+            .WithMany(b => b.BookingVehicleAssignments)
+            .HasForeignKey(x => x.BookingId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder
-            .HasOne(bva => bva.Booking)
-            .WithMany(b => (IEnumerable<BookingVehicleAssignmentEntity>)b.BookingVehicleAssignments)
-            .HasForeignKey(bva => bva.BookingId)
-            .OnDelete(DeleteBehavior.Restrict); // also optional
+        builder.HasOne(x => x.Vehicle)
+            .WithMany(v => v.BookingVehicleAssignments)
+            .HasForeignKey(x => x.VehicleId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(x => new { x.BookingId, x.VehicleId })
+            .IsUnique();
+
+        builder.HasIndex(x => x.VehicleId);
     }
 }
