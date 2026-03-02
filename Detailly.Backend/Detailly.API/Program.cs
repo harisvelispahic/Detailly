@@ -20,7 +20,7 @@ public partial class Program
 
         try
         {
-            Log.Information("Starting Detailly :) API...");
+            Log.Information("Starting Detailly API...");
 
             //
             // 1) Standard builder (includes appsettings.json, appsettings.{ENV}.json,

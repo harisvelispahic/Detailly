@@ -62,19 +62,30 @@ public partial class DatabaseContext
 
     private void ApplyGlobalFilters(ModelBuilder modelBuilder)
     {
-        // Apply a global filter to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
-            {
-                var parameter = Expression.Parameter(entityType.ClrType, "e");
-                var prop = Expression.Property(parameter, nameof(BaseEntity.IsDeleted));
-                var compare = Expression.Equal(prop, Expression.Constant(false));
-                var lambda = Expression.Lambda(compare, parameter);
+            var clrType = entityType.ClrType;
 
-                modelBuilder.Entity(entityType.ClrType)
-                            .HasQueryFilter(lambda);
-            }
+            // Apply filter to any entity that has a bool IsDeleted property
+            var isDeletedProp = clrType.GetProperty(nameof(BaseEntity.IsDeleted));
+            if (isDeletedProp is null || isDeletedProp.PropertyType != typeof(bool))
+                continue;
+
+            var parameter = Expression.Parameter(clrType, "e");
+
+            // EF.Property<bool>(e, "IsDeleted") so it works even if it isn't BaseEntity
+            var efPropertyMethod = typeof(EF).GetMethod(nameof(EF.Property))!
+                .MakeGenericMethod(typeof(bool));
+
+            var isDeletedPropertyAccess = Expression.Call(
+                efPropertyMethod,
+                parameter,
+                Expression.Constant(nameof(BaseEntity.IsDeleted)));
+
+            var compare = Expression.Equal(isDeletedPropertyAccess, Expression.Constant(false));
+            var lambda = Expression.Lambda(compare, parameter);
+
+            modelBuilder.Entity(clrType).HasQueryFilter(lambda);
         }
     }
 

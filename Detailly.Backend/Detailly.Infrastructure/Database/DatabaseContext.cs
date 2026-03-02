@@ -13,6 +13,8 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<ApplicationUserEntity> ApplicationUsers => Set<ApplicationUserEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
+
+
     // Sales
     public DbSet<OrderEntity> Orders => Set<OrderEntity>();
     public DbSet<OrderItemEntity> OrderItems => Set<OrderItemEntity>();
@@ -20,10 +22,14 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<CartEntity> Carts => Set<CartEntity>();
     public DbSet<CartItemEntity> CartItems => Set<CartItemEntity>();
 
+
+
     // Catalog
     public DbSet<ProductCategoryEntity> ProductCategories => Set<ProductCategoryEntity>();
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
     public DbSet<InventoryEntity> Inventory => Set<InventoryEntity>();
+
+
 
     // Booking
     public DbSet<BookingEntity> Bookings => Set<BookingEntity>();
@@ -38,22 +44,26 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<BookingVehicleAssignmentEntity> BookingVehicleAssignments => Set<BookingVehicleAssignmentEntity>();
     public DbSet<LocationOpeningHoursEntity> LocationOpeningHours => Set<LocationOpeningHoursEntity>();
 
-    //public DbSet<TimeSlotEntity> TimeSlots => Set<TimeSlotEntity>();
 
 
     // Vehicle
     public DbSet< VehicleEntity> Vehicles => Set<VehicleEntity>();
     public DbSet<VehicleCategoryEntity> VehicleCategories => Set<VehicleCategoryEntity>();
 
+
+
     // Payment
     public DbSet<WalletEntity> Wallet => Set<WalletEntity>();
     public DbSet<PaymentTransactionEntity> PaymentTransactions => Set<PaymentTransactionEntity>();
     public DbSet<ProcessedWebhookEventEntity> ProcessedWebhookEvents => Set<ProcessedWebhookEventEntity>();
 
+
+
     // Shared
     public DbSet<AddressEntity> Addresses => Set<AddressEntity>();
     public DbSet<ImageEntity> Images => Set<ImageEntity>();
     public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
+
 
 
     private readonly TimeProvider _clock;

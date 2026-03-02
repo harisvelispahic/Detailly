@@ -48,7 +48,7 @@ public static class DynamicDataSeeder
             );
 
             await context.SaveChangesAsync();
-            Console.WriteLine("✅ Dynamic seed: product categories added.");
+            Console.WriteLine("- Dynamic seed: product categories added.");
         }
     }
 
