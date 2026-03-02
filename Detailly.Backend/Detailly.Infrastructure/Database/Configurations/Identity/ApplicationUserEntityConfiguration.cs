@@ -1,63 +1,44 @@
-﻿
-using Detailly.Domain.Entities.Booking;
+﻿using Detailly.Domain.Entities.Booking;
+using Detailly.Domain.Entities.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Detailly.Infrastructure.Database.Configurations.Identity;
 
-public sealed class ApplicationUserEntityConfiguration
-    : IEntityTypeConfiguration<ApplicationUserEntity>
+public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
 {
-    public void Configure(EntityTypeBuilder<ApplicationUserEntity> b)
+    public void Configure(EntityTypeBuilder<ApplicationUserEntity> builder)
     {
-        b.ToTable("ApplicationUsers");
+        builder.ToTable("ApplicationUsers");
 
-        b.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-        b.HasIndex(x => x.Email)
-            .IsUnique();
+        builder.HasIndex(x => x.Email).IsUnique();
 
-        b.Property(x => x.Email)
-            .IsRequired()
-            .HasMaxLength(200);
+        builder.Property(x => x.Email).IsRequired().HasMaxLength(200);
+        builder.Property(x => x.PasswordHash).IsRequired();
 
-        b.Property(x => x.PasswordHash)
-            .IsRequired();
+        builder.Property(x => x.IsAdmin).HasDefaultValue(false);
+        builder.Property(x => x.IsManager).HasDefaultValue(false);
 
-        // Roles
-        b.Property(x => x.IsAdmin)
-            .HasDefaultValue(false);
+        // ✅ Regular user default
+        builder.Property(x => x.IsEmployee).HasDefaultValue(false);
 
-        b.Property(x => x.IsManager)
-            .HasDefaultValue(false);
+        builder.Property(x => x.TokenVersion).HasDefaultValue(0);
+        builder.Property(x => x.IsEnabled).HasDefaultValue(true);
 
-        b.Property(x => x.IsEmployee)
-            .HasDefaultValue(true); // Default: regular user
-
-        b.Property(x => x.TokenVersion)
-            .HasDefaultValue(0);
-
-        b.Property(x => x.IsEnabled)
-            .HasDefaultValue(true);
-
-        // =========================
-        // Navigation relationships
-        // =========================
-
-        // Customer → Bookings
-        b.HasMany(x => x.Bookings)
-            .WithOne(x => x.ApplicationUser)
-            .HasForeignKey(x => x.ApplicationUserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Employee → Assigned Bookings
-        // (no collection on ApplicationUser side)
-        b.HasMany<BookingEntity>()
-            .WithOne(x => x.Employee)
-            .HasForeignKey(x => x.EmployeeId)
+        // Customer → Bookings (now CustomerId)
+        builder.HasMany(x => x.Bookings)
+            .WithOne(x => x.Customer)
+            .HasForeignKey(x => x.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Refresh tokens
-        b.HasMany(x => x.RefreshTokens)
+        builder.HasMany(x => x.RefreshTokens)
             .WithOne(x => x.ApplicationUser)
             .HasForeignKey(x => x.ApplicationUserId);
+
+        // Index for employee availability filtering
+        builder.HasIndex(x => new { x.IsEmployee, x.EmployeeWorkMode, x.IsEnabled });
     }
 }

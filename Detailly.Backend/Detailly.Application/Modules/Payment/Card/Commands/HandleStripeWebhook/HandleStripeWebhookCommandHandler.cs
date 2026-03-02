@@ -1,9 +1,8 @@
-﻿using Detailly.Application.Abstractions;
+﻿
 using Detailly.Application.Abstractions.Payments;
+using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Detailly.Application.Modules.Payment.Card.Commands.HandleStripeWebhook;
@@ -15,17 +14,20 @@ public class HandleStripeWebhookCommandHandler
     private readonly IWebhookVerifier _verifier;
     private readonly IConfiguration _config;
     private readonly IStripeWebhookParser _parser;
+    private readonly IMediator _mediator;
 
     public HandleStripeWebhookCommandHandler(
         IAppDbContext context,
         IWebhookVerifier verifier,
         IConfiguration config,
-        IStripeWebhookParser parser)
+        IStripeWebhookParser parser,
+        IMediator mediator)
     {
         _context = context;
         _verifier = verifier;
         _config = config;
         _parser = parser;
+        _mediator = mediator;
     }
 
     public async Task<Unit> Handle(
@@ -37,15 +39,11 @@ public class HandleStripeWebhookCommandHandler
         //
         var secret = _config["Stripe:WebhookSecret"];
 
-        Console.WriteLine("WEBHOOK RECEIVED");
-        Console.WriteLine("SIGNATURE: " + request.SignatureHeader);
-        Console.WriteLine("SECRET: " + secret);
-
-
-        if (!_verifier.Verify(request.Payload, request.SignatureHeader ?? "", secret!))
+        if (string.IsNullOrWhiteSpace(secret))
             return Unit.Value;
 
-        Console.WriteLine("WEBHOOK: signature OK");
+        if (!_verifier.Verify(request.Payload, request.SignatureHeader ?? "", secret))
+            return Unit.Value;
 
         //
         // 1️⃣ Parse webhook (abstracted — no Stripe SDK in Application)
@@ -55,11 +53,7 @@ public class HandleStripeWebhookCommandHandler
         if (parsed is null)
             return Unit.Value;
 
-
         var (eventId, eventType, providerTransactionId) = parsed.Value;
-
-        Console.WriteLine($"WEBHOOK: parsed {eventType} / {providerTransactionId}");
-
 
         //
         // 2️⃣ Idempotency
@@ -70,20 +64,21 @@ public class HandleStripeWebhookCommandHandler
         if (alreadyProcessed)
             return Unit.Value;
 
-        Console.WriteLine($"WEBHOOK: idempotency check — new event {eventId}");
-
         //
         // 3️⃣ Look up our payment
         //
         var payment = await _context.PaymentTransactions
             .Include(x => x.Booking)
             .Include(x => x.Wallet)
-            .FirstOrDefaultAsync(x => x.ProviderTransactionId == providerTransactionId, ct);
+            .FirstOrDefaultAsync(x => x.ProviderTransactionId == providerTransactionId && !x.IsDeleted, ct);
 
         if (payment is null)
+        {
+            // Still store processed event so Stripe doesn't keep retrying forever
+            _context.ProcessedWebhookEvents.Add(new ProcessedWebhookEventEntity { EventId = eventId });
+            await _context.SaveChangesAsync(ct);
             return Unit.Value;
-
-        Console.WriteLine($"WEBHOOK: found payment {payment.Id}");
+        }
 
         //
         // 4️⃣ Apply transitions
@@ -95,11 +90,14 @@ public class HandleStripeWebhookCommandHandler
             {
                 payment.Status = PaymentTransactionStatus.Paid;
 
-                // booking flow
+                // Booking payment: use centralized confirm logic
+                // (checks hold expiry + clears ReservationExpiresAtUtc)
                 if (payment.Booking is not null)
-                    payment.Booking.Status = BookingStatus.Confirmed;
+                {
+                    await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
+                }
 
-                // wallet top-up flow
+                // Wallet top-up flow
                 if (payment.Wallet is not null && payment.TransactionType == TransactionType.Deposit)
                 {
                     var wallet = payment.Wallet;
@@ -109,7 +107,6 @@ public class HandleStripeWebhookCommandHandler
                     wallet.Balance += payment.Amount + bonus;
                     wallet.TotalDeposited += payment.Amount;
 
-                    // optional: store bonus info into description
                     payment.Description = (payment.Description ?? "Wallet top-up") + $" (+{bonus:0.00} bonus)";
                 }
             }
@@ -120,12 +117,15 @@ public class HandleStripeWebhookCommandHandler
             {
                 payment.Status = PaymentTransactionStatus.Failed;
 
-                if (payment.Booking is not null)
-                    payment.Booking.Status = BookingStatus.Cancelled;
+                // IMPORTANT:
+                // Do NOT cancel the booking here.
+                // Keep it PendingPayment so the user can retry with another card until ReservationExpiresAtUtc.
             }
         }
-
-
+        else
+        {
+            // Ignore other event types (still record idempotency below)
+        }
 
         //
         // 5️⃣ Save processed event
