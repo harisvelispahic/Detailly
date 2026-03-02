@@ -13,4 +13,8 @@ public interface IStripeService
         int userId,
         CancellationToken ct);
 
+    Task<string> RefundPaymentIntentAsync(
+        string paymentIntentId,
+        decimal amount,
+        CancellationToken ct);
 }

@@ -2,25 +2,25 @@
 namespace Detailly.Infrastructure.Database.Configurations.Identity;
 public sealed class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<RefreshTokenEntity>
 {
-    public void Configure(EntityTypeBuilder<RefreshTokenEntity> b)
+    public void Configure(EntityTypeBuilder<RefreshTokenEntity> builder)
     {
-        b.ToTable("RefreshTokens");
+        builder.ToTable("RefreshTokens");
 
-        b.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-        b.HasIndex(x => new { x.ApplicationUserId, x.TokenHash })
+        builder.HasIndex(x => new { x.ApplicationUserId, x.TokenHash })
             .IsUnique();
 
-        b.Property(x => x.TokenHash)
+        builder.Property(x => x.TokenHash)
             .IsRequired();
 
-        b.Property(x => x.ExpiresAtUtc)
+        builder.Property(x => x.ExpiresAtUtc)
             .IsRequired();
 
-        b.Property(x => x.IsRevoked)
+        builder.Property(x => x.IsRevoked)
             .HasDefaultValue(false);
 
-        b.Property(x => x.Fingerprint)
+        builder.Property(x => x.Fingerprint)
             .HasMaxLength(200);
     }
 }

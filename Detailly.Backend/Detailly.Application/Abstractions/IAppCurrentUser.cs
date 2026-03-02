@@ -34,4 +34,9 @@ public interface IAppCurrentUser
     /// Indicates whether the user is a regular employee.
     /// </summary>
     bool IsEmployee { get; }
+
+    /// <summary>
+    /// Indicates whether the user is a fleet customer.
+    /// </summary>
+    bool IsFleet { get; }
 }

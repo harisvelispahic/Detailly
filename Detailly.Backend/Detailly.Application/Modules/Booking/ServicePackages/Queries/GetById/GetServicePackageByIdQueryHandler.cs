@@ -19,7 +19,8 @@ public class GetServicePackageByIdQueryHandler(IAppDbContext context)
                 Name = sp.Name,
                 Description = sp.Description,
                 Price = sp.Price,
-                EstimatedDurationHours = sp.EstimatedDurationHours,
+                //EstimatedDurationHours = sp.EstimatedDurationHours,
+                EstimatedDurationHours = 1,
 
                 Items = context.ServicePackageItemAssignments
                     .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted)

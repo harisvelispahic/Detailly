@@ -5,23 +5,23 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentsService {
-  private baseUrl = `${environment.apiUrl}/api/payments`;
+  private baseUrl = `${environment.apiUrl}/Payments`;
 
   constructor(private http: HttpClient) {}
 
   createCardIntent(bookingId: number): Observable<{ clientSecret: string }> {
     return this.http.post<{ clientSecret: string }>(
       `${this.baseUrl}/bookings/${bookingId}/card-intent`,
-      {}
+      {},
     );
   }
 
   createWalletTopUpCardIntent(
-    body: CreateWalletTopUpIntentRequest
+    body: CreateWalletTopUpIntentRequest,
   ): Observable<{ clientSecret: string }> {
     return this.http.post<{ clientSecret: string }>(
       `${this.baseUrl}/wallet/top-up/card-intent`,
-      body
+      body,
     );
   }
 }
