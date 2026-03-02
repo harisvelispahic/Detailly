@@ -12,5 +12,5 @@ public class BookingEmployeeAssignmentEntity : BaseEntity
     public ApplicationUserEntity Employee { get; set; } = null!;
 
     public DateTime AssignedAtUtc { get; set; } = DateTime.UtcNow;
-    public bool IsLead { get; set; } = false;
+    //public bool IsLead { get; set; } = false;
 }

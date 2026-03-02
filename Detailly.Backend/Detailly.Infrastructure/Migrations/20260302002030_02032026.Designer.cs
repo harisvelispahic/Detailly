@@ -4,6 +4,7 @@ using Detailly.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260302002030_02032026")]
+    partial class _02032026
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,16 +276,12 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LocationType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("TotalBays")
                         .HasColumnType("int");
@@ -290,8 +289,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
-
-                    b.HasIndex("LocationType");
 
                     b.HasIndex("Name");
 
@@ -1080,11 +1077,11 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.Property<decimal?>("Latitude")
                         .HasPrecision(18, 2)
-                        .HasColumnType("decimal(9,6)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("Longitude")
                         .HasPrecision(18, 2)
-                        .HasColumnType("decimal(9,6)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
@@ -1103,9 +1100,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("City", "Country");
-
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>

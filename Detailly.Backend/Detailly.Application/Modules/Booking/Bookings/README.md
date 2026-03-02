@@ -149,6 +149,25 @@ Stripe confirmation is required to finalize booking.
 
 ---
 
+## 6️⃣ AssignEmployeesToBookingCommand
+
+**Purpose:**  
+Manager/Admin assigns employees to a specific booking.
+
+**Expected rules (enforced in handler):**
+- Booking must exist and not be in terminal states (`Cancelled`, `Expired`)
+- Booking must typically be `Confirmed` or `PendingPayment` (your business decision; most systems assign after `Confirmed`)
+- Each employee must:
+  - exist and be `IsEmployee == true`
+  - have an `EmployeeShift` that covers the booking interval (`StartUtc..EndUtc`) and matches `ServiceMode` (`InShop` vs `Mobile`)
+  - not be assigned to another booking that overlaps time-wise (for blocking statuses)
+
+**Effect:**
+- Inserts rows into `BookingEmployeeAssignments`
+- Can replace old assignments (if implemented as “set assignments” semantics)
+
+---
+
 # 🔎 Queries
 
 ---
@@ -186,6 +205,44 @@ Returns:
 - PaymentStatus
 
 Only accessible by booking owner.
+
+---
+
+## 3️⃣ ListBookingsForDateQuery (Staff Schedule View)
+
+**Purpose:**  
+Staff dashboard that shows bookings for a day and optionally shows assigned employees.
+
+**Inputs:**
+- `dateUtc`
+- `shopLocationId`
+- `serviceMode`
+- optional: include `PendingPayment` to monitor active holds
+
+**Returns (typical):**
+- Start/End
+- RequiredEmployees / RequiredBays
+- Customer name
+- Package name
+- Notes
+- Assigned employees list (IDs + names)
+
+Use-cases:
+- Employee sees what is scheduled today
+- Manager sees what needs assignment
+
+---
+
+## 4️⃣ ListAssignableEmployeesForBookingQuery
+
+**Purpose:**  
+Manager/Admin sees employees that are eligible to be assigned to a booking.
+
+**Filtering (typical):**
+- Employee has a shift fully covering booking time
+- Work mode matches booking `ServiceMode`
+- Employee is enabled and `IsEmployee == true`
+- Employee is not already assigned to an overlapping booking
 
 ---
 

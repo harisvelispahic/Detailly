@@ -11,6 +11,13 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<LocationEnt
         builder.ToTable("Locations");
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Name)
+            .IsRequired()
+            .HasMaxLength(150);
+
+        builder.Property(x => x.LocationType)
+            .IsRequired();
+
         builder.Property(x => x.TotalBays)
             .IsRequired();
 
@@ -20,5 +27,6 @@ public sealed class LocationConfiguration : IEntityTypeConfiguration<LocationEnt
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => x.LocationType);
     }
 }
