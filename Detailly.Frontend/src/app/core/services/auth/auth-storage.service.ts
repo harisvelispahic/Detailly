@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
-import {
-  LoginCommandDto,
-  RefreshTokenCommandDto
-} from '../../../api-services/auth/auth-api.model';
+import { LoginCommandDto, RefreshTokenCommandDto } from '../../../api-services/auth/auth-api.model';
 
 /**
  * Low-level service for managing auth tokens in localStorage.
  * Should not be used directly in components - use AuthFacadeService instead.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthStorageService {
   private readonly ACCESS_TOKEN_KEY = 'accessToken';
@@ -23,7 +20,8 @@ export class AuthStorageService {
   saveLogin(response: LoginCommandDto): void {
     localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
     localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
-    localStorage.setItem(this.ACCESS_EXPIRES_KEY, response.expiresAtUtc);
+    localStorage.setItem(this.ACCESS_EXPIRES_KEY, response.accessTokenExpiresAtUtc);
+    localStorage.setItem(this.REFRESH_EXPIRES_KEY, response.refreshTokenExpiresAtUtc);
   }
 
   /**

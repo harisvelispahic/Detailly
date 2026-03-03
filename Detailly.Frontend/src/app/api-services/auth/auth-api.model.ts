@@ -16,12 +16,18 @@ export interface LoginCommand {
  */
 export interface LoginCommandDto {
   accessToken: string;
+  /**
+   * ISO string (UTC) returned by backend
+   * Example: "2025-12-02T23:59:59Z"
+   */
+  accessTokenExpiresAtUtc: string;
+
   refreshToken: string;
   /**
    * ISO string (UTC) returned by backend
    * Example: "2025-12-02T23:59:59Z"
    */
-  expiresAtUtc: string;
+  refreshTokenExpiresAtUtc: string;
 }
 
 /**

@@ -18,7 +18,7 @@ import { CurrentUserDto } from './current-user.dto';
 import { JwtPayloadDto } from './jwt-payload.dto';
 
 /**
- * Glavni auth servis (façade).
+ * Glavni auth servis (facade).
  * - priča sa AuthApiService (HTTP)
  * - priča sa AuthStorageService (localStorage)
  * - dekodira JWT i drži CurrentUser kao signal
@@ -46,6 +46,8 @@ export class AuthFacadeService {
   isAdmin = computed(() => this._currentUser()?.isAdmin ?? false);
   isManager = computed(() => this._currentUser()?.isManager ?? false);
   isEmployee = computed(() => this._currentUser()?.isEmployee ?? false);
+  isFleet = computed(() => this._currentUser()?.isFleet ?? false);
+  isStandardClient = computed(() => this._currentUser()?.isStandard ?? false);
 
   constructor() {
     // pokušaj inicijalizacije iz postojećeg access tokena
@@ -63,10 +65,10 @@ export class AuthFacadeService {
   login(payload: LoginCommand): Observable<void> {
     return this.api.login(payload).pipe(
       tap((response: LoginCommandDto) => {
-        this.storage.saveLogin(response);           // access + refresh + expiries
+        this.storage.saveLogin(response); // access + refresh + expiries
         this.decodeAndSetUser(response.accessToken); // popuni _currentUser
       }),
-      map(() => void 0)
+      map(() => void 0),
     );
   }
 
@@ -99,9 +101,9 @@ export class AuthFacadeService {
   refresh(payload: RefreshTokenCommand): Observable<RefreshTokenCommandDto> {
     return this.api.refresh(payload).pipe(
       tap((response: RefreshTokenCommandDto) => {
-        this.storage.saveRefresh(response);           // snimi nove tokene
-        this.decodeAndSetUser(response.accessToken);  // update current usera
-      })
+        this.storage.saveRefresh(response); // snimi nove tokene
+        this.decodeAndSetUser(response.accessToken); // update current usera
+      }),
     );
   }
 
@@ -152,14 +154,35 @@ export class AuthFacadeService {
     try {
       const payload = jwtDecode<JwtPayloadDto>(token);
 
+      const idStr =
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
+        payload.sub ??
+        null;
+
+      const email =
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? null;
+
+      const isFleet = String(payload.is_fleet).toLowerCase() === 'true';
+
       const user: CurrentUserDto = {
-        userId: Number(payload.sub),
-        email: payload.email,
-        isAdmin: payload.is_admin === 'true',
-        isManager: payload.is_manager === 'true',
-        isEmployee: payload.is_employee === 'true',
-        tokenVersion: Number(payload.ver),
+        userId: Number(idStr),
+        email: email ?? '',
+
+        isAdmin: String(payload.is_admin).toLowerCase() === 'true',
+        isManager: String(payload.is_manager).toLowerCase() === 'true',
+        isEmployee: String(payload.is_employee).toLowerCase() === 'true',
+
+        isFleet,
+        isStandard: !isFleet,
+
+        tokenVersion: Number(payload.ver ?? 0),
       };
+
+      // optional: if token is missing id, treat as invalid
+      if (!user.userId || Number.isNaN(user.userId)) {
+        this._currentUser.set(null);
+        return;
+      }
 
       this._currentUser.set(user);
     } catch (error) {

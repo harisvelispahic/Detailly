@@ -13,6 +13,8 @@ export class CurrentUserService {
   isAdmin = computed(() => this.auth.isAdmin());
   isManager = computed(() => this.auth.isManager());
   isEmployee = computed(() => this.auth.isEmployee());
+  isFleet = computed(() => this.auth.isFleet());
+  isStandardClient = computed(() => this.auth.isStandardClient());
 
   get snapshot() {
     return this.auth.currentUser();
