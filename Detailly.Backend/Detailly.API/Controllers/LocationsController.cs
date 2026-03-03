@@ -1,9 +1,9 @@
-﻿
-using Detailly.Application.Modules.Booking.Locations.Commands.Create;
+﻿using Detailly.Application.Modules.Booking.Locations.Commands.Create;
 using Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 using Detailly.Application.Modules.Booking.Locations.Commands.Update;
 using Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 using Detailly.Application.Modules.Booking.Locations.Queries.List;
+using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
 
@@ -12,7 +12,7 @@ namespace Detailly.API.Controllers;
 public class LocationsController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    [Authorize] // later: policy Admin/Manager
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<ActionResult<int>> Create(CreateLocationCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -20,7 +20,7 @@ public class LocationsController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize] // later: policy Admin/Manager
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Update(int id, UpdateLocationCommand command, CancellationToken ct)
     {
         command.Id = id;
@@ -28,19 +28,21 @@ public class LocationsController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize] // later: policy Admin/Manager
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteLocationCommand { Id = id }, ct);
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<GetLocationByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         return await sender.Send(new GetLocationByIdQuery { Id = id }, ct);
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<List<ListLocationsQueryDto>> List([FromQuery] ListLocationsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);

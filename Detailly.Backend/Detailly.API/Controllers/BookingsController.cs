@@ -7,6 +7,7 @@ using Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListAssignableEmployees;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
+using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
 
@@ -18,6 +19,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // CREATE BOOKING HOLD (PendingPayment)
     // ---------------------------------------
     [HttpPost]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<ActionResult<int>> Create(CreateBookingHoldCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -29,6 +31,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // CANCEL BOOKING
     // ---------------------------------------
     [HttpPut("{id:int}/cancel")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task Cancel(int id, CancelBookingCommand command, CancellationToken ct)
     {
         command.BookingId = id; // Route ID precedence
@@ -40,6 +43,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET BOOKING BY ID (ownership enforced)
     // ---------------------------------------
     [HttpGet("{id:int}")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<GetBookingByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var booking = await sender.Send(new GetBookingByIdQuery { Id = id }, ct);
@@ -50,6 +54,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // LIST MY BOOKINGS
     // ---------------------------------------
     [HttpGet]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<List<ListMyBookingsQueryDto>> ListMine(CancellationToken ct)
     {
         var result = await sender.Send(new ListMyBookingsQuery(), ct);
@@ -60,6 +65,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET AVAILABILITY
     // ---------------------------------------
     [HttpGet("availability")]
+    [AllowAnonymous]
     public async Task<List<GetAvailabilityQueryDto>> GetAvailability(
         [FromQuery] GetAvailabilityQuery query,
         CancellationToken ct)
@@ -72,6 +78,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // COMPLETE BOOKING (Employee, Manager or Admin)
     // ---------------------------------------
     [HttpPut("{id:int}/complete")]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Complete(int id, CompleteBookingCommand command, CancellationToken ct)
     {
         command.BookingId = id; // Route ID precedence
@@ -89,7 +96,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // Example:
     // GET /Bookings/staff/schedule?dateUtc=2026-03-01&shopLocationId=1&serviceMode=InShop&includePendingPayment=true
     [HttpGet("staff/schedule")]
-    //[Authorize]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task<List<ListBookingsForDateQueryDto>> ListForDate(
         [FromQuery] ListBookingsForDateQuery query,
         CancellationToken ct)
@@ -102,7 +109,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // MANAGER: LIST ASSIGNABLE EMPLOYEES FOR BOOKING
     // ---------------------------------------
     [HttpGet("{id:int}/assignable-employees")]
-    //[Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<List<ListAssignableEmployeesForBookingQueryDto>> ListAssignableEmployees(
         int id,
         CancellationToken ct)
@@ -115,7 +122,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // MANAGER: ASSIGN EMPLOYEES TO BOOKING
     // ---------------------------------------
     [HttpPut("{id:int}/assign-employees")]
-    //[Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task AssignEmployees(
         int id,
         AssignEmployeesToBookingCommand command,

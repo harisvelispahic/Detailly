@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Identity.User.Commands.Update;
+﻿namespace Detailly.Application.Modules.Identity.User.Commands.Update;
 public class UpdateUserCommand : IRequest<Unit>
 {
     public required int Id { get; set; }

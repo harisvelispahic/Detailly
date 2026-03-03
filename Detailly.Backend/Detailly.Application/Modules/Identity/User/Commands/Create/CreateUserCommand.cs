@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Detailly.Application.Modules.Identity.User.Commands.Create;
+﻿namespace Detailly.Application.Modules.Identity.User.Commands.Create;
 public class CreateUserCommand : IRequest<int>
 {
     public required string FirstName { get; set; }

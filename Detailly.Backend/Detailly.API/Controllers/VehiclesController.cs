@@ -1,8 +1,9 @@
-﻿using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Delete;
-using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
+﻿using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
+using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Delete;
 using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 using Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 using Detailly.Application.Modules.Vehicle.Vehicles.Queries.List;
+using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
 
@@ -11,6 +12,7 @@ namespace Detailly.API.Controllers;
 public class VehiclesController(ISender sender) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<ActionResult<int>> Create(CreateVehicleCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -19,6 +21,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task Update(int id, UpdateVehicleCommand command, CancellationToken ct)
     {
         // ID from the route takes precedence
@@ -28,6 +31,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteVehicleCommand { Id = id }, ct);
@@ -35,6 +39,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<GetVehicleByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await sender.Send(new GetVehicleByIdQuery { Id = id }, ct);
@@ -42,32 +47,10 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<List<ListVehiclesQueryDto>> List([FromQuery] ListVehiclesQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
         return result;
     }
-
-
-
-
-
-
-
-
-
-
-    //[HttpPut("{id:int}/disable")]
-    //public async Task Disable(int id, CancellationToken ct)
-    //{
-    //    await sender.Send(new DisableProductCategoryCommand { Id = id }, ct);
-    //    // no return -> 204 No Content
-    //}
-
-    //[HttpPut("{id:int}/enable")]
-    //public async Task Enable(int id, CancellationToken ct)
-    //{
-    //    await sender.Send(new EnableProductCategoryCommand { Id = id }, ct);
-    //    // no return -> 204 No Content
-    //}
 }

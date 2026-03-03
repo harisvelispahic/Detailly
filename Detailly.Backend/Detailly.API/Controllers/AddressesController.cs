@@ -12,6 +12,7 @@ public class AddressesController(ISender sender) : ControllerBase
 {
 
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<int>> Create(
         CreateAddressCommand command,
         CancellationToken ct)
@@ -23,6 +24,7 @@ public class AddressesController(ISender sender) : ControllerBase
 
     
     [HttpPut("{id:int}")]
+    [Authorize]
     public async Task Update(
         int id,
         UpdateAddressCommand command,
@@ -36,6 +38,7 @@ public class AddressesController(ISender sender) : ControllerBase
     
 
     [HttpDelete("{id:int}")]
+    [Authorize]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteAddressCommand { Id = id }, ct);
@@ -44,6 +47,7 @@ public class AddressesController(ISender sender) : ControllerBase
     
  
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<GetAddressByIdQueryDto> GetById(
         int id,
         CancellationToken ct)
@@ -56,6 +60,7 @@ public class AddressesController(ISender sender) : ControllerBase
    
    
     [HttpGet]
+    [Authorize]
     public async Task<PageResult<ListAddressesQueryDto>> List(
         [FromQuery] ListAddressesQuery query,
         CancellationToken ct)

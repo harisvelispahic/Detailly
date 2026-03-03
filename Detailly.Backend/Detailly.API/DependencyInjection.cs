@@ -1,4 +1,5 @@
 ﻿using Detailly.Infrastructure.Common;
+using Detailly.Shared.Constants;
 using Detailly.Shared.Dtos;
 using Detailly.Shared.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -68,6 +69,40 @@ public static class DependencyInjection
             o.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
+
+            o.AddPolicy(AuthPolicies.AdminOnly,
+                p => p.RequireClaim("is_admin", "true"));
+
+            o.AddPolicy(AuthPolicies.ManagerOnly,
+                p => p.RequireClaim("is_manager", "true"));
+
+            o.AddPolicy(AuthPolicies.EmployeeOnly,
+                p => p.RequireClaim("is_employee", "true"));
+
+            o.AddPolicy(AuthPolicies.FleetOnly,
+                p => p.RequireClaim("is_fleet", "true"));
+
+            o.AddPolicy(AuthPolicies.AdminOrManager,
+                p => p.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("is_admin", "true") ||
+                    ctx.User.HasClaim("is_manager", "true")));
+
+            o.AddPolicy(AuthPolicies.Staff,
+                p => p.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("is_admin", "true") ||
+                    ctx.User.HasClaim("is_manager", "true") ||
+                    ctx.User.HasClaim("is_employee", "true")));
+
+            // "Any client" = authenticated AND (fleet true OR fleet false)
+            // Since we only store "is_fleet", this basically means "authenticated user"
+            o.AddPolicy(AuthPolicies.AnyClient,
+                p => p.RequireAssertion(ctx =>
+                    ctx.User.HasClaim("is_fleet", "true") ||
+                    ctx.User.HasClaim("is_fleet", "false")));
+
+            // StandardClientOnly = explicitly not fleet
+            o.AddPolicy(AuthPolicies.StandardClientOnly,
+                p => p.RequireClaim("is_fleet", "false"));
         });
 
         // Swagger with Bearer auth

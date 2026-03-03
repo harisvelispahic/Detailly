@@ -37,6 +37,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<GetProductCategoryByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await sender.Send(new GetProductCategoryByIdQuery { Id = id }, ct);
@@ -44,6 +45,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<PageResult<ListProductCategoriesQueryDto>> List([FromQuery] ListProductCategoriesQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);

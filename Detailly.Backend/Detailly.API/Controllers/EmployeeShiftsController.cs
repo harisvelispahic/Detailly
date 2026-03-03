@@ -3,6 +3,7 @@ using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
+using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
 
@@ -15,7 +16,7 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     // POST /EmployeeShifts
     // ---------------------------------------
     [HttpPost]
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<ActionResult<int>> Create(CreateEmployeeShiftCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -27,7 +28,7 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     // PUT /EmployeeShifts/{id}
     // ---------------------------------------
     [HttpPut("{id:int}")]
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Update(int id, UpdateEmployeeShiftCommand command, CancellationToken ct)
     {
         command.Id = id;
@@ -41,6 +42,7 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpDelete("{id:int}")]
     [Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteEmployeeShiftCommand { Id = id }, ct);
@@ -52,7 +54,7 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     // GET /EmployeeShifts?dateUtc=YYYY-MM-DD&shopLocationId=1&employeeWorkMode=InShop
     // ---------------------------------------
     [HttpGet]
-    [Authorize]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<List<ListEmployeeShiftsForDateQueryDto>> ListForDate([FromQuery] ListEmployeeShiftsForDateQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);

@@ -4,6 +4,7 @@ using Detailly.Application.Modules.Identity.User.Commands.Delete;
 using Detailly.Application.Modules.Identity.User.Queries.GetById;
 using Detailly.Application.Modules.Identity.User.Queries.List;
 using Detailly.Application.Modules.Identity.User.Commands.ChangePassword;
+using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
 
@@ -12,6 +13,7 @@ namespace Detailly.API.Controllers;
 public class UsersController(ISender sender) : ControllerBase
 {
     [HttpPost]
+    [AllowAnonymous]
     public async Task<ActionResult<int>> Create(CreateUserCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -20,6 +22,7 @@ public class UsersController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize]
     public async Task Update(int id, UpdateUserCommand command, CancellationToken ct)
     {
         // ID from the route takes precedence
@@ -29,6 +32,7 @@ public class UsersController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteUserCommand { Id = id }, ct);
@@ -36,6 +40,7 @@ public class UsersController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<GetUserByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await sender.Send(new GetUserByIdQuery { Id = id }, ct);
@@ -43,14 +48,15 @@ public class UsersController(ISender sender) : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
     public async Task<PageResult<ListUsersQueryDto>> List([FromQuery] ListUsersQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
         return result;
     }
 
-    [Authorize]
     [HttpPut("change-password")]
+    [Authorize]
     public async Task ChangePassword(ChangePasswordCommand command, CancellationToken ct)
     {
         await sender.Send(command, ct);
