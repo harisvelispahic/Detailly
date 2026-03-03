@@ -9,5 +9,9 @@ export interface CurrentUserDto {
   isFleet: boolean;
   isStandard: boolean; // derived = !isFleet
 
+  // derived convenience
+  isStaff: boolean;
+  isAdminOrManager: boolean;
+
   tokenVersion: number;
 }

@@ -1,4 +1,3 @@
-// src/app/core/guards/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { CurrentUserService } from '../services/auth/current-user.service';
@@ -10,11 +9,16 @@ export const myAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const data = route.data['auth'] as MyAuthRouteData | undefined;
 
   const requireAuth = data?.requireAuth === true;
+
   const requireAdmin = data?.requireAdmin === true;
   const requireManager = data?.requireManager === true;
   const requireEmployee = data?.requireEmployee === true;
+
   const requireFleet = data?.requireFleet === true;
   const requireStandard = data?.requireStandard === true;
+
+  const requireStaff = data?.requireStaff === true;
+  const requireAdminOrManager = data?.requireAdminOrManager === true;
 
   const isAuth = currentUser.isAuthenticated();
 
@@ -61,16 +65,31 @@ export const myAuthGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     return false;
   }
 
+  if (requireStaff && !user.isStaff) {
+    router.navigate([currentUser.getDefaultRoute()]);
+    return false;
+  }
+
+  if (requireAdminOrManager && !user.isAdminOrManager) {
+    router.navigate([currentUser.getDefaultRoute()]);
+    return false;
+  }
+
   return true;
 };
 
 export interface MyAuthRouteData {
   requireAuth?: boolean;
+
   requireAdmin?: boolean;
   requireManager?: boolean;
   requireEmployee?: boolean;
+
   requireFleet?: boolean;
   requireStandard?: boolean;
+
+  requireStaff?: boolean; // Staff
+  requireAdminOrManager?: boolean; // AdminOrManager
 }
 
 export function myAuthData(data: MyAuthRouteData): { auth: MyAuthRouteData } {

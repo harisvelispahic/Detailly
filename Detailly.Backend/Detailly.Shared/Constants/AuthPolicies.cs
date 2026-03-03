@@ -10,5 +10,5 @@ public static class AuthPolicies
     public const string Staff = "Staff";                            //  admin/manager/employee
     public const string AdminOrManager = "AdminOrManager";          //  admin/manager
     public const string AnyClient = "AnyClient";                    //  fleet or standard
-    public const string StandardClientOnly = "StandardClientOnly";  //  IsFleet=false
+    public const string StandardClientOnly = "StandardClientOnly";  //  IsFleet = false
 }

@@ -1,4 +1,3 @@
-// src/app/core/services/auth/auth-facade.service.ts
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, tap, catchError, map } from 'rxjs';
@@ -47,7 +46,7 @@ export class AuthFacadeService {
   isManager = computed(() => this._currentUser()?.isManager ?? false);
   isEmployee = computed(() => this._currentUser()?.isEmployee ?? false);
   isFleet = computed(() => this._currentUser()?.isFleet ?? false);
-  isStandardClient = computed(() => this._currentUser()?.isStandard ?? false);
+  isStandard = computed(() => this._currentUser()?.isStandard ?? false);
 
   constructor() {
     // pokušaj inicijalizacije iz postojećeg access tokena
@@ -112,7 +111,7 @@ export class AuthFacadeService {
    */
   redirectToLogin(): void {
     this.clearUserState();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth/login']);
   }
 
   // =========================================================
@@ -162,18 +161,22 @@ export class AuthFacadeService {
       const email =
         payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? null;
 
+      const isAdmin = String(payload.is_admin).toLowerCase() === 'true';
+      const isManager = String(payload.is_manager).toLowerCase() === 'true';
+      const isEmployee = String(payload.is_employee).toLowerCase() === 'true';
       const isFleet = String(payload.is_fleet).toLowerCase() === 'true';
 
       const user: CurrentUserDto = {
         userId: Number(idStr),
         email: email ?? '',
 
-        isAdmin: String(payload.is_admin).toLowerCase() === 'true',
-        isManager: String(payload.is_manager).toLowerCase() === 'true',
-        isEmployee: String(payload.is_employee).toLowerCase() === 'true',
-
+        isAdmin,
+        isManager,
+        isEmployee,
         isFleet,
         isStandard: !isFleet,
+        isStaff: isAdmin || isManager || isEmployee,
+        isAdminOrManager: isAdmin || isManager,
 
         tokenVersion: Number(payload.ver ?? 0),
       };
