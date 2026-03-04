@@ -14,7 +14,7 @@ public class OrderEntity : BaseEntity
     public required DateTime OrderDate { get; set; }
     public decimal TotalAmount { get; set; }
     public string? Notes { get; set; }
-    public OrderStatus Status { get; set; } = OrderStatus.Draft;
+    public OrderStatus Status { get; set; } = OrderStatus.PendingPayment;
 
 
     // Foreign keys

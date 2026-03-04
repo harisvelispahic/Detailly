@@ -256,7 +256,8 @@ public static class DynamicDataSeeder
                     ProductNumber = new Guid().ToString(),
                     Price = 100m,
                     Currency = CurrencyName.BAM,
-                    CategoryId = 1
+                    CategoryId = 1,
+                    IsEnabled = true
                 },
                 new ProductEntity
                 {
@@ -265,7 +266,9 @@ public static class DynamicDataSeeder
                     ProductNumber = new Guid().ToString(),
                     Price = 200m,
                     Currency = CurrencyName.EUR,
-                    CategoryId = 2
+                    CategoryId = 2,
+                    IsEnabled = true
+
                 }
             );
 

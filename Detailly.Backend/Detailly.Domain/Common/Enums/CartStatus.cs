@@ -4,9 +4,7 @@ namespace Detailly.Domain.Common.Enums;
 
 public enum CartStatus
 {
-    Active = 0,     // Korisnik dodaje artikle, korpa još nije potvrđena
-    CheckedOut = 1, // Korpa je potvrđena i pretvorena u Order
-    Abandoned = 2,  // Korpa napuštena (korisnik nije završio proces)
-    Cancelled = 3   // Korpa ručno otkazana
+    Active = 1,     // User adds products, but hasn't started checkout yet
+    Abandoned = 2,  // Cart abandoned, e.g. user left without checking out for a long time (e.g. 24+ hours)
 }
 

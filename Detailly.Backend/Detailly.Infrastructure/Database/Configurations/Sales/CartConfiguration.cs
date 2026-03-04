@@ -10,22 +10,32 @@ public sealed class CartConfiguration : IEntityTypeConfiguration<CartEntity>
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.IsEmpty)
+        builder.Property(x => x.Status)
             .IsRequired();
 
         builder.Property(x => x.TotalAmount)
-            .HasPrecision(18, 2);
+            .HasPrecision(18, 2)
+            .IsRequired();
+
+        builder.Property(x => x.IsEmpty)
+            .IsRequired();
 
         builder.Property(x => x.Notes)
             .IsRequired(false);
 
-        builder.Property(x => x.Status)
-            .IsRequired();
+        // One cart per user (1:1)
+        builder.HasIndex(x => x.ApplicationUserId)
+            .IsUnique();
 
         builder.HasOne(x => x.ApplicationUser)
-            .WithMany() // don't assume ApplicationUserEntity has Carts nav
-            .HasForeignKey(x => x.ApplicationUserId);
+            .WithOne(u => u.Cart)
+            .HasForeignKey<CartEntity>(x => x.ApplicationUserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // Let CartItems relationship be handled by CartItemEntity config (safe either way).
+        // Cart -> CartItems (1:N)
+        builder.HasMany(x => x.CartItems)
+            .WithOne(ci => ci.Cart)
+            .HasForeignKey(ci => ci.CartId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

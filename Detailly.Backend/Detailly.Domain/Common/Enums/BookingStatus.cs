@@ -6,12 +6,12 @@ namespace Detailly.Domain.Common.Enums;
 
 public enum BookingStatus
 {
-    Draft = 0,          // User is building booking (no payment intent yet)
-    PendingPayment = 1, // Payment intent created, waiting for payment
-    Confirmed = 2,      // Fully paid & accepted
-    Cancelled = 3,      // Cancelled (before or after payment)
-    Completed = 4,      // Service finished
-    Expired = 5         // Service payment period expired
+    Draft = 1,          // User is building booking (no payment intent yet)
+    PendingPayment = 2, // Payment intent created, waiting for payment
+    Confirmed = 3,      // Fully paid & accepted
+    Cancelled = 4,      // Cancelled (before or after payment)
+    Completed = 5,      // Service finished
+    Expired = 6         // Service payment period expired
 }
 
 //Draft             ->  Needed for frontend UX(edit freely)

@@ -2,11 +2,11 @@
 namespace Detailly.Domain.Common.Enums;
 public enum PaymentTransactionStatus
 {
-    Unpaid = 0,    // Created internally, no payment started
-    Pending = 1,   // External provider processing
-    Paid = 2,      // Fully paid (atomic success)
-    Failed = 3,    // Payment failed
-    Refunded = 4   // Full refund issued
+    Unpaid = 1,    // Created internally, no payment started
+    Pending = 2,   // External provider processing
+    Paid = 3,      // Fully paid (atomic success)
+    Failed = 4,    // Payment failed
+    Refunded = 5   // Full refund issued
 }
 
 

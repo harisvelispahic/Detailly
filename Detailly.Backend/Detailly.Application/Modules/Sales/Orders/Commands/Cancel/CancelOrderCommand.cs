@@ -1,6 +1,7 @@
-﻿
-namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
-public class CancelOrderCommand : IRequest<Unit>
+﻿namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
+
+public sealed class CancelOrderCommand : IRequest
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
+    public string? Reason { get; set; }
 }

@@ -40,8 +40,7 @@ public sealed class JwtTokenService : IJwtTokenService
             new("is_fleet", user.IsFleet.ToString().ToLowerInvariant()),
             new("ver",         user.TokenVersion.ToString()),
             new(JwtRegisteredClaimNames.Iat, ToUnixTimeSeconds(nowInstant).ToString(), ClaimValueTypes.Integer64),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-            //new(JwtRegisteredClaimNames.Aud, _jwt.Audience)
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N"))
         };
 
         // --- Signature ---
