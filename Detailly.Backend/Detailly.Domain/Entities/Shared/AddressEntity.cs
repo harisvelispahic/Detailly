@@ -27,7 +27,6 @@ public class AddressEntity : BaseEntity
     public decimal? Longitude { get; set; }
 
     // Foreign keys
-    //public IReadOnlyCollection<ApplicationUserEntity> ApplicationUsers { get; private set; } = new List<ApplicationUserEntity>();
     public int? ApplicationUserId { get; set; }
     public ApplicationUserEntity? ApplicationUser { get; set; }
 

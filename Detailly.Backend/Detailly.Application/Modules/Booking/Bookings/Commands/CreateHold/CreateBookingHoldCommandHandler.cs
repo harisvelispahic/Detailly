@@ -31,9 +31,21 @@ public sealed class CreateBookingHoldCommandHandler(
             throw new DetaillyBusinessRuleException("BOOKING_TIME_PAST",
                 "Start time must be in the future.");
 
-        if (request.ServiceMode == ServiceMode.Mobile && request.ServiceAddressId is null)
-            throw new DetaillyBusinessRuleException("BOOKING_ADDRESS_REQUIRED",
-                "Service address is required for mobile bookings.");
+        // ✅ ServiceMode address rules:
+        // - InShop: address must NOT be provided
+        // - Mobile: address MUST be provided
+        if (request.ServiceMode == ServiceMode.InShop)
+        {
+            if (request.ServiceAddressId is not null)
+                throw new DetaillyBusinessRuleException("BOOKING_ADDRESS_NOT_ALLOWED",
+                    "Service address must not be provided for in-shop bookings.");
+        }
+        else if (request.ServiceMode == ServiceMode.Mobile)
+        {
+            if (request.ServiceAddressId is null)
+                throw new DetaillyBusinessRuleException("BOOKING_ADDRESS_REQUIRED",
+                    "Service address is required for mobile bookings.");
+        }
 
         // Quote = single source of truth for duration/employees/bays/price + validated addon set
         var quote = await quoteService.CalculateAsync(
