@@ -1,5 +1,5 @@
 ﻿
-using Detailly.Application.Modules.Payment.Card.Commands.RefundCardPayment;
+using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
 using Detailly.Domain.Common.Enums;
 
@@ -68,7 +68,7 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurre
                 // Stripe payment
                 else if (string.Equals(paidPayment.Provider, "Stripe", StringComparison.OrdinalIgnoreCase))
                 {
-                    await mediator.Send(new RefundCardPaymentCommand(paidPayment.Id, refundAmount), ct);
+                    await mediator.Send(new RefundStripePaymentCommand(paidPayment.Id, refundAmount), ct);
                 }
                 else
                 {

@@ -9,13 +9,29 @@ export class PaymentsService {
 
   constructor(private http: HttpClient) {}
 
+  // -----------------------------
+  // BOOKINGS
+  // -----------------------------
   createCardIntent(bookingId: number): Observable<{ clientSecret: string }> {
     return this.http.post<{ clientSecret: string }>(
-      `${this.baseUrl}/bookings/${bookingId}/card-intent`,
+      `${this.baseUrl}/bookings/card-intent/${bookingId}`,
       {},
     );
   }
 
+  // -----------------------------
+  // ORDERS
+  // -----------------------------
+  createOrderCardIntent(orderId: number): Observable<{ clientSecret: string }> {
+    return this.http.post<{ clientSecret: string }>(
+      `${this.baseUrl}/orders/card-intent/${orderId}`,
+      {},
+    );
+  }
+
+  // -----------------------------
+  // WALLET TOP-UP
+  // -----------------------------
   createWalletTopUpCardIntent(
     body: CreateWalletTopUpIntentRequest,
   ): Observable<{ clientSecret: string }> {

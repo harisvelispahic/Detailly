@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
+﻿namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
 public class CancelOrderCommandValidator : AbstractValidator<CancelOrderCommand>
 {
     public CancelOrderCommandValidator()

@@ -18,7 +18,7 @@ public class StripeService : IStripeService
     }
 
     public async Task<(string ProviderTransactionId, string ClientSecret)>
-        CreatePaymentIntentAsync(decimal amount, int bookingId, CancellationToken ct)
+        CreateBookingPaymentIntentAsync(decimal amount, int bookingId, CancellationToken ct)
     {
         var options = new PaymentIntentCreateOptions
         {
@@ -32,6 +32,23 @@ public class StripeService : IStripeService
 
         var intent = await _paymentIntentService.CreateAsync(options, cancellationToken: ct);
 
+        return (intent.Id, intent.ClientSecret);
+    }
+
+    public async Task<(string ProviderTransactionId, string ClientSecret)>
+        CreateOrderPaymentIntentAsync(decimal amount, int orderId, CancellationToken ct)
+    {
+        var options = new PaymentIntentCreateOptions
+        {
+            Amount = (long)Math.Round(amount * 100m, 0, MidpointRounding.AwayFromZero),
+            Currency = "bam",
+            Metadata = new Dictionary<string, string>
+        {
+            { "orderId", orderId.ToString() }
+        }
+        };
+
+        var intent = await _paymentIntentService.CreateAsync(options, cancellationToken: ct);
         return (intent.Id, intent.ClientSecret);
     }
 

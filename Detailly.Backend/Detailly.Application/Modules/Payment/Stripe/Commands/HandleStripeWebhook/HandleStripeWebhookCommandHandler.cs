@@ -1,6 +1,6 @@
-﻿
-using Detailly.Application.Abstractions.Payments;
+﻿using Detailly.Application.Abstractions.Payments;
 using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
+using Detailly.Application.Modules.Sales.Orders.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 using Microsoft.Extensions.Configuration;
@@ -70,6 +70,7 @@ public class HandleStripeWebhookCommandHandler
         var payment = await _context.PaymentTransactions
             .Include(x => x.Booking)
             .Include(x => x.Wallet)
+            .Include(x => x.Order)
             .FirstOrDefaultAsync(x => x.ProviderTransactionId == providerTransactionId && !x.IsDeleted, ct);
 
         if (payment is null)
@@ -95,6 +96,11 @@ public class HandleStripeWebhookCommandHandler
                 if (payment.Booking is not null)
                 {
                     await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
+                }
+
+                if (payment.Order is not null)
+                {
+                    await _mediator.Send(new ConfirmOrderAfterPaymentCommand(payment.Id), ct);
                 }
 
                 // Wallet top-up flow

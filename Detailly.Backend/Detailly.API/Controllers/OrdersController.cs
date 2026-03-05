@@ -23,7 +23,7 @@ public class OrdersController(ISender sender) : ControllerBase
         return CreatedAtAction(nameof(GetOrderDetails), new { id }, new { id });
     }
 
-    [HttpPut("{id:int}/cancel")]
+    [HttpPut("cancel/{id:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task Cancel(int id, [FromBody] CancelOrderCommand command, CancellationToken ct)
     {
@@ -38,7 +38,7 @@ public class OrdersController(ISender sender) : ControllerBase
         => await sender.Send(query, ct);
 
     // Ownership-enforced details
-    [HttpGet("{id:int}/details")]
+    [HttpGet("details/{id:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<GetOrderDetailsQueryDto> GetOrderDetails(int id, CancellationToken ct)
         => await sender.Send(new GetOrderDetailsQuery { Id = id }, ct);
@@ -54,7 +54,7 @@ public class OrdersController(ISender sender) : ControllerBase
     public async Task<PageResult<ListOrdersQueryDto>> List([FromQuery] ListOrdersQuery query, CancellationToken ct)
         => await sender.Send(query, ct);
 
-    [HttpPut("{id:int}/ship")]
+    [HttpPut("ship/{id:int}")]
     [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Ship(int id, [FromBody] MarkOrderShippedCommand command, CancellationToken ct)
     {
@@ -62,7 +62,7 @@ public class OrdersController(ISender sender) : ControllerBase
         await sender.Send(command, ct);
     }
 
-    [HttpPut("{id:int}/deliver")]
+    [HttpPut("deliver/{id:int}")]
     [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Deliver(int id, [FromBody] MarkOrderDeliveredCommand command, CancellationToken ct)
     {

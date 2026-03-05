@@ -1,0 +1,40 @@
+<div class="box">
+  <h2 class="title is-4">My Orders</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+
+  <div *ngIf="error" class="notification is-danger">
+    {{ error }}
+  </div>
+
+  <table class="table is-fullwidth is-striped" *ngIf="!isLoading">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Date</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let o of items">
+        <td>{{ o.orderNumber ?? o.id }}</td>
+        <td>{{ o.orderDate }}</td>
+        <td>{{ o.totalAmount }}</td>
+        <td>{{ o.status }}</td>
+        <td>
+          <button class="button is-small" (click)="open(o.id)">Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="buttons mt-3">
+    <button class="button" (click)="prev()" [disabled]="page <= 1">Prev</button>
+    <button class="button" (click)="next()" [disabled]="page * pageSize >= total">Next</button>
+  </div>
+
+  <p class="has-text-grey mt-2">Showing page {{ page }} — total {{ total }}</p>
+</div>

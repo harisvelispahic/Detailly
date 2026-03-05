@@ -1,14 +1,11 @@
-﻿using Detailly.Application.Abstractions;
-using Detailly.Application.Abstractions.Payments;
+﻿using Detailly.Application.Abstractions.Payments;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
-namespace Detailly.Application.Modules.Payment.Card.Commands.CreateCardPaymentIntent;
+namespace Detailly.Application.Modules.Payment.Card.Commands.CreateBookingPaymentIntent;
 
-public class CreateCardPaymentIntentCommandHandler
-    : IRequestHandler<CreateCardPaymentIntentCommand, CreateCardPaymentIntentResult>
+public class CreateBookingPaymentIntentCommandHandler
+    : IRequestHandler<CreateBookingPaymentIntentCommand, CreateBookingPaymentIntentResult>
 {
     // If a PaymentIntent has been Pending for longer than this, allow replacing it with a new one.
     private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(2);
@@ -16,13 +13,13 @@ public class CreateCardPaymentIntentCommandHandler
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;
 
-    public CreateCardPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe)
+    public CreateBookingPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe)
     {
         _context = context;
         _stripe = stripe;
     }
 
-    public async Task<CreateCardPaymentIntentResult> Handle(CreateCardPaymentIntentCommand request, CancellationToken ct)
+    public async Task<CreateBookingPaymentIntentResult> Handle(CreateBookingPaymentIntentCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
@@ -74,7 +71,7 @@ public class CreateCardPaymentIntentCommandHandler
         }
 
         var (providerTransactionId, clientSecret) =
-            await _stripe.CreatePaymentIntentAsync(booking.TotalPrice, booking.Id, ct);
+            await _stripe.CreateBookingPaymentIntentAsync(booking.TotalPrice, booking.Id, ct);
 
         var transaction = new PaymentTransactionEntity
         {
@@ -93,7 +90,7 @@ public class CreateCardPaymentIntentCommandHandler
         _context.PaymentTransactions.Add(transaction);
         await _context.SaveChangesAsync(ct);
 
-        return new CreateCardPaymentIntentResult
+        return new CreateBookingPaymentIntentResult
         {
             ClientSecret = clientSecret
         };

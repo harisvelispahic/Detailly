@@ -1,0 +1,62 @@
+<div class="box">
+  <h2 class="title is-4">Order Details</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+
+  <div *ngIf="error" class="notification is-danger">
+    {{ error }}
+  </div>
+
+  <div *ngIf="order && !isLoading">
+    <p><b>Order #:</b> {{ order.orderNumber ?? order.id }}</p>
+    <p><b>Date:</b> {{ order.orderDate }}</p>
+    <p><b>Status:</b> {{ order.status }}</p>
+    <p><b>Total:</b> {{ order.totalAmount }}</p>
+
+    <hr />
+
+    <h3 class="title is-6">Items</h3>
+    <table class="table is-fullwidth is-striped" *ngIf="order.items?.length">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Unit</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let it of order.items">
+          <td>{{ it.productName ?? it.productId }}</td>
+          <td>{{ it.quantity }}</td>
+          <td>{{ it.unitPrice }}</td>
+          <td>{{ it.lineTotal }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!order.items?.length" class="has-text-grey">No items found.</div>
+
+    <hr />
+
+    <div *ngIf="canCancel()">
+      <h3 class="title is-6">Cancel Order</h3>
+
+      <div class="field">
+        <label class="label">Reason (optional)</label>
+        <div class="control">
+          <!-- <input class="input" [(ngModel)]="cancelReason" /> -->
+          <input class="input" />
+        </div>
+      </div>
+
+      <button class="button is-danger" (click)="cancel()" [disabled]="isCancelling">
+        Cancel Order
+      </button>
+    </div>
+
+    <div *ngIf="!canCancel()" class="notification is-info">
+      This order cannot be cancelled in its current status.
+    </div>
+  </div>
+</div>

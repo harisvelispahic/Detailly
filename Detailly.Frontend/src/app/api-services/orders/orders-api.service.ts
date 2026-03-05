@@ -10,12 +10,12 @@ import {
   GetOrderByIdQueryDto,
   CreateOrderCommand,
   UpdateOrderCommand,
-  OrderStatusType
+  OrderStatusType,
 } from './orders-api.models';
 import { buildHttpParams } from '../../core/models/build-http-params';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OrdersApiService {
   private readonly baseUrl = `${environment.apiUrl}/Orders`;
@@ -80,7 +80,22 @@ export class OrdersApiService {
    */
   changeStatus(id: number, newStatus: OrderStatusType): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${id}/change-status`, {
-      newStatus: newStatus
+      newStatus: newStatus,
     });
+  }
+
+  cancelOrder(orderId: number, reason?: string | null): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/cancel/${orderId}`, {
+      reason: reason ?? null,
+    });
+  }
+
+  getMy(request?: any): Observable<any> {
+    const params = request ? buildHttpParams(request as any) : undefined;
+    return this.http.get<any>(`${this.baseUrl}/my`, { params });
+  }
+
+  getDetails(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/details/${id}`);
   }
 }

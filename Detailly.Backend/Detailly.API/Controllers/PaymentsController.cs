@@ -1,6 +1,7 @@
 ﻿using Detailly.Application.Abstractions;
-using Detailly.Application.Modules.Payment.Card.Commands.CreateCardPaymentIntent;
-using Detailly.Application.Modules.Payment.Card.Commands.RefundCardPayment;
+using Detailly.Application.Modules.Payment.Card.Commands.CreateBookingPaymentIntent;
+using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
+using Detailly.Application.Modules.Payment.Stripe.Commands.CreateOrderPaymentIntent;
 using Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
@@ -17,7 +18,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 1) TOP UP WALLET (instant/internal)
     // -------------------------------
     [HttpPost("wallet/top-up")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
     public async Task<IActionResult> TopUpWallet([FromBody] TopUpWalletCommand command, CancellationToken ct)
     {
         await sender.Send(command, ct);
@@ -27,7 +28,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // -------------------------------
     // 2) PAY BOOKING WITH WALLET
     // -------------------------------
-    [HttpPost("bookings/{bookingId:int}/wallet")]
+    [HttpPost("bookings/wallet/{bookingId:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<IActionResult> PayBookingWithWallet(int bookingId, CancellationToken ct)
     {
@@ -41,19 +42,34 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // -------------------------------
     // 3) CREATE CARD PAYMENT INTENT (booking)
     // -------------------------------
-    [HttpPost("bookings/{bookingId:int}/card-intent")]
+    [HttpPost("bookings/card-intent/{bookingId:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task<ActionResult<CreateCardPaymentIntentResult>> CreateCardIntent(int bookingId, CancellationToken ct)
+    public async Task<ActionResult<CreateBookingPaymentIntentResult>> CreateCardIntent(int bookingId, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
             return Unauthorized();
 
-        var result = await sender.Send(new CreateCardPaymentIntentCommand(currentUser.ApplicationUserId.Value, bookingId), ct);
+        var result = await sender.Send(new CreateBookingPaymentIntentCommand(currentUser.ApplicationUserId.Value, bookingId), ct);
         return Ok(result);
     }
 
     // -------------------------------
-    // 4) CREATE CARD PAYMENT INTENT (wallet top-up)
+    // 4) CREATE CARD PAYMENT INTENT (order)
+    // -------------------------------
+    [HttpPost("orders/card-intent/{orderId:int}")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
+    public async Task<ActionResult<CreateOrderPaymentIntentResult>> CreateOrderCardIntent(int orderId, CancellationToken ct)
+    {
+        if (currentUser.ApplicationUserId is null)
+            return Unauthorized();
+
+        // Ownership is enforced in the handler
+        var result = await sender.Send(new CreateOrderPaymentIntentCommand(orderId), ct);
+        return Ok(result);
+    }
+
+    // -------------------------------
+    // 5) CREATE CARD PAYMENT INTENT (wallet top-up)
     // -------------------------------
     [HttpPost("wallet/top-up/card-intent")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
@@ -70,9 +86,9 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     }
 
     // -------------------------------
-    // 5) REFUND WALLET PAYMENT (admin)
+    // 6) REFUND WALLET PAYMENT (admin)
     // -------------------------------
-    [HttpPost("{paymentId:int}/refund-wallet")]
+    [HttpPost("refund-wallet/{paymentId:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]    // later restrict to Admin/Manager policy
     public async Task<IActionResult> RefundWalletPayment(int paymentId, [FromBody] RefundRequest req, CancellationToken ct)
     {
@@ -81,13 +97,13 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     }
 
     // -------------------------------
-    // 6) REFUND CARD PAYMENT (admin)
+    // 7) REFUND CARD PAYMENT (admin)
     // -------------------------------
-    [HttpPost("{paymentId:int}/refund-card")]
+    [HttpPost("refund-card/{paymentId:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]    // later restrict to Admin/Manager policy
     public async Task<IActionResult> RefundCardPayment(int paymentId, [FromBody] RefundRequest req, CancellationToken ct)
     {
-        await sender.Send(new RefundCardPaymentCommand(paymentId, req.Amount), ct);
+        await sender.Send(new RefundStripePaymentCommand(paymentId, req.Amount), ct);
         return Ok();
     }
 }

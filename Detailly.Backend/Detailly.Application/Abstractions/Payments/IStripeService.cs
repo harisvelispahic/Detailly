@@ -2,10 +2,15 @@
 
 public interface IStripeService
 {
-    Task<(string ProviderTransactionId, string ClientSecret)> CreatePaymentIntentAsync(
+    Task<(string ProviderTransactionId, string ClientSecret)> CreateBookingPaymentIntentAsync(
         decimal amount,
         int bookingId,
         CancellationToken ct);
+
+    Task<(string ProviderTransactionId, string ClientSecret)> CreateOrderPaymentIntentAsync(
+    decimal amount,
+    int orderId,
+    CancellationToken ct);
 
     Task<(string ProviderTransactionId, string ClientSecret)> CreateWalletTopUpPaymentIntentAsync(
         decimal amount,

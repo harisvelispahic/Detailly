@@ -1,0 +1,13 @@
+<div class="box">
+  <h2 class="title is-4">Pay Order</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+
+  <div *ngIf="cardError" class="notification is-danger">
+    {{ cardError }}
+  </div>
+
+  <div id="card-element" class="mb-3"></div>
+
+  <button class="button is-primary" (click)="pay()" [disabled]="isLoading">Pay</button>
+</div>
