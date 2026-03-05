@@ -1,9 +1,4 @@
-﻿using Detailly.Domain.Entities.Booking;
-using Detailly.Domain.Entities.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Detailly.Infrastructure.Database.Configurations.Identity;
+﻿namespace Detailly.Infrastructure.Database.Configurations.Identity;
 
 public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguration<ApplicationUserEntity>
 {
@@ -20,8 +15,6 @@ public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguratio
 
         builder.Property(x => x.IsAdmin).HasDefaultValue(false);
         builder.Property(x => x.IsManager).HasDefaultValue(false);
-
-        // ✅ Regular user default
         builder.Property(x => x.IsEmployee).HasDefaultValue(false);
 
         builder.Property(x => x.TokenVersion).HasDefaultValue(0);
@@ -37,6 +30,8 @@ public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguratio
         builder.HasMany(x => x.RefreshTokens)
             .WithOne(x => x.ApplicationUser)
             .HasForeignKey(x => x.ApplicationUserId);
+
+        // ✅ Address book relationship is configured from AddressConfiguration (below)
 
         // Index for employee availability filtering
         builder.HasIndex(x => new { x.IsEmployee, x.EmployeeWorkMode, x.IsEnabled });

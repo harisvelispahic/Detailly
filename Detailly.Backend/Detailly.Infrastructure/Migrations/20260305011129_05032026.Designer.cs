@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260305002224_05032026")]
+    [Migration("20260305011129_05032026")]
     partial class _05032026
     {
         /// <inheritdoc />
@@ -611,9 +611,6 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CompanyName")
                         .HasColumnType("nvarchar(max)");
 
@@ -685,8 +682,6 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AddressId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -1075,6 +1070,9 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ApplicationUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("City")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -1113,6 +1111,8 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("City", "Country");
 
@@ -1496,15 +1496,9 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
                 {
-                    b.HasOne("Detailly.Domain.Entities.Shared.AddressEntity", "Address")
-                        .WithMany("ApplicationUsers")
-                        .HasForeignKey("AddressId");
-
                     b.HasOne("Detailly.Domain.Entities.Shared.ImageEntity", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
-
-                    b.Navigation("Address");
 
                     b.Navigation("Image");
                 });
@@ -1621,6 +1615,16 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>
+                {
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
+                        .WithMany("Addresses")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
@@ -1746,6 +1750,8 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
                 {
+                    b.Navigation("Addresses");
+
                     b.Navigation("Bookings");
 
                     b.Navigation("Cart");
@@ -1780,8 +1786,6 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>
                 {
-                    b.Navigation("ApplicationUsers");
-
                     b.Navigation("Locations");
 
                     b.Navigation("Orders");

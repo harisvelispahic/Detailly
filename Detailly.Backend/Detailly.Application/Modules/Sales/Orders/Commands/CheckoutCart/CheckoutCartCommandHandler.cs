@@ -13,10 +13,13 @@ public sealed class CheckoutCartCommandHandler(IAppDbContext context, IAppCurren
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
-        // Validate address exists (optional: later enforce ownership)
-        var addressExists = await context.Addresses.AnyAsync(a => a.Id == request.ShipToAddressId, ct);
+        // Validate address exists
+        var addressExists = await context.Addresses
+            .AnyAsync(a => a.Id == request.ShipToAddressId && a.ApplicationUserId == userId, ct);
+
         if (!addressExists)
             throw new DetaillyBusinessRuleException("address.not_found", "Shipping address does not exist.");
+
 
         await using var tx = await context.Database.BeginTransactionAsync(ct);
 
@@ -97,7 +100,8 @@ public sealed class CheckoutCartCommandHandler(IAppDbContext context, IAppCurren
 
             // Keep your current placeholder discount model.
             // Later: Promotion engine; for now it's deterministic server-side.
-            var discount = 0.05m;
+            //var discount = 0.05m;
+            var discount = 0m;
 
             var lineTotal = (1 - discount) * lineSubtotal;
 

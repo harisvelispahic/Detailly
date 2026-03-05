@@ -14,7 +14,8 @@ public class GetUserByIdQueryHandler(IAppDbContext context)
                 Username = u.Username,
                 Email = u.Email,
                 CompanyName = u.CompanyName,
-                Address = u.Address
+                //Address = u.Address
+                Address = null
             })
             .FirstOrDefaultAsync(ct);
 

@@ -9,7 +9,7 @@ public sealed class UpdateUserCommandHandler(IAppDbContext context)
     public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken ct)
     {
         var user = await context.ApplicationUsers
-            .Include(x => x.Address)
+            //.Include(x => x.Address)      // POPRAVITI
             .Include(x => x.Image)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
@@ -53,31 +53,31 @@ public sealed class UpdateUserCommandHandler(IAppDbContext context)
             user.CompanyName = request.CompanyName.Trim();
 
         // ADDRESS (create if missing)
-        if (request.Address != null)
-        {
-            user.Address ??= new AddressEntity();
+        //if (request.Address != null)
+        //{
+        //    user.Address ??= new AddressEntity();
 
-            if (request.Address.Street != null)
-                user.Address.Street = request.Address.Street.Trim();
+        //    if (request.Address.Street != null)
+        //        user.Address.Street = request.Address.Street.Trim();
 
-            if (request.Address.City != null)
-                user.Address.City = request.Address.City.Trim();
+        //    if (request.Address.City != null)
+        //        user.Address.City = request.Address.City.Trim();
 
-            if (request.Address.Region != null)
-                user.Address.Region = request.Address.Region.Trim();
+        //    if (request.Address.Region != null)
+        //        user.Address.Region = request.Address.Region.Trim();
 
-            if (request.Address.PostalCode != null)
-                user.Address.PostalCode = request.Address.PostalCode.Trim();
+        //    if (request.Address.PostalCode != null)
+        //        user.Address.PostalCode = request.Address.PostalCode.Trim();
 
-            if (request.Address.Country != null)
-                user.Address.Country = request.Address.Country.Trim();
+        //    if (request.Address.Country != null)
+        //        user.Address.Country = request.Address.Country.Trim();
 
-            if (request.Address.Latitude.HasValue)
-                user.Address.Latitude = request.Address.Latitude.Value;
+        //    if (request.Address.Latitude.HasValue)
+        //        user.Address.Latitude = request.Address.Latitude.Value;
 
-            if (request.Address.Longitude.HasValue)
-                user.Address.Longitude = request.Address.Longitude.Value;
-        }
+        //    if (request.Address.Longitude.HasValue)
+        //        user.Address.Longitude = request.Address.Longitude.Value;
+        //}
 
         // IMAGE
         if (request.Image?.ImageUrl != null)

@@ -66,7 +66,7 @@ public static class DynamicDataSeeder
         {
             Email = "admin@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
             Username = "admin",
@@ -87,7 +87,7 @@ public static class DynamicDataSeeder
         {
             Email = "manager@detailly.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
             Username = "admin",
@@ -108,7 +108,7 @@ public static class DynamicDataSeeder
         {
             Email = "string",
             PasswordHash = hasher.HashPassword(null!, "string"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
             Username = "admin",
@@ -128,7 +128,7 @@ public static class DynamicDataSeeder
         {
             Email = "test",
             PasswordHash = hasher.HashPassword(null!, "test123"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
             Username = "admin",
@@ -148,7 +148,7 @@ public static class DynamicDataSeeder
         {
             Email = "haris.velispahic@edu.fit.ba",
             PasswordHash = hasher.HashPassword(null!, "haris123"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Haris",
             LastName = "Velispahic",
             Username = "haris123",
@@ -168,7 +168,7 @@ public static class DynamicDataSeeder
         {
             Email = "danis.music@edu.fit.ba",
             PasswordHash = hasher.HashPassword(null!, "danis123"),
-            AddressId = null,
+            //AddressId = null,
             FirstName = "Admin",
             LastName = "Admin",
             Username = "admin",

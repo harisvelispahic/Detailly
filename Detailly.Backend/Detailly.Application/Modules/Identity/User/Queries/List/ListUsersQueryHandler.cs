@@ -28,7 +28,8 @@ public class ListUsersQueryHandler(IAppDbContext ctx)
                 Username = x.Username,
                 Email = x.Email,
                 CompanyName = x.CompanyName,
-                Address = x.Address!
+                //Address = x.Address!
+                Address = null
             });
         return await PageResult<ListUsersQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
