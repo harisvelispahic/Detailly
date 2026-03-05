@@ -93,12 +93,12 @@ public class HandleStripeWebhookCommandHandler
 
                 // Booking payment: use centralized confirm logic
                 // (checks hold expiry + clears ReservationExpiresAtUtc)
-                if (payment.Booking is not null)
+                if (payment.BookingId is not null)  // used to be payment.Booking is not null
                 {
                     await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
                 }
 
-                if (payment.Order is not null)
+                if (payment.OrderId is not null)    // used to be payment.Order is not null
                 {
                     await _mediator.Send(new ConfirmOrderAfterPaymentCommand(payment.Id), ct);
                 }

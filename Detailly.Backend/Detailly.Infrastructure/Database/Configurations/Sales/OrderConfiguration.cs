@@ -1,5 +1,4 @@
-﻿using Detailly.Domain.Entities.Payment;
-using Detailly.Domain.Entities.Sales;
+﻿using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Infrastructure.Database.Configurations.Sales;
 
@@ -23,11 +22,10 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<OrderEntity>
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Order -> PaymentTransaction (1:1 optional)
-        builder.HasOne(o => o.PaymentTransaction)
+        // ✅ Order -> PaymentTransactions (1:N) (audit-safe)
+        builder.HasMany(o => o.PaymentTransactions)
             .WithOne(pt => pt.Order)
-            .HasForeignKey<PaymentTransactionEntity>(pt => pt.OrderId)
-            .IsRequired(false)
+            .HasForeignKey(pt => pt.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

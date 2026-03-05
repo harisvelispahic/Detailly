@@ -1,7 +1,4 @@
-﻿using Detailly.Domain.Entities.Booking;
-using Detailly.Domain.Entities.Payment;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Detailly.Domain.Entities.Payment;
 
 namespace Detailly.Infrastructure.Database.Configurations.Payment;
 
@@ -37,7 +34,7 @@ public sealed class PaymentTransactionConfiguration
 
         // ORDER (1 : many)
         builder.HasOne(x => x.Order)
-            .WithMany()
+            .WithMany(o => o.PaymentTransactions)
             .HasForeignKey(x => x.OrderId)
             .OnDelete(DeleteBehavior.Restrict);
 

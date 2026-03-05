@@ -23,7 +23,7 @@ public class OrderEntity : BaseEntity
     public AddressEntity ShipToAddress { get; set; } = null!;
     public required int ApplicationUserId { get; set; }
     public ApplicationUserEntity ApplicationUser { get; set; } = null!;
-    public PaymentTransactionEntity? PaymentTransaction { get; set; }
 
     public IReadOnlyCollection<OrderItemEntity> OrderItems { get; private set; } = new List<OrderItemEntity>();
+    public IReadOnlyCollection<PaymentTransactionEntity> PaymentTransactions { get; private set; } = new List<PaymentTransactionEntity>();
 }

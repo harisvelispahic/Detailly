@@ -794,9 +794,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProviderTransactionId")
                         .IsUnique()
@@ -1527,8 +1525,8 @@ namespace Detailly.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
-                        .WithOne("PaymentTransaction")
-                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "OrderId")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
@@ -1774,7 +1772,7 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("PaymentTransaction");
+                    b.Navigation("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>

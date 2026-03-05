@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class _04032026 : Migration
+    public partial class _05032026 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1054,9 +1054,7 @@ namespace Detailly.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_OrderId",
                 table: "PaymentTransactions",
-                column: "OrderId",
-                unique: true,
-                filter: "[OrderId] IS NOT NULL");
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_ProviderTransactionId",

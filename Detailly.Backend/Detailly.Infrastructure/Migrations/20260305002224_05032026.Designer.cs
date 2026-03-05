@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260304005320_04032026")]
-    partial class _04032026
+    [Migration("20260305002224_05032026")]
+    partial class _05032026
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -797,9 +797,7 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.HasIndex("OrderId")
-                        .IsUnique()
-                        .HasFilter("[OrderId] IS NOT NULL");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProviderTransactionId")
                         .IsUnique()
@@ -1530,8 +1528,8 @@ namespace Detailly.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Sales.OrderEntity", "Order")
-                        .WithOne("PaymentTransaction")
-                        .HasForeignKey("Detailly.Domain.Entities.Payment.PaymentTransactionEntity", "OrderId")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Detailly.Domain.Entities.Payment.WalletEntity", "Wallet")
@@ -1777,7 +1775,7 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("PaymentTransaction");
+                    b.Navigation("PaymentTransactions");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.AddressEntity", b =>
