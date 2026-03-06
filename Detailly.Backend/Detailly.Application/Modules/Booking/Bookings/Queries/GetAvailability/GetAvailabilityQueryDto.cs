@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
+﻿namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 
 public sealed class GetAvailabilityQueryDto
 {

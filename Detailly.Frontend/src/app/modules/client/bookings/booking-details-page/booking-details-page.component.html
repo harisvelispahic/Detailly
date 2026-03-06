@@ -1,0 +1,37 @@
+<div class="container">
+  <button type="button" (click)="back()">← Back</button>
+
+  <h2>Booking Details</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!isLoading && booking">
+    <p><b>ID:</b> {{ booking?.id }}</p>
+    <p><b>Status:</b> {{ booking?.status }}</p>
+    <p><b>Start:</b> {{ booking?.startUtc }}</p>
+    <p><b>End:</b> {{ booking?.endUtc }}</p>
+    <p><b>Total:</b> {{ booking?.totalPrice }}</p>
+
+    <div style="margin-top: 16px">
+      <label>Cancel reason (optional)</label><br />
+      <input type="text" placeholder="Reason..." style="width: 100%; max-width: 480px" />
+      <!-- <input
+        type="text"
+        [(ngModel)]="cancelReason"
+        placeholder="Reason..."
+        style="width: 100%; max-width: 480px"
+      /> -->
+    </div>
+
+    <div style="margin-top: 12px">
+      <a [routerLink]="['/client/bookings/pay', booking.id]"> Pay by card </a>
+    </div>
+
+    <div style="margin-top: 12px">
+      <button type="button" (click)="cancel()" [disabled]="isCancelling">
+        {{ isCancelling ? 'Cancelling...' : 'Cancel Booking' }}
+      </button>
+    </div>
+  </div>
+</div>

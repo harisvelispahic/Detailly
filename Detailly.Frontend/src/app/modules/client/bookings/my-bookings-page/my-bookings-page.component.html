@@ -1,0 +1,32 @@
+<div class="container">
+  <h2>My Bookings</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!isLoading && bookings.length === 0">You have no bookings yet.</div>
+
+  <table *ngIf="!isLoading && bookings.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let b of bookings">
+        <td>{{ b.id }}</td>
+        <td>{{ b.startUtc }}</td>
+        <td>{{ b.endUtc }}</td>
+        <td>{{ b.status }}</td>
+        <td>
+          <button type="button" (click)="openDetails(b.id)">Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

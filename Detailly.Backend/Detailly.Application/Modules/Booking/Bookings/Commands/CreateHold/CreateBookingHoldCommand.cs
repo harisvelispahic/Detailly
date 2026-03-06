@@ -1,5 +1,4 @@
 ﻿using Detailly.Domain.Common.Enums;
-using MediatR;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.CreateHold;
 

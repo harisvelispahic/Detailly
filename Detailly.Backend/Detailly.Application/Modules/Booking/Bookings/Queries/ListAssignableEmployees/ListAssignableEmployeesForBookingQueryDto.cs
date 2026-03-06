@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListAssignableEmployees;
+﻿namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListAssignableEmployees;
 public sealed class ListAssignableEmployeesForBookingQueryDto
 {
     public int EmployeeId { get; set; }

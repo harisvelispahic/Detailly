@@ -36,7 +36,7 @@ public class BookingEntity : BaseEntity
     public ApplicationUserEntity Customer { get; set; } = null!;
 
 
-    // SHOP LOCATION (single shop now, still useful long-term)
+    // SHOP LOCATION (required for knowledge about the home base of the mobile team)
     public required int ShopLocationId { get; set; }
     public LocationEntity ShopLocation { get; set; } = null!;
 

@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
+﻿using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
 using Detailly.Domain.Common.Enums;
 

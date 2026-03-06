@@ -1,0 +1,21 @@
+<div class="container">
+  <button type="button" (click)="back()">← Back</button>
+
+  <h2>Pay Booking (Card)</h2>
+
+  <div *ngIf="isLoading">Loading...</div>
+
+  <div *ngIf="cardError" style="color: red; margin: 8px 0">
+    {{ cardError }}
+  </div>
+
+  <div id="card-element" style="margin: 16px 0"></div>
+
+  <button (click)="pay()" [disabled]="isLoading || !isReady">
+    {{ isLoading ? 'Processing...' : 'Pay now' }}
+  </button>
+
+  <p style="margin-top: 12px; opacity: 0.8">
+    Note: status updates after Stripe webhook confirmation.
+  </p>
+</div>
