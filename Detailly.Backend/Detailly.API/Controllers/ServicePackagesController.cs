@@ -51,7 +51,7 @@ public class ServicePackagesController(ISender sender) : ControllerBase
         return result;
     }
 
-    [HttpGet("AvailableAddons/{id:int}")]
+    [HttpGet("available-addons/{id:int}")]
     [AllowAnonymous]
     public async Task<ActionResult<GetAvailableAddonsQueryDto>> GetAvailableAddons(int id, CancellationToken ct)
     {

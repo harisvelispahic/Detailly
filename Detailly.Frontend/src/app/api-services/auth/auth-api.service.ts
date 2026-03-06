@@ -14,7 +14,7 @@ import {
   providedIn: 'root',
 })
 export class AuthApiService {
-  private readonly baseUrl = `${environment.apiUrl}/api/auth`;
+  private readonly baseUrl = `${environment.apiUrl}/Auth`;
   private http = inject(HttpClient);
 
   /**

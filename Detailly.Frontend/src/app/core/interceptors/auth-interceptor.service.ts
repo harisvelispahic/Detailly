@@ -55,7 +55,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
  */
 function isAuthEndpoint(url: string): boolean {
   const u = url.toLowerCase();
-  return u.includes('/auth/');
+  return u.includes('/auth');
 }
 
 /**

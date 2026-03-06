@@ -1,7 +1,6 @@
-﻿
-namespace Detailly.Domain.Common.Enums;
+﻿namespace Detailly.Domain.Common.Enums;
 public enum ServiceMode
 {
-    InShop = 1,
-    Mobile = 2
+    InShop = 0,
+    Mobile = 1
 }

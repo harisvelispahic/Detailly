@@ -1,12 +1,11 @@
-﻿
-namespace Detailly.Domain.Common.Enums;
+﻿namespace Detailly.Domain.Common.Enums;
 
 public enum OrderStatus
 {
-    PendingPayment = 1,
-    Paid = 2,
-    Shipped = 3,
-    Delivered = 4,
-    Cancelled = 5
+    PendingPayment = 0,
+    Paid = 1,
+    Shipped = 2,
+    Delivered = 3,
+    Cancelled = 4
 }
 

@@ -52,14 +52,14 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
         return result;
     }
 
-    [HttpPut("{id:int}/disable")]
+    [HttpPut("disable/{id:int}")]
     public async Task Disable(int id, CancellationToken ct)
     {
         await sender.Send(new DisableProductCategoryCommand { Id = id }, ct);
         // no return -> 204 No Content
     }
 
-    [HttpPut("{id:int}/enable")]
+    [HttpPut("enable/{id:int}")]
     public async Task Enable(int id, CancellationToken ct)
     {
         await sender.Send(new EnableProductCategoryCommand { Id = id }, ct);
