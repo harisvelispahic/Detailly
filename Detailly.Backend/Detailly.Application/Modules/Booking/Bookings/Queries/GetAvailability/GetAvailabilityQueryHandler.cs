@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Abstractions.Booking;
+﻿using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;

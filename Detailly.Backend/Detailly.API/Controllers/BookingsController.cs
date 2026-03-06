@@ -30,7 +30,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     // CANCEL BOOKING
     // ---------------------------------------
-    [HttpPut("{id:int}/cancel")]
+    [HttpPut("cancel/{id:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task Cancel(int id, CancelBookingCommand command, CancellationToken ct)
     {
@@ -77,7 +77,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     // COMPLETE BOOKING (Employee, Manager or Admin)
     // ---------------------------------------
-    [HttpPut("{id:int}/complete")]
+    [HttpPut("complete/{id:int}")]
     [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Complete(int id, CompleteBookingCommand command, CancellationToken ct)
     {
@@ -108,7 +108,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     // MANAGER: LIST ASSIGNABLE EMPLOYEES FOR BOOKING
     // ---------------------------------------
-    [HttpGet("{id:int}/assignable-employees")]
+    [HttpGet("assignable-employees/{id:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<List<ListAssignableEmployeesForBookingQueryDto>> ListAssignableEmployees(
         int id,
@@ -121,7 +121,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     // MANAGER: ASSIGN EMPLOYEES TO BOOKING
     // ---------------------------------------
-    [HttpPut("{id:int}/assign-employees")]
+    [HttpPut("assign-employees/{id:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task AssignEmployees(
         int id,

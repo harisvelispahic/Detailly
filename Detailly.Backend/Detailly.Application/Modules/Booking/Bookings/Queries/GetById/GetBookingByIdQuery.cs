@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 
 public sealed class GetBookingByIdQuery : IRequest<GetBookingByIdQueryDto>
 {

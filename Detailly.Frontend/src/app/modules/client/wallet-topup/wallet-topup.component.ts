@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
-import { PaymentsService } from '../../../api-services/payments/payments.service';
+import { PaymentsService } from '../../../api-services/payments/payments-api.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({

@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common.Enums;
+﻿using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 
@@ -22,11 +21,11 @@ public sealed class GetBookingByIdQueryDto
     public required int ServicePackageId { get; set; }
     public required string ServicePackageName { get; set; }
 
-    public List<BookingAddonDto> Addons { get; set; } = new();
-    public List<int> VehicleIds { get; set; } = new();
-
     public int? PaymentTransactionId { get; set; }
     public PaymentTransactionStatus? PaymentStatus { get; set; }
+
+    public List<BookingAddonDto> Addons { get; set; } = new();
+    public List<int> VehicleIds { get; set; } = new();
 }
 public sealed class BookingAddonDto
 {

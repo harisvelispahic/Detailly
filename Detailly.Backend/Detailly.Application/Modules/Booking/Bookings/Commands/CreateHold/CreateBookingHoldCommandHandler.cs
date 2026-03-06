@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Abstractions.Booking;
+﻿using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 

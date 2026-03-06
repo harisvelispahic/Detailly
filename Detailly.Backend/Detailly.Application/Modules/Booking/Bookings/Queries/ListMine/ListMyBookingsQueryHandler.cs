@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
+﻿namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
 
 public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
     : IRequestHandler<ListMyBookingsQuery, List<ListMyBookingsQueryDto>>
