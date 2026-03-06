@@ -53,7 +53,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     // LIST MY BOOKINGS
     // ---------------------------------------
-    [HttpGet]
+    [HttpGet("my")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
     public async Task<List<ListMyBookingsQueryDto>> ListMine(CancellationToken ct)
     {

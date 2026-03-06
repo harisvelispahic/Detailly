@@ -15,7 +15,7 @@ export class BookingsService {
   constructor(private http: HttpClient) {}
 
   listMine(): Observable<ListMyBookingsQueryDto[]> {
-    return this.http.get<ListMyBookingsQueryDto[]>(this.baseUrl);
+    return this.http.get<ListMyBookingsQueryDto[]>(`${this.baseUrl}/my`);
   }
 
   getById(id: number): Observable<GetBookingByIdQueryDto> {
