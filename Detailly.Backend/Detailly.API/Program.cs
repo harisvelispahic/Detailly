@@ -85,7 +85,7 @@ public partial class Program
             app.UseHttpsRedirection();
             app.UseCors("FrontendPolicy");
 
-            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+            //app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
             app.UseAuthentication();
             app.UseAuthorization();
