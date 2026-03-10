@@ -8,6 +8,7 @@ import { environment } from './environments/environment';
 Sentry.init({
   dsn: environment.sentryDsn,
   environment: environment.sentryEnvironment,
+  release: environment.sentryRelease,
   enabled: !!environment.sentryDsn,
 
   // Keep phase 1 simple: error monitoring only

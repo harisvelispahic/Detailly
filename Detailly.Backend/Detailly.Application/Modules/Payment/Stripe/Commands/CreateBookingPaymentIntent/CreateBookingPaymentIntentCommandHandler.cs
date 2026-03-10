@@ -25,16 +25,16 @@ public class CreateBookingPaymentIntentCommandHandler
 
         var booking = await _context.Bookings
             .FirstOrDefaultAsync(b => b.Id == request.BookingId && !b.IsDeleted, ct)
-            ?? throw new Exception("Booking not found.");
+            ?? throw new DetaillyNotFoundException("Booking not found.");
 
         if (booking.CustomerId != request.UserId)
-            throw new Exception("Forbidden.");
+            throw new DetaillyForbiddenException("Forbidden.");
 
         if (booking.Status != BookingStatus.PendingPayment)
-            throw new Exception("Booking is not awaiting payment.");
+            throw new DetaillyBusinessRuleException("BOOKING_NOT_AWAITING_PAYMENT","Booking is not awaiting payment.");
 
         if (booking.ReservationExpiresAtUtc is null || booking.ReservationExpiresAtUtc <= now)
-            throw new Exception("Booking reservation expired.");
+            throw new DetaillyBusinessRuleException("BOOKING_RESERVATION_EXPIRED", "Booking reservation expired.");
 
         // ✅ Latest PAYMENT attempt for this booking (ignore refunds)
         var existing = await _context.PaymentTransactions
@@ -49,14 +49,14 @@ public class CreateBookingPaymentIntentCommandHandler
         if (existing is not null)
         {
             if (existing.Status == PaymentTransactionStatus.Paid)
-                throw new Exception("Booking is already paid.");
+                throw new DetaillyBusinessRuleException("BOOKING_ALREADY_PAID","Booking is already paid.");
 
             if (existing.Status == PaymentTransactionStatus.Pending)
             {
                 var age = now - existing.TransactionDate;
 
                 if (age < PendingReplaceAfter)
-                    throw new Exception("Payment is already in progress.");
+                    throw new DetaillyBusinessRuleException("PAYMENT_IN_PROGRESS", "Payment is already in progress.");
 
                 // stale pending -> mark failed and allow new intent
                 existing.Status = PaymentTransactionStatus.Failed;
@@ -67,7 +67,7 @@ public class CreateBookingPaymentIntentCommandHandler
 
             // Failed/Unpaid -> allow new intent
             if (existing.Status is not (PaymentTransactionStatus.Failed or PaymentTransactionStatus.Unpaid or PaymentTransactionStatus.Pending))
-                throw new Exception("Booking cannot start a new payment at this time.");
+                throw new DetaillyBusinessRuleException("BOOKING_CANNOT_START_NEW_PAYMENT","Booking cannot start a new payment at this time.");
         }
 
         var (providerTransactionId, clientSecret) =

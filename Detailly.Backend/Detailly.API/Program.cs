@@ -44,6 +44,7 @@ public partial class Program
             builder.WebHost.UseSentry(options =>
             {
                 options.Dsn = builder.Configuration["Sentry:Dsn"];
+                options.Release = builder.Configuration["Sentry:Release"];
                 options.Environment = builder.Environment.EnvironmentName;
                 options.Debug = builder.Environment.IsDevelopment();
 
@@ -53,8 +54,8 @@ public partial class Program
                 // Filter expected exceptions so Sentry stays useful
                 options.AddExceptionFilterForType<ValidationException>();
                 options.AddExceptionFilterForType<DetaillyNotFoundException>();
-                options.AddExceptionFilterForType<DetaillyConflictException>();
-                options.AddExceptionFilterForType<DetaillyBusinessRuleException>();
+                options.AddExceptionFilterForType<DetaillyUnauthorizedException>();
+                options.AddExceptionFilterForType<DetaillyForbiddenException>();
             });
 
             builder.Services.AddScoped<IPasswordHasher
@@ -103,6 +104,7 @@ public partial class Program
             app.UseCors("FrontendPolicy");
 
             app.UseAuthentication();
+            app.UseMiddleware<SentryContextMiddleware>();
             app.UseAuthorization();
 
             app.MapControllers();

@@ -16,6 +16,8 @@ import { AuthStorageService } from './auth-storage.service';
 import { CurrentUserDto } from './current-user.dto';
 import { JwtPayloadDto } from './jwt-payload.dto';
 
+import * as Sentry from '@sentry/angular';
+
 /**
  * Glavni auth servis (facade).
  * - priča sa AuthApiService (HTTP)
@@ -188,6 +190,17 @@ export class AuthFacadeService {
       }
 
       this._currentUser.set(user);
+
+      Sentry.setUser({
+        id: String(user.userId),
+        email: user.email || undefined,
+      });
+
+      Sentry.setTag('is_admin', String(user.isAdmin));
+      Sentry.setTag('is_manager', String(user.isManager));
+      Sentry.setTag('is_employee', String(user.isEmployee));
+      Sentry.setTag('is_fleet', String(user.isFleet));
+      Sentry.setTag('area', 'frontend');
     } catch (error) {
       console.error('Failed to decode JWT token:', error);
       this._currentUser.set(null);
@@ -200,5 +213,6 @@ export class AuthFacadeService {
   private clearUserState(): void {
     this._currentUser.set(null);
     this.storage.clear();
+    Sentry.setUser(null);
   }
 }

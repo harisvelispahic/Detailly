@@ -1,9 +1,6 @@
-﻿using Detailly.Application.Abstractions;
-using Detailly.Application.Abstractions.Payments;
+﻿using Detailly.Application.Abstractions.Payments;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
 
