@@ -3,6 +3,8 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { ToasterService } from '../services/toaster.service';
 
+import * as Sentry from '@sentry/angular';
+
 /**
  * HTTP interceptor that logs errors.
  *
@@ -27,16 +29,33 @@ export const errorLoggingInterceptor: HttpInterceptorFn = (req, next) => {
         statusText: error.statusText,
         message: error.message,
         error: error.error,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // Optional: Send to external logging service
       // logToSentry(error, req);
+      const shouldReportToSentry = error.status === 0 || error.status >= 500;
+
+      if (shouldReportToSentry) {
+        Sentry.captureException(error, {
+          tags: {
+            area: 'http',
+          },
+          extra: {
+            url: req.url,
+            method: req.method,
+            status: error.status,
+            statusText: error.statusText,
+            requestBody: req.body,
+            responseError: error.error,
+          },
+        });
+      }
 
       // Re-throw error so components can handle it
       // Components should show appropriate toaster messages with context
       return throwError(() => error);
-    })
+    }),
   );
 };
 

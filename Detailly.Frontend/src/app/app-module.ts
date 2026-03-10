@@ -1,22 +1,27 @@
-import { NgModule, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import {
+  ErrorHandler,
+  NgModule,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideAnimations} from '@angular/platform-browser/animations';
-import {HttpClient, provideHttpClient, withInterceptors} from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing-module';
 import { AppComponent } from './app.component';
-import {authInterceptor} from './core/interceptors/auth-interceptor.service';
-import {loadingBarInterceptor} from './core/interceptors/loading-bar-interceptor.service';
-import {errorLoggingInterceptor} from './core/interceptors/error-logging-interceptor.service';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {CustomTranslateLoader} from './core/services/custom-translate-loader';
-import {materialModules} from './modules/shared/material-modules';
-import {SharedModule} from './modules/shared/shared-module';
+import { authInterceptor } from './core/interceptors/auth-interceptor.service';
+import { loadingBarInterceptor } from './core/interceptors/loading-bar-interceptor.service';
+import { errorLoggingInterceptor } from './core/interceptors/error-logging-interceptor.service';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { CustomTranslateLoader } from './core/services/custom-translate-loader';
+import { materialModules } from './modules/shared/material-modules';
+import { SharedModule } from './modules/shared/shared-module';
+
+import * as Sentry from '@sentry/angular';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -24,26 +29,25 @@ import {SharedModule} from './modules/shared/shared-module';
       loader: {
         provide: TranslateLoader,
         useFactory: (http: HttpClient) => new CustomTranslateLoader(http),
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
     SharedModule,
     materialModules,
   ],
   providers: [
+    {
+      provide: ErrorHandler,
+      useValue: Sentry.createErrorHandler(),
+    },
     provideAnimations(),
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection(),
     provideHttpClient(
-      withInterceptors([
-        loadingBarInterceptor,
-        authInterceptor,
-        errorLoggingInterceptor
-      ])
-    )
+      withInterceptors([loadingBarInterceptor, authInterceptor, errorLoggingInterceptor]),
+    ),
   ],
-  exports: [
-  ],
-  bootstrap: [AppComponent]
+  exports: [],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
