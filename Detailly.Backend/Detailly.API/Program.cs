@@ -2,6 +2,7 @@
 using Detailly.API;
 using Detailly.API.Middleware;
 using Detailly.Application;
+using Detailly.Application.Common.Exceptions;
 using Detailly.Domain.Entities.Identity;
 using Detailly.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -38,6 +39,22 @@ public partial class Program
                         .AllowAnyMethod()
                         .AllowCredentials();
                 });
+            });
+
+            builder.WebHost.UseSentry(options =>
+            {
+                options.Dsn = builder.Configuration["Sentry:Dsn"];
+                options.Environment = builder.Environment.EnvironmentName;
+                options.Debug = builder.Environment.IsDevelopment();
+
+                // We only want error monitoring for now, not performance tracing
+                options.TracesSampleRate = 0;
+
+                // Filter expected exceptions so Sentry stays useful
+                options.AddExceptionFilterForType<ValidationException>();
+                options.AddExceptionFilterForType<DetaillyNotFoundException>();
+                options.AddExceptionFilterForType<DetaillyConflictException>();
+                options.AddExceptionFilterForType<DetaillyBusinessRuleException>();
             });
 
             builder.Services.AddScoped<IPasswordHasher
@@ -84,8 +101,6 @@ public partial class Program
 
             app.UseHttpsRedirection();
             app.UseCors("FrontendPolicy");
-
-            //app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
             app.UseAuthentication();
             app.UseAuthorization();
