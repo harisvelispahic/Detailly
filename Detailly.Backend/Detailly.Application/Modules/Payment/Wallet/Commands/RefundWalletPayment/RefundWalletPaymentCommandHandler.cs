@@ -19,21 +19,21 @@ public class RefundWalletPaymentCommandHandler
         var now = DateTime.UtcNow;
 
         if (request.Amount <= 0)
-            throw new Exception("Refund amount must be greater than zero.");
+            throw new DetaillyBusinessRuleException("INVALID_REFUND_AMOUNT", "Refund amount must be greater than zero.");
 
         var payment = await _context.PaymentTransactions
             .Include(x => x.Wallet)
             .FirstOrDefaultAsync(x => x.Id == request.PaymentTransactionId && !x.IsDeleted, ct)
-            ?? throw new Exception("Payment not found.");
+            ?? throw new DetaillyBusinessRuleException("PAYMENT_NOT_FOUND","Payment not found.");
 
         if (payment.Status != PaymentTransactionStatus.Paid)
-            throw new Exception("Only paid transactions can be refunded.");
+            throw new DetaillyBusinessRuleException("ONLY_PAID_REFUNDABLE", "Only paid transactions can be refunded.");
 
         if (payment.Wallet is null && payment.WalletId is null)
-            throw new Exception("This payment is not a wallet payment.");
+            throw new DetaillyBusinessRuleException("PAYMENT_NOT_WALLET","This payment is not a wallet payment.");
 
         if (request.Amount > payment.Amount)
-            throw new Exception("Refund amount cannot exceed original payment amount.");
+            throw new DetaillyBusinessRuleException("REFUND_AMOUNT_INVALID", "Refund amount cannot exceed original payment amount.");
 
         // Create a separate REFUND transaction (audit-safe)
         var refundTx = new PaymentTransactionEntity

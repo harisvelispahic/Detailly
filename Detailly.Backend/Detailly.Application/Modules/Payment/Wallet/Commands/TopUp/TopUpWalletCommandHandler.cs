@@ -17,10 +17,10 @@ public class TopUpWalletCommandHandler
     {
         var wallet = await _context.Wallet
             .FirstOrDefaultAsync(x => x.ApplicationUserId == request.UserId, ct)
-            ?? throw new Exception("Wallet not found.");
+            ?? throw new DetaillyNotFoundException("Wallet not found.");
 
         if (request.Amount <= 0)
-            throw new Exception("Amount must be greater than zero.");
+            throw new DetaillyBusinessRuleException("TOPUP_INVALID_AMOUNT","Amount must be greater than zero.");
 
         // bonus (if enabled)
         var bonus = (wallet.PercentageAdded / 100m) * request.Amount;

@@ -24,11 +24,11 @@ public class CreateWalletTopUpCardIntentCommandHandler
         CancellationToken ct)
     {
         if (request.Amount <= 0)
-            throw new Exception("Amount must be greater than zero.");
+            throw new DetaillyBusinessRuleException("TOPUP_AMOUNT_INVALID","Amount must be greater than zero.");
 
         var wallet = await _context.Wallet
             .FirstOrDefaultAsync(x => x.ApplicationUserId == request.UserId, ct)
-            ?? throw new Exception("Wallet not found.");
+            ?? throw new DetaillyNotFoundException("Wallet not found.");
 
         // Create Stripe PaymentIntent (reuse existing method but pass a dummy bookingId? NO)
         // -> We'll add a new overload in IStripeService (next step).
