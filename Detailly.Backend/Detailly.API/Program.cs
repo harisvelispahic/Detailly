@@ -48,8 +48,8 @@ public partial class Program
                 options.Environment = builder.Environment.EnvironmentName;
                 options.Debug = builder.Environment.IsDevelopment();
 
-                // We only want error monitoring for now, not performance tracing
-                options.TracesSampleRate = 0;
+                // Only 20% of transactions are recorded
+                options.TracesSampleRate = 0.2;
 
                 // Filter expected exceptions so Sentry stays useful
                 options.AddExceptionFilterForType<ValidationException>();

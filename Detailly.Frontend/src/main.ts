@@ -11,8 +11,8 @@ Sentry.init({
   release: environment.sentryRelease,
   enabled: !!environment.sentryDsn,
 
-  // Keep phase 1 simple: error monitoring only
-  tracesSampleRate: 0,
+  // Only 20% of transactions are recorded
+  tracesSampleRate: 0.2,
 
   beforeSend(event, hint) {
     const originalException = hint.originalException;
