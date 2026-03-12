@@ -1,5 +1,4 @@
-﻿using Sentry;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace Detailly.API.Middleware;
 

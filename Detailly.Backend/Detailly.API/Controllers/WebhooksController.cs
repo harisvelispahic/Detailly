@@ -1,6 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Detailly.Application.Modules.Payment.Card.Commands.HandleStripeWebhook;
+﻿using Detailly.Application.Modules.Payment.Card.Commands.HandleStripeWebhook;
 
 namespace Detailly.API.Controllers;
 

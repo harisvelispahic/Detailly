@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
+﻿using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;

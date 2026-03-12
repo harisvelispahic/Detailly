@@ -21,6 +21,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
  
     public DbSet<CartEntity> Carts => Set<CartEntity>();
     public DbSet<CartItemEntity> CartItems => Set<CartItemEntity>();
+    public DbSet<SavedProductEntity> SavedProducts => Set<SavedProductEntity>();
 
 
 

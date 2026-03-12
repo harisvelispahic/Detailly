@@ -9,7 +9,7 @@ public sealed class GetMyCartQueryHandler(IAppDbContext context, IAppCurrentUser
     public async Task<GetMyCartQueryDto> Handle(GetMyCartQuery request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
@@ -18,6 +18,13 @@ public sealed class GetMyCartQueryHandler(IAppDbContext context, IAppCurrentUser
                 .ThenInclude(ci => ci.Product)
                     .ThenInclude(p => p.Inventory)
             .FirstOrDefaultAsync(c => c.ApplicationUserId == userId, ct);
+
+        var savedProducts = await context.SavedProducts
+            .Where(x => x.ApplicationUserId == userId)
+            .Include(x => x.Product)
+                .ThenInclude(p => p.Inventory)
+            .OrderByDescending(x => x.CreatedAtUtc)
+            .ToListAsync(ct);
 
         if (cart is null)
         {
@@ -38,13 +45,22 @@ public sealed class GetMyCartQueryHandler(IAppDbContext context, IAppCurrentUser
                 TotalAmount = 0m,
                 IsEmpty = true,
                 Status = cart.Status.ToString(),
-                Items = new()
+                Items = new(),
+                SavedProducts = savedProducts
+                    .Select(x => new GetMySavedProductInCartViewQueryDto
+                    {
+                        ProductId = x.ProductId,
+                        ProductName = x.Product.Name,
+                        Price = x.Product.Price,
+                        ProductIsEnabled = x.Product.IsEnabled,
+                        QuantityInStock = x.Product.Inventory.QuantityInStock,
+                        SavedAtUtc = x.CreatedAtUtc
+                    })
+                    .ToList()
             };
         }
 
-        // Ensure totals are consistent (server-owned)
         RecalculateCartTotals(cart);
-
         await context.SaveChangesAsync(ct);
 
         return new GetMyCartQueryDto
@@ -65,6 +81,17 @@ public sealed class GetMyCartQueryHandler(IAppDbContext context, IAppCurrentUser
                     LineTotal = ci.LineTotal,
                     ProductIsEnabled = ci.Product.IsEnabled,
                     QuantityInStock = ci.Product.Inventory.QuantityInStock
+                })
+                .ToList(),
+            SavedProducts = savedProducts
+                .Select(x => new GetMySavedProductInCartViewQueryDto
+                {
+                    ProductId = x.ProductId,
+                    ProductName = x.Product.Name,
+                    Price = x.Product.Price,
+                    ProductIsEnabled = x.Product.IsEnabled,
+                    QuantityInStock = x.Product.Inventory.QuantityInStock,
+                    SavedAtUtc = x.CreatedAtUtc
                 })
                 .ToList()
         };

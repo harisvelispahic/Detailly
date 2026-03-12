@@ -34,7 +34,7 @@ public class ProductEntity : BaseEntity
     public IReadOnlyCollection<OrderItemEntity> OrderItems { get; private set; } = new List<OrderItemEntity>();
     public IReadOnlyCollection<CartItemEntity> CartItems { get; private set; } = new List<CartItemEntity>();
     public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
-
+    public IReadOnlyCollection<SavedProductEntity> SavedProducts { get; private set; } = new List<SavedProductEntity>();
 
 
     /// <summary>

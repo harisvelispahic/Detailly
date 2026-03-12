@@ -37,6 +37,7 @@ public sealed class ApplicationUserEntity : BaseEntity
     public CartEntity? Cart { get; set; }
     public ImageEntity? Image { get; set; }
     public IReadOnlyCollection<AddressEntity> Addresses { get; private set; } = new List<AddressEntity>();
+    public IReadOnlyCollection<SavedProductEntity> SavedProducts { get; private set; } = new List<SavedProductEntity>();
 
     // Customer bookings
     public IReadOnlyCollection<BookingEntity> Bookings { get; private set; } = new List<BookingEntity>();

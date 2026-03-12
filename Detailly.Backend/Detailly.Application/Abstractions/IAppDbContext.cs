@@ -26,6 +26,7 @@ public interface IAppDbContext
     DbSet<OrderItemEntity> OrderItems { get; }
     DbSet<CartEntity> Carts { get; }
     DbSet<CartItemEntity> CartItems { get; }
+    DbSet<SavedProductEntity> SavedProducts { get; }
 
 
 
