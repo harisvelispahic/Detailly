@@ -1,30 +1,20 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Update;
+﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Update;
 
-public sealed class UpdateProductCategoryCommandHandler(IAppDbContext ctx)
-            : IRequestHandler<UpdateProductCategoryCommand, Unit>
+public sealed class UpdateProductCategoryCommandHandler(IAppDbContext context)
+    : IRequestHandler<UpdateProductCategoryCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateProductCategoryCommand request, CancellationToken ct)
     {
-        var entity = await ctx.ProductCategories
-            .Where(x => x.Id == request.Id)
-            .FirstOrDefaultAsync(ct);
+        var entity = await context.ProductCategories
+            .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
-        if (entity is null)
-            throw new DetaillyNotFoundException($"Product category (ID={request.Id} ) was not found.");
-
-        // Check for duplicate name (case-insensitive, except for the same ID)
-        var exists = await ctx.ProductCategories
-            .AnyAsync(x => x.Id != request.Id && x.Name.ToLower() == request.Name.ToLower(), ct);
-
-        if (exists)
-        {
-            throw new DetaillyConflictException("Name already exists.");
-        }
+        if (entity is null || entity.IsDeleted)
+            throw new DetaillyNotFoundException($"Product category (ID={request.Id}) was not found.");
 
         entity.Name = request.Name.Trim();
+        entity.Description = request.Description?.Trim();
 
-        await ctx.SaveChangesAsync(ct);
+        await context.SaveChangesAsync(ct);
 
         return Unit.Value;
     }

@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Queries.List;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Queries.List;
 
 public sealed class ListProductsQueryDto
 {

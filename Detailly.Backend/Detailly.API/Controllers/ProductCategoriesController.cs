@@ -1,10 +1,13 @@
+using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Create;
 using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Delete;
+using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Patch;
 using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Status.Disable;
 using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Status.Enable;
-using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Create;
 using Detailly.Application.Modules.Catalog.ProductCategories.Commands.Update;
 using Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
 using Detailly.Application.Modules.Catalog.ProductCategories.Queries.List;
+using Detailly.Shared.Constants;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Detailly.API.Controllers;
 
@@ -18,22 +21,6 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
         int id = await sender.Send(command, ct);
 
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
-    }
-
-    [HttpPut("{id:int}")]
-    public async Task Update(int id, UpdateProductCategoryCommand command, CancellationToken ct)
-    {
-        // ID from the route takes precedence
-        command.Id = id;
-        await sender.Send(command, ct);
-        // no return -> 204 No Content
-    }
-
-    [HttpDelete("{id:int}")]
-    public async Task Delete(int id, CancellationToken ct)
-    {
-        await sender.Send(new DeleteProductCategoryCommand { Id = id }, ct);
-        // no return -> 204 No Content
     }
 
     [HttpGet("{id:int}")]
@@ -52,6 +39,22 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
         return result;
     }
 
+    [HttpPut("{id:int}")]
+    public async Task Update(int id, UpdateProductCategoryCommand command, CancellationToken ct)
+    {
+        // ID from the route takes precedence
+        command.Id = id;
+        await sender.Send(command, ct);
+        // no return -> 204 No Content
+    }
+    
+    [HttpPut("enable/{id:int}")]
+    public async Task Enable(int id, CancellationToken ct)
+    {
+        await sender.Send(new EnableProductCategoryCommand { Id = id }, ct);
+        // no return -> 204 No Content
+    }
+
     [HttpPut("disable/{id:int}")]
     public async Task Disable(int id, CancellationToken ct)
     {
@@ -59,10 +62,43 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
         // no return -> 204 No Content
     }
 
-    [HttpPut("enable/{id:int}")]
-    public async Task Enable(int id, CancellationToken ct)
+    [HttpPatch("{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
+    public async Task<IActionResult> Patch(
+    int id,
+    [FromBody] JsonPatchDocument<PatchProductCategoryRequest> patchDoc,
+    CancellationToken ct)
     {
-        await sender.Send(new EnableProductCategoryCommand { Id = id }, ct);
+        if (patchDoc is null)
+            return BadRequest("Patch document is required.");
+
+        var existing = await sender.Send(new GetProductCategoryByIdQuery { Id = id }, ct);
+
+        var patchModel = new PatchProductCategoryRequest
+        {
+            Name = existing.Name,
+            Description = existing.Description
+        };
+
+        patchDoc.ApplyTo(patchModel, ModelState);
+
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        await sender.Send(new PatchProductCategoryCommand
+        {
+            Id = id,
+            Name = patchModel.Name,
+            Description = patchModel.Description
+        }, ct);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task Delete(int id, CancellationToken ct)
+    {
+        await sender.Send(new DeleteProductCategoryCommand { Id = id }, ct);
         // no return -> 204 No Content
     }
 }

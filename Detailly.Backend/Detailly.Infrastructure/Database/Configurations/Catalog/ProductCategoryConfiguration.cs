@@ -1,21 +1,20 @@
+namespace Detailly.Infrastructure.Database.Configurations.Catalog;
 
-﻿namespace Detailly.Infrastructure.Database.Configurations.Catalog;
-
-public class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCategoryEntity>
+public sealed class ProductCategoryConfiguration : IEntityTypeConfiguration<ProductCategoryEntity>
 {
     public void Configure(EntityTypeBuilder<ProductCategoryEntity> builder)
     {
-        builder
-            .ToTable("ProductCategories");
+        builder.ToTable("ProductCategories");
 
-        builder
-            .Property(x => x.Name)
+        builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(ProductCategoryEntity.Constraints.NameMaxLength);
 
-        builder
-            .Property(x => x.IsEnabled)
-            .IsRequired();
+        builder.Property(x => x.Description)
+            .HasMaxLength(ProductCategoryEntity.Constraints.DescriptionMaxLength)
+            .IsRequired(false);
 
+        builder.Property(x => x.IsEnabled)
+            .IsRequired();
     }
 }

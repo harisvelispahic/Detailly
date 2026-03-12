@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.GetById;
 
 public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductCategoryByIdQuery, GetProductCategoryByIdQueryDto>
 {
@@ -11,6 +10,7 @@ public class GetProductCategoryByIdQueryHandler(IAppDbContext context) : IReques
             {
                 Id = x.Id,
                 Name = x.Name,
+                Description = x.Description,
                 IsEnabled = x.IsEnabled
             })
             .FirstOrDefaultAsync(ct);

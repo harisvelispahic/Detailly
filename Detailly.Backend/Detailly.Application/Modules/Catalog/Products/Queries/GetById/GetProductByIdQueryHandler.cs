@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Queries.GetById;
 
 public class GetProductByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductByIdQuery, GetProductByIdQueryDto>
 {

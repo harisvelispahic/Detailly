@@ -22,24 +22,6 @@ public class ProductsController(ISender sender) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
-    [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthPolicies.Staff)]
-    public async Task Update(int id, UpdateProductCommand command, CancellationToken ct)
-    {
-        // ID from the route takes precedence
-        command.Id = id;
-        await sender.Send(command, ct);
-        // no return -> 204 No Content
-    }
-
-    [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthPolicies.Staff)]
-    public async Task Delete(int id, CancellationToken ct)
-    {
-        await sender.Send(new DeleteProductCommand { Id = id }, ct);
-        // no return -> 204 No Content
-    }
-
     [HttpGet("{id:int}")]
     [AllowAnonymous]
     public async Task<GetProductByIdQueryDto> GetById(int id, CancellationToken ct)
@@ -56,11 +38,13 @@ public class ProductsController(ISender sender) : ControllerBase
         return result;
     }
 
-    [HttpPut("disable/{id:int}")]
+    [HttpPut("{id:int}")]
     [Authorize(Policy = AuthPolicies.Staff)]
-    public async Task Disable(int id, CancellationToken ct)
+    public async Task Update(int id, UpdateProductCommand command, CancellationToken ct)
     {
-        await sender.Send(new DisableProductCommand { Id = id }, ct);
+        // ID from the route takes precedence
+        command.Id = id;
+        await sender.Send(command, ct);
         // no return -> 204 No Content
     }
 
@@ -69,6 +53,22 @@ public class ProductsController(ISender sender) : ControllerBase
     public async Task Enable(int id, CancellationToken ct)
     {
         await sender.Send(new EnableProductCommand { Id = id }, ct);
+        // no return -> 204 No Content
+    }
+
+    [HttpPut("disable/{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
+    public async Task Disable(int id, CancellationToken ct)
+    {
+        await sender.Send(new DisableProductCommand { Id = id }, ct);
+        // no return -> 204 No Content
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
+    public async Task Delete(int id, CancellationToken ct)
+    {
+        await sender.Send(new DeleteProductCommand { Id = id }, ct);
         // no return -> 204 No Content
     }
 }

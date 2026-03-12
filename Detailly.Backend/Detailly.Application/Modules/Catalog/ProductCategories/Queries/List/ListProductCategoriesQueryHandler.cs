@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.List;
+﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Queries.List;
 
 public sealed class ListProductCategoriesQueryHandler(IAppDbContext ctx)
         : IRequestHandler<ListProductCategoriesQuery, PageResult<ListProductCategoriesQueryDto>>
@@ -22,6 +21,7 @@ public sealed class ListProductCategoriesQueryHandler(IAppDbContext ctx)
             {
                 Id = x.Id,
                 Name = x.Name,
+                Description = x.Description,
                 IsEnabled = x.IsEnabled
             });
 

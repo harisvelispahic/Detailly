@@ -1,20 +1,19 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Enable;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Enable;
 
 public sealed class EnableProductCommandHandler(IAppDbContext ctx)
     : IRequestHandler<EnableProductCommand, Unit>
 {
     public async Task<Unit> Handle(EnableProductCommand request, CancellationToken ct)
     {
-        var entity = await ctx.Products
+        var product = await ctx.Products
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
-        if (entity is null)
+        if (product is null)
             throw new DetaillyNotFoundException($"Product (ID={request.Id}) was not found.");
 
-        if (!entity.IsEnabled)
+        if (!product.IsEnabled)
         {
-            entity.IsEnabled = true;
+            product.IsEnabled = true;
             await ctx.SaveChangesAsync(ct);
         }
 

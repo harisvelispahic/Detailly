@@ -1,22 +1,21 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Disable;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Commands.Status.Disable;
 
 public sealed class DisableProductCommandHandler(IAppDbContext ctx)
     : IRequestHandler<DisableProductCommand, Unit>
 {
     public async Task<Unit> Handle(DisableProductCommand request, CancellationToken ct)
     {
-        var pro = await ctx.Products
+        var product = await ctx.Products
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
-        if (pro is null)
+        if (product is null)
         {
             throw new DetaillyNotFoundException($"Product (ID={request.Id}) was not found.");
         }
 
-        if (!pro.IsEnabled) return Unit.Value; // idempotent
+        if (!product.IsEnabled) return Unit.Value; // idempotent
 
-        pro.IsEnabled = false;
+        product.IsEnabled = false;
 
         await ctx.SaveChangesAsync(ct);
 

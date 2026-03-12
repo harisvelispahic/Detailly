@@ -6,7 +6,6 @@ public sealed class InventoryConfiguration : IEntityTypeConfiguration<InventoryE
     {
         builder.ToTable("Inventories");
 
-        // PK is ProductId (shared PK) - matches your [Key, ForeignKey(nameof(Product))]
         builder.HasKey(x => x.ProductId);
 
         builder.Property(x => x.QuantityInStock)
@@ -26,11 +25,5 @@ public sealed class InventoryConfiguration : IEntityTypeConfiguration<InventoryE
 
         builder.Property(x => x.ModifiedAtUtc)
             .IsRequired(false);
-
-        // Relationship: Inventory -> Product (required, because your nav is non-null and FK is non-nullable)
-        // We avoid specifying the inverse navigation name because we don't know if ProductEntity has it.
-        builder.HasOne(x => x.Product)
-            .WithOne()
-            .HasForeignKey<InventoryEntity>(x => x.ProductId);
     }
 }

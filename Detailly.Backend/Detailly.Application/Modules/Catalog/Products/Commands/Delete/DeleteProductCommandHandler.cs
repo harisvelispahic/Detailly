@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Commands.Delete;
 
 public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
       : IRequestHandler<DeleteProductCommand, Unit>
@@ -7,7 +6,7 @@ public class DeleteProductHandler(IAppDbContext context, IAppCurrentUser appCurr
     public async Task<Unit> Handle(DeleteProductCommand request, CancellationToken ct)
     {
         if (appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("123", "Korisnik nije autentifikovan.");
+            throw new DetaillyBusinessRuleException("USER_NOT_AUTHENTICATED", "User is not authenticated.");
 
         var product = await context.Products
             .Include(p => p.Inventory)

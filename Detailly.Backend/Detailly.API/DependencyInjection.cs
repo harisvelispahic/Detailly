@@ -17,7 +17,8 @@ public static class DependencyInjection
         IHostEnvironment env)
     {
         // Controllers + uniform BadRequest
-        services.AddControllers()
+        services
+            .AddControllers()
             .ConfigureApiBehaviorOptions(opts =>
             {
                 opts.InvalidModelStateResponseFactory = ctx =>
@@ -33,7 +34,8 @@ public static class DependencyInjection
                         Message = msg
                     });
                 };
-            });
+            })
+            .AddNewtonsoftJson();
 
         // Typed options + validation on startup
         services.AddOptions<JwtOptions>()

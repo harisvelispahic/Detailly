@@ -1,7 +1,7 @@
-﻿
-namespace Detailly.Application.Modules.Catalog.Products.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Catalog.Products.Commands.Delete;
 
 public class DeleteProductCommand : IRequest<Unit>
 {
-    public required int Id { get; set; }
+    [JsonIgnore]
+    public int Id { get; set; }
 }
