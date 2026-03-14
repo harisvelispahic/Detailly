@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common.Enums;
+﻿using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Queries.List;
 public class ListOrdersQueryDto

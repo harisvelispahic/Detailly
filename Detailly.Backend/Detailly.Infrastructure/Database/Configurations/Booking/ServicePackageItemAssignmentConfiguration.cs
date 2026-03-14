@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Entities.Booking;
+﻿using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Infrastructure.Database.Configurations.Booking;
 public class ServicePackageItemAssignmentConfiguration: IEntityTypeConfiguration<ServicePackageItemAssignmentEntity>

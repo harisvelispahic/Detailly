@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 namespace Detailly.Tests.ProductCategoryTests.IntegrationTests;
 

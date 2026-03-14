@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 
 public sealed class ListServicePackagesQueryValidator : AbstractValidator<ListServicePackagesQuery>
 {

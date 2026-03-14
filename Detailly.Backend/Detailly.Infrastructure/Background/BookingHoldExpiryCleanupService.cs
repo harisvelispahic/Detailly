@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common.Enums;
+﻿using Detailly.Domain.Common.Enums;
 using Detailly.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

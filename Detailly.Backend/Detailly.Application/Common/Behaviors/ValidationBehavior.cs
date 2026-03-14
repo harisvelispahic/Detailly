@@ -1,5 +1,4 @@
-﻿// behavior
-namespace Detailly.Application.Common.Behaviors;
+﻿namespace Detailly.Application.Common.Behaviors;
 
 public sealed class ValidationBehavior<TRequest, TResponse>
     : IPipelineBehavior<TRequest, TResponse>

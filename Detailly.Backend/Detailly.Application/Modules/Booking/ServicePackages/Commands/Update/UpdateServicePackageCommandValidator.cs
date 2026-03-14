@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Update;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Update;
 
 public sealed class UpdateServicePackageCommandValidator : AbstractValidator<UpdateServicePackageCommand>
 {

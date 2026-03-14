@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Identity.User.Commands.Update;
+﻿namespace Detailly.Application.Modules.Identity.User.Commands.Update;
 
 public sealed class UpdateUserCommandValidator
     : AbstractValidator<UpdateUserCommand>

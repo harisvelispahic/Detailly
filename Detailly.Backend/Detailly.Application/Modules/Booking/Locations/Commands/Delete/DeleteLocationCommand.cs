@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 
 public sealed class DeleteLocationCommand : IRequest<Unit>
 {

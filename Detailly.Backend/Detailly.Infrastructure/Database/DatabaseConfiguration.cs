@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common;
+﻿using Detailly.Domain.Common;
 using Detailly.Infrastructure.Database.Seeders;
 using System.Linq.Expressions;
 

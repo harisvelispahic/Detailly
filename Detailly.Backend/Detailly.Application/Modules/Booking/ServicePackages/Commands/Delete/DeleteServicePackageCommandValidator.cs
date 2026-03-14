@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
 
 public class DeleteServicePackageCommandValidator : AbstractValidator<DeleteServicePackageCommand>
 {

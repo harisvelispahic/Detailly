@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Entities.Shared;
+﻿using Detailly.Domain.Entities.Shared;
 
 namespace Detailly.Application.Modules.Booking.Reviews.Commands.Update;
 

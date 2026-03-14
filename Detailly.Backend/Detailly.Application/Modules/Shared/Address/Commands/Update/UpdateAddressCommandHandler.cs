@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Detailly.Domain.Entities.Shared;
-
-namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
+﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
 
 public sealed class UpdateAddressCommandHandler(IAppDbContext context)
     : IRequestHandler<UpdateAddressCommand, Unit>

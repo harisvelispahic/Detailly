@@ -1,9 +1,6 @@
-﻿using Detailly.Application.Abstractions;
-using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
+﻿using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 

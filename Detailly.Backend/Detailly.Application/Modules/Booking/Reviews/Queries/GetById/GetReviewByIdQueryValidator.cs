@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
 public class GetReviewByIdQueryValidator : AbstractValidator<GetReviewByIdQuery>
 {
     public GetReviewByIdQueryValidator()

@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Modules.Booking.Reviews.Commands.Create;
+﻿using Detailly.Application.Modules.Booking.Reviews.Commands.Create;
 using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Shared;
 

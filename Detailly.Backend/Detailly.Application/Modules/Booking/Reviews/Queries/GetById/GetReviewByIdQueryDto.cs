@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
 public class GetReviewByIdQueryDto
 {
     public required int BookingId { get; init; }

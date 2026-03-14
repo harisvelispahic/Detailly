@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Delete;
 
 public class DeleteVehicleCommand : IRequest<Unit>
 {

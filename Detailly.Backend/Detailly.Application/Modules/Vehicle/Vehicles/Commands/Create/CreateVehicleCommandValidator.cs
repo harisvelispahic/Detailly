@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
 
 public sealed class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleCommand>
 {

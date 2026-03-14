@@ -1,7 +1,4 @@
-﻿using Detailly.Domain.Entities.Shared;
-using Microsoft.EntityFrameworkCore;
-
-namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
 
 public class GetAddressByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetAddressByIdQuery, GetAddressByIdQueryDto>

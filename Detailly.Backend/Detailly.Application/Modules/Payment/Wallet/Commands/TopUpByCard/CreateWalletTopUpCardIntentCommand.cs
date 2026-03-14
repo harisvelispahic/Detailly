@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
+﻿namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
 
 public record CreateWalletTopUpCardIntentCommand(
     int UserId,

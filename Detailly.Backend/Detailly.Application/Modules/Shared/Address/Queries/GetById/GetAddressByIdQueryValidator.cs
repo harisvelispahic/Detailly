@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
 
 public class GetAddressByIdQueryValidator : AbstractValidator<GetAddressByIdQuery>
 {

@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Create;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Create;
 
 public sealed class CreateServicePackageCommandValidator : AbstractValidator<CreateServicePackageCommand>
 {

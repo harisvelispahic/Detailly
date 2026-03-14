@@ -1,6 +1,4 @@
 ﻿using Detailly.Domain.Entities.Sales;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Detailly.Infrastructure.Database.Configurations.Sales;
 

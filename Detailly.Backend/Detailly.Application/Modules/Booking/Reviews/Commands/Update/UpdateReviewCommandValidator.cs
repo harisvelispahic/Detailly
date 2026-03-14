@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Commands.Update;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Commands.Update;
 
 public class UpdateReviewCommandValidator : AbstractValidator<UpdateReviewCommand>
 {

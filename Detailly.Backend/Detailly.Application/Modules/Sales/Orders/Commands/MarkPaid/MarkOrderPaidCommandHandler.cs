@@ -1,7 +1,5 @@
-﻿using Detailly.Application.Abstractions;
-using Detailly.Domain.Common.Enums;
+﻿using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
-using Microsoft.EntityFrameworkCore;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.MarkPaid;
 

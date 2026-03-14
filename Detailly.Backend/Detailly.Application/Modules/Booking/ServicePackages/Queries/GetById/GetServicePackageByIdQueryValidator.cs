@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 
 public class GetServicePackageByIdQueryValidator : AbstractValidator<GetServicePackageByIdQuery>
 {

@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Commands.Create;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Commands.Create;
 public class CreateReviewCommand : IRequest<int>
 {
     public required int BookingId { get; set; }

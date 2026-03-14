@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Abstractions.Payments;
+﻿namespace Detailly.Application.Abstractions.Payments;
 
 public interface IWebhookVerifier
 {

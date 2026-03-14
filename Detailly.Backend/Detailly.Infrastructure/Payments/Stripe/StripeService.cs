@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Abstractions.Payments;
+﻿using Detailly.Application.Abstractions.Payments;
 using Microsoft.Extensions.Configuration;
 using Stripe;
 

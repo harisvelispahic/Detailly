@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Sales.Orders.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Sales.Orders.Queries.GetById;
 public class GetOrderByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetOrderByIdQuery, GetOrderByIdQueryDto>
 {

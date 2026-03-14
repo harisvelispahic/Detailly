@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 
 public sealed class GetVehicleByIdQueryValidator : AbstractValidator<GetVehicleByIdQuery>
 {

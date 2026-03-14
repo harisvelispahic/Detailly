@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 
 public sealed class GetLocationByIdQuery : IRequest<GetLocationByIdQueryDto>
 {

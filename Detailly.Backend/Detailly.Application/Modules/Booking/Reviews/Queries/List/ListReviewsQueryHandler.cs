@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
 public class ListReviewsQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListReviewsQuery, List<ListReviewsQueryDto>>
 {

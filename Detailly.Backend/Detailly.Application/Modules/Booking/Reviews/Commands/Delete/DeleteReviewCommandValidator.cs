@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
 public class DeleteReviewCommandValidator : AbstractValidator<DeleteReviewCommand>
 {
     public DeleteReviewCommandValidator()

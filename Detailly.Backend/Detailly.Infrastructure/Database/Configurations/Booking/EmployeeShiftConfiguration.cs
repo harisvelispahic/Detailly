@@ -1,6 +1,4 @@
 ﻿using Detailly.Domain.Entities.Booking;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Detailly.Infrastructure.Database.Configurations.Booking;
 

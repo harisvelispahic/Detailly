@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
+﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 
 public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
     : IRequestHandler<UpdateEmployeeShiftCommand, Unit>

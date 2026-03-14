@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
+﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
 public sealed class ListReviewsQueryValidator : AbstractValidator<ListReviewsQuery>
 {
     public ListReviewsQueryValidator()

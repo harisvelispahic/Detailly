@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common.Enums;
+﻿using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.AssignEmployees;

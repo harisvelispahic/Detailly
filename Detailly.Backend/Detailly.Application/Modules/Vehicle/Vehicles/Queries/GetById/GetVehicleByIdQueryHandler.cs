@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 
 public class GetVehicleByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetVehicleByIdQuery, GetVehicleByIdQueryDto>
 {

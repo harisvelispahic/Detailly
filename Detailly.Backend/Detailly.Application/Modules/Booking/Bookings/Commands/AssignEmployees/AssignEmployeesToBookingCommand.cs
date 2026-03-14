@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Bookings.Commands.AssignEmployees;
+﻿namespace Detailly.Application.Modules.Booking.Bookings.Commands.AssignEmployees;
 
 public sealed class AssignEmployeesToBookingCommand : IRequest<Unit>
 {

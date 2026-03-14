@@ -1,6 +1,4 @@
-﻿
-using Detailly.Domain.Entities.Booking;
-using Microsoft.EntityFrameworkCore;
+﻿using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Infrastructure.Database.Configurations.Booking;
 public class ReviewConfiguration : IEntityTypeConfiguration<ReviewEntity>

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Detailly.Domain.Entities.Booking;
+﻿using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Create;
 

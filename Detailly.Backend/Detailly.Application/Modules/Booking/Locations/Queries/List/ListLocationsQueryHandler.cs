@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Locations.Queries.List;
+﻿namespace Detailly.Application.Modules.Booking.Locations.Queries.List;
 
 public sealed class ListLocationsQueryHandler(IAppDbContext context)
     : IRequestHandler<ListLocationsQuery, List<ListLocationsQueryDto>>

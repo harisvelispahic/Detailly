@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 
 public class GetServicePackageByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetServicePackageByIdQuery, GetServicePackageByIdQueryDto>

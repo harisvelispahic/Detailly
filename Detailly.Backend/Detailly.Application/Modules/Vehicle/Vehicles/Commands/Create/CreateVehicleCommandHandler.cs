@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Entities.Vehicle;
+﻿using Detailly.Domain.Entities.Vehicle;
 
 namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Create;
 

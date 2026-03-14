@@ -1,7 +1,4 @@
-﻿
-using Detailly.Application.Abstractions.Payments;
-
-namespace Detailly.Infrastructure.Payments.Stripe;
+﻿namespace Detailly.Infrastructure.Payments.Stripe;
 
 
 //public class FakeStripeService : IStripeService

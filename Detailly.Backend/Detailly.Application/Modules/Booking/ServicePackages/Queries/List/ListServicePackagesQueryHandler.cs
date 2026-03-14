@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 
 public class ListServicePackagesQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListServicePackagesQuery, PageResult<ListServicePackagesQueryDto>>

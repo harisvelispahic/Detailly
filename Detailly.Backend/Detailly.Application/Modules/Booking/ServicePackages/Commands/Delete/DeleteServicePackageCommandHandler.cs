@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Detailly.Application.Common.Exceptions;
-
-
-namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
 
 public class DeleteServicePackageCommandHandler(IAppDbContext context)
     : IRequestHandler<DeleteServicePackageCommand, Unit>

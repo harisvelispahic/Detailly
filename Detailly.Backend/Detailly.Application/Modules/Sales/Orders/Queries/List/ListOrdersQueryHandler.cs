@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Sales.Orders.Queries.List;
+﻿namespace Detailly.Application.Modules.Sales.Orders.Queries.List;
 public class ListOrdersQueryHandler(IAppDbContext ctx)
         : IRequestHandler<ListOrdersQuery, PageResult<ListOrdersQueryDto>>
 {

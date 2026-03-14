@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetAvailableAddons;
+﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetAvailableAddons;
 
 public sealed class GetAvailableAddonsQueryHandler(IAppDbContext context)
     : IRequestHandler<GetAvailableAddonsQuery, List<GetAvailableAddonsQueryDto>>

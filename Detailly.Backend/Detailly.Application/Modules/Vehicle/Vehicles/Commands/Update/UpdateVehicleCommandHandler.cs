@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 
 public class UpdateVehicleCommandHandler(IAppDbContext ctx)
     : IRequestHandler<UpdateVehicleCommand, Unit>

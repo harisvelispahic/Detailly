@@ -1,5 +1,4 @@
 ﻿using Detailly.Application.Modules.Identity.User.Commands.ChangePassword;
-using FluentValidation;
 
 public sealed class ChangePasswordCommandValidator
     : AbstractValidator<ChangePasswordCommand>

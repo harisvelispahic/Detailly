@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.List;
+﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.List;
 
 public class ListVehiclesQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListVehiclesQuery, List<ListVehiclesQueryDto>>

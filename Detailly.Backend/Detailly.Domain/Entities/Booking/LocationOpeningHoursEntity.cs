@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Common;
+﻿using Detailly.Domain.Common;
 
 namespace Detailly.Domain.Entities.Booking;
 

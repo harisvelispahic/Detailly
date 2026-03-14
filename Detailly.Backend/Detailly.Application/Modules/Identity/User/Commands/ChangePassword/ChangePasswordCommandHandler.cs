@@ -1,6 +1,4 @@
 ﻿using Detailly.Application.Modules.Identity.User.Commands.ChangePassword;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 public sealed class ChangePasswordCommandHandler(
     IAppDbContext context,

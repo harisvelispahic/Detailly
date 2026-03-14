@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 
 public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
     : IRequestHandler<DeleteLocationCommand, Unit>

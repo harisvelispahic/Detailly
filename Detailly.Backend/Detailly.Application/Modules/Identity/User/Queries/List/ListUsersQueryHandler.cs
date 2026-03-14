@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Identity.User.Queries.List;
+﻿namespace Detailly.Application.Modules.Identity.User.Queries.List;
 public class ListUsersQueryHandler(IAppDbContext ctx)
         : IRequestHandler<ListUsersQuery, PageResult<ListUsersQueryDto>>
 {

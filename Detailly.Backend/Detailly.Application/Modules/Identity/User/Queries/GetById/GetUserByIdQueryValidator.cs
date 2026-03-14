@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Identity.User.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Identity.User.Queries.GetById;
 public class GetUserByIdQueryValidator : AbstractValidator<GetUserByIdQuery>
 {
     public GetUserByIdQueryValidator()

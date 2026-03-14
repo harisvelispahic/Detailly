@@ -1,7 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-
-namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 
 public sealed class GetLocationByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetLocationByIdQuery, GetLocationByIdQueryDto>

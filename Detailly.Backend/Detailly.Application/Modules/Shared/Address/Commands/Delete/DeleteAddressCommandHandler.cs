@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Detailly.Domain.Entities.Shared;
-
-namespace Detailly.Application.Modules.Shared.Address.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Delete;
 
 public class DeleteAddressCommandHandler(IAppDbContext context)
     : IRequestHandler<DeleteAddressCommand, Unit>

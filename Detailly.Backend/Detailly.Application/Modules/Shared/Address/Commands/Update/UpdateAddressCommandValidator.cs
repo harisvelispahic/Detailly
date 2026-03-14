@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-
-namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
+﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
 
 public sealed class UpdateAddressCommandValidator : AbstractValidator<UpdateAddressCommand>
 {

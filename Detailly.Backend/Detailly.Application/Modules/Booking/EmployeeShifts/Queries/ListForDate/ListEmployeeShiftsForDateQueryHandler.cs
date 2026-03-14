@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
+﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
 
 public sealed class ListEmployeeShiftsForDateQueryHandler(IAppDbContext context, IAppCurrentUser currentUser)
     : IRequestHandler<ListEmployeeShiftsForDateQuery, List<ListEmployeeShiftsForDateQueryDto>>

@@ -1,5 +1,4 @@
-﻿
-using Detailly.Domain.Entities.Payment;
+﻿using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Application.Modules.Identity.User.Commands.Create;

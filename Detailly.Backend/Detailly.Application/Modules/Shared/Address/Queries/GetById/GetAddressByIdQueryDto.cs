@@ -1,6 +1,4 @@
-﻿using Detailly.Domain.Entities.Shared;
-
-namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
 
 public class GetAddressByIdQueryDto
 {

@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Shared.Address.Commands.Create;
+﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Create;
 
 public class CreateAddressCommand : IRequest<int>
 {

@@ -1,6 +1,4 @@
-﻿
-using Detailly.Domain.Common.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Queries.GetById;
 public class GetOrderByIdQueryDto

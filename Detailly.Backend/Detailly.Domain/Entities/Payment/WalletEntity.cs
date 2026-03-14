@@ -1,6 +1,5 @@
 ﻿using Detailly.Domain.Common;
 using Detailly.Domain.Common.Enums;
-using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Identity;
 
 namespace Detailly.Domain.Entities.Payment;

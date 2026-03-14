@@ -1,7 +1,4 @@
-﻿using Detailly.Application.Abstractions;
-using Detailly.Application.Common.Exceptions;
-using Detailly.Domain.Common.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.MarkShipped;
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Detailly.Application.Modules.Shared.Address.Queries.List;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.List;
 
 public class ListAddressesQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListAddressesQuery, PageResult<ListAddressesQueryDto>>

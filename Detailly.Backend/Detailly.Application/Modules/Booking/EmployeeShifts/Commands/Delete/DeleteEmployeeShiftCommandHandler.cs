@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
+﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 
 public sealed class DeleteEmployeeShiftCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
     : IRequestHandler<DeleteEmployeeShiftCommand, Unit>

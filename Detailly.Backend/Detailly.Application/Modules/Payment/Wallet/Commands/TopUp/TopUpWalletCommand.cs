@@ -1,5 +1,4 @@
-﻿
-namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
+﻿namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
 public record TopUpWalletCommand(
     int UserId,
     decimal Amount,

@@ -1,5 +1,4 @@
-﻿
-using Detailly.API;
+﻿using Detailly.API;
 using Detailly.API.Middleware;
 using Detailly.Application;
 using Detailly.Application.Common.Exceptions;

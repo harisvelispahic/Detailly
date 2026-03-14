@@ -1,5 +1,4 @@
-﻿
-using Detailly.Application.Modules.Identity.User.Commands.Create;
+﻿using Detailly.Application.Modules.Identity.User.Commands.Create;
 
 public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
