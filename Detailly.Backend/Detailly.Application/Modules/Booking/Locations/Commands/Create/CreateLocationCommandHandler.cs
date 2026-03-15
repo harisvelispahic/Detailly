@@ -11,8 +11,8 @@ public sealed class CreateLocationCommandHandler(IAppDbContext context, IAppCurr
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         // Staff-only (you can tighten later)
         if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
@@ -56,7 +56,8 @@ public sealed class CreateLocationCommandHandler(IAppDbContext context, IAppCurr
                 Country = a.Country?.Trim(),
                 Latitude = a.Latitude,
                 Longitude = a.Longitude,
-                CreatedAtUtc = now
+                CreatedAtUtc = now,
+                ApplicationUserId = appCurrentUser.ApplicationUserId.Value
             };
 
             context.Addresses.Add(address);
