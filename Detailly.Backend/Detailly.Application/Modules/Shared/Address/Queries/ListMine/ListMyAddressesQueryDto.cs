@@ -1,6 +1,6 @@
-﻿namespace Detailly.Application.Modules.Shared.Address.Queries.GetById;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.ListMine;
 
-public sealed class GetAddressByIdQueryDto
+public sealed class ListMyAddressesQueryDto
 {
     public required int Id { get; init; }
     public required string Street { get; init; }

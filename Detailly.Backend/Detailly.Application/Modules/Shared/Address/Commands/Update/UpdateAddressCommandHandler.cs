@@ -1,29 +1,40 @@
 ﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
 
-public sealed class UpdateAddressCommandHandler(IAppDbContext context)
+public sealed class UpdateAddressCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser)
     : IRequestHandler<UpdateAddressCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateAddressCommand request, CancellationToken ct)
     {
-        var address = await context.Addresses
-            .FirstOrDefaultAsync(a => a.Id == request.Id, ct);
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
-        if (address == null)
+        var userId = appCurrentUser.ApplicationUserId.Value;
+        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
+
+        var address = await context.Addresses
+            .FirstOrDefaultAsync(a =>
+                a.Id == request.Id &&
+                (isStaff || a.ApplicationUserId == userId),
+                ct);
+
+        if (address is null)
             throw new DetaillyNotFoundException($"Address with Id {request.Id} not found.");
 
-        if (request.Street != null)
+        if (request.Street is not null)
             address.Street = request.Street.Trim();
 
-        if (request.City != null)
+        if (request.City is not null)
             address.City = request.City.Trim();
 
-        if (request.PostalCode != null)
+        if (request.PostalCode is not null)
             address.PostalCode = request.PostalCode.Trim();
 
-        if (request.Region != null)
-            address.Region = request.Region.Trim();
+        if (request.Region is not null)
+            address.Region = string.IsNullOrWhiteSpace(request.Region) ? null : request.Region.Trim();
 
-        if (request.Country != null)
+        if (request.Country is not null)
             address.Country = request.Country.Trim();
 
         if (request.Latitude.HasValue)

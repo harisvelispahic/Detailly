@@ -27,6 +27,9 @@ public class AddressEntity : BaseEntity
     public decimal? Longitude { get; set; }
 
     // Foreign keys
+
+    // null = system/shared/business address
+    // non-null = user-owned address
     public int? ApplicationUserId { get; set; }
     public ApplicationUserEntity? ApplicationUser { get; set; }
 

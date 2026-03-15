@@ -1,17 +1,20 @@
-﻿namespace Detailly.Application.Modules.Shared.Address.Queries.List;
+﻿namespace Detailly.Application.Modules.Shared.Address.Queries.ListMine;
 
-public sealed class ListAddressesQueryHandler(
+public sealed class ListMyAddressesQueryHandler(
     IAppDbContext context,
     IAppCurrentUser appCurrentUser)
-    : IRequestHandler<ListAddressesQuery, PageResult<ListAddressesQueryDto>>
+    : IRequestHandler<ListMyAddressesQuery, PageResult<ListMyAddressesQueryDto>>
 {
-    public async Task<PageResult<ListAddressesQueryDto>> Handle(ListAddressesQuery request, CancellationToken ct)
+    public async Task<PageResult<ListMyAddressesQueryDto>> Handle(ListMyAddressesQuery request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
             throw new DetaillyUnauthorizedException("User is not authenticated.");
 
+        var userId = appCurrentUser.ApplicationUserId.Value;
+
         var q = context.Addresses
-            .AsNoTracking();
+            .AsNoTracking()
+            .Where(x => x.ApplicationUserId == userId);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
@@ -27,7 +30,7 @@ public sealed class ListAddressesQueryHandler(
         var projectedQuery = q
             .OrderBy(x => x.City)
             .ThenBy(x => x.Street)
-            .Select(x => new ListAddressesQueryDto
+            .Select(x => new ListMyAddressesQueryDto
             {
                 Id = x.Id,
                 Street = x.Street!,
@@ -39,7 +42,7 @@ public sealed class ListAddressesQueryHandler(
                 Longitude = x.Longitude
             });
 
-        return await PageResult<ListAddressesQueryDto>
+        return await PageResult<ListMyAddressesQueryDto>
             .FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
 }

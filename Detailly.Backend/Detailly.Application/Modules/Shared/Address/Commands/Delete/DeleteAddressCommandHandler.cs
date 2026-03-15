@@ -1,28 +1,53 @@
 ﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Delete;
 
-public class DeleteAddressCommandHandler(IAppDbContext context)
+public sealed class DeleteAddressCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser)
     : IRequestHandler<DeleteAddressCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteAddressCommand request, CancellationToken ct)
     {
-        //var address = await context.Addresses
-        //    .Include(a => a.ApplicationUsers) // Include povezanih usera
-        //    .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
-        //if (address is null)
-        //    throw new DetaillyNotFoundException($"Address with Id {request.Id} was not found.");
+        var userId = appCurrentUser.ApplicationUserId.Value;
+        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
 
-        //// Provjera constrainta
-        //if (address.ApplicationUsers.Any(u => !u.IsDeleted))
-        //{
-        //    throw new ValidationException(
-        //        "Cannot delete address because it is assigned to one or more active users.");
-        //}
+        var address = await context.Addresses
+            .FirstOrDefaultAsync(a =>
+                a.Id == request.Id &&
+                (isStaff || a.ApplicationUserId == userId),
+                ct);
 
-        //// Soft delete
-        //address.IsDeleted = true;
+        if (address is null)
+            throw new DetaillyNotFoundException($"Address with Id {request.Id} was not found.");
 
-        //await context.SaveChangesAsync(ct);
+        var isUsedByLocation = await context.Locations
+            .AnyAsync(x => x.AddressId == request.Id, ct);
+
+        if (isUsedByLocation)
+            throw new DetaillyBusinessRuleException(
+                "ADDRESS_IN_USE",
+                "Address cannot be deleted because it is used by a location.");
+
+        var isUsedByOrder = await context.Orders
+            .AnyAsync(x => x.ShipToAddressId == request.Id, ct);
+
+        if (isUsedByOrder)
+            throw new DetaillyBusinessRuleException(
+                "ADDRESS_IN_USE",
+                "Address cannot be deleted because it is used by an order.");
+
+        var isUsedByBooking = await context.Bookings
+            .AnyAsync(x => x.ServiceAddressId == request.Id, ct);
+
+        if (isUsedByBooking)
+            throw new DetaillyBusinessRuleException(
+                "ADDRESS_IN_USE",
+                "Address cannot be deleted because it is used by a booking.");
+
+        context.Addresses.Remove(address);
+        await context.SaveChangesAsync(ct);
 
         return Unit.Value;
     }

@@ -1,8 +1,9 @@
 ﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
 
-public class UpdateAddressCommand : IRequest<Unit>
+public sealed class UpdateAddressCommand : IRequest<Unit>
 {
-    public required int Id { get; set; }
+    [JsonIgnore]
+    public int Id { get; set; }
 
     public string? Street { get; set; }
     public string? City { get; set; }

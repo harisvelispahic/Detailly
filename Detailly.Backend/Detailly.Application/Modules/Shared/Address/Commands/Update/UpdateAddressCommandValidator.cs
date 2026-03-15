@@ -5,52 +5,42 @@ public sealed class UpdateAddressCommandValidator : AbstractValidator<UpdateAddr
     public UpdateAddressCommandValidator()
     {
         RuleFor(x => x.Id)
-            .GreaterThan(0).WithMessage("Address Id is required.");
+            .GreaterThan(0)
+            .WithMessage("Address id must be greater than 0.");
 
-        When(x => x.Street != null, () =>
-        {
-            RuleFor(x => x.Street!)
-                .NotEmpty()
-                .MaximumLength(250);
-        });
+        RuleFor(x => x.Street)
+            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
+            .WithMessage("Street cannot be empty or whitespace only.")
+            .MaximumLength(250).WithMessage("Street cannot exceed 250 characters.");
 
-        When(x => x.City != null, () =>
-        {
-            RuleFor(x => x.City!)
-                .NotEmpty()
-                .MaximumLength(100);
-        });
+        RuleFor(x => x.City)
+            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
+            .WithMessage("City cannot be empty or whitespace only.")
+            .MaximumLength(100).WithMessage("City cannot exceed 100 characters.");
 
-        When(x => x.PostalCode != null, () =>
-        {
-            RuleFor(x => x.PostalCode!)
-                .NotEmpty()
-                .MaximumLength(20);
-        });
+        RuleFor(x => x.PostalCode)
+            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
+            .WithMessage("Postal code cannot be empty or whitespace only.")
+            .MaximumLength(20).WithMessage("Postal code cannot exceed 20 characters.");
 
-        When(x => x.Region != null, () =>
-        {
-            RuleFor(x => x.Region!)
-                .MaximumLength(100);
-        });
+        RuleFor(x => x.Region)
+            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
+            .WithMessage("Region cannot be empty or whitespace only.")
+            .MaximumLength(100).WithMessage("Region cannot exceed 100 characters.");
 
-        When(x => x.Country != null, () =>
-        {
-            RuleFor(x => x.Country!)
-                .NotEmpty()
-                .MaximumLength(100);
-        });
+        RuleFor(x => x.Country)
+            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
+            .WithMessage("Country cannot be empty or whitespace only.")
+            .MaximumLength(100).WithMessage("Country cannot exceed 100 characters.");
 
-        When(x => x.Latitude.HasValue, () =>
-        {
-            RuleFor(x => x.Latitude.Value)
-                .InclusiveBetween(-90, 90);
-        });
+        RuleFor(x => x.Latitude)
+            .InclusiveBetween(-90m, 90m)
+            .When(x => x.Latitude.HasValue)
+            .WithMessage("Latitude must be between -90 and 90.");
 
-        When(x => x.Longitude.HasValue, () =>
-        {
-            RuleFor(x => x.Longitude.Value)
-                .InclusiveBetween(-180, 180);
-        });
+        RuleFor(x => x.Longitude)
+            .InclusiveBetween(-180m, 180m)
+            .When(x => x.Longitude.HasValue)
+            .WithMessage("Longitude must be between -180 and 180.");
     }
 }

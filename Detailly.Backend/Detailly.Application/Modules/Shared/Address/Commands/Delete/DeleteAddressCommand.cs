@@ -1,6 +1,7 @@
 ﻿namespace Detailly.Application.Modules.Shared.Address.Commands.Delete;
 
-public class DeleteAddressCommand : IRequest<Unit>
+public sealed class DeleteAddressCommand : IRequest<Unit>
 {
+    [JsonIgnore]
     public int Id { get; set; }
 }

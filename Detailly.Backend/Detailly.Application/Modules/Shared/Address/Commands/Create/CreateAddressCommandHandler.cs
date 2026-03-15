@@ -2,28 +2,26 @@
 
 namespace Detailly.Application.Modules.Shared.Address.Commands.Create;
 
-public class CreateAddressCommandHandler(IAppDbContext context) : IRequestHandler<CreateAddressCommand, int>
+public sealed class CreateAddressCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser)
+    : IRequestHandler<CreateAddressCommand, int>
 {
-
     public async Task<int> Handle(CreateAddressCommand request, CancellationToken ct)
     {
-        // Normalize values
-        var street = request.Street.Trim();
-        var city = request.City.Trim();
-        var postalCode = request.PostalCode.Trim();
-        var country = request.Country.Trim();
-        var region = request.Region?.Trim();
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
-        // Create entity
         var address = new AddressEntity
         {
-            Street = street,
-            City = city,
-            PostalCode = postalCode,
-            Region = region,
-            Country = country,
+            Street = request.Street.Trim(),
+            City = request.City.Trim(),
+            PostalCode = request.PostalCode.Trim(),
+            Region = string.IsNullOrWhiteSpace(request.Region) ? null : request.Region.Trim(),
+            Country = request.Country.Trim(),
             Latitude = request.Latitude,
-            Longitude = request.Longitude
+            Longitude = request.Longitude,
+            ApplicationUserId = appCurrentUser.ApplicationUserId.Value
         };
 
         context.Addresses.Add(address);

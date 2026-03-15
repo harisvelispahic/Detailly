@@ -1,6 +1,6 @@
 ﻿namespace Detailly.Application.Modules.Shared.Address.Queries.List;
 
-public class ListAddressesQueryDto
+public sealed class ListAddressesQueryDto
 {
     public required int Id { get; init; }
     public required string Street { get; init; }
@@ -8,7 +8,6 @@ public class ListAddressesQueryDto
     public required string PostalCode { get; init; }
     public string? Region { get; init; }
     public required string Country { get; init; }
-
     public decimal? Latitude { get; init; }
     public decimal? Longitude { get; init; }
 }
