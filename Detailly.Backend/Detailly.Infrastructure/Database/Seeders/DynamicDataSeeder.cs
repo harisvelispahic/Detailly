@@ -3,6 +3,7 @@ using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
+using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Infrastructure.Database.Seeders;
 
@@ -11,7 +12,6 @@ namespace Detailly.Infrastructure.Database.Seeders;
 /// obično pri startu aplikacije (npr. u Program.cs).
 /// Koristi se za unos demo/test podataka koji nisu dio migracije.
 /// </summary>
-
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
@@ -99,6 +99,14 @@ public static class DynamicDataSeeder
             ApplicationUser = admin,
             CreatedAtUtc = now
         };
+        admin.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
+            ApplicationUser = admin,
+            CreatedAtUtc = now
+        };
 
         var manager = new ApplicationUserEntity
         {
@@ -120,6 +128,14 @@ public static class DynamicDataSeeder
             Currency = CurrencyName.BAM,
             TotalDeposited = 750m,
             PercentageAdded = 15,
+            ApplicationUser = manager,
+            CreatedAtUtc = now
+        };
+        manager.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
             ApplicationUser = manager,
             CreatedAtUtc = now
         };
@@ -147,6 +163,14 @@ public static class DynamicDataSeeder
             ApplicationUser = employee,
             CreatedAtUtc = now
         };
+        employee.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
+            ApplicationUser = employee,
+            CreatedAtUtc = now
+        };
 
         var fleetClient = new ApplicationUserEntity
         {
@@ -170,6 +194,14 @@ public static class DynamicDataSeeder
             ApplicationUser = fleetClient,
             CreatedAtUtc = now
         };
+        fleetClient.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
+            ApplicationUser = fleetClient,
+            CreatedAtUtc = now
+        };
 
         var demoClient = new ApplicationUserEntity
         {
@@ -189,6 +221,14 @@ public static class DynamicDataSeeder
             Currency = CurrencyName.BAM,
             TotalDeposited = 320m,
             PercentageAdded = 10,
+            ApplicationUser = demoClient,
+            CreatedAtUtc = now
+        };
+        demoClient.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
             ApplicationUser = demoClient,
             CreatedAtUtc = now
         };
@@ -216,6 +256,14 @@ public static class DynamicDataSeeder
             ApplicationUser = swaggerDummy,
             CreatedAtUtc = now
         };
+        swaggerDummy.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
+            ApplicationUser = swaggerDummy,
+            CreatedAtUtc = now
+        };
 
         var haris = new ApplicationUserEntity
         {
@@ -239,6 +287,15 @@ public static class DynamicDataSeeder
             ApplicationUser = haris,
             CreatedAtUtc = now
         };
+        haris.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
+            ApplicationUser = haris,
+            CreatedAtUtc = now
+        };
+
         var danis = new ApplicationUserEntity
         {
             Email = "danis.music@edu.fit.ba",
@@ -258,6 +315,14 @@ public static class DynamicDataSeeder
             Currency = CurrencyName.BAM,
             TotalDeposited = 1000m,
             PercentageAdded = 10,
+            ApplicationUser = danis,
+            CreatedAtUtc = now
+        };
+        danis.Cart = new CartEntity
+        {
+            IsEmpty = true,
+            TotalAmount = 0m,
+            Status = CartStatus.Active,
             ApplicationUser = danis,
             CreatedAtUtc = now
         };
