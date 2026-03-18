@@ -2,13 +2,24 @@
 
 namespace Detailly.Application.Modules.Identity.User.Commands.Update;
 
-public sealed class UpdateUserCommandHandler(IAppDbContext context)
+public sealed class UpdateUserCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser)
     : IRequestHandler<UpdateUserCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken ct)
     {
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
+
+        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
+        var currentUserId = appCurrentUser.ApplicationUserId.Value;
+
+        // Only staff can update arbitrary users; normal users can only update themselves
+        if (!isStaff && request.Id != currentUserId)
+            throw new DetaillyForbiddenException("You are not allowed to update this user.");
+
         var user = await context.ApplicationUsers
-            //.Include(x => x.Address)      // POPRAVITI
             .Include(x => x.Image)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
@@ -22,27 +33,28 @@ public sealed class UpdateUserCommandHandler(IAppDbContext context)
         if (request.LastName != null)
             user.LastName = request.LastName.Trim();
 
-
         if (request.Email != null)
         {
+            var normalizedEmail = request.Email.Trim().ToLower();
             var exists = await context.ApplicationUsers
-                .AnyAsync(x => x.Email == request.Email && x.Id != request.Id, ct);
+                .AnyAsync(x => x.Email == normalizedEmail && x.Id != request.Id, ct);
 
             if (exists)
                 throw new DetaillyConflictException("Email already exists.");
 
-            user.Email = request.Email.Trim().ToLower();
+            user.Email = normalizedEmail;
         }
 
         if (request.Username != null)
         {
+            var normalizedUsername = request.Username.Trim();
             var exists = await context.ApplicationUsers
-                .AnyAsync(x => x.Username == request.Username && x.Id != request.Id, ct);
+                .AnyAsync(x => x.Username == normalizedUsername && x.Id != request.Id, ct);
 
             if (exists)
                 throw new DetaillyConflictException("Username already exists.");
 
-            user.Username = request.Username.Trim();
+            user.Username = normalizedUsername;
         }
 
         if (request.Phone != null)
@@ -51,34 +63,7 @@ public sealed class UpdateUserCommandHandler(IAppDbContext context)
         if (request.CompanyName != null)
             user.CompanyName = request.CompanyName.Trim();
 
-        // ADDRESS (create if missing)
-        //if (request.Address != null)
-        //{
-        //    user.Address ??= new AddressEntity();
-
-        //    if (request.Address.Street != null)
-        //        user.Address.Street = request.Address.Street.Trim();
-
-        //    if (request.Address.City != null)
-        //        user.Address.City = request.Address.City.Trim();
-
-        //    if (request.Address.Region != null)
-        //        user.Address.Region = request.Address.Region.Trim();
-
-        //    if (request.Address.PostalCode != null)
-        //        user.Address.PostalCode = request.Address.PostalCode.Trim();
-
-        //    if (request.Address.Country != null)
-        //        user.Address.Country = request.Address.Country.Trim();
-
-        //    if (request.Address.Latitude.HasValue)
-        //        user.Address.Latitude = request.Address.Latitude.Value;
-
-        //    if (request.Address.Longitude.HasValue)
-        //        user.Address.Longitude = request.Address.Longitude.Value;
-        //}
-
-        // IMAGE
+        // IMAGE (unchanged)
         if (request.Image?.ImageUrl != null)
         {
             if (user.Image == null)
@@ -93,6 +78,8 @@ public sealed class UpdateUserCommandHandler(IAppDbContext context)
                 user.Image.ImageUrl = request.Image.ImageUrl.Trim();
             }
         }
+
+        user.ModifiedAtUtc = DateTime.UtcNow;
 
         await context.SaveChangesAsync(ct);
         return Unit.Value;
