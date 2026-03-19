@@ -16,6 +16,7 @@ namespace Detailly.API.Controllers;
 public class ProductCategoriesController(ISender sender) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task<ActionResult<int>> Create(CreateProductCategoryCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -40,6 +41,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Update(int id, UpdateProductCategoryCommand command, CancellationToken ct)
     {
         // ID from the route takes precedence
@@ -49,6 +51,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
     
     [HttpPut("enable/{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Enable(int id, CancellationToken ct)
     {
         await sender.Send(new EnableProductCategoryCommand { Id = id }, ct);
@@ -56,6 +59,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("disable/{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Disable(int id, CancellationToken ct)
     {
         await sender.Send(new DisableProductCategoryCommand { Id = id }, ct);
@@ -96,6 +100,7 @@ public class ProductCategoriesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteProductCategoryCommand { Id = id }, ct);
