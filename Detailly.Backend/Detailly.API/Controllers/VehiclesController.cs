@@ -3,6 +3,7 @@ using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Delete;
 using Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 using Detailly.Application.Modules.Vehicle.Vehicles.Queries.GetById;
 using Detailly.Application.Modules.Vehicle.Vehicles.Queries.List;
+using Detailly.Application.Modules.Vehicle.Vehicles.Queries.ListMine;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -46,9 +47,19 @@ public class VehiclesController(ISender sender) : ControllerBase
         return category; // if NotFoundException -> 404 via middleware
     }
 
+    // --- Admin-only listing (handler also enforces admin) ---
     [HttpGet]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<PageResult<ListVehiclesQueryDto>> List([FromQuery] ListVehiclesQuery query, CancellationToken ct)
+    {
+        var result = await sender.Send(query, ct);
+        return result;
+    }
+
+    // --- Authenticated user's vehicles (paged) ---
+    [HttpGet("my")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task<List<ListVehiclesQueryDto>> List([FromQuery] ListVehiclesQuery query, CancellationToken ct)
+    public async Task<PageResult<ListMyVehiclesQueryDto>> ListMine([FromQuery] ListMyVehiclesQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
         return result;

@@ -2,5 +2,6 @@
 
 public class GetVehicleByIdQuery : IRequest<GetVehicleByIdQueryDto>
 {
+    [JsonIgnore]
     public int Id { get; set; }
 }

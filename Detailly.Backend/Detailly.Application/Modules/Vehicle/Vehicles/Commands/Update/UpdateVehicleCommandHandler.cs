@@ -1,10 +1,13 @@
 ﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 
-public class UpdateVehicleCommandHandler(IAppDbContext ctx)
+public class UpdateVehicleCommandHandler(IAppDbContext ctx, IAppCurrentUser appCurrentUser)
     : IRequestHandler<UpdateVehicleCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateVehicleCommand request, CancellationToken ct)
     {
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
+
         // Find the vehicle
         var vehicle = await ctx.Vehicles
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
@@ -15,17 +18,20 @@ public class UpdateVehicleCommandHandler(IAppDbContext ctx)
         if (vehicle.IsDeleted)
             throw new DetaillyConflictException("Cannot update a deleted vehicle.");
 
+        // Authorization: owner or admin
+        if (!appCurrentUser.IsAdmin && vehicle.ApplicationUserId != appCurrentUser.ApplicationUserId)
+            throw new DetaillyForbiddenException("You are not allowed to update this vehicle.");
 
         var newLicencePlate = request.LicencePlate?.Trim().ToUpper();
 
-        // --- Check for duplicate licence plate if updated ---
+        // --- Check for duplicate licence plate if updated (within same user) ---
         if (newLicencePlate is not null && vehicle.LicencePlate.ToUpper() != newLicencePlate)
         {
             var licenceExists = await ctx.Vehicles
-                .AnyAsync(x => x.LicencePlate.ToUpper() == newLicencePlate, ct);
+                .AnyAsync(x => x.LicencePlate.ToUpper() == newLicencePlate && x.ApplicationUserId == vehicle.ApplicationUserId, ct);
 
             if (licenceExists)
-                throw new DetaillyConflictException("A vehicle with this licence plate already exists.");
+                throw new DetaillyConflictException("A vehicle with this licence plate already exists for this user.");
         }
 
         // Update only provided fields

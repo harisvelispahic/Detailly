@@ -7,8 +7,10 @@ public class CreateVehicleCommandHandler(IAppDbContext context, IAppCurrentUser 
 {
     public async Task<int> Handle(CreateVehicleCommand request, CancellationToken ct)
     {
+        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
-        // duplicates are checked by licence plate
+        // duplicates are checked by licence plate for this user
         bool exists = await context.Vehicles
             .AnyAsync(x =>
                 x.LicencePlate.ToUpper() == request.LicencePlate.Trim().ToUpper() &&

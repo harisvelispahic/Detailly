@@ -1,18 +1,23 @@
 ﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Queries.List;
 
-public class ListVehiclesQueryHandler(IAppDbContext ctx)
-    : IRequestHandler<ListVehiclesQuery, List<ListVehiclesQueryDto>>
+public class ListVehiclesQueryHandler(IAppDbContext ctx, IAppCurrentUser appCurrentUser)
+    : IRequestHandler<ListVehiclesQuery, PageResult<ListVehiclesQueryDto>>
 {
-    public async Task<List<ListVehiclesQueryDto>> Handle(ListVehiclesQuery request, CancellationToken ct)
+    public async Task<PageResult<ListVehiclesQueryDto>> Handle(ListVehiclesQuery request, CancellationToken ct)
     {
+        // Controller may limit access, but enforce admin here too
+        if (!appCurrentUser.IsAuthenticated || !appCurrentUser.IsAdmin)
+            throw new DetaillyForbiddenException("Only admins can list vehicles.");
+
         var q = ctx.Vehicles.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            q = q.Where(x => x.Model.Contains(request.Search) || x.Brand.Contains(request.Search));
+            var s = request.Search.Trim();
+            q = q.Where(x => x.Model.Contains(s) || x.Brand.Contains(s));
         }
 
-        var vehicles = q.OrderBy(x => x.Brand)
+        var projectedQuery = q.OrderBy(x => x.Brand)
             .Select(x => new ListVehiclesQueryDto
             {
                 Id = x.Id,
@@ -27,9 +32,7 @@ public class ListVehiclesQueryHandler(IAppDbContext ctx)
                 },
             });
 
-        //if (!vehicles.Any())
-        //    throw new DetaillyNotFoundException("No vehicles found.");
-
-        return await vehicles.ToListAsync(ct);
+        return await PageResult<ListVehiclesQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
 }
+
