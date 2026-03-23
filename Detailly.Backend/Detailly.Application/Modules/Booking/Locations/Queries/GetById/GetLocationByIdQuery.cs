@@ -2,5 +2,6 @@
 
 public sealed class GetLocationByIdQuery : IRequest<GetLocationByIdQueryDto>
 {
-    public required int Id { get; set; }
+    [JsonIgnore]
+    public int Id { get; set; }
 }

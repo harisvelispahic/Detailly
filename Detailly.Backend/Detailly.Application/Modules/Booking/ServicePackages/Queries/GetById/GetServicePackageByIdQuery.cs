@@ -2,5 +2,6 @@
 
 public class GetServicePackageByIdQuery : IRequest<GetServicePackageByIdQueryDto>
 {
+    [JsonIgnore]
     public int Id { get; set; }
 }

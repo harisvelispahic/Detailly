@@ -4,7 +4,8 @@ namespace Detailly.Application.Modules.Booking.Locations.Commands.Update;
 
 public sealed class UpdateLocationCommand : IRequest<Unit>
 {
-    public required int Id { get; set; }
+    [JsonIgnore]
+    public int Id { get; set; }
 
     public string? Name { get; set; }
     public string? Description { get; set; }
