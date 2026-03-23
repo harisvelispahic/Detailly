@@ -3,8 +3,8 @@ public class GetReviewByIdQueryValidator : AbstractValidator<GetReviewByIdQuery>
 {
     public GetReviewByIdQueryValidator()
     {
-        RuleFor(x => x.Id)
+        RuleFor(x => x.BookingId)
             .GreaterThan(0)
-            .WithMessage("Vehicle ID must be greater than zero.");
+            .WithMessage("Booking ID must be greater than zero.");
     }
 }

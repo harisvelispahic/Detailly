@@ -1,4 +1,5 @@
 ﻿using Detailly.Application.Modules.Booking.Reviews.Commands.Create;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Shared;
 
@@ -18,6 +19,12 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         if (booking.CustomerId != currentUser.ApplicationUserId)
             throw new DetaillyForbiddenException("You are not allowed to review this booking.");
 
+        // Business rule: only allow review if booking is completed
+        if (booking.Status != BookingStatus.Completed)
+            throw new DetaillyBusinessRuleException(
+                "BOOKING_NOT_COMPLETED",
+                "Cannot leave a review before the booking is completed.");
+
         // Check if a review already exists
         var existingReview = await context.Reviews
             .FirstOrDefaultAsync(x => x.BookingId == request.BookingId, ct);
@@ -26,11 +33,6 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         {
             throw new DetaillyConflictException("Review for this booking already exists.");
         }
-
-        // Optional: only allow review if booking is completed
-        // if (booking.Status != BookingStatus.Completed)
-        //     throw new ValidationException("Cannot leave a review before the booking is completed.");
-
 
         // If soft-deleted review exists → restore it
         if (existingReview is not null && existingReview.IsDeleted)

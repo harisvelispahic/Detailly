@@ -16,8 +16,8 @@ public class DeleteReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         if (review is null || review.IsDeleted)
             throw new DetaillyNotFoundException("Review not found.");
 
-        // Authorization: check user owns the booking
-        if (review.Booking.CustomerId != currentUser.ApplicationUserId)
+        // Authorization: allow owner of the booking OR an admin to delete the review
+        if (review.Booking.CustomerId != currentUser.ApplicationUserId && !currentUser.IsAdmin)
             throw new DetaillyForbiddenException("You are not allowed to delete this review.");
 
         // Soft delete
@@ -36,42 +36,3 @@ public class DeleteReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         return Unit.Value;
     }
 }
-
-
-//public class DeleteReviewCommandHandler(IAppDbContext context)
-//    : IRequestHandler<DeleteReviewCommand, Unit>
-//{
-//    public async Task<Unit> Handle(DeleteReviewCommand request, CancellationToken ct)
-//    {
-//        // Start an EF transaction
-//        await using var transaction = await context.Database.BeginTransactionAsync(ct);
-
-//        // Load review with images
-//        var review = await context.Reviews
-//            .Include(r => r.Images)
-//            .FirstOrDefaultAsync(x => x.BookingId == request.BookingId, ct);
-
-//        if (review is null)
-//            throw new DetaillyNotFoundException("Review was not found.");
-
-//        if (review.IsDeleted)
-//            throw new DetaillyNotFoundException("Review does not exist.");
-
-//        // Soft delete review
-//        review.IsDeleted = true;
-//        review.ModifiedAtUtc = DateTime.UtcNow;
-
-//        // Soft delete related images
-//        foreach (var image in review.Images)
-//        {
-//            image.IsDeleted = true;
-//            image.ModifiedAtUtc = DateTime.UtcNow;
-//        }
-
-//        // Save everything
-//        await context.SaveChangesAsync(ct);
-//        await transaction.CommitAsync(ct);
-
-//        return Unit.Value;
-//    }
-//}

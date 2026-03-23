@@ -1,4 +1,5 @@
-﻿using Detailly.Domain.Entities.Shared;
+﻿using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Entities.Shared;
 
 namespace Detailly.Application.Modules.Booking.Reviews.Commands.Update;
 
@@ -21,6 +22,12 @@ public class UpdateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         // Authorization
         if (review.Booking.CustomerId != currentUser.ApplicationUserId)
             throw new DetaillyForbiddenException("You are not allowed to update this review.");
+
+        // Business rule: only allow review if booking is completed
+        if (review.Booking.Status != BookingStatus.Completed)
+            throw new DetaillyBusinessRuleException(
+                "BOOKING_NOT_COMPLETED",
+                "Cannot leave a review before the booking is completed.");
 
         // -------- PARTIAL UPDATE --------
 

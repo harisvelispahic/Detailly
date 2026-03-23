@@ -1,18 +1,17 @@
 ﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
 public class ListReviewsQueryHandler(IAppDbContext ctx)
-    : IRequestHandler<ListReviewsQuery, List<ListReviewsQueryDto>>
+    : IRequestHandler<ListReviewsQuery, PageResult<ListReviewsQueryDto>>
 {
-    public async Task<List<ListReviewsQueryDto>> Handle(ListReviewsQuery request, CancellationToken ct)
+    public async Task<PageResult<ListReviewsQueryDto>> Handle(ListReviewsQuery request, CancellationToken ct)
     {
-        var q = ctx.Reviews.AsNoTracking()
-            .Where(x => x.IsDeleted == false);
+        var q = ctx.Reviews.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
             q = q.Where(x => x.Description.Contains(request.Search));
         }
 
-        var reviews = q.OrderBy(x => x.CreatedAtUtc)
+        var projectedQuery = q.OrderBy(x => x.CreatedAtUtc)
             .Select(x => new ListReviewsQueryDto
             {
                 BookingId = x.BookingId,
@@ -29,6 +28,7 @@ public class ListReviewsQueryHandler(IAppDbContext ctx)
                 }).ToList()
             });
 
-        return await reviews.ToListAsync(ct);
+        return await PageResult<ListReviewsQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
+
     }
 }

@@ -11,44 +11,45 @@ namespace Detailly.API.Controllers;
 [Route("[controller]")]
 public class ReviewsController(ISender sender) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("{bookingId:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task<ActionResult<int>> Create(CreateReviewCommand command, CancellationToken ct)
+    public async Task<ActionResult<int>> Create(int bookingId, CreateReviewCommand command, CancellationToken ct)
     {
-        int id = await sender.Send(command, ct);
+        command.BookingId = bookingId;
+        await sender.Send(command, ct);
 
-        return CreatedAtAction(nameof(GetById), new { id }, new { id });
+        return CreatedAtAction(nameof(GetById), new { bookingId }, new { bookingId });
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{bookingId:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task Update(int id, UpdateReviewCommand command, CancellationToken ct)
+    public async Task Update(int bookingId, UpdateReviewCommand command, CancellationToken ct)
     {
         // ID from the route takes precedence
-        command.BookingId = id;
+        command.BookingId = bookingId;
         await sender.Send(command, ct);
         // no return -> 204 No Content
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{bookingId:int}")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task Delete(int id, CancellationToken ct)
+    public async Task Delete(int bookingId, CancellationToken ct)
     {
-        await sender.Send(new DeleteReviewCommand { BookingId = id }, ct);
+        await sender.Send(new DeleteReviewCommand { BookingId = bookingId }, ct);
         // no return -> 204 No Content
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{bookingId:int}")]
     [AllowAnonymous]
-    public async Task<GetReviewByIdQueryDto> GetById(int id, CancellationToken ct)
+    public async Task<GetReviewByIdQueryDto> GetById(int bookingId, CancellationToken ct)
     {
-        var category = await sender.Send(new GetReviewByIdQuery { Id = id }, ct);
+        var category = await sender.Send(new GetReviewByIdQuery { BookingId = bookingId }, ct);
         return category; // if NotFoundException -> 404 via middleware
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<ListReviewsQueryDto>> List([FromQuery] ListReviewsQuery query, CancellationToken ct)
+    public async Task<PageResult<ListReviewsQueryDto>> List([FromQuery] ListReviewsQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
         return result;

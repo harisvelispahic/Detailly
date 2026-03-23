@@ -5,11 +5,11 @@ public class GetReviewByIdQueryHandler(IAppDbContext context)
     public async Task<GetReviewByIdQueryDto> Handle(GetReviewByIdQuery request, CancellationToken ct)
     {
         var review = await context.Reviews
-            .Where(r => r.BookingId == request.Id)
+            .Where(r => r.BookingId == request.BookingId)
             .FirstOrDefaultAsync(ct);
 
         var result = await context.Reviews
-            .Where(r => r.BookingId == request.Id)
+            .Where(r => r.BookingId == request.BookingId)
             .Select(r => new GetReviewByIdQueryDto
             {
                 BookingId = r.BookingId,
@@ -28,7 +28,7 @@ public class GetReviewByIdQueryHandler(IAppDbContext context)
             .FirstOrDefaultAsync(ct);
 
         if (review == null)
-            throw new DetaillyNotFoundException($"Review with Id {request.Id} not found.");
+            throw new DetaillyNotFoundException($"Review with Id {request.BookingId} not found.");
 
         if (review.IsDeleted)
             throw new DetaillyBusinessRuleException("123", "Review does not exist.");
