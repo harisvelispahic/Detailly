@@ -1,0 +1,29 @@
+<section class="features-section">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2 class="section-title">
+        Why Choose
+        <span class="gradient-text">Detailly</span>
+      </h2>
+      <p class="section-subtitle">
+        We're passionate about making your vehicle look its absolute best.
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="features-grid">
+      <div
+        *ngFor="let feature of features; let i = index"
+        class="feature-card"
+        [style.animation-delay]="i * 100 + 'ms'"
+      >
+        <div class="feature-icon">
+          <mat-icon>{{ feature.icon }}</mat-icon>
+        </div>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>

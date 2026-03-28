@@ -1,0 +1,227 @@
+// src/app/modules/public/landing/testimonials/testimonials.component.scss
+
+$primary-blue: #4a90e2;
+$dark-blue: #2e5c8a;
+$light-blue: #e8f4fd;
+$text-dark: #1a1a1a;
+$text-light: #666666;
+$white: #ffffff;
+$warning: #ffc107;
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.testimonials-section {
+  padding: 80px 20px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(232, 244, 253, 0.5) 50%,
+    transparent 100%
+  );
+
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 48px;
+  }
+}
+
+.section-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 32px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.section-subtitle {
+  font-size: 16px;
+  color: $text-light;
+  margin: 0;
+}
+
+.testimonial-carousel {
+  position: relative;
+}
+
+.review-card {
+  padding: 48px 40px;
+  background: $white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 36px 24px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px 16px;
+  }
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: rgba(0, 0, 0, 0.15);
+    transition: color 0.2s ease;
+
+    &.filled {
+      color: $warning;
+    }
+  }
+}
+
+.review-text {
+  font-size: 18px;
+  line-height: 1.8;
+  color: $text-dark;
+  margin: 0 0 32px 0;
+  font-style: italic;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+}
+
+.reviewer-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.reviewer-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $primary-blue;
+}
+
+.reviewer-details {
+  text-align: left;
+}
+
+.reviewer-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-dark;
+  margin: 0;
+}
+
+.reviewer-service {
+  font-size: 13px;
+  color: $text-light;
+  margin: 2px 0 0 0;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 32px;
+
+  @media (max-width: 480px) {
+    gap: 16px;
+  }
+}
+
+.nav-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: $light-blue;
+  transition: all 0.3s ease;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: $primary-blue;
+  }
+
+  &:hover:not(:disabled) {
+    background: $primary-blue;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+
+    mat-icon {
+      color: $white;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.dot-indicators {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  &.active {
+    background: $primary-blue;
+    width: 32px;
+    border-radius: 5px;
+  }
+
+  &:hover {
+    background: rgba(74, 144, 226, 0.5);
+  }
+}

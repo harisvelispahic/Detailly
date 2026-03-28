@@ -1,0 +1,56 @@
+<section class="pricing-section">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <h2 class="section-title">
+        Simple, Transparent
+        <span class="gradient-text">Pricing</span>
+      </h2>
+      <p class="section-subtitle">Choose the package that fits your needs. No hidden fees, ever.</p>
+    </div>
+
+    <!-- Pricing Tiers Grid -->
+    <div class="pricing-grid">
+      <div
+        *ngFor="let tier of pricingTiers; let i = index"
+        class="pricing-card"
+        [class.popular]="tier.popular"
+        [style.animation-delay]="i * 100 + 'ms'"
+      >
+        <!-- Popular Badge -->
+        <div *ngIf="tier.popular" class="popular-badge">Most Popular</div>
+
+        <!-- Tier Header -->
+        <div class="tier-header">
+          <h3 class="tier-name">{{ tier.name }}</h3>
+          <p class="tier-description">{{ tier.description }}</p>
+        </div>
+
+        <!-- Price -->
+        <div class="price-section">
+          <span class="price-amount">${{ tier.price }}</span>
+          <span class="price-unit">/service</span>
+        </div>
+
+        <!-- Features List -->
+        <ul class="features-list">
+          <li *ngFor="let feature of tier.features" class="feature-item">
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <span>{{ feature }}</span>
+          </li>
+        </ul>
+
+        <!-- CTA Button -->
+        <button
+          mat-raised-button
+          [color]="tier.popular ? 'primary' : ''"
+          [class.popular-btn]="tier.popular"
+          class="book-btn"
+          (click)="bookNow()"
+        >
+          Book Now
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

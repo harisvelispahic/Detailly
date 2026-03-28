@@ -1,0 +1,155 @@
+// src/app/modules/public/landing/final-cta/final-cta.component.scss
+
+$primary-blue: #4a90e2;
+$dark-blue: #2e5c8a;
+$light-blue: #e8f4fd;
+$text-dark: #1a1a1a;
+$text-light: #666666;
+$white: #ffffff;
+
+.final-cta-section {
+  padding: 80px 20px;
+  background: $white;
+
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cta-card {
+  position: relative;
+  padding: 64px 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    padding: 48px 32px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 36px 24px;
+  }
+}
+
+.card-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 226, 0.08) 0%,
+    rgba(232, 244, 253, 0.3) 50%,
+    rgba(74, 144, 226, 0.08) 100%
+  );
+
+  .gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(74, 144, 226, 0.1) 0%,
+      rgba(100, 181, 246, 0.1) 50%,
+      rgba(74, 144, 226, 0.1) 100%
+    );
+  }
+}
+
+.cta-content {
+  position: relative;
+  z-index: 10;
+}
+
+.cta-title {
+  font-size: 44px;
+  font-weight: 700;
+  color: $text-dark;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 28px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.cta-description {
+  font-size: 18px;
+  color: $text-light;
+  margin: 0 0 40px 0;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+}
+
+.cta-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.primary-cta,
+.secondary-cta {
+  height: 56px;
+  padding: 0 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  mat-icon {
+    margin-right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.primary-cta {
+  background: $primary-blue;
+  color: $white;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+  }
+}
+
+.secondary-cta {
+  border: 2px solid $primary-blue;
+  color: $primary-blue;
+  background: transparent;
+
+  &:hover {
+    background: rgba(74, 144, 226, 0.05);
+    transform: translateY(-2px);
+  }
+}

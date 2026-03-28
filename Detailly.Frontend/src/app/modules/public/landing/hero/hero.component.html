@@ -1,0 +1,55 @@
+<section class="hero-section">
+  <!-- Background with gradients -->
+  <div class="hero-background">
+    <div class="gradient-overlay gradient-1"></div>
+    <div class="gradient-overlay gradient-2"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="container hero-content">
+    <div class="hero-text">
+      <div class="badge-container">
+        <mat-icon class="badge-icon">sparkles</mat-icon>
+        <span class="badge-text">Premium Vehicle Detailing</span>
+      </div>
+
+      <h1 class="hero-title">
+        Your Car Deserves
+        <span class="gradient-text">Showroom</span>
+        Perfection
+      </h1>
+
+      <p class="hero-description">
+        Experience the ultimate in vehicle care. From essential washes to complete ceramic coating
+        packages, we bring the shine your car deserves.
+      </p>
+
+      <div class="hero-actions">
+        <button mat-raised-button color="primary" class="cta-button" routerLink="/booking">
+          <mat-icon>arrow_forward</mat-icon>
+          Book Your Detail
+        </button>
+        <button mat-stroked-button class="secondary-button" routerLink="/shop">
+          <mat-icon>shopping_cart</mat-icon>
+          Shop Products
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-number">{{ stats.carsDetailed }}</div>
+          <div class="stat-label">Cars Detailed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ stats.averageRating }}</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{{ stats.yearsExperience }}</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
