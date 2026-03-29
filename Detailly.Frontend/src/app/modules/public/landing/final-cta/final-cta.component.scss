@@ -1,18 +1,19 @@
 // src/app/modules/public/landing/final-cta/final-cta.component.scss
 
-$primary-blue: #4a90e2;
-$dark-blue: #2e5c8a;
-$light-blue: #e8f4fd;
-$text-dark: #1a1a1a;
-$text-light: #666666;
+$primary: #8b5cf6;
+$accent: #a78bfa;
+$background: #0f1419;
+$card-bg: #1a1f2e;
+$foreground: #faf9f8;
+$muted-foreground: #999999;
 $white: #ffffff;
 
 .final-cta-section {
-  padding: 80px 20px;
-  background: $white;
+  padding: 80px 20px; // py-20
+  background: $background;
 
-  @media (max-width: 768px) {
-    padding: 60px 20px;
+  @media (min-width: 768px) {
+    padding: 112px 20px; // md:py-28
   }
 }
 
@@ -23,17 +24,17 @@ $white: #ffffff;
 
 .cta-card {
   position: relative;
-  padding: 64px 48px;
+  padding: 32px; // p-8
   border-radius: 12px;
   overflow: hidden;
   text-align: center;
 
-  @media (max-width: 768px) {
-    padding: 48px 32px;
+  @media (min-width: 768px) {
+    padding: 48px; // md:p-12
   }
 
   @media (max-width: 480px) {
-    padding: 36px 24px;
+    padding: 24px;
   }
 }
 
@@ -41,20 +42,20 @@ $white: #ffffff;
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    135deg,
-    rgba(74, 144, 226, 0.08) 0%,
-    rgba(232, 244, 253, 0.3) 50%,
-    rgba(74, 144, 226, 0.08) 100%
+    to right,
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(167, 139, 250, 0.1) 50%,
+    rgba(139, 92, 246, 0.1) 100%
   );
 
   .gradient-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      to right,
-      rgba(74, 144, 226, 0.1) 0%,
-      rgba(100, 181, 246, 0.1) 50%,
-      rgba(74, 144, 226, 0.1) 100%
+      135deg,
+      rgba(139, 92, 246, 0.05) 0%,
+      rgba(167, 139, 250, 0.05) 50%,
+      rgba(139, 92, 246, 0.05) 100%
     );
   }
 }
@@ -65,14 +66,14 @@ $white: #ffffff;
 }
 
 .cta-title {
-  font-size: 44px;
+  font-size: 32px; // text-3xl
   font-weight: 700;
-  color: $text-dark;
+  color: $foreground;
   margin: 0 0 16px 0;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
-    font-size: 36px;
+  @media (min-width: 768px) {
+    font-size: 42px; // md:text-4xl
   }
 
   @media (max-width: 480px) {
@@ -80,7 +81,7 @@ $white: #ffffff;
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
+    background: linear-gradient(135deg, $accent 0%, $primary 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -89,43 +90,59 @@ $white: #ffffff;
 
 .cta-description {
   font-size: 18px;
-  color: $text-light;
-  margin: 0 0 40px 0;
+  color: $muted-foreground;
+  margin: 0 0 32px 0;
   line-height: 1.6;
-  max-width: 600px;
+  max-width: 42rem; // max-w-xl
   margin-left: auto;
   margin-right: auto;
 
-  @media (max-width: 768px) {
+  @media (min-width: 768px) {
     font-size: 16px;
     margin-bottom: 32px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 16px;
+    margin-bottom: 24px;
   }
 }
 
 .cta-actions {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 16px; // gap-4
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: center;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 
   @media (max-width: 480px) {
-    flex-direction: column;
     gap: 12px;
   }
 }
 
 .primary-cta,
 .secondary-cta {
-  height: 56px;
+  height: 56px; // size="xl"
   padding: 0 32px;
   font-size: 16px;
   font-weight: 600;
   border-radius: 8px;
   transition: all 0.3s ease;
   white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
 
   mat-icon {
-    margin-right: 8px;
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -133,23 +150,23 @@ $white: #ffffff;
 }
 
 .primary-cta {
-  background: $primary-blue;
+  background: $primary;
   color: $white;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
   }
 }
 
 .secondary-cta {
-  border: 2px solid $primary-blue;
-  color: $primary-blue;
+  border: 2px solid $primary;
+  color: $accent;
   background: transparent;
 
   &:hover {
-    background: rgba(74, 144, 226, 0.05);
+    background: rgba(139, 92, 246, 0.05);
     transform: translateY(-2px);
   }
 }

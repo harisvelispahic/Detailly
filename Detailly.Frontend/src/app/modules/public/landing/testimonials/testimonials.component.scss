@@ -1,65 +1,56 @@
 // src/app/modules/public/landing/testimonials/testimonials.component.scss
 
-$primary-blue: #4a90e2;
-$dark-blue: #2e5c8a;
-$light-blue: #e8f4fd;
-$text-dark: #1a1a1a;
-$text-light: #666666;
+$primary: #8b5cf6;
+$accent: #a78bfa;
+$background: #0f1419;
+$card: rgba(26, 31, 46, 0.5);
+$card-bg: #1a1f2e;
+$foreground: #faf9f8;
+$muted-foreground: #999999;
+$warning: #fbbf24;
 $white: #ffffff;
-$warning: #ffc107;
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 .testimonials-section {
-  padding: 80px 20px;
+  padding: 80px 20px; // py-20
   background: linear-gradient(
-    180deg,
+    to bottom,
     transparent 0%,
-    rgba(232, 244, 253, 0.5) 50%,
+    rgba(248, 250, 252, 0.5) 50%,
     transparent 100%
-  );
+  ); // bg-gradient-to-b from-transparent via-card/50 to-transparent
 
-  @media (max-width: 768px) {
-    padding: 60px 20px;
+  @media (min-width: 768px) {
+    padding: 112px 20px; // md:py-28
   }
 }
 
 .container {
-  max-width: 900px;
+  max-width: 48rem; // max-w-3xl
   margin: 0 auto;
 }
 
 .section-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 48px; // mb-12
 
-  @media (max-width: 768px) {
+  @media (min-width: 768px) {
     margin-bottom: 48px;
   }
 }
 
 .section-title {
-  font-size: 40px;
+  font-size: 32px; // text-3xl
   font-weight: 700;
-  color: $text-dark;
+  color: $foreground;
   margin: 0 0 16px 0;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
-    font-size: 32px;
+  @media (min-width: 768px) {
+    font-size: 42px; // md:text-4xl
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
+    background: linear-gradient(135deg, $accent 0%, $primary 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -68,25 +59,30 @@ $warning: #ffc107;
 
 .section-subtitle {
   font-size: 16px;
-  color: $text-light;
+  color: $muted-foreground;
   margin: 0;
+  max-width: 42rem; // max-w-2xl
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 .testimonial-carousel {
   position: relative;
+  margin-bottom: 24px;
 }
 
 .review-card {
-  padding: 48px 40px;
-  background: $white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  padding: 32px; // p-8
+  background: rgba(26, 31, 46, 0.6); // variant="glass"
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   text-align: center;
-  animation: fadeInUp 0.6s ease-out;
+  backdrop-filter: blur(10px);
 
-  @media (max-width: 768px) {
-    padding: 36px 24px;
+  @media (min-width: 768px) {
+    padding: 32px;
   }
 
   @media (max-width: 480px) {
@@ -101,14 +97,14 @@ $warning: #ffc107;
   margin-bottom: 24px;
 
   mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
     color: rgba(0, 0, 0, 0.15);
-    transition: color 0.2s ease;
 
     &.filled {
       color: $warning;
+      fill: $warning;
     }
   }
 }
@@ -116,13 +112,23 @@ $warning: #ffc107;
 .review-text {
   font-size: 18px;
   line-height: 1.8;
-  color: $text-dark;
-  margin: 0 0 32px 0;
+  color: $foreground;
+  margin: 0 0 24px 0;
   font-style: italic;
 
   @media (max-width: 768px) {
     font-size: 16px;
     margin-bottom: 24px;
+  }
+
+  &::before {
+    content: '"';
+    margin-right: 4px;
+  }
+
+  &::after {
+    content: '"';
+    margin-left: 4px;
   }
 }
 
@@ -130,7 +136,7 @@ $warning: #ffc107;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 12px; // gap-3
 }
 
 .reviewer-avatar {
@@ -138,7 +144,8 @@ $warning: #ffc107;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid $primary-blue;
+  border: 2px solid $accent;
+  /* TODO: Add reviewer avatar image here */
 }
 
 .reviewer-details {
@@ -148,45 +155,52 @@ $warning: #ffc107;
 .reviewer-name {
   font-size: 16px;
   font-weight: 600;
-  color: $text-dark;
+  color: $foreground;
   margin: 0;
+  padding: 0;
 }
 
 .reviewer-service {
-  font-size: 13px;
-  color: $text-light;
-  margin: 2px 0 0 0;
+  font-size: 14px;
+  color: $muted-foreground;
+  margin: 4px 0 0 0;
+  padding: 0;
 }
 
 .carousel-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  margin-top: 32px;
+  gap: 16px; // gap-4
+  margin-top: 24px;
 
   @media (max-width: 480px) {
-    gap: 16px;
+    gap: 12px;
   }
 }
 
 .nav-button {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: $light-blue;
+  background: rgba(139, 92, 246, 0.1);
+  border: none;
+  cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-    color: $primary-blue;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: $primary;
   }
 
   &:hover:not(:disabled) {
-    background: $primary-blue;
-    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    background: $primary;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 
     mat-icon {
       color: $white;
@@ -199,29 +213,27 @@ $warning: #ffc107;
   }
 }
 
-.dot-indicators {
+.carousel-dots {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.2);
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
+  transition: background 0.3s ease;
 
   &.active {
-    background: $primary-blue;
-    width: 32px;
-    border-radius: 5px;
+    background: $primary;
   }
 
   &:hover {
-    background: rgba(74, 144, 226, 0.5);
+    background: $primary;
   }
 }

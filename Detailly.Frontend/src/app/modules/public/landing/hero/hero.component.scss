@@ -1,11 +1,12 @@
 // src/app/modules/public/landing/hero/hero.component.scss
 
-$primary-blue: #4a90e2;
-$dark-blue: #2e5c8a;
-$accent-blue: #64b5f6;
-$light-blue: #e8f4fd;
-$text-dark: #1a1a1a;
-$text-light: #666666;
+$primary: #8b5cf6;
+$accent: #a78bfa;
+$background: #0f1419;
+$card-bg: #1a1f2e;
+$foreground: #faf9f8;
+$muted-foreground: #999999;
+$warning: #fbbf24;
 $white: #ffffff;
 
 .hero-section {
@@ -13,129 +14,99 @@ $white: #ffffff;
   min-height: 90vh;
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
-  padding: 60px 20px;
 
   @media (max-width: 768px) {
-    min-height: 60vh;
-    padding: 40px 20px;
+    min-height: 90vh;
   }
 }
 
 .hero-background {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #f5faff 0%, #ffffff 50%, #e8f4fd 100%);
 
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* TODO: Add hero background image here */
+  }
+
+  // Gradient overlays matching React: from-background via-background/80 to-background/40
   .gradient-overlay {
     position: absolute;
-    opacity: 0.6;
+    inset: 0;
 
     &.gradient-1 {
-      top: -50%;
-      right: -20%;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: pulse 8s ease-in-out infinite;
+      background: linear-gradient(
+        to right,
+        rgba($background, 1) 0%,
+        rgba($background, 0.8) 50%,
+        rgba($background, 0.4) 100%
+      );
     }
 
     &.gradient-2 {
-      bottom: -30%;
-      left: -10%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(100, 181, 246, 0.08) 0%, transparent 70%);
-      border-radius: 50%;
-      animation: pulse 10s ease-in-out infinite 2s;
+      background: linear-gradient(
+        to bottom,
+        rgba($background, 0) 0%,
+        rgba($background, 0) 50%,
+        rgba($background, 1) 100%
+      );
     }
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 20px;
   position: relative;
   z-index: 10;
 }
 
 .hero-content {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.hero-text {
-  max-width: 600px;
+  max-width: 42rem; // max-w-2xl equivalent
 }
 
 .badge-container {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 24px;
-  padding: 10px 16px;
-  background: rgba(74, 144, 226, 0.1);
-  border-radius: 20px;
-  width: fit-content;
-
-  @media (max-width: 768px) {
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-.badge-icon {
-  font-size: 16px;
-  width: 16px;
-  height: 16px;
-  color: $primary-blue;
-}
-
-.badge-text {
+  padding: 8px 16px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 9999px; // Essentially full rounded
   font-size: 14px;
   font-weight: 500;
-  color: $primary-blue;
+  color: $accent;
+  width: fit-content;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .hero-title {
-  font-size: 56px;
+  font-size: 36px; // text-4xl
   font-weight: 700;
   line-height: 1.2;
-  color: $text-dark;
+  color: $foreground;
   margin: 0 0 24px 0;
-  letter-spacing: -0.5px;
 
-  @media (max-width: 768px) {
-    font-size: 36px;
+  @media (min-width: 768px) {
+    font-size: 48px; // md:text-5xl
   }
 
-  @media (max-width: 480px) {
-    font-size: 28px;
+  @media (min-width: 1024px) {
+    font-size: 56px; // lg:text-6xl
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $primary-blue 0%, $dark-blue 100%);
+    background: linear-gradient(135deg, $accent 0%, $primary 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -143,25 +114,24 @@ $white: #ffffff;
 }
 
 .hero-description {
-  font-size: 18px;
-  line-height: 1.7;
-  color: $text-light;
+  font-size: 18px; // text-lg
+  line-height: 1.6;
+  color: $muted-foreground;
   margin: 0 0 32px 0;
-  max-width: 550px;
 
-  @media (max-width: 768px) {
-    font-size: 16px;
+  @media (min-width: 768px) {
+    font-size: 20px; // md:text-xl
   }
 }
 
 .hero-actions {
   display: flex;
+  flex-direction: column;
   gap: 16px;
   margin-bottom: 48px;
 
-  @media (max-width: 480px) {
-    flex-direction: column;
-    gap: 12px;
+  @media (min-width: 640px) {
+    flex-direction: row;
   }
 }
 
@@ -173,9 +143,15 @@ $white: #ffffff;
   font-weight: 600;
   border-radius: 8px;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
 
   mat-icon {
-    margin-right: 8px;
     font-size: 20px;
     width: 20px;
     height: 20px;
@@ -183,70 +159,62 @@ $white: #ffffff;
 }
 
 .cta-button {
-  background: $primary-blue;
+  background: $primary;
   color: $white;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
   }
 }
 
 .secondary-button {
-  border: 2px solid $primary-blue;
-  color: $primary-blue;
+  border: 2px solid $primary;
+  color: $accent;
   background: transparent;
 
   &:hover {
-    background-color: rgba(74, 144, 226, 0.05);
+    background: rgba(139, 92, 246, 0.05);
     transform: translateY(-2px);
   }
 }
 
 .stats-row {
   display: flex;
-  gap: 48px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(26, 26, 26, 0.1);
-
-  @media (max-width: 768px) {
-    gap: 32px;
-    padding-top: 32px;
-  }
+  gap: 32px; // gap-8 = 32px
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08); // border-white/10
 
   @media (max-width: 480px) {
-    justify-content: space-around;
     gap: 16px;
+    justify-content: space-around;
   }
 }
 
 .stat-item {
-  &:first-child {
-    flex: 1;
+  flex: 1;
 
-    @media (max-width: 480px) {
-      flex: 0;
-    }
+  @media (max-width: 480px) {
+    flex: auto;
   }
 }
 
 .stat-number {
-  font-size: 32px;
+  font-size: 30px; // text-3xl
   font-weight: 700;
-  color: $primary-blue;
+  color: $primary;
   line-height: 1;
-  margin-bottom: 4px;
+  margin: 0 0 4px 0;
 
-  @media (max-width: 768px) {
-    font-size: 24px;
+  @media (min-width: 768px) {
   }
 }
 
 .stat-label {
-  font-size: 12px;
-  color: $text-light;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 600;
+  font-size: 14px;
+  color: $muted-foreground;
+  font-weight: 500;
+  line-height: 1.4;
 }

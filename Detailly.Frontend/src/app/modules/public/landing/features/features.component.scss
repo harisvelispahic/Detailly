@@ -1,28 +1,19 @@
 // src/app/modules/public/landing/features/features.component.scss
 
-$primary-blue: #4a90e2;
-$light-blue: #e8f4fd;
-$text-dark: #1a1a1a;
-$text-light: #666666;
+$primary: #8b5cf6;
+$accent: #a78bfa;
+$background: #0f1419;
+$card-bg: #1a1f2e;
+$foreground: #faf9f8;
+$muted-foreground: #999999;
 $white: #ffffff;
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .features-section {
-  padding: 80px 20px;
-  background: $white;
+  padding: 80px 20px; // py-20
+  background: $background;
 
-  @media (max-width: 768px) {
-    padding: 60px 20px;
+  @media (min-width: 768px) {
+    padding: 112px 20px; // md:py-28
   }
 }
 
@@ -33,26 +24,26 @@ $white: #ffffff;
 
 .section-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 48px; // mb-12
 
-  @media (max-width: 768px) {
+  @media (min-width: 768px) {
     margin-bottom: 48px;
   }
 }
 
 .section-title {
-  font-size: 40px;
+  font-size: 32px; // text-3xl
   font-weight: 700;
-  color: $text-dark;
+  color: $foreground;
   margin: 0 0 16px 0;
   line-height: 1.2;
 
-  @media (max-width: 768px) {
-    font-size: 32px;
+  @media (min-width: 768px) {
+    font-size: 42px; // md:text-4xl
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $primary-blue 0%, #2e5c8a 100%);
+    background: linear-gradient(135deg, $accent 0%, $primary 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -61,39 +52,43 @@ $white: #ffffff;
 
 .section-subtitle {
   font-size: 16px;
-  color: $text-light;
+  color: $muted-foreground;
   margin: 0;
-  max-width: 500px;
+  max-width: 42rem; // max-w-2xl
   margin-left: auto;
   margin-right: auto;
+  line-height: 1.6;
 }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
+  grid-template-columns: 1fr; // grid-cols-1
+  gap: 24px; // gap-6
 
-  @media (max-width: 768px) {
-    gap: 24px;
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr); // md:grid-cols-2
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr); // lg:grid-cols-4
   }
 }
 
 .feature-card {
-  padding: 32px;
-  background: $white;
+  padding: 24px; // p-6
+  background: $card-bg;
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
-  animation: fadeInUp 0.6s ease-out forwards;
-  opacity: 0;
+  height: 100%;
 
   &:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 
     .feature-icon {
-      background: $primary-blue;
+      background: $primary;
       color: $white;
 
       mat-icon {
@@ -104,36 +99,37 @@ $white: #ffffff;
 }
 
 .feature-icon {
-  width: 64px;
-  height: 64px;
-  background: $light-blue;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  background: rgba(139, 92, 246, 0.1); // bg-primary/10
+  border-radius: 8px; // rounded-xl equivalent
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   transition: all 0.3s ease;
-  color: $primary-blue;
+  color: $primary;
 
   mat-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
-    color: $primary-blue;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: $primary;
     transition: all 0.3s ease;
   }
 }
 
 .feature-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  color: $text-dark;
-  margin: 0 0 12px 0;
+  color: $foreground;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
 }
 
 .feature-description {
   font-size: 14px;
-  color: $text-light;
+  color: $muted-foreground;
   line-height: 1.6;
   margin: 0;
 }
