@@ -1,0 +1,12 @@
+.textarea-wrapper {
+  display: block;
+}
+
+.textarea-element {
+  font-family: inherit;
+  font-size: inherit;
+
+  &::placeholder {
+    color: inherit;
+  }
+}

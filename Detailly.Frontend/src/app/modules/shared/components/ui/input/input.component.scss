@@ -1,0 +1,25 @@
+.input-wrapper {
+  display: block;
+}
+
+.input-element {
+  font-family: inherit;
+
+  &::placeholder {
+    color: inherit;
+  }
+
+  /* File input styling */
+  &::file-selector-button {
+    border: 0;
+    background-color: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

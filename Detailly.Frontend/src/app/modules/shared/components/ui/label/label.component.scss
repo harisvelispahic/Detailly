@@ -1,0 +1,15 @@
+.label-element {
+  display: block;
+  cursor: pointer;
+}
+
+.label-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.required-indicator {
+  color: var(--color-destructive, #ef4444);
+  margin-left: 0.25rem;
+  font-weight: 600;
+}

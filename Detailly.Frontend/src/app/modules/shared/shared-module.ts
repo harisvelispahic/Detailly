@@ -10,12 +10,52 @@ import { DialogHelperService } from './services/dialog-helper.service';
 import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading-bar.component';
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
 
+// UI Primitives
+import { ButtonComponent } from './components/ui/button/button.component';
+import { BadgeComponent } from './components/ui/badge/badge.component';
+import { CardComponent } from './components/ui/card/card.component';
+import { CardHeaderComponent } from './components/ui/card/card-header.component';
+import { CardTitleComponent } from './components/ui/card/card-title.component';
+import { CardDescriptionComponent } from './components/ui/card/card-description.component';
+import { CardContentComponent } from './components/ui/card/card-content.component';
+import { CardFooterComponent } from './components/ui/card/card-footer.component';
+import { InputComponent } from './components/ui/input/input.component';
+import { LabelComponent } from './components/ui/label/label.component';
+import { SeparatorComponent } from './components/ui/separator/separator.component';
+import { TabsComponent } from './components/ui/tabs/tabs.component';
+import { TabsListComponent } from './components/ui/tabs/tabs-list.component';
+import { TabsTriggerComponent } from './components/ui/tabs/tabs-trigger.component';
+import { TabsContentComponent } from './components/ui/tabs/tabs-content.component';
+import { ContainerComponent } from './components/ui/container/container.component';
+import { TextareaComponent } from './components/ui/textarea/textarea.component';
+
+const UI_COMPONENTS = [
+  ButtonComponent,
+  BadgeComponent,
+  CardComponent,
+  CardHeaderComponent,
+  CardTitleComponent,
+  CardDescriptionComponent,
+  CardContentComponent,
+  CardFooterComponent,
+  InputComponent,
+  LabelComponent,
+  SeparatorComponent,
+  TabsComponent,
+  TabsListComponent,
+  TabsTriggerComponent,
+  TabsContentComponent,
+  ContainerComponent,
+  TextareaComponent,
+];
+
 @NgModule({
   declarations: [
     FitPaginatorBarComponent,
     FitConfirmDialogComponent,
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
+    ...UI_COMPONENTS,
   ],
   imports: [
     CommonModule,
@@ -36,6 +76,7 @@ import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-t
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
     ...materialModules,
+    ...UI_COMPONENTS,
   ],
 })
 export class SharedModule {}
