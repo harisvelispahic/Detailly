@@ -1,0 +1,15 @@
+.public-layout {
+  min-height: 100vh;
+  background: hsl(var(--background));
+}
+
+.public-layout__main {
+  min-height: 100vh;
+  padding-top: 4rem;
+}
+
+@media (min-width: 768px) {
+  .public-layout__main {
+    padding-top: 5rem;
+  }
+}

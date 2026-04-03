@@ -10,6 +10,8 @@ import { ServicesComponent } from './landing/services/services.component';
 import { PricingComponent } from './landing/pricing/pricing.component';
 import { TestimonialsComponent } from './landing/testimonials/testimonials.component';
 import { FinalCtaComponent } from './landing/final-cta/final-cta.component';
+import { PublicLayoutComponent } from './public-layout/public-layout.component';
+import { PublicNavbarComponent } from './public-navbar/public-navbar.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { FinalCtaComponent } from './landing/final-cta/final-cta.component';
     PricingComponent,
     TestimonialsComponent,
     FinalCtaComponent,
+    PublicLayoutComponent,
+    PublicNavbarComponent,
   ],
   imports: [SharedModule, PublicRoutingModule],
 })

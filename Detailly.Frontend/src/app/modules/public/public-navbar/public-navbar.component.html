@@ -1,0 +1,102 @@
+<nav class="public-navbar">
+  <div class="public-navbar__container">
+    <div class="public-navbar__content">
+      <a class="brand" routerLink="/" aria-label="Detailly home">
+        <span class="brand__mark">D</span>
+        <span class="brand__text">Detailly</span>
+      </a>
+
+      <div class="nav-links nav-links--desktop">
+        <a
+          *ngFor="let link of navLinks"
+          [routerLink]="link.route"
+          class="nav-link"
+          [class.nav-link--active]="isLinkActive(link)"
+          [attr.aria-current]="isLinkActive(link) ? 'page' : null"
+          [class.nav-link--hidden]="!isLinkVisible(link)"
+        >
+          {{ link.label }}
+        </a>
+      </div>
+
+      <div class="public-navbar__actions">
+        <div *ngIf="isAuthenticated()" class="account-actions account-actions--desktop">
+          <app-badge *ngIf="isAdmin() || isManager() || isEmployee()" variant="outline">
+            <span class="role-badge">
+              <mat-icon>admin_panel_settings</mat-icon>
+              {{ getRoleLabel() }}
+            </span>
+          </app-badge>
+
+          <a [routerLink]="getAccountRoute()" class="icon-button" aria-label="Open account area">
+            <mat-icon>person</mat-icon>
+          </a>
+
+          <button type="button" class="icon-button" (click)="logout()" aria-label="Sign out">
+            <mat-icon>logout</mat-icon>
+          </button>
+        </div>
+
+        <a *ngIf="!isAuthenticated()" routerLink="/auth/login" class="icon-button account-actions--desktop">
+          <mat-icon>person</mat-icon>
+        </a>
+
+        <button
+          type="button"
+          class="icon-button mobile-toggle"
+          (click)="toggleMobileMenu()"
+          [attr.aria-expanded]="isMenuOpen"
+          aria-label="Toggle navigation menu"
+        >
+          <mat-icon>{{ isMenuOpen ? 'close' : 'menu' }}</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-menu" [class.mobile-menu--open]="isMenuOpen">
+    <div class="mobile-menu__content">
+      <a
+        *ngFor="let link of navLinks"
+        [routerLink]="link.route"
+        class="mobile-link"
+        [class.mobile-link--active]="isLinkActive(link)"
+        [class.mobile-link--hidden]="!isLinkVisible(link)"
+        (click)="closeMobileMenu()"
+      >
+        <mat-icon>{{ link.icon }}</mat-icon>
+        <span>{{ link.label }}</span>
+      </a>
+
+      <div class="mobile-menu__actions">
+        <ng-container *ngIf="isAuthenticated(); else guestActions">
+          <div *ngIf="isAdmin() || isManager() || isEmployee()" class="mobile-role">
+            <app-badge variant="outline">
+              <span class="role-badge">
+                <mat-icon>admin_panel_settings</mat-icon>
+                {{ getRoleLabel() }} Mode
+              </span>
+            </app-badge>
+          </div>
+
+          <a [routerLink]="getAccountRoute()" class="mobile-action mobile-action--outline" (click)="closeMobileMenu()">
+            <mat-icon>dashboard</mat-icon>
+            <span>My Account</span>
+          </a>
+
+          <button type="button" class="mobile-action mobile-action--ghost" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Sign Out <span *ngIf="currentUser()?.email">({{ currentUser()?.email }})</span></span>
+          </button>
+        </ng-container>
+
+        <ng-template #guestActions>
+          <a routerLink="/auth/login" class="mobile-action mobile-action--outline" (click)="closeMobileMenu()">
+            <mat-icon>person</mat-icon>
+            <span>Sign In</span>
+          </a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</nav>
