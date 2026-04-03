@@ -8,6 +8,6 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class CardContentComponent {
   @HostBinding('class') get hostClasses(): string {
-    return 'p-6 pt-0 card-content-element';
+    return 'card-content';
   }
 }

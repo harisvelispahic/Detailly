@@ -25,10 +25,9 @@ export class SeparatorComponent {
   }
 
   private getSeparatorClasses(): string {
-    const baseClasses = 'shrink-0 bg-border';
+    const baseClasses = 'separator-element';
     const orientationClasses =
-      this.orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]';
-
-    return `${baseClasses} ${orientationClasses} separator-element`;
+      this.orientation === 'horizontal' ? 'separator-horizontal' : 'separator-vertical';
+    return `${baseClasses} ${orientationClasses}`;
   }
 }

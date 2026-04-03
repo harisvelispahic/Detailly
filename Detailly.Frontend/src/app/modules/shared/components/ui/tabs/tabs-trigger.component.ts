@@ -33,13 +33,9 @@ export class TabsTriggerComponent {
   }
 
   private getTriggerClasses(): string {
-    const baseClasses =
-      'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
-
-    const stateClasses = this.isActive
-      ? 'bg-background text-foreground shadow-sm'
-      : 'text-muted-foreground hover:text-foreground';
-
-    return `${baseClasses} ${stateClasses} tabs-trigger-element`;
+    const baseClass = 'tabs-trigger-element';
+    const stateClass = this.isActive ? 'tabs-trigger-active' : 'tabs-trigger-inactive';
+    const disabledClass = this.disabled ? 'tabs-trigger-disabled' : '';
+    return `${baseClass} ${stateClass} ${disabledClass}`.trim();
   }
 }

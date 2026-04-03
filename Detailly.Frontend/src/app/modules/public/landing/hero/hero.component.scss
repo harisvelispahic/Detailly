@@ -1,14 +1,5 @@
 // src/app/modules/public/landing/hero/hero.component.scss
 
-$primary: #8b5cf6;
-$accent: #a78bfa;
-$background: #0f1419;
-$card-bg: #1a1f2e;
-$foreground: #faf9f8;
-$muted-foreground: #999999;
-$warning: #fbbf24;
-$white: #ffffff;
-
 .hero-section {
   position: relative;
   min-height: 90vh;
@@ -41,18 +32,18 @@ $white: #ffffff;
     &.gradient-1 {
       background: linear-gradient(
         to right,
-        rgba($background, 1) 0%,
-        rgba($background, 0.8) 50%,
-        rgba($background, 0.4) 100%
+        hsl(var(--background) / 1) 0%,
+        hsl(var(--background) / 0.8) 50%,
+        hsl(var(--background) / 0.4) 100%
       );
     }
 
     &.gradient-2 {
       background: linear-gradient(
         to bottom,
-        rgba($background, 0) 0%,
-        rgba($background, 0) 50%,
-        rgba($background, 1) 100%
+        hsl(var(--background) / 0) 0%,
+        hsl(var(--background) / 0) 50%,
+        hsl(var(--background) / 1) 100%
       );
     }
   }
@@ -76,11 +67,11 @@ $white: #ffffff;
   gap: 8px;
   margin-bottom: 24px;
   padding: 8px 16px;
-  background: rgba(139, 92, 246, 0.1);
+  background: hsl(var(--accent) / 0.1);
   border-radius: 9999px; // Essentially full rounded
   font-size: 14px;
   font-weight: 500;
-  color: $accent;
+  color: hsl(var(--accent));
   width: fit-content;
 
   mat-icon {
@@ -94,7 +85,7 @@ $white: #ffffff;
   font-size: 36px; // text-4xl
   font-weight: 700;
   line-height: 1.2;
-  color: $foreground;
+  color: hsl(var(--foreground));
   margin: 0 0 24px 0;
 
   @media (min-width: 768px) {
@@ -106,7 +97,7 @@ $white: #ffffff;
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $accent 0%, $primary 100%);
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -116,7 +107,7 @@ $white: #ffffff;
 .hero-description {
   font-size: 18px; // text-lg
   line-height: 1.6;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   margin: 0 0 32px 0;
 
   @media (min-width: 768px) {
@@ -159,23 +150,23 @@ $white: #ffffff;
 }
 
 .cta-button {
-  background: $primary;
-  color: $white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3) !important;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px hsl(var(--primary) / 0.4) !important;
   }
 }
 
 .secondary-button {
-  border: 2px solid $primary;
-  color: $accent;
-  background: transparent;
+  border: 2px solid hsl(var(--primary)) !important;
+  color: hsl(var(--accent)) !important;
+  background: transparent !important;
 
   &:hover {
-    background: rgba(139, 92, 246, 0.05);
+    background: hsl(var(--primary) / 0.05) !important;
     transform: translateY(-2px);
   }
 }
@@ -185,7 +176,7 @@ $white: #ffffff;
   gap: 32px; // gap-8 = 32px
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08); // border-white/10
+  border-top: 1px solid hsl(var(--foreground) / 0.1); // border-white/10
 
   @media (max-width: 480px) {
     gap: 16px;
@@ -204,7 +195,7 @@ $white: #ffffff;
 .stat-number {
   font-size: 30px; // text-3xl
   font-weight: 700;
-  color: $primary;
+  color: hsl(var(--primary));
   line-height: 1;
   margin: 0 0 4px 0;
 
@@ -214,7 +205,7 @@ $white: #ffffff;
 
 .stat-label {
   font-size: 14px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   font-weight: 500;
   line-height: 1.4;
 }

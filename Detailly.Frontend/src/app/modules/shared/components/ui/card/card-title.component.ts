@@ -8,6 +8,6 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class CardTitleComponent {
   @HostBinding('class') get hostClasses(): string {
-    return 'text-2xl font-semibold leading-none tracking-tight font-display card-title-element';
+    return 'card-title';
   }
 }

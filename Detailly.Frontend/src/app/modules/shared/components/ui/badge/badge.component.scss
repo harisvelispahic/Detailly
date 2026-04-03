@@ -1,3 +1,118 @@
+// ===========================
+// BADGE BASE STYLES
+// ===========================
+
 .badge-element {
   display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+
+  &:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring));
+  }
+}
+
+// ===========================
+// BADGE VARIANTS
+// ===========================
+
+.badge-variant-default {
+  border-color: transparent;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+
+  &:hover {
+    background-color: hsl(var(--primary) / 0.8);
+  }
+}
+
+.badge-variant-secondary {
+  border-color: transparent;
+  background-color: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+
+  &:hover {
+    background-color: hsl(var(--secondary) / 0.8);
+  }
+}
+
+.badge-variant-destructive {
+  border-color: transparent;
+  background-color: hsl(var(--destructive));
+  color: hsl(var(--destructive-foreground));
+
+  &:hover {
+    background-color: hsl(var(--destructive) / 0.8);
+  }
+}
+
+.badge-variant-outline {
+  border-color: hsl(var(--border));
+  background-color: transparent;
+  color: hsl(var(--foreground));
+}
+
+.badge-variant-success {
+  border-color: transparent;
+  background-color: hsl(var(--success) / 0.2);
+  color: hsl(var(--success));
+}
+
+.badge-variant-warning {
+  border-color: transparent;
+  background-color: hsl(var(--warning) / 0.2);
+  color: hsl(var(--warning));
+}
+
+.badge-variant-info {
+  border-color: transparent;
+  background-color: hsl(var(--info) / 0.2);
+  color: hsl(var(--info));
+}
+
+.badge-variant-pending {
+  border-color: transparent;
+  background-color: hsl(var(--warning) / 0.2);
+  color: hsl(var(--warning));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-variant-confirmed {
+  border-color: transparent;
+  background-color: hsl(var(--info) / 0.2);
+  color: hsl(var(--info));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-variant-completed {
+  border-color: transparent;
+  background-color: hsl(var(--success) / 0.2);
+  color: hsl(var(--success));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-variant-cancelled {
+  border-color: transparent;
+  background-color: hsl(var(--destructive) / 0.2);
+  color: hsl(var(--destructive));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-variant-glass {
+  border-color: hsl(var(--border) / 0.2);
+  background-color: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(12px);
+  color: hsl(var(--foreground));
 }

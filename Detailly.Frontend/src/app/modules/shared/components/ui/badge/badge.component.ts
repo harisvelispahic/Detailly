@@ -28,12 +28,8 @@ export class BadgeComponent {
   }
 
   private getBadgeClasses(): string {
-    const baseClasses =
-      'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-
-    const variantClasses = this.getVariantClasses();
-
-    return `${baseClasses} ${variantClasses}`;
+    const variantClass = `badge-variant-${this.variant}`;
+    return `badge-element ${variantClass}`;
   }
 
   private getVariantClasses(): string {

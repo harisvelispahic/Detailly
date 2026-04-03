@@ -1,3 +1,19 @@
+.separator-element {
+  display: block;
+  flex-shrink: 0;
+  background-color: hsl(var(--border));
+}
+
+.separator-horizontal {
+  height: 1px;
+  width: 100%;
+}
+
+.separator-vertical {
+  height: 100%;
+  width: 1px;
+}
+
 .separator-line {
   display: block;
 }

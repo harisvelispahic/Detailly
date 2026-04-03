@@ -165,7 +165,9 @@ $white: #ffffff;
   padding: 0;
   margin: 0 0 24px 0;
   flex: 1;
-  space-y: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .feature-item {

@@ -1,7 +1,6 @@
-.card-description-element {
+.card-description {
   display: block;
-}
-
-.card-description-text {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
   margin: 0;
 }

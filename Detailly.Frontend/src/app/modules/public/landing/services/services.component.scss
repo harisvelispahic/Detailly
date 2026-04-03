@@ -1,20 +1,11 @@
 // src/app/modules/public/landing/services/services.component.scss
 
-$primary: #8b5cf6;
-$accent: #a78bfa;
-$background: #0f1419;
-$card: rgba(26, 31, 46, 0.5);
-$card-bg: #1a1f2e;
-$foreground: #faf9f8;
-$muted-foreground: #999999;
-$white: #ffffff;
-
 .services-section {
   padding: 80px 20px; // py-20
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(248, 250, 252, 0.5) 50%,
+    hsl(var(--card) / 0.5) 50%,
     transparent 100%
   ); // bg-gradient-to-b from-transparent via-card/50 to-transparent
 
@@ -40,7 +31,7 @@ $white: #ffffff;
 .section-title {
   font-size: 32px; // text-3xl
   font-weight: 700;
-  color: $foreground;
+  color: hsl(var(--foreground));
   margin: 0 0 16px 0;
   line-height: 1.2;
 
@@ -49,7 +40,7 @@ $white: #ffffff;
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $accent 0%, $primary 100%);
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -58,7 +49,7 @@ $white: #ffffff;
 
 .section-subtitle {
   font-size: 16px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   margin: 0;
   max-width: 42rem; // max-w-2xl
   margin-left: auto;
@@ -82,10 +73,10 @@ $white: #ffffff;
 }
 
 .service-card {
-  background: $card-bg;
+  background: hsl(var(--card));
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid hsl(var(--foreground) / 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
   height: 100%;
@@ -94,7 +85,7 @@ $white: #ffffff;
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 32px hsl(0 0% 0% / 0.12);
 
     .service-image img {
       transform: scale(1.1); // group-hover:scale-110
@@ -125,7 +116,7 @@ $white: #ffffff;
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  background: $accent;
+  background: hsl(var(--accent));
   color: #000000;
   border-radius: 9999px;
   font-size: 12px;
@@ -156,7 +147,7 @@ $white: #ffffff;
 .service-name {
   font-size: 18px;
   font-weight: 600;
-  color: $foreground;
+  color: hsl(var(--foreground));
   margin: 0;
   flex: 1;
 }
@@ -164,13 +155,13 @@ $white: #ffffff;
 .service-price {
   font-size: 18px;
   font-weight: 700;
-  color: $primary;
+  color: hsl(var(--primary));
   white-space: nowrap;
 }
 
 .service-description {
   font-size: 14px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   line-height: 1.5;
   margin: 0 0 12px 0;
   display: -webkit-box;
@@ -185,7 +176,7 @@ $white: #ffffff;
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
 
   mat-icon {
     font-size: 14px;

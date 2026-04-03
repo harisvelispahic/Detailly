@@ -16,11 +16,8 @@ export class CardComponent {
   }
 
   private getCardClasses(): string {
-    const baseClasses = 'rounded-xl border text-card-foreground transition-all duration-300';
-
-    const variantClasses = this.getVariantClasses();
-
-    return `${baseClasses} ${variantClasses}`;
+    const variantClass = `card-variant-${this.variant}`;
+    return `card-element ${variantClass}`;
   }
 
   private getVariantClasses(): string {

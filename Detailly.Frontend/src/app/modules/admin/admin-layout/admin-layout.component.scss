@@ -1,39 +1,23 @@
-// Colors
-$primary-color: #4976b5;
-$primary-light: #6b92c9;
-$primary-dark: #365a8f;
-$accent-color: #5b9bd5;
-$success-color: #66bb6a;
-$error-color: #ef5350;
-$warning-color: #ffa726;
-$text-primary: #212121;
-$text-secondary: #757575;
-$text-light: #9e9e9e;
-$background-page: linear-gradient(135deg, #f0f5fb 0%, #e3ecf7 100%);
-$background-card: #ffffff;
-$border-color: #e3e8ef;
-$hover-color: #f5f8fc;
-$sidebar-bg: #ffffff;
-$sidebar-width: 280px;
+// All colors use the global design system from styles.scss
 
 // Sidenav Container
 .sidenav-container {
   height: 100vh;
   width: 100%;
-  background: $background-page;
+  background: hsl(var(--background));
 
   // Sidebar
   .sidenav {
-    width: $sidebar-width;
-    background: $sidebar-bg;
-    border-right: 1px solid $border-color;
-    box-shadow: 4px 0 16px rgba(73, 118, 181, 0.08);
+    width: 280px;
+    background: hsl(var(--card));
+    border-right: 1px solid hsl(var(--border));
+    box-shadow: 4px 0 16px hsl(0 0% 0% / 0.15);
     display: flex;
     flex-direction: column;
 
     // Sidebar Header
     .sidebar-header {
-      background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+      background: var(--gradient-primary);
       padding: 24px 20px;
       position: relative;
       overflow: hidden;
@@ -46,7 +30,7 @@ $sidebar-width: 280px;
         right: -30px;
         width: 120px;
         height: 120px;
-        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+        background: radial-gradient(circle, hsl(var(--foreground) / 0.15) 0%, transparent 70%);
         border-radius: 50%;
       }
 
@@ -85,7 +69,7 @@ $sidebar-width: 280px;
             font-size: 36px;
             width: 36px;
             height: 36px;
-            color: $background-card;
+            color: hsl(var(--foreground));
           }
         }
 
@@ -94,7 +78,7 @@ $sidebar-width: 280px;
           min-width: 0;
 
           .user-email {
-            color: $background-card;
+            color: hsl(var(--foreground));
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
@@ -155,7 +139,7 @@ $sidebar-width: 280px;
           background: rgba(255, 255, 255, 0.15);
           border-radius: 12px;
           backdrop-filter: blur(10px);
-          color: $background-card;
+          color: hsl(var(--foreground));
           width: 100%;
           height: 44px;
           display: flex;
@@ -195,17 +179,17 @@ $sidebar-width: 280px;
       }
 
       &::-webkit-scrollbar-thumb {
-        background: rgba($primary-color, 0.2);
+        background: rgba(139, 92, 246, 0.2);
         border-radius: 3px;
 
         &:hover {
-          background: rgba($primary-color, 0.3);
+          background: rgba(139, 92, 246, 0.3);
         }
       }
 
       // Section Title
       .nav-section-title {
-        color: $text-secondary;
+        color: hsl(var(--muted-foreground));
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
@@ -223,7 +207,7 @@ $sidebar-width: 280px;
         border-radius: 12px;
         margin-bottom: 4px;
         height: 48px;
-        color: $text-primary;
+        color: hsl(var(--foreground));
         transition: all 0.3s ease;
         position: relative;
         overflow: hidden;
@@ -235,12 +219,12 @@ $sidebar-width: 280px;
           top: 0;
           width: 0;
           height: 100%;
-          background: linear-gradient(90deg, $primary-color 0%, transparent 100%);
+          background: linear-gradient(90deg, hsl(var(--primary)) 0%, transparent 100%);
           transition: width 0.3s ease;
         }
 
         mat-icon[matListItemIcon] {
-          color: $text-secondary;
+          color: hsl(var(--muted-foreground));
           margin-right: 16px;
           transition: all 0.3s ease;
         }
@@ -253,10 +237,10 @@ $sidebar-width: 280px;
         }
 
         &:hover:not(.active) {
-          background-color: $hover-color;
+          background-color: hsl(var(--card) / 0.8);
 
           mat-icon[matListItemIcon] {
-            color: $primary-color;
+            color: hsl(var(--primary));
             transform: translateX(4px);
           }
         }
@@ -265,48 +249,48 @@ $sidebar-width: 280px;
         &.active {
           background: linear-gradient(
             135deg,
-            rgba($primary-color, 0.15) 0%,
-            rgba($accent-color, 0.1) 100%
+            hsl(var(--primary) / 0.15) 0%,
+            hsl(var(--accent) / 0.1) 100%
           );
-          color: $primary-color;
+          color: hsl(var(--primary));
           font-weight: 600;
-          box-shadow: 0 2px 8px rgba($primary-color, 0.15);
+          box-shadow: 0 2px 8px hsl(var(--primary) / 0.15);
 
           &::before {
             width: 4px;
           }
 
           mat-icon[matListItemIcon] {
-            color: $primary-color;
+            color: hsl(var(--primary));
             transform: scale(1.1);
           }
 
           span[matListItemTitle] {
-            color: $primary-color;
+            color: hsl(var(--primary));
           }
         }
 
         // Logout Item
         &.logout-item {
           margin-top: auto;
-          background-color: rgba($error-color, 0.05);
-          border: 1px solid rgba($error-color, 0.1);
+          background-color: hsl(var(--destructive) / 0.05);
+          border: 1px solid hsl(var(--destructive) / 0.1);
 
           mat-icon[matListItemIcon] {
-            color: $error-color;
+            color: hsl(var(--destructive));
           }
 
           span[matListItemTitle] {
-            color: $error-color;
+            color: hsl(var(--destructive));
           }
 
           &:hover {
             background: linear-gradient(
               135deg,
-              rgba($error-color, 0.15) 0%,
-              rgba($error-color, 0.1) 100%
+              hsl(var(--destructive) / 0.15) 0%,
+              hsl(var(--destructive) / 0.1) 100%
             );
-            border-color: rgba($error-color, 0.3);
+            border-color: hsl(var(--destructive) / 0.3);
             transform: translateX(4px);
 
             mat-icon[matListItemIcon] {
@@ -319,7 +303,7 @@ $sidebar-width: 280px;
       // Divider
       mat-divider {
         margin: 16px 0;
-        background-color: $border-color;
+        background-color: hsl(var(--border));
       }
     }
   }
@@ -340,11 +324,11 @@ $sidebar-width: 280px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba($primary-color, 0.3);
+      background: rgba(139, 92, 246, 0.3);
       border-radius: 4px;
 
       &:hover {
-        background: rgba($primary-color, 0.5);
+        background: rgba(139, 92, 246, 0.5);
       }
     }
   }
@@ -383,7 +367,7 @@ $sidebar-width: 280px;
 
       .check-icon {
         margin-left: auto;
-        color: $success-color;
+        color: hsl(var(--success));
         font-size: 20px;
         width: 20px;
         height: 20px;
@@ -392,15 +376,15 @@ $sidebar-width: 280px;
       &.active-lang {
         background: linear-gradient(
           135deg,
-          rgba($primary-color, 0.1) 0%,
-          rgba($accent-color, 0.05) 100%
+          hsl(var(--primary) / 0.1) 0%,
+          hsl(var(--accent) / 0.05) 100%
         );
-        color: $primary-color;
+        color: hsl(var(--primary));
         font-weight: 600;
       }
 
       &:hover {
-        background-color: $hover-color;
+        background-color: hsl(var(--card) / 0.8);
       }
     }
   }
@@ -487,11 +471,7 @@ $sidebar-width: 280px;
       border-right-color: #3a4255;
 
       .sidebar-header {
-        background: linear-gradient(
-          135deg,
-          darken($primary-color, 15%) 0%,
-          darken($primary-dark, 15%) 100%
-        );
+        background: var(--gradient-primary);
       }
 
       mat-nav-list {
@@ -505,14 +485,14 @@ $sidebar-width: 280px;
           &.active {
             background: linear-gradient(
               135deg,
-              rgba($primary-color, 0.25) 0%,
-              rgba($accent-color, 0.15) 100%
+              hsl(var(--primary) / 0.25) 0%,
+              hsl(var(--accent) / 0.15) 100%
             );
           }
         }
 
         .nav-section-title {
-          color: #8891a0;
+          color: hsl(var(--muted-foreground));
         }
       }
     }

@@ -17,12 +17,9 @@ export class ContainerComponent {
   }
 
   private getContainerClasses(): string {
-    const baseClasses = 'mx-auto';
-
-    const sizeClasses = this.getSizeClasses();
-    const paddingClasses = this.padding ? 'px-4 md:px-6' : '';
-
-    return `${baseClasses} ${sizeClasses} ${paddingClasses} container-element`;
+    const sizeClass = `container-${this.size}`;
+    const paddingClass = this.padding ? 'container-with-padding' : '';
+    return `container-element ${sizeClass} ${paddingClass}`.trim();
   }
 
   private getSizeClasses(): string {

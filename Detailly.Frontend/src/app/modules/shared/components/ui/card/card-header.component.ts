@@ -8,6 +8,6 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class CardHeaderComponent {
   @HostBinding('class') get hostClasses(): string {
-    return 'flex flex-col space-y-1.5 p-6 card-header-element';
+    return 'card-header';
   }
 }

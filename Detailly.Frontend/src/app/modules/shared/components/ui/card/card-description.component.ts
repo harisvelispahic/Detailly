@@ -8,6 +8,6 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class CardDescriptionComponent {
   @HostBinding('class') get hostClasses(): string {
-    return 'text-sm text-muted-foreground card-description-element';
+    return 'card-description';
   }
 }

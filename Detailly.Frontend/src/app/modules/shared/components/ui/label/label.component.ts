@@ -11,6 +11,6 @@ export class LabelComponent {
   @Input() required: boolean = false;
 
   @HostBinding('class') get hostClasses(): string {
-    return 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 label-element';
+    return 'label-element';
   }
 }

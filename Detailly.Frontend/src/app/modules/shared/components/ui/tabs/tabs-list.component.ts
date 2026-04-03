@@ -8,7 +8,7 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class TabsListComponent {
   @HostBinding('class') get hostClasses(): string {
-    return 'inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground tabs-list-element';
+    return 'tabs-list-element';
   }
 
   @HostBinding('attr.role') role = 'tablist';

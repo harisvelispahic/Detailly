@@ -1,8 +1,40 @@
 .container-element {
   display: block;
   width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .container-wrapper {
   width: 100%;
+}
+
+.container-sm {
+  max-width: 24rem;
+}
+
+.container-md {
+  max-width: 28rem;
+}
+
+.container-lg {
+  max-width: 56rem;
+}
+
+.container-xl {
+  max-width: 80rem;
+}
+
+.container-full {
+  width: 100%;
+}
+
+.container-with-padding {
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  @media (min-width: 768px) {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
