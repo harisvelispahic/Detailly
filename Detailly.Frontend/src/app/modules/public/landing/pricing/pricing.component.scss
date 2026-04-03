@@ -1,16 +1,8 @@
 // src/app/modules/public/landing/pricing/pricing.component.scss
 
-$primary: #8b5cf6;
-$accent: #a78bfa;
-$background: #0f1419;
-$card-bg: #1a1f2e;
-$foreground: #faf9f8;
-$muted-foreground: #999999;
-$white: #ffffff;
-
 .pricing-section {
   padding: 80px 20px; // py-20
-  background: $background;
+  background: hsl(var(--background));
 
   @media (min-width: 768px) {
     padding: 112px 20px; // md:py-28
@@ -34,7 +26,7 @@ $white: #ffffff;
 .section-title {
   font-size: 32px; // text-3xl
   font-weight: 700;
-  color: $foreground;
+  color: hsl(var(--foreground));
   margin: 0 0 16px 0;
   line-height: 1.2;
 
@@ -43,7 +35,7 @@ $white: #ffffff;
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, $accent 0%, $primary 100%);
+    background: var(--gradient-accent);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -52,7 +44,7 @@ $white: #ffffff;
 
 .section-subtitle {
   font-size: 16px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   margin: 0;
   max-width: 42rem; // max-w-2xl
   margin-left: auto;
@@ -79,8 +71,8 @@ $white: #ffffff;
 .pricing-card {
   position: relative;
   padding: 24px; // p-6
-  background: $card-bg;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 0.5);
   border-radius: 12px;
   transition: all 0.3s ease;
   display: flex;
@@ -89,20 +81,20 @@ $white: #ffffff;
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 32px hsl(0 0% 0% / 0.3);
   }
 
   &.popular {
-    border-color: $primary;
+    border-color: hsl(var(--primary));
     border-width: 2px;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); // glow-primary
+    box-shadow: var(--glow-primary);
 
     @media (min-width: 768px) {
       transform: none;
     }
 
     &:hover {
-      box-shadow: 0 12px 40px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 12px 40px hsl(var(--primary) / 0.4);
       transform: translateY(-8px);
     }
   }
@@ -114,8 +106,8 @@ $white: #ffffff;
   left: 50%;
   transform: translateX(-50%);
   padding: 6px 16px;
-  background: $accent;
-  color: #000000;
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 600;
@@ -129,13 +121,13 @@ $white: #ffffff;
 .tier-name {
   font-size: 20px;
   font-weight: 600;
-  color: $foreground;
+  color: hsl(var(--foreground));
   margin: 0 0 8px 0;
 }
 
 .tier-description {
   font-size: 14px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   margin: 0;
   line-height: 1.5;
 }
@@ -149,14 +141,14 @@ $white: #ffffff;
   display: block;
   font-size: 36px; // text-4xl
   font-weight: 700;
-  color: $primary;
+  color: hsl(var(--primary));
   line-height: 1;
   margin: 0;
 }
 
 .price-unit {
   font-size: 14px;
-  color: $muted-foreground;
+  color: hsl(var(--muted-foreground));
   font-weight: 500;
 }
 
@@ -176,34 +168,8 @@ $white: #ffffff;
   gap: 12px;
   padding: 12px 0;
   font-size: 14px;
-  color: $foreground;
+  color: hsl(var(--foreground));
   line-height: 1.5;
-
-  &::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgba(139, 92, 246, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    margin-top: 2px;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: $primary;
-    border-radius: 50%;
-    left: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 }
 
 .cta-button {
@@ -223,23 +189,69 @@ $white: #ffffff;
 }
 
 .cta-button-primary {
-  background: $primary;
-  color: $white;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 20px hsl(var(--primary) / 0.4);
   }
 }
 
 .cta-button-outline {
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: $foreground;
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
   background: transparent;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: hsl(var(--secondary));
     transform: translateY(-2px);
   }
+}
+
+// Book Now button styles
+.book-btn {
+  width: 100%;
+  height: 48px;
+  padding: 0 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+
+  &:hover {
+    background: hsl(var(--secondary) / 0.8) !important;
+    transform: translateY(-2px);
+  }
+
+  &.popular-btn {
+    background: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+
+    &:hover {
+      background: hsl(var(--primary) / 0.9) !important;
+      box-shadow: 0 6px 20px hsl(var(--primary) / 0.4);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Check icon styling for feature items
+.check-icon {
+  color: hsl(var(--primary)) !important;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  font-variation-settings: 'FILL' 1;
 }

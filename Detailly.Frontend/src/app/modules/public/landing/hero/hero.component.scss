@@ -5,12 +5,8 @@
   min-height: 90vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow: hidden;
-
-  @media (max-width: 768px) {
-    min-height: 90vh;
-  }
 }
 
 .hero-background {
@@ -51,10 +47,21 @@
 
 .container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  margin: 0 10%;
+  padding: 0 40px;
   position: relative;
   z-index: 10;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    padding: 0 20px;
+    margin: 0;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0 16px;
+    margin: 0;
+  }
 }
 
 .hero-content {

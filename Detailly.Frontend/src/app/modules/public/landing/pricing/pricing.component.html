@@ -15,7 +15,6 @@
         *ngFor="let tier of pricingTiers; let i = index"
         class="pricing-card"
         [class.popular]="tier.popular"
-        [style.animation-delay]="i * 100 + 'ms'"
       >
         <!-- Popular Badge -->
         <div *ngIf="tier.popular" class="popular-badge">Most Popular</div>

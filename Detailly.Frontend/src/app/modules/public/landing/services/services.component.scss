@@ -97,7 +97,7 @@
   position: relative;
   height: 192px; // h-48
   overflow: hidden;
-  background: #f5f5f5;
+  background: hsl(var(--secondary));
 
   img {
     width: 100%;
@@ -117,7 +117,7 @@
   gap: 4px;
   padding: 6px 12px;
   background: hsl(var(--accent));
-  color: #000000;
+  color: hsl(var(--accent-foreground));
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 600;
@@ -197,12 +197,12 @@
   padding: 0 32px;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(131, 65, 185, 0.3);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 20px rgba(131, 65, 185, 0.3);
   }
 
   mat-icon {

@@ -88,10 +88,9 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        primary: mat.$violet-palette,
+        tertiary: mat.$violet-palette,
       ),
-      typography: Roboto,
       density: 0,
     )
   );
@@ -101,7 +100,7 @@ body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.
-  color-scheme: light;
+  color-scheme: dark;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -126,7 +125,36 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+html,
+body,
+* {
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+// Preserve Material Icons font - MUST come after universal selector
+mat-icon,
+.mat-icon,
+.material-icons,
+.mat-mdc-icon,
+.mdc-icon-button__ripple {
+  font-family: 'Material Icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Space Grotesk', sans-serif !important;
 }
 
 // ===========================
@@ -138,9 +166,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em !important;
 }
 
 * {
@@ -508,4 +536,205 @@ html {
   .mat-mdc-button {
     color: hsl(var(--info-foreground)) !important;
   }
+}
+
+// ===========================
+// MATERIAL TYPOGRAPHY OVERRIDES
+// ===========================
+
+// Force custom fonts throughout Material components
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-stroked-button,
+.mat-mdc-flat-button,
+.mat-mdc-icon-button,
+.mat-mdc-card-title,
+.mat-mdc-card-subtitle,
+.mat-mdc-dialog-title,
+.mat-mdc-list-item,
+.mat-mdc-tab-label,
+.mat-mdc-menu-item,
+.mat-mdc-form-field,
+.mat-mdc-select,
+.mat-mdc-input-element,
+.mat-mdc-text-field-wrapper,
+.mat-toolbar {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+// Headings in Material components
+.mat-mdc-card-title,
+.mat-mdc-card-subtitle,
+.mat-mdc-dialog-title {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.025em !important;
+}
+
+// ===========================
+// MATERIAL BUTTON OVERRIDES
+// ===========================
+
+// Override Material raised button (primary color)
+.mat-mdc-raised-button[color='primary'] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+
+  &:hover:not(:disabled) {
+    background-color: hsl(var(--primary) / 0.9) !important;
+  }
+
+  &:active:not(:disabled) {
+    background-color: hsl(var(--primary) / 0.8) !important;
+  }
+}
+
+// Override Material stroked button (outline)
+.mat-mdc-stroked-button {
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+
+  &:hover:not(:disabled) {
+    background-color: hsl(var(--secondary)) !important;
+    border-color: hsl(var(--primary) / 0.5) !important;
+  }
+
+  &:active:not(:disabled) {
+    background-color: hsl(var(--secondary) / 0.8) !important;
+  }
+}
+
+// Material flat button
+.mat-mdc-button {
+  color: hsl(var(--foreground)) !important;
+
+  &:hover:not(:disabled) {
+    background-color: hsl(var(--secondary)) !important;
+  }
+}
+
+// Material icon button
+.mat-mdc-icon-button {
+  color: hsl(var(--foreground)) !important;
+
+  &:hover:not(:disabled) {
+    background-color: hsl(var(--secondary) / 0.5) !important;
+  }
+}
+
+// Material form fields
+.mat-mdc-form-field {
+  .mat-mdc-form-field-hint {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  .mat-mdc-floating-label {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  &.mat-focused .mat-mdc-floating-label {
+    color: hsl(var(--primary)) !important;
+  }
+}
+
+// Material input
+.mat-mdc-text-field-wrapper input,
+.mat-mdc-input-element {
+  color: hsl(var(--foreground)) !important;
+
+  &::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  &:focus {
+    caret-color: hsl(var(--primary)) !important;
+  }
+}
+
+// Material card
+.mat-mdc-card {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+// Material dialog
+.mat-mdc-dialog-container {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+// Material menu
+.mat-mdc-menu-panel {
+  background-color: hsl(var(--card)) !important;
+
+  .mat-mdc-menu-item {
+    color: hsl(var(--foreground)) !important;
+
+    &:hover {
+      background-color: hsl(var(--secondary)) !important;
+    }
+  }
+}
+
+// Material select
+.mat-mdc-select {
+  color: hsl(var(--foreground)) !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: hsl(var(--card)) !important;
+
+  .mat-mdc-option {
+    color: hsl(var(--foreground)) !important;
+
+    &:hover {
+      background-color: hsl(var(--secondary)) !important;
+    }
+
+    &.mat-selected {
+      background-color: hsl(var(--primary) / 0.15) !important;
+      color: hsl(var(--primary)) !important;
+    }
+  }
+}
+
+// Material table
+.mat-mdc-table {
+  background-color: transparent !important;
+}
+
+.mat-mdc-header-cell {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.mat-mdc-cell {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+.mat-mdc-row:hover {
+  background-color: hsl(var(--secondary) / 0.3) !important;
+}
+
+// Material tabs
+.mat-mdc-tab-nav-panel,
+.mat-mdc-tab-body-content {
+  color: hsl(var(--foreground)) !important;
+}
+
+.mat-mdc-tab-label {
+  color: hsl(var(--muted-foreground)) !important;
+
+  &.mat-mdc-tab-active {
+    color: hsl(var(--primary)) !important;
+  }
+}
+
+// Material tooltip
+.mat-mdc-tooltip {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
 }

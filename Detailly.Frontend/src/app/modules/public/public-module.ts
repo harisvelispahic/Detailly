@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 
 import { PublicRoutingModule } from './public-routing-module';
-import { PublicLayoutComponent } from './public-layout/public-layout.component';
 import { SearchProductsComponent } from './search-products/search-products.component';
 import { SharedModule } from '../shared/shared-module';
 import { LandingComponent } from './landing/landing.component';
@@ -14,7 +13,6 @@ import { FinalCtaComponent } from './landing/final-cta/final-cta.component';
 
 @NgModule({
   declarations: [
-    PublicLayoutComponent,
     SearchProductsComponent,
     LandingComponent,
     HeroComponent,
