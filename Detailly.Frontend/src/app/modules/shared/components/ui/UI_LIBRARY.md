@@ -1,414 +1,567 @@
-# Angular UI Component Library
+# Angular UI Library - Component Reference
 
-## Overview
+## Scope
 
-A reusable, non-standalone Angular UI component library built from React reference components. Follows Material Design principles with Tailwind CSS styling and provides atomic, composable UI primitives.
+This document describes the actual shared UI components in `src/app/modules/shared/components/ui/`.
 
-## Component Organization
+It also notes where the app currently depends on global theme styling and Angular Material instead of these primitives.
 
-### Directory Structure
+## Global Theme Context
 
+Before using the components, understand that their styling depends on the global CSS variables defined in `src/styles.scss`.
+
+The most important tokens are:
+
+- `--background`
+- `--foreground`
+- `--card`
+- `--primary`
+- `--secondary`
+- `--muted-foreground`
+- `--border`
+- `--ring`
+- `--success`
+- `--warning`
+- `--info`
+- `--destructive`
+- `--gradient-primary`
+- `--gradient-card`
+- `--shadow-card`
+- `--shadow-elevated`
+- `--shadow-hero`
+
+If those tokens change, the shared components change with them.
+
+## Export Path
+
+All UI components are exported via `SharedModule`.
+
+Typical module setup:
+
+```ts
+import { NgModule } from '@angular/core';
+
+import { SharedModule } from '../shared/shared-module';
+
+@NgModule({
+  imports: [SharedModule],
+})
+export class FeatureModule {}
 ```
-src/app/modules/shared/components/ui/
-├── button/
-│   ├── button.component.ts
-│   ├── button.component.html
-│   └── button.component.scss
-├── badge/
-├── card/
-│   ├── card.component.ts (Parent)
-│   ├── card-header.component.ts
-│   ├── card-title.component.ts
-│   ├── card-description.component.ts
-│   ├── card-content.component.ts
-│   └── card-footer.component.ts
-├── input/
-├── label/
-├── separator/
-├── tabs/
-│   ├── tabs.component.ts (Parent)
-│   ├── tabs-list.component.ts
-│   ├── tabs-trigger.component.ts
-│   └── tabs-content.component.ts
-├── container/
-└── textarea/
+
+## Component Catalog
+
+### app-button
+
+Selector:
+
+```html
+<app-button></app-button>
 ```
 
-## Component Reference
+Inputs:
 
-### Low-Level Reusable Primitives
+- `variant: ButtonVariant = 'default'`
+- `size: ButtonSize = 'default'`
+- `disabled = false`
+- `type: 'button' | 'submit' | 'reset' = 'button'`
+- `ariaLabel?: string`
 
-#### 1. **Button** (`app-button`)
-
-Primary interactive element with multiple variants and sizes.
-
-**Inputs:**
-
-- `variant`: `'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient' | 'hero' | 'hero-outline' | 'glass' | 'success'` (default: `'default'`)
-- `size`: `'default' | 'sm' | 'lg' | 'xl' | 'icon'` (default: `'default'`)
-- `disabled`: `boolean` (default: `false`)
-- `type`: `'button' | 'submit' | 'reset'` (default: `'button'`)
-- `ariaLabel`: `string` (optional)
-
-**Outputs:**
+Outputs:
 
 - `clicked: EventEmitter<MouseEvent>`
 
-**Example:**
+Variants:
+
+- `default`
+- `destructive`
+- `outline`
+- `secondary`
+- `ghost`
+- `link`
+- `gradient`
+- `hero`
+- `hero-outline`
+- `glass`
+- `success`
+
+Sizes:
+
+- `default`
+- `sm`
+- `lg`
+- `xl`
+- `icon`
+
+Behavior notes:
+
+- Uses content projection.
+- Icon placement is determined by projected markup order.
+- Emits `clicked` only when `disabled === false`.
+- Host gets `app-button-wrapper`; actual styling is applied to the inner `<button>`.
+
+Visual notes:
+
+- `default`, `gradient`, and `hero` use the purple brand direction.
+- `glass` uses blurred translucent card styling.
+- `outline` and `hero-outline` both use border-based treatments, but `hero-outline` is intended for CTA-style layouts.
+
+Example:
 
 ```html
-<app-button variant="primary" size="lg" (clicked)="handleClick($event)"> Click Me </app-button>
-
-<app-button variant="hero" size="icon">
-  <mat-icon>add</mat-icon>
+<app-button variant="hero" size="lg" (clicked)="bookNow()">
+  Book Now
+  <mat-icon>arrow_forward</mat-icon>
 </app-button>
 ```
 
-#### 2. **Badge** (`app-badge`)
+### app-badge
 
-Small label with semantic variants for status/category indication.
-
-**Inputs:**
-
-- `variant`: `'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info' | 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'glass'` (default: `'default'`)
-
-**Example:**
+Selector:
 
 ```html
-<app-badge variant="success">Active</app-badge>
-<app-badge variant="pending">Pending</app-badge>
-<app-badge variant="destructive">Error</app-badge>
+<app-badge></app-badge>
 ```
 
-#### 3. **Card** (`app-card`) - Composite Component
+Inputs:
 
-Container with elevation and variants. Compose with sub-components.
+- `variant: BadgeVariant = 'default'`
 
-**Inputs:**
+Variants:
 
-- `variant`: `'default' | 'elevated' | 'interactive' | 'glass' | 'gradient' | 'outline'` (default: `'default'`)
+- `default`
+- `secondary`
+- `destructive`
+- `outline`
+- `success`
+- `warning`
+- `info`
+- `pending`
+- `confirmed`
+- `completed`
+- `cancelled`
+- `glass`
 
-**Sub-Components:**
+Behavior notes:
 
-- `app-card-header`: Container for header section
-- `app-card-title`: Heading element
-- `app-card-description`: Descriptive text
-- `app-card-content`: Main content area
-- `app-card-footer`: Footer section
+- Text is uppercase by default because the base badge style sets `text-transform: uppercase`.
+- Best suited for status chips and compact metadata.
+- Host gets the computed badge classes; content is rendered inside the child `<span>`.
 
-**Example:**
+Example:
 
 ```html
-<app-card variant="elevated">
+<app-badge variant="completed">Completed</app-badge>
+```
+
+### app-card
+
+Selector:
+
+```html
+<app-card></app-card>
+```
+
+Inputs:
+
+- `variant: CardVariant = 'default'`
+
+Variants:
+
+- `default`
+- `elevated`
+- `interactive`
+- `glass`
+- `gradient`
+- `outline`
+
+Subcomponents:
+
+- `app-card-header`
+- `app-card-title`
+- `app-card-description`
+- `app-card-content`
+- `app-card-footer`
+
+Behavior notes:
+
+- `app-card` is the outer variant carrier.
+- Layout spacing comes from subcomponents, not the parent.
+- `interactive` adds hover lift and purple glow.
+- `glass` uses translucent blur styling.
+
+Example:
+
+```html
+<app-card variant="interactive">
   <app-card-header>
-    <app-card-title>Payment Details</app-card-title>
-    <app-card-description>Enter your payment information</app-card-description>
+    <app-card-title>Premium Package</app-card-title>
+    <app-card-description>Interior and exterior detail</app-card-description>
   </app-card-header>
 
   <app-card-content>
-    <app-input placeholder="Card number"></app-input>
+    <p>$149</p>
   </app-card-content>
 
   <app-card-footer>
-    <app-button>Submit</app-button>
+    <app-button variant="hero">Book Now</app-button>
   </app-card-footer>
 </app-card>
 ```
 
-#### 4. **Input** (`app-input`)
+### app-card-header
 
-Text input field with consistent styling and accessibility.
+Purpose:
 
-**Inputs:**
+- top spacing block for a card
+- vertical layout with a small gap between title/description rows
 
-- `type`: `string` (default: `'text'`)
-- `placeholder`: `string`
-- `disabled`: `boolean`
-- `required`: `boolean`
-- `id`: `string` (optional)
-- `name`: `string` (optional)
-- `value`: `string`
-- `minLength`: `number` (optional)
-- `maxLength`: `number` (optional)
-- `pattern`: `string` (optional)
+Notes:
 
-**Example:**
+- padding: `1.5rem`
+- flex column layout
+
+### app-card-title
+
+Purpose:
+
+- main heading inside a card
+
+Notes:
+
+- uses `Space Grotesk`
+- size: `1.5rem`
+- weight: `600`
+
+### app-card-description
+
+Purpose:
+
+- muted descriptive text inside a card header or content area
+
+Notes:
+
+- size: `0.875rem`
+- color: `hsl(var(--muted-foreground))`
+
+### app-card-content
+
+Purpose:
+
+- main content area
+
+Notes:
+
+- padding: `1.5rem`
+- top padding removed to sit directly below header when both are used
+
+### app-card-footer
+
+Purpose:
+
+- bottom action row
+
+Notes:
+
+- flex row
+- gap: `1rem`
+- padding: `1.5rem`
+- top padding removed
+
+### app-input
+
+Selector:
 
 ```html
-<app-label for="email">Email Address</app-label>
-<app-input id="email" type="email" placeholder="user@example.com" required> </app-input>
+<app-input></app-input>
 ```
 
-#### 5. **Label** (`app-label`)
+Inputs:
 
-Form label with optional required indicator.
+- `type = 'text'`
+- `placeholder = ''`
+- `disabled = false`
+- `required = false`
+- `id?: string`
+- `name?: string`
+- `value = ''`
+- `minLength?: number`
+- `maxLength?: number`
+- `pattern?: string`
 
-**Inputs:**
+Important limitation:
 
-- `for`: `string` (optional) - Associates with input id
-- `required`: `boolean` (default: `false`)
+`app-input` is **not** a `ControlValueAccessor`.
 
-**Example:**
+That means:
+
+- no `[(ngModel)]`
+- no `[formControl]`
+- no `formControlName`
+- no output for value changes
+
+Use it today for presentational/static markup or extend it before adopting it for real Angular forms.
+
+Example:
 
 ```html
-<app-label for="name" [required]="true">Name</app-label> <app-input id="name"></app-input>
+<app-label for="promo-code">Promo Code</app-label>
+<app-input id="promo-code" placeholder="SPRING25"></app-input>
 ```
 
-#### 6. **Separator** (`app-separator`)
+### app-label
 
-Divider line (horizontal or vertical).
-
-**Inputs:**
-
-- `orientation`: `'horizontal' | 'vertical'` (default: `'horizontal'`)
-- `decorative`: `boolean` (default: `true`)
-
-**Example:**
+Selector:
 
 ```html
-<div>Section 1</div>
+<app-label></app-label>
+```
+
+Inputs:
+
+- `for?: string`
+- `required = false`
+
+Behavior notes:
+
+- renders a label with optional `*`
+- suitable companion for `app-input` and `app-textarea`
+
+Example:
+
+```html
+<app-label for="email" [required]="true">Email</app-label>
+```
+
+### app-textarea
+
+Selector:
+
+```html
+<app-textarea></app-textarea>
+```
+
+Inputs:
+
+- `placeholder = ''`
+- `disabled = false`
+- `required = false`
+- `id?: string`
+- `name?: string`
+- `value = ''`
+- `minLength?: number`
+- `maxLength?: number`
+- `rows = 4`
+
+Important limitation:
+
+Like `app-input`, this is **not** a `ControlValueAccessor`.
+
+Use it for:
+
+- static/demonstration markup
+- uncontrolled text areas
+
+Do not document it as a reactive-forms replacement until that work is actually done.
+
+### app-separator
+
+Selector:
+
+```html
 <app-separator></app-separator>
-<div>Section 2</div>
-
-<!-- Vertical separator -->
-<app-separator orientation="vertical"></app-separator>
 ```
 
-#### 7. **Textarea** (`app-textarea`)
+Inputs:
 
-Multi-line text input field.
+- `orientation: 'horizontal' | 'vertical' = 'horizontal'`
+- `decorative = true`
 
-**Inputs:**
+Behavior notes:
 
-- `placeholder`: `string`
-- `disabled`: `boolean`
-- `required`: `boolean`
-- `id`: `string` (optional)
-- `name`: `string` (optional)
-- `value`: `string`
-- `minLength`: `number` (optional)
-- `maxLength`: `number` (optional)
-- `rows`: `number` (default: `4`)
+- adds `role="separator"` only when `decorative` is false
+- exposes `aria-orientation`
+- horizontal separator is full-width 1px
+- vertical separator is full-height 1px
 
-**Example:**
+Example:
 
 ```html
-<app-label for="message">Message</app-label>
-<app-textarea id="message" placeholder="Enter your message..." [rows]="6"> </app-textarea>
+<app-separator></app-separator>
+<app-separator orientation="vertical" [decorative]="false"></app-separator>
 ```
 
-#### 8. **Tabs** (`app-tabs`) - Composite Component
+### app-container
 
-Tabbed interface for organizing content.
-
-**Inputs:**
-
-- `activeTab`: `string` - ID of currently active tab
-- `activeTabChange: EventEmitter<string>` - Emits when tab changes
-
-**Sub-Components:**
-
-- `app-tabs-list`: Container for tabs
-- `app-tabs-trigger`: Tab button (receives `tabId`, `isActive`, `disabled`)
-- `app-tabs-content`: Content panel (receives `tabId`, `isActive`)
-
-**Example:**
+Selector:
 
 ```html
-<app-tabs [activeTab]="activeTab" (activeTabChange)="activeTab = $event">
+<app-container></app-container>
+```
+
+Inputs:
+
+- `size: 'sm' | 'md' | 'lg' | 'xl' | 'full' = 'lg'`
+- `padding = true`
+
+Current size mapping:
+
+- `sm -> 24rem`
+- `md -> 28rem`
+- `lg -> 56rem`
+- `xl -> var(--page-max-width)`
+- `full -> 100%`
+
+Behavior notes:
+
+- the host element receives the sizing class
+- the inner `.container-wrapper` just renders projected content
+- `padding` toggles horizontal padding classes
+
+Example:
+
+```html
+<app-container size="xl">
+  <section>...</section>
+</app-container>
+```
+
+### app-tabs
+
+Selector:
+
+```html
+<app-tabs></app-tabs>
+```
+
+Inputs:
+
+- `activeTab = ''`
+
+Outputs:
+
+- `activeTabChange: EventEmitter<string>`
+
+Important note:
+
+`app-tabs` is currently a thin wrapper. It does not automatically coordinate triggers and content. Consumers still manage the state manually.
+
+### app-tabs-list
+
+Purpose:
+
+- tab strip container
+
+Behavior notes:
+
+- inline-flex layout
+- muted background
+- rounded shell around triggers
+
+### app-tabs-trigger
+
+Inputs:
+
+- `tabId = ''`
+- `isActive = false`
+- `disabled = false`
+
+Outputs:
+
+- `tabSelected: EventEmitter<string>`
+
+Accessibility:
+
+- `role="tab"`
+- `tabindex` is `0` for active, `-1` for inactive
+- `aria-selected` reflects `isActive`
+
+Important note:
+
+The inner `<button>` uses `display: contents`, so the host classes carry most of the visible styling.
+
+### app-tabs-content
+
+Inputs:
+
+- `tabId = ''`
+- `isActive = false`
+
+Accessibility / behavior:
+
+- `role="tabpanel"`
+- `data-state` becomes `active` or `inactive`
+- `display` is toggled to `block` / `none`
+
+## Valid Tabs Example
+
+```ts
+export class BookingPageComponent {
+  activeTab = 'services';
+}
+```
+
+```html
+<app-tabs [activeTab]="activeTab">
   <app-tabs-list>
     <app-tabs-trigger
-      tabId="tab1"
-      [isActive]="activeTab === 'tab1'"
-      (tabSelected)="onTabSelect($event)"
+      tabId="services"
+      [isActive]="activeTab === 'services'"
+      (tabSelected)="activeTab = $event"
     >
-      Dashboard
+      Services
     </app-tabs-trigger>
+
     <app-tabs-trigger
-      tabId="tab2"
-      [isActive]="activeTab === 'tab2'"
-      (tabSelected)="onTabSelect($event)"
+      tabId="addons"
+      [isActive]="activeTab === 'addons'"
+      (tabSelected)="activeTab = $event"
     >
-      Settings
+      Add-ons
     </app-tabs-trigger>
   </app-tabs-list>
 
-  <app-tabs-content tabId="tab1" [isActive]="activeTab === 'tab1'">
-    <!-- Dashboard content -->
+  <app-tabs-content tabId="services" [isActive]="activeTab === 'services'">
+    <p>Service content</p>
   </app-tabs-content>
-  <app-tabs-content tabId="tab2" [isActive]="activeTab === 'tab2'">
-    <!-- Settings content -->
+
+  <app-tabs-content tabId="addons" [isActive]="activeTab === 'addons'">
+    <p>Add-on content</p>
   </app-tabs-content>
 </app-tabs>
 ```
 
-#### 9. **Container** (`app-container`)
+## Relationship to Angular Material
 
-Responsive wrapper with max-width constraints.
+The app currently uses both:
 
-**Inputs:**
+- shared `app-*` primitives
+- themed Angular Material components
 
-- `size`: `'sm' | 'md' | 'lg' | 'xl' | 'full'` (default: `'lg'`)
-- `padding`: `boolean` (default: `true`)
+Use Material when you need:
 
-**Example:**
+- `mat-form-field`
+- `matInput`
+- dialogs
+- snackbars
+- tables
+- paginator
+- select/menu patterns
 
-```html
-<app-container size="xl">
-  <h1>Page Title</h1>
-  <p>Content within responsive container</p>
-</app-container>
-```
+Use the shared primitives when you want:
 
-## Design System
+- token-driven composition
+- lightweight reusable building blocks
+- card/button/badge/container structure without Material markup
 
-### Color Tokens
+## Do Not Assume
 
-The components use CSS variables for theming:
+Do not assume the following unless the implementation changes:
 
-- `--color-primary`: Primary action color
-- `--color-secondary`: Secondary element color
-- `--color-destructive`: Error/delete actions
-- `--color-success`: Success states
-- `--color-warning`: Warning states
-- `--color-info`: Information states
-- `--color-foreground`: Text color
-- `--color-background`: Page background
-- `--color-card`: Card background
-- `--color-muted-foreground`: Muted text
+- Tailwind is active
+- `app-input` supports reactive forms
+- `app-textarea` supports reactive forms
+- `app-tabs` auto-wires child state
+- icon ordering is automatic
 
-### Spacing Scale
-
-Consistent padding/margin using rem units:
-
-- `0.25rem (4px)`, `0.5rem (8px)`, `1rem (16px)`, `1.5rem (24px)`, `2rem (32px)`
-
-### Typography
-
-- **Display**: Large headings (24px, semibold)
-- **Heading**: Card titles (20px, semibold)
-- **Body**: Standard text (16px, regular)
-- **Small**: Captions (14px, regular)
-- **Tiny**: Labels (12px, medium)
-
-### Effects
-
-- **Shadows**: sm, md, lg, xl with subtle black opacity
-- **Blur**: backdrop-blur for glass effect
-- **Transitions**: 200-300ms duration for smooth interactions
-- **Borders**: Rounded corners (md, lg, xl radius)
-
-## Usage Examples
-
-### Form Layout
-
-```html
-<app-card>
-  <app-card-header>
-    <app-card-title>Create Account</app-card-title>
-  </app-card-header>
-
-  <app-card-content class="space-y-4">
-    <div>
-      <app-label for="name" [required]="true">Full Name</app-label>
-      <app-input id="name" placeholder="John Doe"></app-input>
-    </div>
-
-    <div>
-      <app-label for="email" [required]="true">Email</app-label>
-      <app-input id="email" type="email" placeholder="john@example.com"></app-input>
-    </div>
-
-    <div>
-      <app-label for="message">Message</app-label>
-      <app-textarea id="message" placeholder="Your message..."></app-textarea>
-    </div>
-  </app-card-content>
-
-  <app-card-footer class="flex gap-2 justify-end">
-    <app-button variant="outline">Cancel</app-button>
-    <app-button variant="default">Submit</app-button>
-  </app-card-footer>
-</app-card>
-```
-
-### Status Display
-
-```html
-<div class="flex items-center gap-2">
-  <span>Order Status:</span>
-  <app-badge *ngIf="order.status === 'confirmed'" variant="confirmed"> Confirmed </app-badge>
-  <app-badge *ngIf="order.status === 'pending'" variant="pending"> Pending </app-badge>
-  <app-badge *ngIf="order.status === 'completed'" variant="completed"> Completed </app-badge>
-</div>
-```
-
-## Best Practices
-
-1. **Component Composition**: Use atomic components to build larger features
-2. **Semantic HTML**: Components emit proper HTML elements (button, input, label, etc.)
-3. **Accessibility**: All components include ARIA attributes
-4. **Type Safety**: Use provided type unions for variant/size props
-5. **Theming**: Customize via CSS variables in global styles
-6. **Two-Way Binding**: Use `[(ngModel)]` with inputs, or `@Output()` with buttons
-7. **Content Projection**: Use `<ng-content>` for flexible slot-based composition
-
-## Import in Your Modules
-
-The components are already exported in `SharedModule`. Simply:
-
-```typescript
-import { SharedModule } from '@app/modules/shared/shared-module';
-
-@NgModule({
-  imports: [SharedModule],
-  // ...
-})
-export class MyFeatureModule {}
-```
-
-## Future Enhancements
-
-Planned components for next batch:
-
-- Checkbox / Radio
-- Select / Dropdown
-- Toggle
-- Dialog / Modal
-- Toast / Alert
-- Breadcrumb
-- Pagination
-- Skeleton / Loading states
-- Tooltip
-- Popover
-- Accordion
-- Carousel
-- Avatar
-- Progress bar
-
-## Customization
-
-### Override Variant Styles
-
-Extend component classes in your SCSS:
-
-```scss
-// In your component styles
-.app-button {
-  &.my-custom-variant {
-    // Custom styles
-  }
-}
-```
-
-### CSS Variables
-
-Define in `styles.scss` for global theming:
-
-```scss
-:root {
-  --color-primary: #6d28d9;
-  --color-secondary: #e5e7eb;
-  // ... other tokens
-}
-```
+If any of those become true later, update this file first.

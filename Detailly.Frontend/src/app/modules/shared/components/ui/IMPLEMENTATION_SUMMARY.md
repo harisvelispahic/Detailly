@@ -1,382 +1,282 @@
 # Angular UI Component Library - Implementation Summary
 
-## ✅ Completed Deliverables
+## Current Status
 
-### Component Catalog
+This folder documents the UI foundation that currently exists in the Angular app.
 
-A comprehensive, production-ready UI component library has been created with **17 reusable components** and **3 documentation files**.
+The implementation is split into two layers:
 
-#### Primitive Components (Atomic Level)
+1. Shared UI primitives in `src/app/modules/shared/components/ui/`
+2. Global theme and Angular Material overrides in `src/styles.scss`
 
-| Component     | Variants     | Sizes   | Purpose                     |
-| ------------- | ------------ | ------- | --------------------------- |
-| **Button**    | 11 variants  | 5 sizes | Primary interactive element |
-| **Badge**     | 12 variants  | —       | Status/category indicators  |
-| **Input**     | —            | —       | Text input field            |
-| **Label**     | —            | —       | Form label                  |
-| **Textarea**  | —            | —       | Multi-line input            |
-| **Separator** | 2 directions | —       | Visual divider              |
-| **Container** | 5 sizes      | —       | Responsive wrapper          |
+That split matters. The app does not rely only on `app-*` primitives. The public landing page, auth screens, dialogs, and a lot of admin UI still use Angular Material directly, but they inherit the Detailly dark theme through global overrides.
 
-#### Composite Components (Built from Primitives)
+## What Actually Exists
 
-**Card System (6 variants)**
+The shared UI layer exports 17 Angular components through `SharedModule`:
 
-- Parent: `app-card`
-- Sub-components:
-  - `app-card-header` - Header section
-  - `app-card-title` - Title heading
-  - `app-card-description` - Descriptive text
-  - `app-card-content` - Main content area
-  - `app-card-footer` - Footer section
+### Primitive / single-purpose components
 
-**Tabs System**
+- `app-button`
+- `app-badge`
+- `app-input`
+- `app-label`
+- `app-textarea`
+- `app-separator`
+- `app-container`
 
-- Parent: `app-tabs`
-- Sub-components:
-  - `app-tabs-list` - Tab list container
-  - `app-tabs-trigger` - Individual tab button
-  - `app-tabs-content` - Tab content panel
+### Card system
 
-### Directory Structure
+- `app-card`
+- `app-card-header`
+- `app-card-title`
+- `app-card-description`
+- `app-card-content`
+- `app-card-footer`
 
-```
-src/app/modules/shared/
-├── components/
-│   └── ui/
-│       ├── button/
-│       │   ├── button.component.ts
-│       │   ├── button.component.html
-│       │   └── button.component.scss
-│       ├── badge/
-│       ├── card/
-│       │   ├── card.component.ts
-│       │   ├── card-header.component.ts
-│       │   ├── card-title.component.ts
-│       │   ├── card-description.component.ts
-│       │   ├── card-content.component.ts
-│       │   └── card-footer.component.ts
-│       ├── input/
-│       ├── label/
-│       ├── separator/
-│       ├── tabs/
-│       │   ├── tabs.component.ts
-│       │   ├── tabs-list.component.ts
-│       │   ├── tabs-trigger.component.ts
-│       │   └── tabs-content.component.ts
-│       ├── container/
-│       ├── textarea/
-│       ├── UI_LIBRARY.md
-│       ├── ARCHITECTURE.md
-│       └── EXAMPLES.md
-└── shared-module.ts (UPDATED)
-```
+### Tabs system
 
-### Key Features
+- `app-tabs`
+- `app-tabs-list`
+- `app-tabs-trigger`
+- `app-tabs-content`
 
-✨ **Preserved from React Design:**
+## SharedModule Role
 
-- Visual hierarchy and spacing
-- Color system and variants
-- State management patterns
-- Accessibility principles (ARIA attributes)
-- Interactive effects and transitions
+`SharedModule` is the delivery mechanism for the UI library.
 
-🎯 **Native Angular Implementation:**
+It currently exports:
 
-- Non-standalone components (per requirements)
-- @Input/@Output decorators instead of React props
-- Content projection with ng-content instead of children
-- Type-safe variant selection
-- EventEmitter pattern for events
-- @HostBinding for dynamic class application
+- all 17 UI components
+- Angular Material modules from `material-modules.ts`
+- `CommonModule`
+- `FormsModule`
+- `ReactiveFormsModule`
+- `RouterModule`
+- `TranslatePipe`
 
-🎨 **Design System:**
+This means feature modules usually get both:
 
-- Tailwind CSS for styling
-- CSS custom properties for theming
-- Consistent spacing scale
-- Semantic color tokens
-- Smooth transitions and effects
+- the custom `app-*` primitives
+- themed Angular Material building blocks
 
-## 📖 Documentation Provided
+## Theme Source of Truth
 
-### 1. **UI_LIBRARY.md** - Component Reference
+The design system lives primarily in `src/styles.scss`.
 
-Complete reference guide covering:
+Important facts:
 
-- Component overview with visual hierarchy
-- Input/Output specifications for each component
-- All variant options and sizes
-- Copy-paste usage examples
-- Design system details (colors, spacing, typography)
-- Best practices and customization
+- The app theme is dark-only.
+- Core colors are defined as HSL CSS variables.
+- Gradient, shadow, ring, layout, and status tokens are centralized there.
+- Angular Material surfaces, buttons, inputs, dialogs, menus, selects, cards, and icon buttons are globally overridden there to match the Detailly look.
+- Public/auth styling also builds on those same variables.
 
-### 2. **ARCHITECTURE.md** - Technical Deep Dive
+Key token groups currently in use:
 
-Design decisions documentation:
+- background / foreground
+- card / popover
+- primary / accent / secondary
+- muted / border / input / ring
+- success / warning / info / destructive
+- gradient-primary / gradient-card / gradient-hero
+- shadow-card / shadow-elevated / shadow-hero
+- page-max-width / page-padding-x / nav heights
 
-- Component categorization (Level 1, 2, 3)
-- React to Angular conversion strategy
-- Props to @Input/@Output mapping
-- CSS class application strategy
-- Accessibility implementation
-- Component dependency map
-- Comparison chart: React vs Angular
-- Testing strategy
-- Performance considerations
+## What Changed Recently
 
-### 3. **EXAMPLES.md** - Copy-Paste Code Patterns
+These docs were updated because the implementation changed in meaningful ways:
 
-Real-world usage examples:
+- The shared primitives were restyled to better match the React Detailly design.
+- Button, badge, input, card, and container styles were tightened around the new dark theme.
+- Angular Material now has stronger global visual overrides so MDC defaults do not leak into the UI.
+- The public navbar and auth/login branding now use the Detailly logo assets.
+- The landing page hero, features, services, pricing, testimonials, and final CTA were adjusted toward the React references.
 
-- Contact form
-- Login form with validation
-- Product cards
-- Status displays
-- Tab implementations
-- Layout patterns
-- Empty states, error messages, loading skeletons
-- Responsive classes and styling tips
+## Important Implementation Truths
 
-## 🚀 Getting Started
+These are the main points earlier docs got wrong.
 
-### 1. **Import Components**
+### 1. This library is not Tailwind-driven
 
-Components are already exported from `SharedModule`:
+The current implementation uses:
 
-```typescript
-import { SharedModule } from '@app/modules/shared/shared-module';
+- Angular components
+- SCSS
+- CSS variables
+- Angular Material for some higher-level UI
 
-@NgModule({
-  declarations: [YourComponent],
-  imports: [SharedModule],
-})
-export class YourModule {}
-```
+Some examples in the old docs used Tailwind utility classes as if Tailwind were the source of truth. It is not.
 
-### 2. **Use in Templates**
+### 2. `app-input` and `app-textarea` are presentational wrappers, not Angular form controls
 
-**Simple Button:**
+They accept static inputs like:
+
+- `value`
+- `placeholder`
+- `required`
+- `minLength`
+- `maxLength`
+
+They do **not** implement:
+
+- `ControlValueAccessor`
+- `ngModel`
+- `formControl`
+- `valueChange`
+
+So today they are useful for:
+
+- static UI composition
+- demos
+- lightweight uncontrolled markup
+
+They are not yet a full replacement for `matInput` in reactive forms.
+
+### 3. Tabs are manually coordinated
+
+`app-tabs` is currently a thin wrapper.
+
+It exposes:
+
+- `activeTab`
+- `activeTabChange`
+
+But it does not automatically wire child triggers/content together via injection or a shared controller. The host component still owns the state and explicitly passes `isActive` into triggers and content.
+
+### 4. Icon order in buttons is determined by template content order
+
+`app-button` uses content projection. If you want text followed by icon, you must write the content in that order.
+
+Example:
 
 ```html
-<app-button variant="default" (clicked)="onAction()"> Click Me </app-button>
+<app-button variant="hero">
+  Book Now
+  <mat-icon>arrow_forward</mat-icon>
+</app-button>
 ```
 
-**Card with Form:**
+### 5. The app uses both custom primitives and Angular Material
 
-```html
-<app-card variant="elevated">
-  <app-card-header>
-    <app-card-title>Settings</app-card-title>
-  </app-card-header>
+That is the current architecture. It is not a failure state, but it should be documented honestly.
 
-  <app-card-content>
-    <app-label for="name">Name</app-label>
-    <app-input id="name" placeholder="Enter name"></app-input>
-  </app-card-content>
+Use the shared primitives when:
 
-  <app-card-footer>
-    <app-button variant="default">Save</app-button>
-  </app-card-footer>
-</app-card>
-```
+- you want simple reusable composition
+- you want token-driven styling without Material markup
 
-**Tabbed Interface:**
+Use Angular Material when:
 
-```html
-<app-tabs [activeTab]="activeTab" (activeTabChange)="activeTab = $event">
-  <app-tabs-list>
-    <app-tabs-trigger
-      tabId="tab1"
-      [isActive]="activeTab === 'tab1'"
-      (tabSelected)="onTabSelect($event)"
-    >
-      Tab 1
-    </app-tabs-trigger>
-  </app-tabs-list>
-  <app-tabs-content tabId="tab1" [isActive]="activeTab === 'tab1'"> Content here </app-tabs-content>
-</app-tabs>
-```
+- the existing screen already uses Material patterns
+- you need dialogs, snackbars, advanced form fields, menus, tables, selects, icons, or paginator behavior already present in the app
 
-## 📋 Component Type References
+## Component-by-Component Summary
 
-```typescript
-// Button
-type ButtonVariant =
-  | 'default'
-  | 'destructive'
-  | 'outline'
-  | 'secondary'
-  | 'ghost'
-  | 'link'
-  | 'gradient'
-  | 'hero'
-  | 'hero-outline'
-  | 'glass'
-  | 'success';
-type ButtonSize = 'default' | 'sm' | 'lg' | 'xl' | 'icon';
+### Button
 
-// Badge
-type BadgeVariant =
-  | 'default'
-  | 'secondary'
-  | 'destructive'
-  | 'outline'
-  | 'success'
-  | 'warning'
-  | 'info'
-  | 'pending'
-  | 'confirmed'
-  | 'completed'
-  | 'cancelled'
-  | 'glass';
+- 11 variants
+- 5 sizes
+- click output: `clicked`
+- projected content
+- icon placement controlled by markup order
 
-// Card
-type CardVariant = 'default' | 'elevated' | 'interactive' | 'glass' | 'gradient' | 'outline';
+### Badge
 
-// Separator
-type SeparatorOrientation = 'horizontal' | 'vertical';
+- 12 variants
+- uppercase styling by default
+- good fit for status chips and role chips
 
-// Container
-type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
-```
+### Card system
 
-## 🎯 Next Steps & Future Enhancements
+- 6 variants on `app-card`
+- subcomponents provide spacing and typography structure
+- useful for content sections, settings blocks, and empty states
 
-### Phase 2: Additional Primitives
+### Input / Textarea
 
-- [ ] Checkbox with label integration
-- [ ] Radio button group
-- [ ] Toggle switch
-- [ ] Select/Dropdown
-- [ ] Tooltip
-- [ ] Popover
-- [ ] Alert/Toast
-- [ ] Progress bar
-- [ ] Skeleton loader
-- [ ] Avatar
+- consistent dark theme shell
+- not connected to Angular forms APIs
 
-### Phase 3: Larger Sections (from React reference)
+### Label
 
-- [ ] Navbar/Navigation
-- [ ] Footer
-- [ ] Layout wrapper (combines Navbar + Footer)
-- [ ] Breadcrumb
-- [ ] Pagination
-- [ ] Dropdown menu
-- [ ] Dialog/Modal
-- [ ] Drawer/Sidebar
-- [ ] Accordion
-- [ ] Carousel
+- simple wrapper with required asterisk support
 
-### Phase 4: Enhancement & Polish
+### Separator
 
-- [ ] Add animations (fade, slide, scale)
-- [ ] Create Storybook documentation
-- [ ] Add unit tests (Jest/Jasmine)
-- [ ] Setup E2E tests
-- [ ] Create custom theme variations
-- [ ] Add dark mode support
-- [ ] Performance optimization
-- [ ] Complete WCAG 2.1 AA compliance testing
+- horizontal or vertical
+- supports decorative / semantic role mode
 
-## ⚡ Design Principles Applied
+### Container
 
-1. **Atomic Design** - Composable building blocks
-2. **Type Safety** - TypeScript for all props/inputs
-3. **Accessibility First** - ARIA attributes, semantic HTML
-4. **Consistency** - Unified design language
-5. **Flexibility** - Content projection for extensibility
-6. **Performance** - No unnecessary dependencies
-7. **Documentation** - Comprehensive guides and examples
+- size-based max width wrapper
+- `xl` now follows the app-level `--page-max-width` token
 
-## 🔧 Customization
+### Tabs system
 
-### CSS Variable Theming
+- visually functional
+- state still manually orchestrated in the consuming component
 
-Define in your `styles.scss`:
+## Known Gaps / Technical Debt
 
-```scss
-:root {
-  --color-primary: #6d28d9;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #e5e7eb;
-  --color-destructive: #ef4444;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-info: #3b82f6;
-  --color-foreground: #000000;
-  --color-background: #ffffff;
-  --color-card: #ffffff;
-  --color-muted-foreground: #6b7280;
-  --color-border: #e5e7eb;
-  --color-input: #e5e7eb;
-}
-```
+These are worth keeping in mind for future work.
 
-### Adding Custom Variants
+- `app-input` and `app-textarea` need `ControlValueAccessor` if they are meant to replace Material/native form fields.
+- The tabs system could be upgraded so `app-tabs` actually coordinates children.
+- Several component classes still contain private helper methods that are no longer used. They are harmless, but they are not the runtime source of truth.
+- Documentation and implementation had drifted badly before this update.
+- The application still contains pages that are not visually migrated yet, even though the theme foundation is much better now.
 
-In component `.ts` file:
+## Recommended Usage Today
 
-```typescript
-private getVariantClasses(): string {
-  const variants: Record<ButtonVariant, string> = {
-    // ... existing
-    'my-custom': 'class1 class2 class3',
-  };
-  return variants[this.variant];
-}
-```
+### Safe to use now
 
-Update the type:
+- `app-button`
+- `app-badge`
+- `app-card` and its subcomponents
+- `app-label`
+- `app-separator`
+- `app-container`
+- tabs, if you are fine managing state manually
 
-```typescript
-export type ButtonVariant = 'default' | 'destructive' | ... | 'my-custom';
-```
+### Use with caution
 
-## 📚 Documentation Location
+- `app-input`
+- `app-textarea`
 
-All documentation is in: `src/app/modules/shared/components/ui/`
+Use them for presentational/static markup only unless you extend them.
 
-- **UI_LIBRARY.md** - Start here for component reference
-- **ARCHITECTURE.md** - Technical implementation details
-- **EXAMPLES.md** - Copy-paste ready code patterns
+### Still rely on Angular Material for
 
-## ✨ React to Angular Comparison
+- reactive forms already built around `mat-form-field` and `matInput`
+- dialogs
+- snackbars
+- menu/select/table/paginator flows
+- icon buttons and advanced admin UI
 
-| Aspect        | React                    | Angular                  |
-| ------------- | ------------------------ | ------------------------ |
-| Props         | Interface, destructuring | @Input decorators        |
-| Variants      | CVA library              | Component methods        |
-| Events        | onClick prop/callback    | @Output EventEmitter     |
-| Styling       | className prop           | @HostBinding + [ngClass] |
-| Content       | children prop            | ng-content               |
-| Refs          | forwardRef               | Template references      |
-| Accessibility | Built with Radix UI      | Direct ARIA attributes   |
+## Documentation Map
 
-## 🎓 Files to Review
+Use the docs in this order:
 
-Start with these files to understand the implementation:
+1. `IMPLEMENTATION_SUMMARY.md`
+   - high-level truth about what exists
+2. `UI_LIBRARY.md`
+   - API-level reference for selectors, inputs, outputs, and styling behavior
+3. `ARCHITECTURE.md`
+   - how the library and global theme fit together
+4. `EXAMPLES.md`
+   - valid usage patterns that match the current implementation
+5. `QUICK_REFERENCE.md`
+   - short checklist and component lookup
+6. `VISUAL_GUIDE.md`
+   - hierarchy and visual relationships
 
-1. **button.component.ts** - Main pattern template
-2. **card.component.ts** + sub-components - Composite pattern
-3. **tabs.component.ts** + sub-components - Complex composition
-4. **shared-module.ts** - How components are exported
+## Bottom Line
 
-## 💡 Tips for Usage
+The current Angular UI foundation is usable and much closer to the Detailly React look than the previous docs implied, but it is not a pure component-library architecture. The real source of truth is:
 
-1. **Prefer composition** - Build complex UIs from atomic components
-2. **Use @Input bindings** - Connect to component properties
-3. **Listen to @Output events** - Implement interactivity
-4. **Content projection** - Use ng-content for flexibility
-5. **Type safety** - Always use the provided type unions
-6. **Accessibility** - Use proper HTML semantics (button, label, input)
+- shared `app-*` primitives
+- global `styles.scss` theme tokens and Material overrides
+- page-level SCSS for public/auth views
 
----
-
-**Status:** ✅ Production Ready
-
-All components are fully implemented, documented, and integrated into the Angular project. Ready for immediate use in feature modules.
-
-For questions or issues, refer to the comprehensive documentation files or check EXAMPLES.md for specific use cases.
+These docs now reflect that reality and should be used as the reference point going forward.

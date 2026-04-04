@@ -1,460 +1,300 @@
-# UI Components Analysis & Architecture
+# UI Architecture
 
-## Component Categorization
+## Purpose
 
-### Level 1: Atomic Primitives (No Dependencies)
+This document explains how the shared UI components, the global theme, and Angular Material fit together in the current codebase.
 
-These are the foundational building blocks that form the basis of all other components.
+The goal is accuracy, not idealization.
 
-| Component     | Purpose                     | Props/Variants                      | Dependencies |
-| ------------- | --------------------------- | ----------------------------------- | ------------ |
-| **Button**    | Primary interactive element | 11 variants, 5 sizes                | None         |
-| **Badge**     | Status/category indicator   | 12 semantic variants                | None         |
-| **Input**     | Text input field            | type, placeholder, validation attrs | None         |
-| **Label**     | Form label                  | for, required                       | None         |
-| **Textarea**  | Multi-line text input       | rows, validation attrs              | None         |
-| **Separator** | Visual divider              | horizontal/vertical                 | None         |
+## High-Level Architecture
 
-### Level 2: Composite Components (Built on Level 1)
+The Angular UI is made of three layers:
 
-Components that use basic primitives as building blocks.
+### Layer 1: Design tokens and global styling
 
-| Component | Purpose           | Sub-Components                              | Props                                                                 |
-| --------- | ----------------- | ------------------------------------------- | --------------------------------------------------------------------- |
-| **Card**  | Content container | Header, Title, Description, Content, Footer | 6 variants (default, elevated, interactive, glass, gradient, outline) |
-| **Tabs**  | Tabbed interface  | TabsList, TabsTrigger, TabsContent          | activeTab, activeTabChange event                                      |
+Location:
 
-### Level 3: Layout & Containers
+- `src/styles.scss`
 
-Components for page structure and spacing.
+Responsibilities:
 
-| Component     | Purpose            | Props                            | Notes                 |
-| ------------- | ------------------ | -------------------------------- | --------------------- |
-| **Container** | Responsive wrapper | size (sm/md/lg/xl/full), padding | Max-width constraints |
+- defines Detailly theme tokens with CSS variables
+- defines gradients, shadows, radii, layout tokens, and status colors
+- applies global typography and scrollbar styles
+- overrides Angular Material/MDC surfaces to match the dark Detailly theme
 
----
+This is the visual foundation of the whole app.
 
-## Design Decisions: React → Angular Conversion
+### Layer 2: Shared UI primitives
 
-### 1. **Component Structure**
+Location:
 
-**React Approach:**
+- `src/app/modules/shared/components/ui/`
 
-- Used forwardRef for DOM access
-- Merged styled variants with `cva` (class-variance-authority)
-- Used Radix UI primitives for accessible components
-- Created sub-components as separate exports
+Responsibilities:
 
-**Angular Approach (Non-Standalone):**
+- reusable `app-*` selectors
+- card composition
+- button/badge/container primitives
+- light structural tabs system
 
-- Use `@Input/@Output` decorators instead of props
-- Move variant logic into component methods
-- Use `@HostBinding` for class application
-- Declare all sub-components in shared module
-- Utilize Angular's `[ngClass]` for dynamic styling
+These components are simple wrappers with SCSS-driven styling.
 
-### 2. **Props → Inputs/Outputs Mapping**
+### Layer 3: Screen-level styling
 
-**Button Example:**
+Locations include:
 
-```typescript
-// React
-interface ButtonProps {
-  variant?: 'default' | 'destructive' | ...;
-  size?: 'default' | 'sm' | ...;
-  disabled?: boolean;
-  onClick?: (event: MouseEvent) => void;
-}
+- `src/app/modules/public/landing/...`
+- `src/app/modules/public/public-navbar/...`
+- `src/app/modules/auth/...`
 
-// Angular
-@Input() variant: ButtonVariant = 'default';
-@Input() disabled: boolean = false;
-@Output() clicked = new EventEmitter<MouseEvent>();
+Responsibilities:
+
+- hero layout
+- landing section grids
+- auth layout
+- page-specific spacing, imagery, and composition
+
+These files often use Angular Material directly, but styled through the same token system from Layer 1.
+
+## SharedModule as the UI Gateway
+
+`SharedModule` exports:
+
+- all shared `app-*` UI components
+- Angular Material modules
+- common Angular module dependencies
+- `TranslatePipe`
+
+This means most feature modules consume UI through one import surface:
+
+```ts
+imports: [SharedModule]
 ```
 
-### 3. **Styling Strategy**
+Architecturally, that makes `SharedModule` the app's UI gateway rather than the `ui/` folder by itself.
 
-**React:**
+## Component Groups
 
-- Used Tailwind CSS with `className` props
-- Applied variants declaratively with `cva`
-- Used Radix UI for behavioral primitives
+### Atomic wrappers
 
-**Angular:**
+- button
+- badge
+- input
+- label
+- textarea
+- separator
+- container
 
-- Applied classes via `[ngClass]` binding or `@HostBinding`
-- Move variant/size logic into component methods
-- Tailwind CSS classes embedded in component TypeScript
-- No dependency on external primitive libraries (Radix)
+Characteristics:
 
-### 4. **Accessibility**
+- small API surface
+- style-driven
+- no service dependency
+- mostly content projection or attribute pass-through
 
-**Preserved from React:**
+### Structured composition
 
-- ARIA attributes (`aria-selected`, `aria-label`, `role`)
-- Focus management
-- Keyboard navigation support
-- Semantic HTML elements
+- card and its 5 subcomponents
+- tabs and its 3 subcomponents
 
-**Implementation in Angular:**
+Characteristics:
 
-```typescript
-@HostBinding('attr.aria-selected') ariaSelected: boolean;
-@HostBinding('role') role: string;
-@HostBinding('tabindex') tabIndex: number;
-```
+- parent + subcomponent relationship
+- spacing and semantics distributed across multiple selectors
+- consumers assemble structure in templates
 
-### 5. **Content Projection**
+## Runtime Patterns Used
 
-**React:** Used `children` prop and `Slot` component
+### 1. HostBinding for host classes
 
-**Angular:** Used `<ng-content>` for flexible content projection
+Most components use `@HostBinding('class')` to apply base or computed classes to the host element.
 
-```html
-<!-- Parent -->
-<app-card>
-  <app-card-header>
-    <app-card-title>Title</app-card-title>
-  </app-card-header>
-</app-card>
-```
+Examples:
 
-### 6. **Event Handling**
+- `app-button` host gets `app-button-wrapper`
+- `app-card` host gets `card-element card-variant-*`
+- `app-tabs-trigger` host gets its stateful trigger classes
 
-**React:** Click handlers passed via props
+### 2. Inner real element pattern
 
-```jsx
-<button onClick={onClickHandler}>Click</button>
-```
+Several components style an inner element instead of the host directly.
 
-**Angular:** EventEmitter pattern with standard event binding
+Examples:
 
-```html
-<button (click)="onClickHandler($event)">Click</button>
-```
+- `app-button` renders an inner `<button>`
+- `app-input` renders an inner `<input>`
+- `app-textarea` renders an inner `<textarea>`
+- `app-badge` renders an inner `<span>`
 
----
+Implication:
 
-## Component Dependencies Map
+- host classes and inner element classes both matter
+- documentation/examples need to reflect projected content and actual attributes correctly
 
-```mermaid
-graph TD
-    Button["Button (Atomic)"]
-    Badge["Badge (Atomic)"]
-    Input["Input (Atomic)"]
-    Label["Label (Atomic)"]
-    Textarea["Textarea (Atomic)"]
-    Separator["Separator (Atomic)"]
+### 3. Variant by CSS class naming convention
 
-    Card["Card (Composite)"]
-    CardHeader["CardHeader (Slot)"]
-    CardTitle["CardTitle (Slot)"]
-    CardContent["CardContent (Slot)"]
-    CardFooter["CardFooter (Slot)"]
+Variants are usually expressed via class-name generation, not via a style dictionary at runtime.
 
-    Card --> CardHeader
-    Card --> CardTitle
-    Card --> CardContent
-    Card --> CardFooter
-    CardFooter --> Button
-    CardContent --> Input
-    CardHeader --> Label
+Examples:
 
-    Tabs["Tabs (Composite)"]
-    TabsList["TabsList (Slot)"]
-    TabsTrigger["TabsTrigger (Slot)"]
-    TabsContent["TabsContent (Slot)"]
+- `btn-variant-default`
+- `badge-variant-success`
+- `card-variant-interactive`
 
-    Tabs --> TabsList
-    Tabs --> TabsTrigger
-    Tabs --> TabsContent
+Several components still contain unused private helper methods from an older implementation approach. The class-name convention in the live template/HostBinding path is the actual runtime behavior.
 
-    Container["Container (Layout)"]
+### 4. Content projection instead of React-style children props
 
-    FormExample["Form Example (Usage)"]
-    FormExample --> Card
-    FormExample --> Label
-    FormExample --> Input
-    FormExample --> Button
-```
+The shared library relies heavily on `ng-content`.
 
----
+That is especially important for:
 
-## CSS Class Application Strategy
+- `app-button`
+- the card system
+- tabs list/trigger/content
+- container
 
-### Approach 1: String Concatenation (Used)
+### 5. Manual state wiring for tabs
 
-```typescript
-getButtonClasses(): string {
-  const baseClasses = '...';
-  const variantClasses = this.getVariantClasses();
-  const sizeClasses = this.getSizeClasses();
-  return `${baseClasses} ${variantClasses} ${sizeClasses}`;
-}
+The tabs system is visual and accessible enough for current use, but it is not a full coordinated state container.
 
-// Template
-[ngClass]="getButtonClasses()"
-```
+Current model:
 
-**Pros:**
+- host component owns `activeTab`
+- trigger emits `tabSelected`
+- consumer sets `activeTab = $event`
+- content receives `[isActive]`
 
-- Explicit and typed
-- Easy to debug
-- Flexible variant selection
-- Supports dynamic class generation
-
-**Cons:**
-
-- More method calls
-- Larger component code
-
-### Approach 2: HostBinding (Used)
-
-```typescript
-@HostBinding('class') get hostClasses(): string {
-  return this.getClasses();
-}
-```
+`app-tabs` itself is only a light wrapper around projected content.
 
-**Pros:**
+## Form Architecture Reality
 
-- Automatic DOM binding
-- Reduces template boilerplate
-- Cleaner HTML
-
-**Cons:**
+The current shared library does **not** contain form controls integrated with Angular Forms APIs.
 
-- Can't use multiple class bindings
-- Less flexible for conditional classes
-
----
+Specifically:
 
-## Variant Value Objects Pattern
-
-Each component with variants maintains a record mapping variant names to CSS classes:
-
-```typescript
-private getVariantClasses(): string {
-  const variants: Record<ButtonVariant, string> = {
-    default: 'bg-primary text-primary-foreground shadow...',
-    destructive: 'bg-destructive text-destructive-foreground...',
-    // ... more variants
-  };
-  return variants[this.variant] || variants['default'];
-}
-```
-
-**Benefits:**
-
-- Type-safe variant selection
-- Self-documenting code
-- Easy to add/modify variants
-- Prevents typos
-
----
-
-## Form Integration Pattern
-
-### Without Reactive Forms
-
-```html
-<app-label for="name" [required]="true">Name</app-label>
-<app-input id="name" type="text" [(ngModel)]="formData.name"> </app-input>
-```
-
-### With Reactive Forms (Recommended)
-
-```typescript
-this.form = this.fb.group({
-  name: ['', Validators.required],
-});
-```
-
-```html
-<app-label for="name" [required]="true">Name</app-label>
-<app-input id="name" [formControl]="form.get('name')"> </app-input>
-<div *ngIf="form.get('name')?.errors?.required" class="text-destructive">Name is required</div>
-```
-
----
-
-## Color Token System
-
-Components use CSS custom properties (variables) for theming:
-
-```scss
-// Define in your styles.scss
-:root {
-  --color-primary: #6d28d9;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #e5e7eb;
-  --color-secondary-foreground: #1f2937;
-  --color-destructive: #ef4444;
-  --color-destructive-foreground: #ffffff;
-  --color-success: #10b981;
-  --color-success-foreground: #ffffff;
-  --color-warning: #f59e0b;
-  --color-warning-foreground: #ffffff;
-  --color-info: #3b82f6;
-  --color-info-foreground: #ffffff;
-  --color-foreground: #000000;
-  --color-background: #ffffff;
-  --color-card: #ffffff;
-  --color-muted-foreground: #6b7280;
-  --color-border: #e5e7eb;
-  --color-input: #e5e7eb;
-}
-```
-
----
-
-## Comparison: React vs Angular Implementation
-
-### Button Component
-
-**React (Original):**
-
-```jsx
-const buttonVariants = cva(
-  "inline-flex items-center...",
-  {
-    variants: { variant: { ... }, size: { ... } }
-  }
-);
-
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'destructive' | ...;
-  size?: 'default' | 'sm' | ...;
-}
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp className={cn(buttonVariants({ variant, size, className }))} {...props} />
-    );
-  }
-);
-```
-
-**Angular (Equivalent):**
-
-```typescript
-@Component({
-  selector: 'app-button',
-  standalone: false,
-  templateUrl: './button.component.html',
-  styleUrls: ['./button.component.scss'],
-})
-export class ButtonComponent {
-  @Input() variant: ButtonVariant = 'default';
-  @Input() size: ButtonSize = 'default';
-  @Input() disabled: boolean = false;
-  @Output() clicked = new EventEmitter<MouseEvent>();
-
-  getButtonClasses(): string {
-    return `${baseClasses} ${this.getVariantClasses()} ${this.getSizeClasses()}`;
-  }
-
-  private getVariantClasses(): string {
-    const variants: Record<ButtonVariant, string> = {
-      /* ... */
-    };
-    return variants[this.variant];
-  }
-}
-```
-
-**Key Differences:**
-| Aspect | React | Angular |
-|--------|-------|---------|
-| Props | Interface & destructuring | @Input decorators |
-| Variants | CVA library | Component methods |
-| Refs | forwardRef | Template variables |
-| Events | onClick prop | @Output EventEmitter |
-| Styling | className prop | @HostBinding + [ngClass] |
-| Content | children prop | ng-content |
-
----
-
-## Extensibility & Future Enhancements
-
-### Adding New Components
-
-1. Create directory: `src/app/modules/shared/components/ui/component-name/`
-2. Create three files:
-   - `component-name.component.ts` - Logic & inputs
-   - `component-name.component.html` - Template with ng-content
-   - `component-name.component.scss` - Styling
-3. Import in `SharedModule` declarations & exports
-4. Document in `UI_LIBRARY.md`
-
-### Adding New Variants
-
-```typescript
-// In component.ts
-private getVariantClasses(): string {
-  const variants: Record<ComponentVariant, string> = {
-    // ... existing variants
-    'new-variant': 'class-a class-b class-c',
-  };
-  return variants[this.variant];
-}
-
-// Update type
-export type ComponentVariant = 'existing' | 'new-variant';
-
-// Update @Input
-@Input() variant: ComponentVariant = 'existing';
-```
-
----
-
-## Testing Strategy
-
-### Unit Test Example (Button)
-
-```typescript
-describe('ButtonComponent', () => {
-  it('should emit clicked event on click', () => {
-    const component = fixture.componentInstance;
-    spyOn(component.clicked, 'emit');
-
-    const button = fixture.nativeElement.querySelector('button');
-    button.click();
-
-    expect(component.clicked.emit).toHaveBeenCalled();
-  });
-
-  it('should apply correct classes for variant', () => {
-    component.variant = 'destructive';
-    fixture.detectChanges();
-
-    const button = fixture.nativeElement.querySelector('button');
-    expect(button.classList.contains('bg-destructive')).toBeTruthy();
-  });
-});
-```
-
----
-
-## Performance Considerations
-
-1. **Change Detection**: Default strategy is sufficient for atomic components
-2. **NgClass**: Applied to host element (efficient)
-3. **Content Projection**: No performance impact
-4. **Event Binding**: Direct EventEmitter (no memory leaks)
-5. **No External Dependencies**: Radix UI/CVA replaced with pure Angular
-
----
-
-## Accessibility Checklist
-
-- [x] Semantic HTML (button, input, label, div)
-- [x] ARIA attributes (aria-selected, aria-label, role)
-- [x] Keyboard navigation support
-- [x] Focus management
-- [x] Color contrast (Tailwind default)
-- [x] Screen reader friendly
-- [ ] Testing with NVDA/JAWS (Future)
-- [ ] WCAG 2.1 AA compliance (Target)
+- `app-input` is not a `ControlValueAccessor`
+- `app-textarea` is not a `ControlValueAccessor`
+- neither component emits typed input value changes
+
+This is why much of the real app still uses Angular Material form fields for working forms.
+
+That is not inconsistency by accident. It is the current functional boundary of the shared library.
+
+## Why Angular Material Is Still Present
+
+Angular Material remains heavily used for the following reasons:
+
+- dialog infrastructure already exists
+- snackbars already exist
+- complex form fields already exist
+- selects, menus, tables, paginator, and icon utilities already exist
+- many feature screens were built around those APIs before the custom primitives matured
+
+The current strategy is:
+
+- keep Material where it solves real behavior
+- override its visual defaults globally so it matches Detailly
+- use custom primitives where simple composition is enough
+
+## Theme Architecture
+
+### Token direction
+
+The visual system is now based on Detailly dark HSL tokens.
+
+Examples of categories:
+
+- core surface/text
+- accent/status colors
+- gradients
+- shadows/glows
+- radii
+- layout width/padding
+
+### Global override direction
+
+`src/styles.scss` now also overrides Material primitives such as:
+
+- buttons
+- icon buttons
+- form fields
+- text fields
+- cards
+- dialogs
+- menus
+- selects
+- tooltips
+
+That file is effectively the global UI theme engine.
+
+## Public/Auth UI Relationship to the Shared Library
+
+The public landing page and auth screens are not built exclusively from `app-*` components.
+
+They combine:
+
+- token-driven page SCSS
+- themed Angular Material controls
+- some shared concepts from the UI layer
+
+This means future documentation should not claim:
+
+- "the whole UI is implemented through the shared library"
+
+That would be false.
+
+The accurate statement is:
+
+- "the shared library provides reusable low-level building blocks, while the app also uses themed Angular Material and page-level SCSS"
+
+## Current Strengths
+
+- Centralized dark theme with a clear brand identity
+- Reusable button/badge/card/container primitives
+- Good token reuse across shared components and page-level styles
+- SharedModule gives one import path for most UI needs
+- Material visuals are now much closer to the same design language
+
+## Current Weaknesses
+
+- `app-input` / `app-textarea` are not ready for real form replacement
+- tabs are manually coordinated
+- some components still carry stale helper methods from an older generation path
+- older docs previously described a different system than the one in source
+- UI usage is split between custom primitives and Material, which requires honest documentation
+
+## Recommended Future Evolution
+
+### Priority 1
+
+- implement `ControlValueAccessor` for `app-input`
+- implement `ControlValueAccessor` for `app-textarea`
+- document migration guidance away from direct `matInput` where appropriate
+
+### Priority 2
+
+- make `app-tabs` own state and coordinate children automatically
+- remove dead helper methods in component classes
+- add tests around button, badge, card, and tabs behavior
+
+### Priority 3
+
+- expand the custom library only where it brings real value
+- avoid duplicating complex Material features unless there is a strong need
+
+## Architecture Rule of Thumb
+
+When editing UI in this repo, evaluate the task in this order:
+
+1. Is the styling/token change global?
+   - edit `src/styles.scss`
+2. Is it a reusable primitive concern?
+   - edit `src/app/modules/shared/components/ui/...`
+3. Is it specific to one screen/section?
+   - edit the page-level component SCSS/HTML
+4. Does the screen already depend on Angular Material behavior?
+   - prefer keeping Material and adjusting theme/styling rather than rebuilding behavior unnecessarily
+
+That rule matches the current codebase and should keep future work consistent.
