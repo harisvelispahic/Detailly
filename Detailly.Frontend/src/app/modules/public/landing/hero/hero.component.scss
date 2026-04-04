@@ -63,6 +63,11 @@
 .hero-text {
   width: min(100%, 56rem);
   text-align: left;
+  margin-left: clamp(3rem, 8vw, 6.5rem);
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
 }
 
 .badge-container {
@@ -88,7 +93,7 @@
 
 .hero-title {
   max-width: 42rem;
-  font-size: clamp(2.15rem, 4vw, 3.5rem);
+  font-size: clamp(2.35rem, 4.35vw, 3.9rem);
   font-weight: 700;
   line-height: 1.14;
   color: hsl(var(--foreground));
@@ -104,7 +109,7 @@
 
 .hero-description {
   max-width: 38rem;
-  font-size: 0.96rem;
+  font-size: 1.02rem;
   line-height: 1.7;
   color: hsl(var(--muted-foreground));
   margin: 0 0 2rem;

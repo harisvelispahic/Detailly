@@ -1,13 +1,6 @@
-// Teget paleta
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
+@use '../../../../../styles/palette-bridge' as *;
 
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.08);
+$hover-bg: $primary-soft;
 
 .paginator-bar {
   padding: 0;
@@ -20,7 +13,7 @@ $hover-bg: rgba(73, 118, 181, 0.08);
     gap: 24px;
     flex-wrap: wrap;
     padding: 16px 24px;
-    background: white;
+    background: $card;
     border-radius: 0 0 16px 16px;
   }
 
@@ -53,7 +46,7 @@ $hover-bg: rgba(73, 118, 181, 0.08);
     }
 
     .info-divider {
-      color: rgba(73, 118, 181, 0.3);
+      color: $primary-border-soft;
       font-weight: bold;
     }
   }
@@ -88,7 +81,7 @@ $hover-bg: rgba(73, 118, 181, 0.08);
             margin: 0;
           }
           .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-            background-color: white !important;
+            background-color: $card !important;
           }
 
           .mat-form-field-flex {
@@ -150,7 +143,7 @@ $hover-bg: rgba(73, 118, 181, 0.08);
         color: $primary-color;
         font-weight: 500;
         transition: all 0.3s ease;
-        background: white;
+        background: $card;
 
         mat-icon {
           font-size: 20px;
@@ -162,7 +155,7 @@ $hover-bg: rgba(73, 118, 181, 0.08);
           background: $primary-lighter;
           border-color: $primary-color;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(73, 118, 181, 0.2);
+          box-shadow: $shadow-primary;
         }
 
         &:not(:disabled):active {
@@ -172,8 +165,8 @@ $hover-bg: rgba(73, 118, 181, 0.08);
         &:disabled {
           opacity: 0.4;
           cursor: not-allowed;
-          background: #f5f5f5;
-          border-color: #e0e0e0;
+          background: $background-light;
+          border-color: $border-color;
           color: $text-secondary;
         }
       }
@@ -185,11 +178,11 @@ $hover-bg: rgba(73, 118, 181, 0.08);
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-        color: white;
+        color: $card-foreground;
         font-weight: 700;
         font-size: 16px;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(73, 118, 181, 0.3);
+        box-shadow: $shadow-primary;
         padding: 0 12px;
       }
     }

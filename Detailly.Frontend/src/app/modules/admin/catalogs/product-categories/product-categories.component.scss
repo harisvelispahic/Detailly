@@ -1,24 +1,4 @@
-// Glavne boje - teget paleta #4976b5
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
-
-$secondary-color: #5a8ac9;
-$accent-color: #7ba7db;
-
-$bg-gradient-start: #f0f5fb;
-$bg-gradient-end: #e3ecf7;
-
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$text-disabled: #90a4ae;
-
-$success-color: #66bb6a;
-$error-color: #ef5350;
-
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.04);
+@use '../../../../../styles/palette-bridge' as *;
 
 // Container
 .container {
@@ -35,12 +15,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba(73, 118, 181, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: $shadow-md;
   }
 
   .header-card-content {
@@ -63,7 +43,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(73, 118, 181, 0.25);
+        box-shadow: $shadow-primary;
 
         mat-icon {
           color: white;
@@ -107,7 +87,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
           }
 
           .mat-form-field-underline {
-            background-color: rgba(73, 118, 181, 0.3) !important;
+            background-color: $primary-border-soft !important;
           }
 
           .mat-form-field-ripple {
@@ -145,11 +125,11 @@ $hover-bg: rgba(73, 118, 181, 0.04);
           }
 
           .mat-slide-toggle-bar {
-            background-color: rgba(73, 118, 181, 0.2);
+            background-color: hsl(270 70% 60% / 0.2);
           }
 
           .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-            background-color: rgba(73, 118, 181, 0.5);
+            background-color: hsl(270 70% 60% / 0.5);
           }
 
           .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
@@ -165,7 +145,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         padding: 0 24px;
         height: 44px;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(73, 118, 181, 0.25);
+        box-shadow: $shadow-primary;
         transition: all 0.3s ease;
 
         mat-icon {
@@ -174,7 +154,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(73, 118, 181, 0.35);
+          box-shadow: $shadow-primary;
         }
 
         &:active {
@@ -194,7 +174,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   padding: 80px 20px;
   background: white;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
 
   mat-spinner {
@@ -218,10 +198,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
-  background: #ffebee;
-  border: 1px solid #ef9a9a;
+  background: $error-soft;
+  border: 1px solid $error-border-soft;
   border-radius: 12px;
-  color: #c62828;
+  color: $error-color;
 
   mat-icon {
     font-size: 28px;
@@ -240,14 +220,14 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   background: white;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
 
   table {
     width: 100%;
 
     th {
-      background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
+      background: $gradient-surface;
       border-bottom: 2px solid $primary-color;
       font-weight: 600;
       color: $primary-dark;
@@ -280,11 +260,11 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       .status-toggle {
         ::ng-deep {
           .mat-slide-toggle-bar {
-            background-color: rgba(73, 118, 181, 0.2);
+            background-color: hsl(270 70% 60% / 0.2);
           }
 
           .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
-            background-color: rgba(73, 118, 181, 0.5);
+            background-color: hsl(270 70% 60% / 0.5);
           }
 
           .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
@@ -325,10 +305,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 
           &.delete-btn {
             color: $error-color;
-            background: rgba(239, 83, 80, 0.05);
+            background: $error-soft;
 
             &:hover {
-              background: rgba(239, 83, 80, 0.15);
+              background: $error-soft-strong;
               transform: scale(1.1);
             }
           }
@@ -365,7 +345,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
             font-size: 64px;
             width: 64px;
             height: 64px;
-            color: rgba(73, 118, 181, 0.3);
+            color: $primary-border-soft;
           }
 
           p {

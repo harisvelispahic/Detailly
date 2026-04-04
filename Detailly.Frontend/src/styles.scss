@@ -31,6 +31,13 @@
   --muted: 240 10% 20%;
   --muted-foreground: 240 5% 60%;
 
+  --surface-1: 240 12% 14%;
+  --surface-2: 240 12% 16%;
+  --surface-3: 240 10% 18%;
+  --surface-4: 240 10% 20%;
+  --neutral: 240 5% 60%;
+  --neutral-foreground: 0 0% 100%;
+
   --accent: 280 80% 65%;
   --accent-foreground: 0 0% 100%;
 
@@ -76,6 +83,18 @@
     hsl(260 20% 8%) 50%,
     hsl(240 15% 9%) 100%
   );
+  --gradient-page: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--popover)) 100%);
+  --gradient-surface: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--card)) 100%);
+  --gradient-danger-soft: linear-gradient(
+    135deg,
+    hsl(var(--destructive) / 0.16) 0%,
+    hsl(var(--destructive) / 0.08) 100%
+  );
+  --gradient-warning-soft: linear-gradient(
+    135deg,
+    hsl(var(--warning) / 0.18) 0%,
+    hsl(var(--warning) / 0.08) 100%
+  );
 
   // Shadows & Glows
   --glow-primary: 0 0 60px -15px hsl(270 70% 60% / 0.5);
@@ -83,6 +102,16 @@
   --shadow-card: 0 4px 20px -4px hsl(0 0% 0% / 0.5);
   --shadow-elevated: 0 8px 40px -8px hsl(0 0% 0% / 0.6);
   --shadow-hero: 0 10px 30px -10px hsl(270 70% 60% / 0.3);
+  --shadow-soft: 0 8px 24px -16px hsl(0 0% 0% / 0.48);
+  --shadow-strong: 0 20px 40px -24px hsl(0 0% 0% / 0.65);
+  --shadow-primary: 0 18px 34px -18px hsl(var(--primary) / 0.4);
+  --shadow-warning: 0 18px 34px -18px hsl(var(--warning) / 0.35);
+  --shadow-danger: 0 18px 34px -18px hsl(var(--destructive) / 0.35);
+
+  // Overlays
+  --overlay-foreground-soft: hsl(0 0% 100% / 0.08);
+  --overlay-foreground-medium: hsl(0 0% 100% / 0.12);
+  --overlay-foreground-strong: hsl(0 0% 100% / 0.18);
 
   // Layout
   --page-max-width: 1400px;

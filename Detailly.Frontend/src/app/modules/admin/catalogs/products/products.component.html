@@ -58,7 +58,7 @@
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.PRICE' | translate }}</th>
         <td mat-cell *matCellDef="let product">
-          <span style="font-weight: 600; color: #4976b5"
+          <span style="font-weight: 600; color: hsl(var(--primary))"
             >{{ product.price | number : '1.2-2' }} KM</span
           >
         </td>
@@ -69,7 +69,9 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.STOCK' | translate }}</th>
         <td mat-cell *matCellDef="let product">
           <span
-            [style.color]="product.stockQuantity > 0 ? '#66bb6a' : '#ef5350'"
+            [style.color]="
+              product.stockQuantity > 0 ? 'hsl(var(--success))' : 'hsl(var(--destructive))'
+            "
             style="font-weight: 500"
           >
             {{ product.stockQuantity }}

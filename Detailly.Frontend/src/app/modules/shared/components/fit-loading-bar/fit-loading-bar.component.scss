@@ -1,3 +1,5 @@
+@use '../../../../../styles/palette-bridge' as *;
+
 .loading-bar-container {
   position: fixed;
   top: 0;
@@ -12,17 +14,10 @@
 .loading-bar {
   height: 100%;
   width: 100%;
-  background: linear-gradient(
-      90deg,
-      #4976b5 0%,
-      #6b96d1 25%,
-      #7ba7db 50%,
-      #6b96d1 75%,
-      #4976b5 100%
-  );
+  background: linear-gradient(90deg, $primary-color 0%, $primary-light 25%, $accent-color 50%, $primary-light 75%, $primary-color 100%);
   background-size: 200% 100%;
   animation: loading-wave 1.5s ease-in-out infinite;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.4);
+  box-shadow: $shadow-primary;
 }
 
 @keyframes loading-wave {

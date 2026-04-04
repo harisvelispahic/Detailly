@@ -1,21 +1,6 @@
 // Import order status styles
+@use '../../../../../styles/palette-bridge' as *;
 @import '../admin-orders-status-styles.scss';
-
-// Main colors
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
-
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$text-muted: #90a4ae;
-
-$success-color: #66bb6a;
-$error-color: #ef5350;
-
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.04);
 
 // ============================================================
 // DIALOG CONTAINER
@@ -37,7 +22,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   align-items: center;
   padding: 20px 24px;
   border-bottom: 2px solid $border-color;
-  background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
+  background: $gradient-surface;
 
   .header-left {
     display: flex;
@@ -76,7 +61,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     color: $text-secondary;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: hsl(0 0% 0% / 0.04);
     }
   }
 }
@@ -108,16 +93,16 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   gap: 16px;
   padding: 24px;
   margin: 24px;
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  border: 1px solid #ef9a9a;
+  background: $gradient-danger-soft;
+  border: 1px solid $error-border-soft;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(239, 83, 80, 0.15);
+  box-shadow: $shadow-danger;
 
   mat-icon {
     font-size: 32px;
     width: 32px;
     height: 32px;
-    color: #c62828;
+    color: $error-color;
     flex-shrink: 0;
   }
 
@@ -126,13 +111,13 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 
     p {
       margin: 0 0 16px 0;
-      color: #d32f2f;
+      color: $error-color;
       line-height: 1.5;
     }
 
     button {
-      border-color: #c62828;
-      color: #c62828;
+      border-color: $error-color;
+      color: $error-color;
 
       mat-icon {
         margin-right: 8px;
@@ -160,7 +145,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
+  background: $gradient-surface;
   border-radius: 12px;
   border: 1px solid $border-color;
   gap: 20px;
@@ -231,7 +216,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 // INFO CARDS
 // ============================================================
 .info-card {
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
   border-radius: 12px;
 
@@ -376,7 +361,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     }
 
     tfoot {
-      background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
+      background: $gradient-surface;
 
       .total-row {
         border-top: 2px solid $primary-color;

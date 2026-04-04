@@ -1,0 +1,83 @@
+$background: hsl(240 15% 9%);
+$foreground: hsl(0 0% 98%);
+
+$card: hsl(240 12% 12%);
+$card-foreground: hsl(0 0% 98%);
+$popover: hsl(240 12% 10%);
+
+$primary-color: hsl(270 70% 60%);
+$primary-light: hsl(280 80% 65%);
+$primary-lighter: hsl(240 10% 18%);
+$primary-dark: hsl(270 70% 52%);
+
+$secondary-color: hsl(265 62% 58%);
+$accent-color: hsl(280 80% 65%);
+
+$bg-gradient-start: hsl(240 15% 9%);
+$bg-gradient-end: hsl(240 12% 10%);
+
+$text-primary: hsl(0 0% 98%);
+$text-secondary: hsl(240 5% 60%);
+$text-disabled: hsl(240 5% 60%);
+$text-muted: hsl(240 5% 60%);
+$text-light: hsl(240 5% 60%);
+
+$success-color: hsl(142 76% 36%);
+$error-color: hsl(0 72% 51%);
+$warning-color: hsl(38 92% 50%);
+$info-color: hsl(200 90% 50%);
+$neutral-color: hsl(240 5% 60%);
+
+$background-card: hsl(240 12% 12%);
+$background-light: hsl(240 10% 18%);
+$border-color: hsl(240 10% 20%);
+$hover-bg: hsl(270 70% 60% / 0.08);
+
+$primary-soft: hsl(270 70% 60% / 0.08);
+$primary-soft-strong: hsl(270 70% 60% / 0.16);
+$primary-border-soft: hsl(270 70% 60% / 0.3);
+
+$success-soft: hsl(142 76% 36% / 0.12);
+$success-border-soft: hsl(142 76% 36% / 0.3);
+$warning-soft: hsl(38 92% 50% / 0.14);
+$warning-border-soft: hsl(38 92% 50% / 0.3);
+$info-soft: hsl(200 90% 50% / 0.12);
+$info-border-soft: hsl(200 90% 50% / 0.3);
+$error-soft: hsl(0 72% 51% / 0.14);
+$error-soft-strong: hsl(0 72% 51% / 0.2);
+$error-border-soft: hsl(0 72% 51% / 0.32);
+$neutral-soft: hsl(240 5% 60% / 0.12);
+$neutral-border-soft: hsl(240 5% 60% / 0.28);
+
+$overlay-white-10: hsl(0 0% 100% / 0.1);
+$overlay-white-15: hsl(0 0% 100% / 0.15);
+$overlay-white-20: hsl(0 0% 100% / 0.2);
+$overlay-white-25: hsl(0 0% 100% / 0.25);
+$overlay-white-30: hsl(0 0% 100% / 0.3);
+$overlay-scrim: hsl(240 15% 9% / 0.92);
+
+$shadow-sm: 0 8px 24px -16px hsl(0 0% 0% / 0.48);
+$shadow-md: 0 16px 36px -24px hsl(0 0% 0% / 0.6);
+$shadow-lg: 0 24px 48px -24px hsl(0 0% 0% / 0.7);
+$shadow-primary: 0 18px 34px -18px hsl(270 70% 60% / 0.4);
+$shadow-warning: 0 18px 34px -18px hsl(38 92% 50% / 0.35);
+$shadow-info: 0 18px 34px -18px hsl(200 90% 50% / 0.35);
+$shadow-danger: 0 18px 34px -18px hsl(0 72% 51% / 0.35);
+
+$gradient-page: linear-gradient(180deg, $bg-gradient-start 0%, $bg-gradient-end 100%);
+$gradient-surface: linear-gradient(135deg, $primary-lighter 0%, $card 100%);
+$gradient-primary: linear-gradient(
+  135deg,
+  hsl(280 80% 55%) 0%,
+  hsl(260 70% 50%) 50%,
+  hsl(240 60% 45%) 100%
+);
+$gradient-accent: linear-gradient(135deg, $primary-light 0%, $primary-color 100%);
+$gradient-warning: linear-gradient(135deg, hsl(38 92% 54%) 0%, hsl(28 92% 48%) 100%);
+$gradient-info: linear-gradient(135deg, hsl(200 90% 54%) 0%, hsl(210 90% 46%) 100%);
+$gradient-danger-soft: linear-gradient(135deg, $error-soft-strong 0%, $error-soft 100%);
+$gradient-warning-soft: linear-gradient(
+  135deg,
+  hsl(38 92% 50% / 0.18) 0%,
+  hsl(38 92% 50% / 0.08) 100%
+);

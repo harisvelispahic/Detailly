@@ -1,25 +1,4 @@
-// Glavne boje - teget paleta #4976b5
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
-
-$secondary-color: #5a8ac9;
-$accent-color: #7ba7db;
-
-$bg-gradient-start: #f0f5fb;
-$bg-gradient-end: #e3ecf7;
-
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$text-disabled: #90a4ae;
-
-$success-color: #66bb6a;
-$error-color: #ef5350;
-$warning-color: #ffa726;
-
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.04);
+@use '../../../../../../styles/palette-bridge' as *;
 
 // Container
 .container {
@@ -36,12 +15,12 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 4px 16px rgba(73, 118, 181, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: $shadow-md;
   }
 
   h1 {
@@ -63,7 +42,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba($warning-color, 0.25);
+      box-shadow: $shadow-warning;
       flex-shrink: 0;
     }
 
@@ -87,7 +66,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   background: white;
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
   position: relative;
   min-height: 400px;
@@ -103,10 +82,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       align-items: center;
       gap: 12px;
       padding: 16px 20px;
-      background: #ffebee;
-      border: 1px solid #ef9a9a;
+      background: $error-soft;
+      border: 1px solid $error-border-soft;
       border-radius: 12px;
-      color: #c62828;
+      color: $error-color;
       font-weight: 500;
       animation: slideDown 0.3s ease-out;
 
@@ -157,7 +136,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
           &.mat-focused {
             .mat-mdc-text-field-wrapper {
               background-color: white;
-              box-shadow: 0 4px 12px rgba(73, 118, 181, 0.12);
+              box-shadow: $shadow-primary;
             }
 
             .mdc-notched-outline__leading,
@@ -259,7 +238,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
             border-color: $text-secondary;
             color: $text-primary;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: $shadow-sm;
 
             mat-icon {
               color: $text-primary;
@@ -276,7 +255,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         &[mat-raised-button] {
           background: linear-gradient(135deg, $warning-color 0%, darken($warning-color, 5%) 100%);
           color: white;
-          box-shadow: 0 4px 12px rgba($warning-color, 0.3);
+          box-shadow: $shadow-warning;
           border: none;
 
           mat-icon {
@@ -289,7 +268,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
               darken($warning-color, 10%) 0%,
               darken($warning-color, 5%) 100%
             );
-            box-shadow: 0 6px 16px rgba($warning-color, 0.4);
+            box-shadow: $shadow-warning;
             transform: translateY(-2px);
           }
 
@@ -320,7 +299,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: $overlay-scrim;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
@@ -413,7 +392,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 // Select Panel Styling
 ::ng-deep .mat-mdc-select-panel {
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(73, 118, 181, 0.15);
+  box-shadow: $shadow-md;
   border: 1px solid $border-color;
   margin-top: 8px;
 

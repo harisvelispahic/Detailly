@@ -1,38 +1,23 @@
 // Import order status styles
+@use '../../../../styles/palette-bridge' as *;
 @import 'admin-orders-status-styles';
-
-// Main colors
-$primary-color: #4976b5;
-$primary-light: #6b96d1;
-$primary-lighter: #e8f0f9;
-$primary-dark: #3a5e91;
-
-$text-primary: #2c3e50;
-$text-secondary: #546e7a;
-$text-muted: #90a4ae;
-
-$success-color: #66bb6a;
-$error-color: #ef5350;
-
-$border-color: rgba(73, 118, 181, 0.15);
-$hover-bg: rgba(73, 118, 181, 0.04);
 
 // Container
 .container {
   padding: 24px;
   max-width: 1600px;
   margin: 0 auto;
-  background: linear-gradient(135deg, #f0f5fb 0%, #e3ecf7 100%);
+  background: $gradient-page;
   min-height: 100vh;
 }
 
 // Header Card
 .header-card {
-  background: white;
+  background: $card;
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
 
   .header-card-content {
@@ -55,7 +40,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(73, 118, 181, 0.25);
+        box-shadow: $shadow-primary;
 
         mat-icon {
           color: white;
@@ -113,7 +98,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         }
 
         &:hover:not(:disabled) {
-          background-color: rgba(73, 118, 181, 0.08);
+          background-color: $primary-soft;
         }
 
         &:disabled {
@@ -130,16 +115,16 @@ $hover-bg: rgba(73, 118, 181, 0.04);
   align-items: flex-start;
   gap: 16px;
   padding: 24px;
-  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
-  border: 1px solid #ef9a9a;
+  background: $gradient-danger-soft;
+  border: 1px solid $error-border-soft;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(239, 83, 80, 0.15);
+  box-shadow: $shadow-danger;
 
   mat-icon {
     font-size: 32px;
     width: 32px;
     height: 32px;
-    color: #c62828;
+    color: $error-color;
     flex-shrink: 0;
   }
 
@@ -150,18 +135,18 @@ $hover-bg: rgba(73, 118, 181, 0.04);
       margin: 0 0 8px 0;
       font-size: 18px;
       font-weight: 600;
-      color: #c62828;
+      color: $error-color;
     }
 
     .error-message {
       margin: 0 0 16px 0;
-      color: #d32f2f;
+      color: $error-color;
       line-height: 1.5;
     }
 
     button {
-      border-color: #c62828;
-      color: #c62828;
+      border-color: $error-color;
+      color: $error-color;
 
       mat-icon {
         margin-right: 8px;
@@ -172,17 +157,17 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 
 // Table Card
 .table-card {
-  background: white;
+  background: $card;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(73, 118, 181, 0.08);
+  box-shadow: $shadow-sm;
   border: 1px solid $border-color;
 
   .orders-table {
     width: 100%;
 
     th {
-      background: linear-gradient(135deg, $primary-lighter 0%, #f5f9fd 100%);
+      background: $gradient-surface;
       border-bottom: 2px solid $primary-color;
       font-weight: 600;
       color: $primary-dark;
@@ -265,7 +250,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
 
         &.view-btn {
           color: $primary-color;
-          background: rgba(73, 118, 181, 0.08);
+          background: $primary-soft;
 
           &:hover:not(:disabled) {
             background: $primary-lighter;
@@ -274,10 +259,10 @@ $hover-bg: rgba(73, 118, 181, 0.04);
         }
 
         &.status-btn {
-          background: rgba(156, 39, 176, 0.08);
+          background: $primary-soft;
 
           &:hover:not(:disabled) {
-            background: rgba(156, 39, 176, 0.15);
+            background: $primary-soft-strong;
             transform: scale(1.1);
           }
 
@@ -321,7 +306,7 @@ $hover-bg: rgba(73, 118, 181, 0.04);
             font-size: 72px;
             width: 72px;
             height: 72px;
-            color: rgba(73, 118, 181, 0.3);
+            color: $primary-border-soft;
           }
 
           p {

@@ -26,67 +26,67 @@
 
 // Draft - Gray (Order is being prepared)
 .status-draft {
-  background: rgba(158, 158, 158, 0.1);
-  color: #616161;
-  border: 1px solid rgba(158, 158, 158, 0.3);
+  background: hsl(var(--neutral) / 0.12);
+  color: hsl(var(--neutral));
+  border: 1px solid hsl(var(--neutral) / 0.28);
   
   mat-icon {
-    color: #616161;
+    color: hsl(var(--neutral));
   }
 }
 
 // Confirmed - Blue (Order confirmed, awaiting payment)
 .status-confirmed {
-  background: rgba(33, 150, 243, 0.1);
-  color: #1976d2;
-  border: 1px solid rgba(33, 150, 243, 0.3);
+  background: hsl(var(--info) / 0.12);
+  color: hsl(var(--info));
+  border: 1px solid hsl(var(--info) / 0.3);
   
   mat-icon {
-    color: #1976d2;
+    color: hsl(var(--info));
   }
 }
 
 // Paid - Green (Payment received, processing)
 .status-paid {
-  background: rgba(76, 175, 80, 0.1);
-  color: #388e3c;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background: hsl(var(--success) / 0.12);
+  color: hsl(var(--success));
+  border: 1px solid hsl(var(--success) / 0.3);
   
   mat-icon {
-    color: #388e3c;
+    color: hsl(var(--success));
   }
 }
 
 // Completed - Dark Green (Order completed/delivered)
 .status-completed {
-  background: rgba(46, 125, 50, 0.1);
-  color: #1b5e20;
-  border: 1px solid rgba(46, 125, 50, 0.3);
+  background: hsl(var(--success) / 0.18);
+  color: hsl(var(--success));
+  border: 1px solid hsl(var(--success) / 0.34);
   
   mat-icon {
-    color: #1b5e20;
+    color: hsl(var(--success));
   }
 }
 
 // Cancelled - Red (Order cancelled)
 .status-cancelled {
-  background: rgba(244, 67, 54, 0.1);
-  color: #c62828;
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  background: hsl(var(--destructive) / 0.12);
+  color: hsl(var(--destructive));
+  border: 1px solid hsl(var(--destructive) / 0.3);
   
   mat-icon {
-    color: #c62828;
+    color: hsl(var(--destructive));
   }
 }
 
 // Unknown - Light Gray
 .status-unknown {
-  background: rgba(189, 189, 189, 0.1);
-  color: #757575;
-  border: 1px solid rgba(189, 189, 189, 0.3);
+  background: hsl(var(--muted-foreground) / 0.12);
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--muted-foreground) / 0.28);
   
   mat-icon {
-    color: #757575;
+    color: hsl(var(--muted-foreground));
   }
 }
 
