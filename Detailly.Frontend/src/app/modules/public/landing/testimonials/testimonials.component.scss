@@ -1,17 +1,14 @@
 // src/app/modules/public/landing/testimonials/testimonials.component.scss
 
 .testimonials-section {
-  padding: 80px 20px; // py-20
+  padding: 6rem 0;
   background: hsl(var(--background));
-
-  @media (min-width: 768px) {
-    padding: 112px 20px; // md:py-28
-  }
 }
 
 .container {
-  max-width: 48rem; // max-w-3xl
+  width: min(100%, 52rem);
   margin: 0 auto;
+  padding: 0 var(--page-padding-x);
 }
 
 .section-header {
@@ -24,15 +21,11 @@
 }
 
 .section-title {
-  font-size: 32px; // text-3xl
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
   color: hsl(var(--foreground));
   margin: 0 0 16px 0;
   line-height: 1.2;
-
-  @media (min-width: 768px) {
-    font-size: 42px; // md:text-4xl
-  }
 
   .gradient-text {
     background: var(--gradient-accent);
@@ -60,11 +53,12 @@
 .review-card {
   position: relative;
   padding: 32px; // p-8
-  background: hsl(var(--card) / 0.6); // variant="glass"
-  border: 1px solid hsl(var(--foreground) / 0.1);
+  background: hsl(var(--card) / 0.72);
+  border: 1px solid hsl(var(--border));
   border-radius: 12px;
   text-align: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-card);
   animation: fadeIn 0.3s ease-out;
 
   @media (min-width: 768px) {
@@ -184,9 +178,9 @@
 .nav-button {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius);
   background: hsl(var(--primary) / 0.1);
-  border: none;
+  border: 1px solid hsl(var(--border));
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -202,7 +196,7 @@
 
   &:hover:not(:disabled) {
     background: hsl(var(--primary));
-    box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+    box-shadow: 0 12px 24px -12px hsl(var(--primary) / 0.5);
 
     mat-icon {
       color: hsl(var(--foreground));

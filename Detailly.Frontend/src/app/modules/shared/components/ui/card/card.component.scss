@@ -15,21 +15,21 @@
 // ===========================
 
 .card-variant-default {
-  background-color: hsl(var(--card));
+  background: var(--gradient-card);
   border-color: hsl(var(--border));
-  box-shadow: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 .card-variant-elevated {
-  background-color: hsl(var(--card));
+  background: var(--gradient-card);
   border-color: hsl(var(--border));
-  box-shadow: 0 10px 15px -3px hsl(0 0% 0% / 0.2);
+  box-shadow: var(--shadow-elevated);
 }
 
 .card-variant-interactive {
-  background-color: hsl(var(--card));
+  background: var(--gradient-card);
   border-color: hsl(var(--border));
-  box-shadow: 0 10px 15px -3px hsl(0 0% 0% / 0.2);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
 
   &:hover {
@@ -45,17 +45,18 @@
 
 .card-variant-glass {
   background-color: hsl(var(--card) / 0.6);
-  backdrop-filter: blur(12px);
-  border-color: hsl(var(--border) / 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-color: hsl(0 0% 100% / 0.08);
 
   &:hover {
     background-color: hsl(var(--card) / 0.8);
-    border-color: hsl(var(--border) / 0.8);
+    border-color: hsl(0 0% 100% / 0.16);
   }
 }
 
 .card-variant-gradient {
-  background: linear-gradient(to bottom right, hsl(var(--card)), hsl(var(--background)));
+  background: var(--gradient-card);
   border-color: hsl(var(--border));
 }
 
@@ -98,10 +99,10 @@
 
 .card-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.875rem;
+  font-size: 1.5rem;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .card-description {

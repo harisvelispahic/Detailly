@@ -1,17 +1,14 @@
 // src/app/modules/public/landing/final-cta/final-cta.component.scss
 
 .final-cta-section {
-  padding: 80px 20px; // py-20
+  padding: 6rem 0 7rem;
   background: hsl(var(--background));
-
-  @media (min-width: 768px) {
-    padding: 112px 20px; // md:py-28
-  }
 }
 
 .container {
-  max-width: 1200px;
+  width: min(100%, var(--page-max-width));
   margin: 0 auto;
+  padding: 0 var(--page-padding-x);
 }
 
 .cta-card {
@@ -20,8 +17,9 @@
   border-radius: 12px;
   overflow: hidden;
   text-align: center;
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border) / 0.5);
+  background: var(--gradient-card);
+  border: 1px solid hsl(var(--border));
+  box-shadow: var(--shadow-card);
 
   @media (min-width: 768px) {
     padding: 48px; // md:p-12
@@ -60,15 +58,11 @@
 }
 
 .cta-title {
-  font-size: 32px; // text-3xl
+  font-size: clamp(2rem, 4vw, 2.5rem);
   font-weight: 700;
   color: hsl(var(--foreground));
   margin: 0 0 16px 0;
   line-height: 1.2;
-
-  @media (min-width: 768px) {
-    font-size: 42px; // md:text-4xl
-  }
 
   @media (max-width: 480px) {
     font-size: 28px;
@@ -121,11 +115,11 @@
 
 .primary-cta,
 .secondary-cta {
-  height: 56px; // size="xl"
+  min-height: 3.25rem;
   padding: 0 32px;
-  font-size: 16px;
+  font-size: 0.95rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius);
   transition: all 0.3s ease;
   white-space: nowrap;
   border: none;
@@ -144,23 +138,24 @@
 }
 
 .primary-cta {
-  background: hsl(var(--primary));
+  background: var(--gradient-primary);
   color: hsl(var(--primary-foreground));
-  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+  box-shadow: var(--shadow-hero);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px hsl(var(--primary) / 0.4);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 40px -10px hsl(var(--primary) / 0.4);
   }
 }
 
 .secondary-cta {
-  border: 2px solid hsl(var(--primary));
-  color: hsl(var(--accent));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
   background: transparent;
 
   &:hover {
-    background: hsl(var(--primary) / 0.05);
+    background: hsl(var(--secondary));
+    border-color: hsl(var(--primary) / 0.4);
     transform: translateY(-2px);
   }
 }

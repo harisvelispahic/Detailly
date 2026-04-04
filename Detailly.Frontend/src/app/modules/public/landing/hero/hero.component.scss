@@ -2,11 +2,11 @@
 
 .hero-section {
   position: relative;
-  min-height: 90vh;
+  min-height: min(100vh, 48rem);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   overflow: hidden;
+  padding: 3rem 0 4rem;
 }
 
 .hero-background {
@@ -46,26 +46,23 @@
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 10%;
-  padding: 0 40px;
+  width: min(100%, var(--page-max-width));
+  margin: 0 auto;
+  padding-right: var(--page-padding-x);
+  padding-left: clamp(2rem, 6vw, 5rem);
   position: relative;
   z-index: 10;
-  width: 100%;
-
-  @media (max-width: 768px) {
-    padding: 0 20px;
-    margin: 0;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0 16px;
-    margin: 0;
-  }
 }
 
 .hero-content {
-  max-width: 42rem; // max-w-2xl equivalent
+  width: 100%;
+  max-width: 58rem;
+  margin-left: 0;
+}
+
+.hero-text {
+  width: min(100%, 56rem);
+  text-align: left;
 }
 
 .badge-container {
@@ -74,7 +71,8 @@
   gap: 8px;
   margin-bottom: 24px;
   padding: 8px 16px;
-  background: hsl(var(--accent) / 0.1);
+  background: hsl(var(--primary) / 0.12);
+  border: 1px solid hsl(var(--primary) / 0.18);
   border-radius: 9999px; // Essentially full rounded
   font-size: 14px;
   font-weight: 500;
@@ -89,19 +87,12 @@
 }
 
 .hero-title {
-  font-size: 36px; // text-4xl
+  max-width: 42rem;
+  font-size: clamp(2.15rem, 4vw, 3.5rem);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.14;
   color: hsl(var(--foreground));
-  margin: 0 0 24px 0;
-
-  @media (min-width: 768px) {
-    font-size: 48px; // md:text-5xl
-  }
-
-  @media (min-width: 1024px) {
-    font-size: 56px; // lg:text-6xl
-  }
+  margin: 0 0 1.25rem;
 
   .gradient-text {
     background: var(--gradient-accent);
@@ -112,19 +103,17 @@
 }
 
 .hero-description {
-  font-size: 18px; // text-lg
-  line-height: 1.6;
+  max-width: 38rem;
+  font-size: 0.96rem;
+  line-height: 1.7;
   color: hsl(var(--muted-foreground));
-  margin: 0 0 32px 0;
-
-  @media (min-width: 768px) {
-    font-size: 20px; // md:text-xl
-  }
+  margin: 0 0 2rem;
 }
 
 .hero-actions {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: 48px;
 
@@ -135,11 +124,11 @@
 
 .cta-button,
 .secondary-button {
-  height: 56px;
-  padding: 0 32px;
-  font-size: 16px;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--radius);
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
@@ -157,42 +146,47 @@
 }
 
 .cta-button {
-  background: hsl(var(--primary)) !important;
+  background: var(--gradient-primary) !important;
   color: hsl(var(--primary-foreground)) !important;
-  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3) !important;
+  box-shadow: var(--shadow-hero) !important;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px hsl(var(--primary) / 0.4) !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 20px 40px -10px hsl(var(--primary) / 0.4) !important;
   }
 }
 
 .secondary-button {
-  border: 2px solid hsl(var(--primary)) !important;
-  color: hsl(var(--accent)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
   background: transparent !important;
 
   &:hover {
-    background: hsl(var(--primary) / 0.05) !important;
+    background: hsl(var(--secondary)) !important;
+    border-color: hsl(var(--primary) / 0.4) !important;
     transform: translateY(-2px);
   }
 }
 
 .stats-row {
   display: flex;
-  gap: 32px; // gap-8 = 32px
-  margin-top: 48px;
-  padding-top: 32px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 2rem;
+  margin-top: 3rem;
+  padding-top: 1.75rem;
+  width: fit-content;
   border-top: 1px solid hsl(var(--foreground) / 0.1); // border-white/10
 
   @media (max-width: 480px) {
     gap: 16px;
-    justify-content: space-around;
+    width: 100%;
   }
 }
 
 .stat-item {
-  flex: 1;
+  flex: 0 0 auto;
+  min-width: 5rem;
 
   @media (max-width: 480px) {
     flex: auto;
@@ -200,14 +194,11 @@
 }
 
 .stat-number {
-  font-size: 30px; // text-3xl
+  font-size: 1.5rem;
   font-weight: 700;
   color: hsl(var(--primary));
   line-height: 1;
   margin: 0 0 4px 0;
-
-  @media (min-width: 768px) {
-  }
 }
 
 .stat-label {

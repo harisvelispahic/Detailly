@@ -1,7 +1,3 @@
-// src/app/pages/auth/login/login.component.scss
-// All animations and colors use global design system from styles.scss
-
-// === MAIN CONTAINER ===
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -9,300 +5,219 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  padding: 20px;
+  padding: 3rem 1.25rem;
 }
 
-// === BACKGROUND ===
 .auth-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: hsl(var(--background));
+  inset: 0;
+  background:
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(260 20% 8%) 100%);
   z-index: 0;
 }
 
 .bg-shape {
   position: absolute;
-  border-radius: 50%;
-  opacity: 0.6;
-  filter: blur(80px);
+  border-radius: 9999px;
+  opacity: 0.55;
+  filter: blur(100px);
 
   &.shape-1 {
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, hsl(var(--primary) / 0.3) 0%, transparent 70%);
-    top: -150px;
-    left: -150px;
-    animation: float 20s ease-in-out infinite;
+    width: 30rem;
+    height: 30rem;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.28) 0%, transparent 70%);
+    top: -10rem;
+    left: -8rem;
+    animation: float 18s ease-in-out infinite;
   }
 
   &.shape-2 {
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, hsl(var(--accent) / 0.25) 0%, transparent 70%);
-    bottom: -100px;
-    right: -100px;
-    animation: float 25s ease-in-out infinite reverse;
+    width: 28rem;
+    height: 28rem;
+    background: radial-gradient(circle, hsl(var(--accent) / 0.22) 0%, transparent 72%);
+    bottom: -10rem;
+    right: -8rem;
+    animation: float 22s ease-in-out infinite reverse;
   }
 
   &.shape-3 {
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, hsl(var(--background) / 0.4) 0%, transparent 70%);
+    width: 36rem;
+    height: 16rem;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.08) 0%, transparent 72%);
     top: 50%;
     left: 50%;
-    animation: float 30s ease-in-out infinite;
+    transform: translate(-50%, -50%);
   }
 }
 
-// === CONTENT ===
 .auth-content {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 480px;
-  animation: slideInUp 0.6s ease-out;
+  max-width: 28rem;
 }
 
-// === BRAND ===
 .auth-brand {
-  text-align: center;
-  margin-bottom: 32px;
-  animation: fadeIn 0.8s ease-out;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
 }
 
-.brand-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  color: hsl(var(--primary));
-  margin-bottom: 16px;
-  animation: pulse 2s ease-in-out infinite;
+.brand-logo {
+  width: auto;
+  height: 3.25rem;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 30px hsl(var(--primary) / 0.18));
 }
 
-.brand-name {
-  font-size: 36px;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.brand-tagline {
-  font-size: 16px;
-  color: hsl(var(--muted-foreground));
-  margin: 0;
-  font-weight: 500;
-}
-
-// === CARD ===
 .auth-card {
-  background: hsl(var(--card));
-  border-radius: 24px;
-  padding: 40px;
-  animation: slideInUp 0.6s ease-out 0.2s both;
-  box-shadow: 0 20px 60px hsl(0 0% 0% / 0.15) !important;
-  border: 1px solid hsl(var(--primary) / 0.1);
+  background: linear-gradient(180deg, hsl(240 12% 14%) 0%, hsl(240 12% 11%) 100%) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 25px 60px -20px hsl(0 0% 0% / 0.7) !important;
 
-  @media (max-width: 480px) {
-    padding: 32px 24px;
-  }
-
-  ::ng-deep {
-    .mat-mdc-card-header {
-      padding: 0 0 32px 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .mat-mdc-card-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: hsl(var(--foreground));
-      margin: 0 0 8px 0;
-      letter-spacing: -0.5px;
-    }
-
-    .mat-mdc-card-subtitle {
-      font-size: 15px;
-      color: hsl(var(--muted-foreground));
-      margin: 0;
-    }
-
-    .mat-mdc-card-content {
-      padding: 0;
-    }
+  ::ng-deep .mat-mdc-card-content {
+    padding: 2rem !important;
   }
 }
 
-// === FORM ===
+.auth-card__header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.auth-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.auth-subtitle {
+  margin: 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.95rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
 
 .full-width {
   width: 100%;
 
   ::ng-deep {
-    .mat-mdc-form-field-focus-overlay {
-      background-color: transparent;
-    }
-
     .mat-mdc-text-field-wrapper {
-      background-color: hsl(var(--secondary));
-      border-radius: 12px;
-      transition: all 0.3s ease;
-    }
-
-    .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: hsl(var(--primary) / 0.2);
-        transition: all 0.3s ease;
-      }
-    }
-
-    .mdc-text-field--focused {
-      .mat-mdc-text-field-wrapper {
-        background-color: hsl(var(--card));
-        box-shadow: 0 0 0 4px hsl(var(--primary) / 0.1);
-      }
-
-      .mdc-notched-outline__leading,
-      .mdc-notched-outline__notch,
-      .mdc-notched-outline__trailing {
-        border-color: hsl(var(--primary)) !important;
-        border-width: 2px !important;
-      }
+      padding-inline: 0.125rem;
+      background: hsl(240 15% 9%) !important;
     }
 
     .mat-mdc-form-field-icon-prefix,
     .mat-mdc-form-field-icon-suffix {
-      color: hsl(var(--primary));
+      color: hsl(var(--muted-foreground)) !important;
     }
 
-    input {
-      font-size: 15px;
-      padding: 16px 12px;
+    .mat-mdc-input-element {
+      padding-block: 0.1rem !important;
     }
 
-    .mat-mdc-form-field-error {
-      font-size: 13px;
-      margin-top: 4px;
+    .mdc-text-field--focused .mat-mdc-form-field-icon-prefix,
+    .mdc-text-field--focused .mat-mdc-form-field-icon-suffix {
+      color: hsl(var(--primary)) !important;
     }
   }
 }
 
-// === ERROR MESSAGE ===
 .error-message {
   background: linear-gradient(
     135deg,
-    hsl(var(--destructive) / 0.1) 0%,
-    hsl(var(--destructive) / 0.05) 100%
+    hsl(var(--destructive) / 0.14) 0%,
+    hsl(var(--destructive) / 0.06) 100%
   );
-  border: 1px solid hsl(var(--destructive));
-  color: hsl(var(--destructive));
-  padding: 16px;
-  border-radius: 12px;
+  border: 1px solid hsl(var(--destructive) / 0.45);
+  color: hsl(var(--destructive-foreground));
+  padding: 0.875rem 1rem;
+  border-radius: calc(var(--radius) - 2px);
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  animation: fadeIn 0.3s ease-out;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
 
   mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    color: hsl(var(--destructive));
+    font-size: 1.125rem;
+    width: 1.125rem;
+    height: 1.125rem;
   }
 }
 
-// === FORM ROW ===
 .form-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: -8px;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+  gap: 1rem;
+  margin-top: -0.25rem;
 }
 
 ::ng-deep .mat-mdc-checkbox {
   .mdc-checkbox__background {
-    border-color: hsl(var(--primary)) !important;
+    border-color: hsl(var(--border)) !important;
   }
 
   &.mat-mdc-checkbox-checked .mdc-checkbox__background {
     background-color: hsl(var(--primary)) !important;
+    border-color: hsl(var(--primary)) !important;
   }
 
   .mdc-label {
-    font-size: 14px;
     color: hsl(var(--foreground));
+    font-size: 0.875rem;
+  }
+}
+
+.forgot-link,
+.register-link,
+.back-link {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: color 200ms ease;
+
+  &:hover {
+    color: hsl(var(--accent));
   }
 }
 
 .forgot-link {
-  color: hsl(var(--primary));
-  text-decoration: none;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: hsl(var(--accent));
-    text-decoration: underline;
-  }
 }
 
-// === SUBMIT BUTTON ===
 .actions {
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 
 .submit-button {
   width: 100%;
-  height: 56px;
-  font-size: 16px;
+  min-height: 3.25rem !important;
+  font-size: 1rem;
   font-weight: 600;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
-  transition: all 0.3s ease;
-
-  &:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px hsl(var(--primary) / 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  border-radius: var(--radius) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 
   mat-icon {
-    margin-right: 8px;
+    font-size: 1.125rem;
+    width: 1.125rem;
+    height: 1.125rem;
   }
 
   mat-progress-spinner {
     display: inline-block;
-    margin-right: 8px;
 
     ::ng-deep circle {
       stroke: hsl(var(--foreground));
@@ -310,102 +225,86 @@ form {
   }
 }
 
-// === DIVIDER ===
 .divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 32px 0;
+  margin: 0.75rem 0 0.25rem;
   color: hsl(var(--muted-foreground));
-  font-size: 14px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 
   &::before,
   &::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid hsl(var(--primary) / 0.2);
+    border-bottom: 1px solid hsl(var(--border));
   }
 
   span {
-    padding: 0 16px;
-    font-weight: 500;
+    padding: 0 0.875rem;
   }
 }
 
-// === REGISTER PROMPT ===
 .register-prompt {
   text-align: center;
-  font-size: 14px;
+  font-size: 0.9rem;
   color: hsl(var(--muted-foreground));
 
   span {
-    margin-right: 8px;
+    margin-right: 0.35rem;
   }
 }
 
 .register-link {
-  color: hsl(var(--primary));
-  text-decoration: none;
   font-weight: 600;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: hsl(var(--accent));
-    text-decoration: underline;
-  }
 }
 
-// === FOOTER ===
 .auth-footer {
   text-align: center;
-  margin-top: 24px;
-  animation: fadeIn 0.8s ease-out 0.4s both;
+  margin-top: 1.5rem;
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.45rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 9999px;
   color: hsl(var(--muted-foreground));
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  padding: 8px 16px;
-  border-radius: 8px;
-
-  &:hover {
-    color: hsl(var(--primary));
-    background: hsl(var(--primary) / 0.1);
-
-    mat-icon {
-      transform: translateX(-4px);
-    }
-  }
+  background: hsl(var(--card) / 0.38);
+  border: 1px solid hsl(var(--border));
 
   mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    transition: transform 0.3s ease;
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: hsl(var(--foreground));
+    background: hsl(var(--secondary));
   }
 }
 
-// === RESPONSIVE ===
 @media (max-width: 480px) {
-  .brand-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-  }
-
-  .brand-name {
-    font-size: 28px;
+  .auth-container {
+    padding-inline: 1rem;
   }
 
   .auth-card {
-    ::ng-deep .mat-mdc-card-title {
-      font-size: 24px;
+    ::ng-deep .mat-mdc-card-content {
+      padding: 1.5rem !important;
     }
+  }
+
+  .brand-logo {
+    height: 2.75rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

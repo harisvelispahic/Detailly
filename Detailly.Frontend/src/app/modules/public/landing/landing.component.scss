@@ -2,5 +2,7 @@
 
 .landing-page {
   min-height: 100vh;
-  background: hsl(var(--background));
+  background:
+    radial-gradient(circle at top right, hsl(var(--primary) / 0.08), transparent 28rem),
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(260 20% 8%) 50%, hsl(var(--background)) 100%);
 }

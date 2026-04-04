@@ -9,7 +9,9 @@
   border: 1px solid;
   padding: 0.25rem 0.625rem;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   transition: all 200ms ease;
 
   &:focus {
@@ -56,7 +58,7 @@
 
 .badge-variant-outline {
   border-color: hsl(var(--border));
-  background-color: transparent;
+  background-color: hsl(var(--primary) / 0.08);
   color: hsl(var(--foreground));
 }
 
@@ -111,7 +113,7 @@
 }
 
 .badge-variant-glass {
-  border-color: hsl(var(--border) / 0.2);
+  border-color: hsl(0 0% 100% / 0.12);
   background-color: hsl(var(--card) / 0.6);
   backdrop-filter: blur(12px);
   color: hsl(var(--foreground));
