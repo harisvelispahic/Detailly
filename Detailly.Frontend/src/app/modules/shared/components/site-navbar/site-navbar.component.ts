@@ -3,26 +3,25 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
-import { AuthFacadeService } from '../../../core/services/auth/auth-facade.service';
+import { AuthFacadeService } from '../../../../core/services/auth/auth-facade.service';
 
-interface PublicNavLink {
-  route: string;
+interface SiteNavLink {
   label: string;
   icon: string;
+  route: string;
   exact?: boolean;
-  authOnly?: boolean;
-  guestOnly?: boolean;
+  guestRoute?: string;
 }
 
 @Component({
-  selector: 'app-public-navbar',
+  selector: 'app-site-navbar',
   standalone: false,
-  templateUrl: './public-navbar.component.html',
-  styleUrls: ['./public-navbar.component.scss'],
+  templateUrl: './site-navbar.component.html',
+  styleUrl: './site-navbar.component.scss',
 })
-export class PublicNavbarComponent {
-  private router = inject(Router);
-  private auth = inject(AuthFacadeService);
+export class SiteNavbarComponent {
+  private readonly router = inject(Router);
+  private readonly auth = inject(AuthFacadeService);
 
   readonly currentUser = this.auth.currentUser;
   readonly isAuthenticated = this.auth.isAuthenticated;
@@ -30,11 +29,17 @@ export class PublicNavbarComponent {
   readonly isManager = this.auth.isManager;
   readonly isEmployee = this.auth.isEmployee;
 
-  readonly navLinks: PublicNavLink[] = [
-    { route: '/', label: 'Home', icon: 'home', exact: true },
-    { route: '/search', label: 'Shop', icon: 'storefront' },
-    { route: '/client/bookings', label: 'Book Now', icon: 'event_available', guestOnly: true },
-    { route: '/client/bookings', label: 'My Appointments', icon: 'event_note', authOnly: true },
+  readonly navLinks: SiteNavLink[] = [
+    { label: 'Home', icon: 'home', route: '/', exact: true },
+    { label: 'Shop', icon: 'storefront', route: '/search' },
+    { label: 'Book Now', icon: 'calendar_month', route: '/book-now' },
+    {
+      label: 'My Appointments',
+      icon: 'event_note',
+      route: '/client/bookings',
+      guestRoute: '/auth/login',
+    },
+    { label: 'Reviews', icon: 'reviews', route: '/reviews' },
   ];
 
   isMenuOpen = false;
@@ -58,26 +63,35 @@ export class PublicNavbarComponent {
     this.isMenuOpen = false;
   }
 
-  isLinkVisible(link: PublicNavLink): boolean {
-    if (link.authOnly) {
-      return this.isAuthenticated();
+  resolveRoute(link: SiteNavLink): string {
+    if (!this.isAuthenticated() && link.guestRoute) {
+      return link.guestRoute;
     }
 
-    if (link.guestOnly) {
-      return !this.isAuthenticated();
-    }
-
-    return true;
+    return link.route;
   }
 
-  isLinkActive(link: PublicNavLink): boolean {
+  isLinkActive(link: SiteNavLink): boolean {
     const currentUrl = this.router.url.split('?')[0].split('#')[0];
+    const route = this.resolveRoute(link);
 
     if (link.exact) {
-      return currentUrl === link.route;
+      return currentUrl === route;
     }
 
-    return currentUrl === link.route || currentUrl.startsWith(`${link.route}/`);
+    return currentUrl === route || currentUrl.startsWith(`${route}/`);
+  }
+
+  isShopActive(): boolean {
+    const currentUrl = this.router.url.split('?')[0].split('#')[0];
+    return currentUrl === '/search' || currentUrl.startsWith('/search/');
+  }
+
+  isAccountActive(): boolean {
+    const currentUrl = this.router.url.split('?')[0].split('#')[0];
+    const accountRoute = this.getAccountRoute();
+
+    return currentUrl === accountRoute || currentUrl.startsWith(`${accountRoute}/`);
   }
 
   getAccountRoute(): string {
@@ -90,7 +104,7 @@ export class PublicNavbarComponent {
     }
 
     if (this.isAuthenticated()) {
-      return '/client/bookings';
+      return '/client/profile';
     }
 
     return '/auth/login';

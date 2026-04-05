@@ -9,6 +9,8 @@ import { FitConfirmDialogComponent } from './components/fit-confirm-dialog/fit-c
 import { DialogHelperService } from './services/dialog-helper.service';
 import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading-bar.component';
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
+import { SiteNavbarComponent } from './components/site-navbar/site-navbar.component';
+import { SiteFooterComponent } from './components/site-footer/site-footer.component';
 
 // UI Primitives
 import { ButtonComponent } from './components/ui/button/button.component';
@@ -55,6 +57,8 @@ const UI_COMPONENTS = [
     FitConfirmDialogComponent,
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
+    SiteNavbarComponent,
+    SiteFooterComponent,
     ...UI_COMPONENTS,
   ],
   imports: [
@@ -75,6 +79,8 @@ const UI_COMPONENTS = [
     FormsModule,
     FitLoadingBarComponent,
     FitTableSkeletonComponent,
+    SiteNavbarComponent,
+    SiteFooterComponent,
     ...materialModules,
     ...UI_COMPONENTS,
   ],

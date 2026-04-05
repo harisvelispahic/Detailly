@@ -1,0 +1,75 @@
+<section class="profile-page">
+  <app-container size="xl">
+    <div class="profile-page__header">
+      <p class="profile-page__eyebrow">Account</p>
+      <h1 class="profile-page__title">
+        My <span class="gradient-text">Profile</span>
+      </h1>
+      <p class="profile-page__subtitle">
+        This placeholder keeps the new navbar account route valid while the full profile experience is implemented.
+      </p>
+    </div>
+
+    <div class="profile-page__grid">
+      <app-card variant="glass">
+        <app-card-header>
+          <app-card-title>Profile Information</app-card-title>
+          <app-card-description>Your personal account details</app-card-description>
+        </app-card-header>
+
+        <app-card-content>
+          <div class="profile-page__detail-list">
+            <div>
+              <span>Full Name</span>
+              <strong>haris.velispahic</strong>
+            </div>
+
+            <div>
+              <span>Email</span>
+              <strong>haris.velispahic@gmail.com</strong>
+            </div>
+
+            <div>
+              <span>Phone</span>
+              <strong>Not provided</strong>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="glass">
+        <app-card-header>
+          <app-card-title>My Vehicles</app-card-title>
+          <app-card-description>Saved vehicles for upcoming bookings</app-card-description>
+        </app-card-header>
+
+        <app-card-content>
+          <div class="profile-page__vehicle-list">
+            <div *ngFor="let vehicle of vehicles" class="profile-page__vehicle">
+              <div>
+                <strong>{{ vehicle.name }}</strong>
+                <span>{{ vehicle.plate }}</span>
+              </div>
+
+              <mat-icon>directions_car</mat-icon>
+            </div>
+          </div>
+        </app-card-content>
+      </app-card>
+
+      <app-card variant="glass" class="profile-page__wide-card">
+        <app-card-header>
+          <app-card-title>Saved Addresses</app-card-title>
+          <app-card-description>Address management will be added in the next pass</app-card-description>
+        </app-card-header>
+
+        <app-card-content>
+          <div class="profile-page__empty-state">
+            <mat-icon>location_on</mat-icon>
+            <p>No addresses saved yet.</p>
+          </div>
+        </app-card-content>
+      </app-card>
+    </div>
+  </app-container>
+</section>

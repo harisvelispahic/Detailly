@@ -1,1 +1,73 @@
-<p>search-products works!</p>
+<section class="shop-page">
+  <app-container size="xl">
+    <div class="shop-page__header">
+      <p class="shop-page__eyebrow">Catalog</p>
+      <h1 class="shop-page__title">
+        Shop <span class="gradient-text">Products</span>
+      </h1>
+      <p class="shop-page__subtitle">
+        Premium detailing products for the same finish featured across the public Detailly experience.
+      </p>
+    </div>
+
+    <div class="shop-page__toolbar">
+      <div class="shop-page__search">
+        <mat-icon>search</mat-icon>
+        <span>Search products...</span>
+      </div>
+
+      <div class="shop-page__toolbar-actions">
+        <button type="button" class="shop-page__toolbar-chip">Featured</button>
+        <button type="button" class="shop-page__toolbar-icon" aria-label="Grid view">
+          <mat-icon>grid_view</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="shop-page__layout">
+      <aside class="shop-page__filters">
+        <div class="shop-page__filters-card">
+          <h2>Filters</h2>
+
+          <div class="shop-page__filter-group">
+            <button *ngFor="let category of categories" type="button" class="shop-page__filter-chip">
+              {{ category }}
+            </button>
+          </div>
+
+          <div class="shop-page__price-block">
+            <span>Price Range</span>
+            <strong>$0 - $100</strong>
+          </div>
+        </div>
+      </aside>
+
+      <div class="shop-page__grid">
+        <article *ngFor="let product of products" class="product-card">
+          <div class="product-card__visual" [style.background]="product.accent">
+            <span>{{ product.category }}</span>
+          </div>
+
+          <div class="product-card__body">
+            <div class="product-card__meta">
+              <p>{{ product.category }}</p>
+              <div>
+                <mat-icon>star</mat-icon>
+                <span>{{ product.rating }}</span>
+              </div>
+            </div>
+
+            <h3>{{ product.name }}</h3>
+
+            <div class="product-card__footer">
+              <strong>{{ product.price }}</strong>
+              <button type="button" class="product-card__action" aria-label="Add to cart">
+                <mat-icon>add_shopping_cart</mat-icon>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </app-container>
+</section>

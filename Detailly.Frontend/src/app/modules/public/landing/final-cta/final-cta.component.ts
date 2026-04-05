@@ -11,10 +11,10 @@ export class FinalCtaComponent {
   constructor(private router: Router) {}
 
   bookNow(): void {
-    this.router.navigate(['/booking']);
+    this.router.navigate(['/book-now']);
   }
 
   exploreProducts(): void {
-    this.router.navigate(['/shop']);
+    this.router.navigate(['/search']);
   }
 }

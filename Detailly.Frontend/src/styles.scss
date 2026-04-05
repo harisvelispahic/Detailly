@@ -342,6 +342,26 @@ img {
   }
 }
 
+.btn-trailing-icon {
+  .mdc-button__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0 !important;
+    line-height: 1;
+  }
+
+  .btn-trailing-icon__text {
+    order: 1;
+  }
+
+  mat-icon {
+    order: 2;
+    margin: 0 0 0 0.75rem !important;
+    flex-shrink: 0;
+  }
+}
+
 // Input glow effect
 .input-glow:focus {
   box-shadow: 0 0 0 2px hsl(270 70% 60% / 0.3);

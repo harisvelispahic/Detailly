@@ -1,0 +1,79 @@
+<footer class="site-footer">
+  <div class="site-footer__container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img
+          class="site-footer__logo"
+          src="/assets/images/detailly-logo-transparent.png"
+          alt="Detailly"
+        />
+
+        <p class="site-footer__description">
+          Premium vehicle detailing services. We bring the showroom shine to your driveway.
+        </p>
+
+        <div class="site-footer__socials" aria-label="Social channels">
+          <span class="site-footer__social" aria-hidden="true">
+            <mat-icon>thumb_up</mat-icon>
+          </span>
+          <span class="site-footer__social" aria-hidden="true">
+            <mat-icon>photo_camera</mat-icon>
+          </span>
+          <span class="site-footer__social" aria-hidden="true">
+            <mat-icon>alternate_email</mat-icon>
+          </span>
+        </div>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Quick Links</h3>
+
+        <a *ngFor="let link of quickLinks" [routerLink]="resolveRoute(link)" class="site-footer__link">
+          {{ link.label }}
+        </a>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Our Services</h3>
+
+        <a
+          *ngFor="let service of services"
+          routerLink="/book-now"
+          [queryParams]="{ service: service }"
+          class="site-footer__link"
+        >
+          {{ service }}
+        </a>
+      </div>
+
+      <div class="site-footer__column">
+        <h3>Contact Us</h3>
+
+        <div class="site-footer__contact-item">
+          <mat-icon>location_on</mat-icon>
+          <span>123 Detail Street, Auto City, AC 12345</span>
+        </div>
+
+        <div class="site-footer__contact-item">
+          <mat-icon>call</mat-icon>
+          <span>(555) 123-4567</span>
+        </div>
+
+        <div class="site-footer__contact-item">
+          <mat-icon>mail</mat-icon>
+          <span>hello@detailly.com</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; 2026 Detailly. All rights reserved.</p>
+
+      <div class="site-footer__legal">
+        <a *ngFor="let link of legalLinks" [routerLink]="resolveRoute(link)" class="site-footer__link">
+          {{ link.label }}
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>

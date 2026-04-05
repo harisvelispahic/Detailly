@@ -8,54 +8,68 @@ import { OrderDetailsComponent } from './orders/order-details/order-details.comp
 import { MyBookingsPageComponent } from './bookings/my-bookings-page/my-bookings-page.component';
 import { BookingDetailsPageComponent } from './bookings/booking-details-page/booking-details-page.component';
 import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/booking-pay-card-page.component';
+import { ClientLayoutComponent } from './client-layout/client-layout.component';
+import { ProfilePageComponent } from './profile/profile-page/profile-page.component';
 
 const routes: Routes = [
-  // PAYMENTS
   {
-    path: 'wallet/top-up',
-    component: WalletTopUpComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-  {
-    path: 'orders/checkout/:orderId',
-    component: OrderPaymentComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-
-  // ORDERS
-  {
-    path: 'orders',
-    component: MyOrdersComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-  {
-    path: 'orders/:id',
-    component: OrderDetailsComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-
-  // BOOKINGS
-  {
-    path: 'bookings',
-    component: MyBookingsPageComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-  {
-    path: 'bookings/:id',
-    component: BookingDetailsPageComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
-  },
-  {
-    path: 'bookings/pay/:bookingId',
-    component: BookingPayCardPageComponent,
-    canActivate: [myAuthGuard],
-    data: { requireAuth: true },
+    path: '',
+    component: ClientLayoutComponent,
+    children: [
+      {
+        path: 'wallet/top-up',
+        component: WalletTopUpComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'orders/checkout/:orderId',
+        component: OrderPaymentComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'orders',
+        component: MyOrdersComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'orders/:id',
+        component: OrderDetailsComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'bookings',
+        component: MyBookingsPageComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'bookings/:id',
+        component: BookingDetailsPageComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'bookings/pay/:bookingId',
+        component: BookingPayCardPageComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'profile',
+        component: ProfilePageComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: '',
+        redirectTo: 'profile',
+        pathMatch: 'full',
+      },
+    ],
   },
 ];
 @NgModule({

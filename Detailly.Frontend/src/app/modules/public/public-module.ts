@@ -11,7 +11,7 @@ import { PricingComponent } from './landing/pricing/pricing.component';
 import { TestimonialsComponent } from './landing/testimonials/testimonials.component';
 import { FinalCtaComponent } from './landing/final-cta/final-cta.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
-import { PublicNavbarComponent } from './public-navbar/public-navbar.component';
+import { PublicPlaceholderPageComponent } from './placeholder-page/public-placeholder-page.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import { PublicNavbarComponent } from './public-navbar/public-navbar.component';
     TestimonialsComponent,
     FinalCtaComponent,
     PublicLayoutComponent,
-    PublicNavbarComponent,
+    PublicPlaceholderPageComponent,
   ],
   imports: [SharedModule, PublicRoutingModule],
 })

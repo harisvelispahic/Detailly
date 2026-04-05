@@ -14,6 +14,6 @@ export class ServicesComponent {
   constructor(private router: Router) {}
 
   viewAllServices(): void {
-    this.router.navigate(['/booking']);
+    this.router.navigate(['/book-now']);
   }
 }

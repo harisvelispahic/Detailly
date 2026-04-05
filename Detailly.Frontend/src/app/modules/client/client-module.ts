@@ -10,9 +10,12 @@ import { OrderDetailsComponent } from './orders/order-details/order-details.comp
 import { MyBookingsPageComponent } from './bookings/my-bookings-page/my-bookings-page.component';
 import { BookingDetailsPageComponent } from './bookings/booking-details-page/booking-details-page.component';
 import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/booking-pay-card-page.component';
+import { ClientLayoutComponent } from './client-layout/client-layout.component';
+import { ProfilePageComponent } from './profile/profile-page/profile-page.component';
 
 @NgModule({
   declarations: [
+    ClientLayoutComponent,
     WalletTopUpComponent,
     OrderPaymentComponent,
     MyOrdersComponent,
@@ -20,6 +23,7 @@ import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/bo
     MyBookingsPageComponent,
     BookingDetailsPageComponent,
     BookingPayCardPageComponent,
+    ProfilePageComponent,
   ],
   imports: [SharedModule, ClientRoutingModule, FormsModule],
   exports: [FormsModule],
