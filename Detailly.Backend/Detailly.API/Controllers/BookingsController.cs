@@ -55,9 +55,9 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpGet("my")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task<List<ListMyBookingsQueryDto>> ListMine(CancellationToken ct)
+    public async Task<PageResult<ListMyBookingsQueryDto>> ListMine([FromQuery] ListMyBookingsQuery query, CancellationToken ct)
     {
-        var result = await sender.Send(new ListMyBookingsQuery(), ct);
+        var result = await sender.Send(query, ct);
         return result;
     }
 

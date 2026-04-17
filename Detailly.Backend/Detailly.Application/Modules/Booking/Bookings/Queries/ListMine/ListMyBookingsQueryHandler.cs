@@ -1,19 +1,17 @@
 ﻿namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
 
 public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
-    : IRequestHandler<ListMyBookingsQuery, List<ListMyBookingsQueryDto>>
+    : IRequestHandler<ListMyBookingsQuery, PageResult<ListMyBookingsQueryDto>>
 {
-    public async Task<List<ListMyBookingsQueryDto>> Handle(ListMyBookingsQuery request, CancellationToken ct)
+    public async Task<PageResult<ListMyBookingsQueryDto>> Handle(ListMyBookingsQuery request, CancellationToken ct)
     {
         if (appCurrentUser.ApplicationUserId is null)
             throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
 
-        var customerId = appCurrentUser.ApplicationUserId.Value;
+        var q = context.Bookings.AsNoTracking();
 
-        return await context.Bookings
-            .AsNoTracking()
-            .Where(b => !b.IsDeleted && b.CustomerId == customerId)
-            .OrderByDescending(b => b.StartUtc)
+        var projectedQuery = q.OrderByDescending(b => b.StartUtc)
+            .Where(b => !b.IsDeleted && b.CustomerId == appCurrentUser.ApplicationUserId.Value)
             .Select(b => new ListMyBookingsQueryDto
             {
                 Id = b.Id,
@@ -22,7 +20,9 @@ public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppCurren
                 EndUtc = b.EndUtc,
                 TotalPrice = b.TotalPrice,
                 ServicePackageName = b.ServicePackage.Name
-            })
-            .ToListAsync(ct);
+            });
+
+        return await PageResult<ListMyBookingsQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
+
     }
 }
