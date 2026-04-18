@@ -2,9 +2,10 @@
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 
-public sealed record ListBookingsForDateQuery(
-    DateTime DateUtc,
-    int ShopLocationId,
-    ServiceMode ServiceMode,
-    bool IncludePendingPaymentHolds = false
-) : IRequest<List<ListBookingsForDateQueryDto>>;
+public class ListBookingsForDateQuery : BasePagedQuery<ListBookingsForDateQueryDto>
+{
+    public DateTime DateUtc { get; set; }
+    public int ShopLocationId { get; set; }
+    public ServiceMode ServiceMode { get; set; }
+    public bool IncludePendingPaymentHolds { get; set; } = false;
+}

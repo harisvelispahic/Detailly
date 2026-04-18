@@ -97,9 +97,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET /Bookings/staff/schedule?dateUtc=2026-03-01&shopLocationId=1&serviceMode=InShop&includePendingPayment=true
     [HttpGet("staff/schedule")]
     [Authorize(Policy = AuthPolicies.Staff)]
-    public async Task<List<ListBookingsForDateQueryDto>> ListForDate(
-        [FromQuery] ListBookingsForDateQuery query,
-        CancellationToken ct)
+    public async Task<PageResult<ListBookingsForDateQueryDto>> ListForDate([FromQuery] ListBookingsForDateQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
         return result;

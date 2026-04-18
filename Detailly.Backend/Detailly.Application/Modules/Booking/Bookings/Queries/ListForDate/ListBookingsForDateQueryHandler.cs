@@ -3,9 +3,9 @@
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 
 public sealed class ListBookingsForDateQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
-    : IRequestHandler<ListBookingsForDateQuery, List<ListBookingsForDateQueryDto>>
+    : IRequestHandler<ListBookingsForDateQuery, PageResult<ListBookingsForDateQueryDto>>
 {
-    public async Task<List<ListBookingsForDateQueryDto>> Handle(ListBookingsForDateQuery request, CancellationToken ct)
+    public async Task<PageResult<ListBookingsForDateQueryDto>> Handle(ListBookingsForDateQuery request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
@@ -25,7 +25,7 @@ public sealed class ListBookingsForDateQueryHandler(IAppDbContext context, IAppC
         // - optionally include PendingPayment, but only if hold still active
         var includePending = request.IncludePendingPaymentHolds;
 
-        var query = context.Bookings
+        var projectedQuery = context.Bookings
             .AsNoTracking()
             .Where(b =>
                 !b.IsDeleted &&
@@ -68,6 +68,6 @@ public sealed class ListBookingsForDateQueryHandler(IAppDbContext context, IAppC
                     .ToList()
             });
 
-        return await query.ToListAsync(ct);
+        return await PageResult<ListBookingsForDateQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
 }
