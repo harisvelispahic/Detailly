@@ -43,7 +43,7 @@ public class LocationsController(ISender sender) : ControllerBase
 
     [HttpGet]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
-    public async Task<List<ListLocationsQueryDto>> List([FromQuery] ListLocationsQuery query, CancellationToken ct)
+    public async Task<PageResult<ListLocationsQueryDto>> List([FromQuery] ListLocationsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
     }

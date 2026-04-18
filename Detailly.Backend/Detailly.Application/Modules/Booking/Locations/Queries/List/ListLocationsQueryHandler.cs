@@ -1,18 +1,22 @@
 ﻿namespace Detailly.Application.Modules.Booking.Locations.Queries.List;
 
 public sealed class ListLocationsQueryHandler(IAppDbContext context)
-    : IRequestHandler<ListLocationsQuery, List<ListLocationsQueryDto>>
+    : IRequestHandler<ListLocationsQuery, PageResult<ListLocationsQueryDto>>
 {
-    public async Task<List<ListLocationsQueryDto>> Handle(ListLocationsQuery request, CancellationToken ct)
+    public async Task<PageResult<ListLocationsQueryDto>> Handle(ListLocationsQuery request, CancellationToken ct)
     {
-        var q = context.Locations
-            .AsNoTracking()
-            .Where(l => !l.IsDeleted);
+        var q = context.Locations.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var s = request.Search.Trim();
+            q = q.Where(x => x.Name.Contains(s));
+        }
 
         if (request.LocationType is not null)
             q = q.Where(l => l.LocationType == request.LocationType.Value);
 
-        return await q
+        var projectedQuery = q
             .OrderBy(l => l.Name)
             .Select(l => new ListLocationsQueryDto
             {
@@ -22,7 +26,8 @@ public sealed class ListLocationsQueryHandler(IAppDbContext context)
                 TotalBays = l.TotalBays,
                 City = l.Address.City,
                 Country = l.Address.Country
-            })
-            .ToListAsync(ct);
+            });
+
+        return await PageResult<ListLocationsQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
 
-public sealed class ListEmployeeShiftsForDateQuery : IRequest<List<ListEmployeeShiftsForDateQueryDto>>
+public sealed class ListEmployeeShiftsForDateQuery : BasePagedQuery<ListEmployeeShiftsForDateQueryDto>
 {
     public required DateTime DateUtc { get; set; }           // only Date part used
     public required int ShopLocationId { get; set; }

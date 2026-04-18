@@ -1,9 +1,9 @@
 ﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
 
 public sealed class ListEmployeeShiftsForDateQueryHandler(IAppDbContext context, IAppCurrentUser currentUser)
-    : IRequestHandler<ListEmployeeShiftsForDateQuery, List<ListEmployeeShiftsForDateQueryDto>>
+    : IRequestHandler<ListEmployeeShiftsForDateQuery, PageResult<ListEmployeeShiftsForDateQueryDto>>
 {
-    public async Task<List<ListEmployeeShiftsForDateQueryDto>> Handle(ListEmployeeShiftsForDateQuery request, CancellationToken ct)
+    public async Task<PageResult<ListEmployeeShiftsForDateQueryDto>> Handle(ListEmployeeShiftsForDateQuery request, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
             throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
@@ -15,8 +15,9 @@ public sealed class ListEmployeeShiftsForDateQueryHandler(IAppDbContext context,
         var dayStart = date;
         var dayEnd = date.AddDays(1);
 
-        var query = context.EmployeeShifts
-            .AsNoTracking()
+        var q = context.EmployeeShifts.AsNoTracking();
+
+        var projecetedQuery = q
             .Where(s =>
                 !s.IsDeleted &&
                 s.ShopLocationId == request.ShopLocationId &&
@@ -24,9 +25,9 @@ public sealed class ListEmployeeShiftsForDateQueryHandler(IAppDbContext context,
                 s.StartUtc < dayEnd);
 
         if (request.EmployeeWorkMode is not null)
-            query = query.Where(s => s.EmployeeWorkMode == request.EmployeeWorkMode.Value);
+            projecetedQuery = projecetedQuery.Where(s => s.EmployeeWorkMode == request.EmployeeWorkMode.Value);
 
-        var result = await query
+        var result = projecetedQuery
             .OrderBy(s => s.StartUtc)
             .Select(s => new ListEmployeeShiftsForDateQueryDto
             {
@@ -37,9 +38,8 @@ public sealed class ListEmployeeShiftsForDateQueryHandler(IAppDbContext context,
                 EmployeeWorkMode = s.EmployeeWorkMode,
                 StartUtc = s.StartUtc,
                 EndUtc = s.EndUtc
-            })
-            .ToListAsync(ct);
+            });
 
-        return result;
+        return await PageResult<ListEmployeeShiftsForDateQueryDto>.FromQueryableAsync(result, request.Paging, ct);
     }
 }
