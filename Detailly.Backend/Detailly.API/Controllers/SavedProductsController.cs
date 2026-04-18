@@ -1,6 +1,6 @@
 ﻿using Detailly.Application.Modules.Sales.SavedProducts.Commands.RemoveSavedProduct;
 using Detailly.Application.Modules.Sales.SavedProducts.Commands.SaveProduct;
-using Detailly.Application.Modules.Sales.SavedProducts.Queries.GetMySavedProducts;
+using Detailly.Application.Modules.Sales.SavedProducts.Queries.ListMySavedProducts;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -10,21 +10,23 @@ namespace Detailly.API.Controllers;
 [Authorize(Policy = AuthPolicies.AnyClient)]
 public sealed class SavedProductsController(ISender sender) : ControllerBase
 {
-    [HttpGet("my")]
-    public async Task<ActionResult<List<GetMySavedProductsQueryDto>>> GetMy(CancellationToken ct)
-        => Ok(await sender.Send(new GetMySavedProductsQuery(), ct));
-
-    [HttpPost("{productId:int}")]
-    public async Task<IActionResult> Save(int productId, CancellationToken ct)
+    [HttpPost]
+    public async Task<IActionResult> Save([FromQuery] SaveProductCommand command, CancellationToken ct)
     {
-        await sender.Send(new SaveProductCommand { ProductId = productId }, ct);
+        await sender.Send(command, ct);
         return NoContent();
     }
 
-    [HttpDelete("{productId:int}")]
-    public async Task<IActionResult> Remove(int productId, CancellationToken ct)
+    [HttpGet("my")]
+    public async Task<PageResult<ListMySavedProductsQueryDto>> GetMy([FromQuery] ListMySavedProductsQuery query, CancellationToken ct)
     {
-        await sender.Send(new RemoveSavedProductCommand { ProductId = productId }, ct);
+        return await sender.Send(query, ct);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Remove([FromQuery] RemoveSavedProductCommand command, CancellationToken ct)
+    {
+        await sender.Send(command, ct);
         return NoContent();
     }
 }

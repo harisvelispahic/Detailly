@@ -35,4 +35,3 @@ public class ListVehiclesQueryHandler(IAppDbContext ctx, IAppCurrentUser appCurr
         return await PageResult<ListVehiclesQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
     }
 }
-

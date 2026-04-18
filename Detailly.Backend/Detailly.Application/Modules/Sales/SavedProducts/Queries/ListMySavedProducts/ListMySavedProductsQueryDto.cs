@@ -1,6 +1,6 @@
-﻿namespace Detailly.Application.Modules.Sales.SavedProducts.Queries.GetMySavedProducts;
+﻿namespace Detailly.Application.Modules.Sales.SavedProducts.Queries.ListMySavedProducts;
 
-public sealed class GetMySavedProductsQueryDto
+public sealed class ListMySavedProductsQueryDto
 {
     public int ProductId { get; set; }
     public string ProductName { get; set; } = default!;

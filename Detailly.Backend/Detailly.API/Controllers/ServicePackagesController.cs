@@ -51,12 +51,11 @@ public class ServicePackagesController(ISender sender) : ControllerBase
         return result;
     }
 
-    [HttpGet("available-addons/{id:int}")]
+    [HttpGet("available-addons")]
     [AllowAnonymous]
-    public async Task<ActionResult<GetAvailableAddonsQueryDto>> GetAvailableAddons(int id, CancellationToken ct)
+    public async Task<ActionResult<PageResult<GetAvailableAddonsQueryDto>>> GetAvailableAddons([FromQuery] GetAvailableAddonsQuery query, CancellationToken ct)
     {
-        var aa = await sender.Send(new GetAvailableAddonsQuery { ServicePackageId = id }, ct);
-
+        var aa = await sender.Send(query, ct);
         return Ok(aa);
     }
 }
