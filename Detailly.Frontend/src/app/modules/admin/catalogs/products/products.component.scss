@@ -1,26 +1,22 @@
-@use '../../../../../styles/palette-bridge' as *;
-
-// Container
 .container {
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background: linear-gradient(135deg, $bg-gradient-start 0%, $bg-gradient-end 100%);
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--popover)) 100%);
   min-height: 100vh;
 }
 
-// Header Card
 .header-card {
-  background: white;
+  background: hsl(var(--card));
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: 0 16px 36px -24px hsl(0 0% 0% / 0.6);
   }
 
   .header-card-content {
@@ -34,7 +30,7 @@
       margin: 0;
       font-size: 28px;
       font-weight: 600;
-      color: $text-primary;
+      color: hsl(var(--foreground));
       letter-spacing: -0.5px;
       display: flex;
       align-items: center;
@@ -44,16 +40,15 @@
         content: '';
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+        background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
         border-radius: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        box-shadow: $shadow-primary;
+        box-shadow: var(--shadow-primary);
         flex-shrink: 0;
       }
 
-      // Ikona preko ::before elementa
       position: relative;
 
       &::after {
@@ -79,7 +74,7 @@
 
         ::ng-deep {
           .mat-mdc-text-field-wrapper {
-            background-color: white;
+            background-color: hsl(var(--card));
           }
 
           .mat-mdc-form-field-focus-overlay {
@@ -89,44 +84,44 @@
           .mdc-notched-outline__leading,
           .mdc-notched-outline__notch,
           .mdc-notched-outline__trailing {
-            border-color: $primary-border-soft !important;
+            border-color: hsl(var(--primary) / 0.3) !important;
           }
 
           .mat-mdc-form-field.mat-focused {
             .mdc-notched-outline__leading,
             .mdc-notched-outline__notch,
             .mdc-notched-outline__trailing {
-              border-color: $primary-color !important;
+              border-color: hsl(var(--primary)) !important;
               border-width: 2px !important;
             }
           }
 
           .mat-mdc-floating-label {
-            color: $text-secondary;
+            color: hsl(var(--muted-foreground));
           }
 
           .mat-focused .mat-mdc-floating-label {
-            color: $primary-color !important;
+            color: hsl(var(--primary)) !important;
           }
 
           input {
-            color: $text-primary;
+            color: hsl(var(--foreground));
           }
 
           .mat-icon {
-            color: $primary-color;
+            color: hsl(var(--primary));
           }
         }
       }
 
       button[mat-raised-button] {
-        background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+        background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
         color: white;
         font-weight: 600;
         padding: 0 24px;
         height: 44px;
         border-radius: 8px;
-        box-shadow: $shadow-primary;
+        box-shadow: var(--shadow-primary);
         transition: all 0.3s ease;
 
         mat-icon {
@@ -135,7 +130,7 @@
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: $shadow-primary;
+          box-shadow: var(--shadow-primary);
         }
 
         &:active {
@@ -146,18 +141,17 @@
   }
 }
 
-// Loading Container
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 80px 20px;
-  background: white;
+  background: hsl(var(--card));
   border-radius: 16px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
-  color: $text-secondary;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
   font-size: 16px;
   text-align: center;
 
@@ -165,8 +159,8 @@
     content: '';
     width: 48px;
     height: 48px;
-    border: 4px solid $primary-lighter;
-    border-top-color: $primary-color;
+    border: 4px solid hsl(var(--secondary));
+    border-top-color: hsl(var(--primary));
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
@@ -179,17 +173,16 @@
   }
 }
 
-// Error Container
 .error {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 20px 24px;
-  background: $error-soft;
-  border: 1px solid $error-border-soft;
+  background: hsl(var(--destructive) / 0.14);
+  border: 1px solid hsl(var(--destructive) / 0.32);
   border-radius: 12px;
-  color: $error-color;
+  color: hsl(var(--destructive));
   font-weight: 500;
 
   &::before {
@@ -199,22 +192,21 @@
   }
 }
 
-// Table Card
 .mat-elevation-z8 {
-  background: white;
+  background: hsl(var(--card));
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
 
   table {
     width: 100%;
 
     th {
-      background: $gradient-surface;
-      border-bottom: 2px solid $primary-color;
+      background: var(--gradient-surface);
+      border-bottom: 2px solid hsl(var(--primary));
       font-weight: 600;
-      color: $primary-dark;
+      color: hsl(270 70% 52%);
       padding: 20px 16px;
       font-size: 13px;
       text-transform: uppercase;
@@ -223,26 +215,24 @@
 
     td {
       padding: 16px;
-      border-bottom: 1px solid $border-color;
-      color: $text-primary;
+      border-bottom: 1px solid hsl(var(--border));
+      color: hsl(var(--foreground));
       font-size: 14px;
 
-      // Ikone za enabled/disabled
       .icon-enabled {
-        color: $success-color;
+        color: hsl(var(--success));
         font-size: 24px;
         width: 24px;
         height: 24px;
       }
 
       .icon-disabled {
-        color: $text-disabled;
+        color: hsl(var(--muted-foreground));
         font-size: 24px;
         width: 24px;
         height: 24px;
       }
 
-      // Action buttons
       button[mat-icon-button] {
         width: 40px;
         height: 40px;
@@ -250,21 +240,21 @@
         transition: all 0.2s ease;
 
         &[color='primary'] {
-          color: $primary-color;
-          background: $hover-bg;
+          color: hsl(var(--primary));
+          background: hsl(var(--primary) / 0.08);
 
           &:hover {
-            background: $primary-lighter;
+            background: hsl(var(--secondary));
             transform: scale(1.1);
           }
         }
 
         &[color='warn'] {
-          color: $error-color;
-          background: $error-soft;
+          color: hsl(var(--destructive));
+          background: hsl(var(--destructive) / 0.14);
 
           &:hover {
-            background: $error-soft-strong;
+            background: hsl(var(--destructive) / 0.2);
             transform: scale(1.1);
           }
         }
@@ -281,24 +271,23 @@
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: $hover-bg;
+        background-color: hsl(var(--primary) / 0.08);
       }
     }
 
-    // No data row
     tr.mat-row {
       td.mat-cell[colspan] {
         border-bottom: none;
         padding: 60px 20px;
         text-align: center;
-        color: $text-secondary;
+        color: hsl(var(--muted-foreground));
         font-size: 16px;
 
         &::before {
           content: 'inbox';
           font-family: 'Material Icons';
           font-size: 64px;
-          color: $primary-border-soft;
+          color: hsl(var(--primary) / 0.3);
           display: block;
           margin-bottom: 16px;
         }
@@ -306,16 +295,14 @@
     }
   }
 
-  // Paginator wrapper
   app-fit-paginator-bar {
     display: block;
     padding: 16px;
-    background: $primary-lighter;
-    border-top: 1px solid $border-color;
+    background: hsl(var(--secondary));
+    border-top: 1px solid hsl(var(--border));
   }
 }
 
-// Responzivnost
 @media (max-width: 1024px) {
   .header-card {
     .header-card-content {

@@ -1,19 +1,15 @@
-@use '../../../../../../styles/palette-bridge' as *;
-
-// Dialog Container
 ::ng-deep .product-category-dialog {
   .mat-mdc-dialog-container {
     padding: 0;
     border-radius: 16px;
-    box-shadow: $shadow-lg;
+    box-shadow: 0 24px 48px -24px hsl(0 0% 0% / 0.7);
     overflow: hidden;
   }
 }
 
-// Dialog Header
 h2[mat-dialog-title] {
-  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
-  color: $background-card;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(270 70% 52%) 100%);
+  color: hsl(var(--card));
   margin: 0;
   padding: 24px 32px;
   font-size: 22px;
@@ -25,7 +21,6 @@ h2[mat-dialog-title] {
   position: relative;
   overflow: hidden;
 
-  // Decorative element
   &::before {
     content: '';
     position: absolute;
@@ -33,11 +28,10 @@ h2[mat-dialog-title] {
     right: -20px;
     width: 100px;
     height: 100px;
-    background: radial-gradient(circle, $overlay-white-15 0%, transparent 70%);
+    background: radial-gradient(circle, hsl(0 0% 100% / 0.15) 0%, transparent 70%);
     border-radius: 50%;
   }
 
-  // Icon
   &::after {
     content: 'category';
     font-family: 'Material Icons';
@@ -47,11 +41,10 @@ h2[mat-dialog-title] {
   }
 }
 
-// Dialog Content
 mat-dialog-content {
   padding: 32px;
   min-height: 180px;
-  background-color: $background-light;
+  background-color: hsl(var(--secondary));
 
   form {
     .full-width {
@@ -62,33 +55,33 @@ mat-dialog-content {
     mat-form-field {
       &.mat-form-field-appearance-outline {
         .mat-mdc-form-field-flex {
-          background-color: $background-card;
+          background-color: hsl(var(--card));
           border-radius: 12px;
           padding: 4px 8px;
-          box-shadow: $shadow-sm;
+          box-shadow: var(--shadow-soft);
           transition: all 0.3s ease;
 
           &:hover {
-            box-shadow: $shadow-sm;
+            box-shadow: var(--shadow-soft);
           }
         }
 
         &.mat-focused {
           .mat-mdc-form-field-flex {
-            box-shadow: $shadow-primary;
+            box-shadow: var(--shadow-primary);
           }
 
           .mat-mdc-notched-outline {
             .mat-mdc-notched-outline-leading,
             .mat-mdc-notched-outline-notch,
             .mat-mdc-notched-outline-trailing {
-              border-color: $primary-color !important;
+              border-color: hsl(var(--primary)) !important;
               border-width: 2px !important;
             }
           }
 
           .mat-mdc-floating-label {
-            color: $primary-color !important;
+            color: hsl(var(--primary)) !important;
           }
         }
 
@@ -96,27 +89,27 @@ mat-dialog-content {
           .mat-mdc-notched-outline-leading,
           .mat-mdc-notched-outline-notch,
           .mat-mdc-notched-outline-trailing {
-            border-color: $border-color;
+            border-color: hsl(var(--border));
           }
         }
 
         .mat-mdc-floating-label {
-          color: $text-secondary;
+          color: hsl(var(--muted-foreground));
           font-weight: 500;
         }
 
         input {
-          color: $text-primary;
+          color: hsl(var(--foreground));
           font-size: 15px;
           padding: 12px 0;
 
           &::placeholder {
-            color: $text-light;
+            color: hsl(var(--muted-foreground));
           }
         }
 
         mat-icon[matSuffix] {
-          color: $primary-color;
+          color: hsl(var(--primary));
           font-size: 22px;
           width: 22px;
           height: 22px;
@@ -129,23 +122,22 @@ mat-dialog-content {
           transform: scale(1.1);
         }
 
-        // Error State
         &.mat-form-field-invalid {
           .mat-mdc-notched-outline {
             .mat-mdc-notched-outline-leading,
             .mat-mdc-notched-outline-notch,
             .mat-mdc-notched-outline-trailing {
-              border-color: $error-color !important;
+              border-color: hsl(var(--destructive)) !important;
             }
           }
 
           mat-icon[matSuffix] {
-            color: $error-color;
+            color: hsl(var(--destructive));
           }
         }
 
         mat-error {
-          color: $error-color;
+          color: hsl(var(--destructive));
           font-size: 12px;
           font-weight: 500;
           margin-top: 4px;
@@ -161,7 +153,7 @@ mat-dialog-content {
         }
 
         mat-hint {
-          color: $text-secondary;
+          color: hsl(var(--muted-foreground));
           font-size: 12px;
           font-weight: 500;
         }
@@ -169,27 +161,26 @@ mat-dialog-content {
     }
   }
 
-  // Loading Container
   .loading-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
-    background-color: $background-card;
+    background-color: hsl(var(--card));
     border-radius: 12px;
-    box-shadow: $shadow-sm;
+    box-shadow: var(--shadow-soft);
 
     mat-spinner {
       margin-bottom: 20px;
 
       ::ng-deep circle {
-        stroke: $primary-color;
+        stroke: hsl(var(--primary));
       }
     }
 
     p {
-      color: $text-secondary;
+      color: hsl(var(--muted-foreground));
       font-size: 14px;
       font-weight: 500;
       margin: 0;
@@ -197,12 +188,11 @@ mat-dialog-content {
   }
 }
 
-// Dialog Actions
 mat-dialog-actions {
   padding: 20px 32px 24px;
   margin: 0;
-  background-color: $background-card;
-  border-top: 1px solid $border-color;
+  background-color: hsl(var(--card));
+  border-top: 1px solid hsl(var(--border));
   gap: 12px;
   display: flex;
   justify-content: flex-end;
@@ -227,25 +217,24 @@ mat-dialog-actions {
       height: 20px;
     }
 
-    // Cancel Button
     &[mat-button] {
-      color: $text-secondary;
+      color: hsl(var(--muted-foreground));
       background-color: transparent;
-      border: 2px solid $border-color;
+      border: 2px solid hsl(var(--border));
 
       mat-icon {
-        color: $text-secondary;
+        color: hsl(var(--muted-foreground));
       }
 
       &:hover:not([disabled]) {
-        background-color: $background-light;
-        border-color: $text-secondary;
-        color: $text-primary;
+        background-color: hsl(var(--secondary));
+        border-color: hsl(var(--muted-foreground));
+        color: hsl(var(--foreground));
         transform: translateY(-2px);
-        box-shadow: $shadow-sm;
+        box-shadow: var(--shadow-soft);
 
         mat-icon {
-          color: $text-primary;
+          color: hsl(var(--foreground));
         }
       }
 
@@ -255,32 +244,31 @@ mat-dialog-actions {
       }
     }
 
-    // Submit Button
     &[mat-raised-button] {
-      background: linear-gradient(135deg, $primary-color 0%, $accent-color 100%);
-      color: $background-card;
-      box-shadow: $shadow-primary;
+      background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+      color: hsl(var(--card));
+      box-shadow: var(--shadow-primary);
       border: none;
 
       mat-icon {
-        color: $background-card;
+        color: hsl(var(--card));
       }
 
       mat-spinner {
         ::ng-deep circle {
-          stroke: $background-card;
+          stroke: hsl(var(--card));
         }
       }
 
       &:hover:not([disabled]) {
-        background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%);
-        box-shadow: $shadow-primary;
+        background: linear-gradient(135deg, hsl(270 70% 52%) 0%, hsl(var(--primary)) 100%);
+        box-shadow: var(--shadow-primary);
         transform: translateY(-2px);
       }
 
       &[disabled] {
-        background: linear-gradient(135deg, lighten($border-color, 5%) 0%, $border-color 100%);
-        color: $text-light;
+        background: linear-gradient(135deg, hsl(240 10% 25%) 0%, hsl(var(--border)) 100%);
+        color: hsl(var(--muted-foreground));
         box-shadow: none;
         cursor: not-allowed;
         opacity: 0.6;
@@ -289,7 +277,6 @@ mat-dialog-actions {
   }
 }
 
-// Responsive Design
 @media (max-width: 600px) {
   h2[mat-dialog-title] {
     padding: 20px 24px;
@@ -311,7 +298,6 @@ mat-dialog-actions {
   }
 }
 
-// Animation
 @keyframes fadeIn {
   from {
     opacity: 0;

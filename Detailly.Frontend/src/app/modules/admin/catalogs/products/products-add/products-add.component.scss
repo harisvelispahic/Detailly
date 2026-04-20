@@ -1,33 +1,29 @@
-@use '../../../../../../styles/palette-bridge' as *;
-
-// Container
 .container {
   padding: 24px;
   max-width: 900px;
   margin: 0 auto;
-  background: $gradient-page;
+  background: var(--gradient-page);
   min-height: 100vh;
 }
 
-// Header Card
 .header-card {
-  background: $card;
+  background: hsl(var(--card));
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
   transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: 0 16px 36px -24px hsl(0 0% 0% / 0.6);
   }
 
   h1 {
     margin: 0;
     font-size: 28px;
     font-weight: 600;
-    color: $text-primary;
+    color: hsl(var(--foreground));
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
@@ -37,12 +33,12 @@
       content: '';
       width: 48px;
       height: 48px;
-      background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+      background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: $shadow-primary;
+      box-shadow: var(--shadow-primary);
       flex-shrink: 0;
     }
 
@@ -52,7 +48,7 @@
       content: 'add_shopping_cart';
       font-family: 'Material Icons';
       font-size: 28px;
-      color: $card-foreground;
+      color: hsl(var(--card-foreground));
       position: absolute;
       left: 10px;
       top: 50%;
@@ -61,13 +57,12 @@
   }
 }
 
-// Form Card
 .form-card {
-  background: $card;
+  background: hsl(var(--card));
   border-radius: 16px;
   padding: 32px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
   position: relative;
 
   form {
@@ -75,16 +70,15 @@
     flex-direction: column;
     gap: 24px;
 
-    // Error Banner
     .error-banner {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 16px 20px;
-      background: $error-soft;
-      border: 1px solid $error-border-soft;
+      background: hsl(var(--destructive) / 0.14);
+      border: 1px solid hsl(var(--destructive) / 0.32);
       border-radius: 12px;
-      color: $error-color;
+      color: hsl(var(--destructive));
       font-weight: 500;
       animation: slideDown 0.3s ease-out;
 
@@ -92,18 +86,17 @@
         font-size: 24px;
         width: 24px;
         height: 24px;
-        color: $error-color;
+        color: hsl(var(--destructive));
       }
     }
 
-    // Loading Overlay
     .loading-overlay {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: $overlay-scrim;
+      background: hsl(var(--background) / 0.92);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -115,19 +108,18 @@
 
       mat-spinner {
         ::ng-deep circle {
-          stroke: $primary-color;
+          stroke: hsl(var(--primary));
         }
       }
 
       p {
-        color: $text-secondary;
+        color: hsl(var(--muted-foreground));
         font-size: 16px;
         font-weight: 500;
         margin: 0;
       }
     }
 
-    // Form Fields
     .full-width {
       width: 100%;
     }
@@ -151,7 +143,7 @@
       &.mat-mdc-form-field-appearance-outline {
         ::ng-deep {
           .mat-mdc-text-field-wrapper {
-            background-color: $primary-lighter;
+            background-color: hsl(var(--secondary));
             border-radius: 12px;
             transition: all 0.3s ease;
           }
@@ -159,25 +151,25 @@
           .mdc-notched-outline__leading,
           .mdc-notched-outline__notch,
           .mdc-notched-outline__trailing {
-            border-color: $border-color !important;
+            border-color: hsl(var(--border)) !important;
             transition: border-color 0.3s ease;
           }
 
           &.mat-focused {
             .mat-mdc-text-field-wrapper {
-              background-color: $card;
-              box-shadow: $shadow-primary;
+              background-color: hsl(var(--card));
+              box-shadow: var(--shadow-primary);
             }
 
             .mdc-notched-outline__leading,
             .mdc-notched-outline__notch,
             .mdc-notched-outline__trailing {
-              border-color: $primary-color !important;
+              border-color: hsl(var(--primary)) !important;
               border-width: 2px !important;
             }
 
             .mat-mdc-floating-label {
-              color: $primary-color !important;
+              color: hsl(var(--primary)) !important;
             }
           }
 
@@ -185,36 +177,36 @@
             .mdc-notched-outline__leading,
             .mdc-notched-outline__notch,
             .mdc-notched-outline__trailing {
-              border-color: $error-color !important;
+              border-color: hsl(var(--destructive)) !important;
             }
 
             .mat-mdc-floating-label {
-              color: $error-color !important;
+              color: hsl(var(--destructive)) !important;
             }
           }
 
           .mat-mdc-floating-label {
-            color: $text-secondary;
+            color: hsl(var(--muted-foreground));
             font-weight: 500;
           }
 
           input,
           textarea {
-            color: $text-primary;
+            color: hsl(var(--foreground));
             font-size: 15px;
 
             &::placeholder {
-              color: $text-disabled;
+              color: hsl(var(--muted-foreground));
             }
           }
 
           .mat-mdc-select {
-            color: $text-primary;
+            color: hsl(var(--foreground));
             font-size: 15px;
           }
 
           .mat-mdc-form-field-error {
-            color: $error-color;
+            color: hsl(var(--destructive));
             font-size: 12px;
             font-weight: 500;
             margin-top: 4px;
@@ -222,19 +214,18 @@
 
           .mat-mdc-form-field-icon-prefix,
           .mat-mdc-form-field-icon-suffix {
-            color: $primary-color;
+            color: hsl(var(--primary));
           }
         }
       }
     }
 
-    // Form Actions
     .form-actions {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
       padding-top: 16px;
-      border-top: 1px solid $border-color;
+      border-top: 1px solid hsl(var(--border));
 
       button {
         min-width: 140px;
@@ -253,25 +244,24 @@
           height: 20px;
         }
 
-        // Cancel Button
         &[mat-stroked-button] {
-          border: 2px solid $border-color;
-          color: $text-secondary;
+          border: 2px solid hsl(var(--border));
+          color: hsl(var(--muted-foreground));
           background-color: transparent;
 
           mat-icon {
-            color: $text-secondary;
+            color: hsl(var(--muted-foreground));
           }
 
           &:hover:not([disabled]) {
-            background-color: $hover-bg;
-            border-color: $text-secondary;
-            color: $text-primary;
+            background-color: hsl(var(--primary) / 0.08);
+            border-color: hsl(var(--muted-foreground));
+            color: hsl(var(--foreground));
             transform: translateY(-2px);
-            box-shadow: $shadow-sm;
+            box-shadow: var(--shadow-soft);
 
             mat-icon {
-              color: $text-primary;
+              color: hsl(var(--foreground));
             }
           }
 
@@ -281,26 +271,25 @@
           }
         }
 
-        // Submit Button
         &[mat-raised-button] {
-          background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-          color: $card-foreground;
-          box-shadow: $shadow-primary;
+          background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+          color: hsl(var(--card-foreground));
+          box-shadow: var(--shadow-primary);
           border: none;
 
           mat-icon {
-            color: $card-foreground;
+            color: hsl(var(--card-foreground));
           }
 
           &:hover:not([disabled]) {
-            background: linear-gradient(135deg, $primary-dark 0%, $primary-color 100%);
-            box-shadow: $shadow-primary;
+            background: linear-gradient(135deg, hsl(270 70% 52%) 0%, hsl(var(--primary)) 100%);
+            box-shadow: var(--shadow-primary);
             transform: translateY(-2px);
           }
 
           &[disabled] {
-            background: linear-gradient(135deg, lighten($border-color, 5%) 0%, $border-color 100%);
-            color: $text-disabled;
+            background: linear-gradient(135deg, hsl(240 10% 25%) 0%, hsl(var(--border)) 100%);
+            color: hsl(var(--muted-foreground));
             box-shadow: none;
             cursor: not-allowed;
             opacity: 0.6;
@@ -319,7 +308,6 @@
   }
 }
 
-// Animations
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -331,7 +319,6 @@
   }
 }
 
-// Responzivnost
 @media (max-width: 768px) {
   .container {
     padding: 16px;
@@ -384,11 +371,10 @@
   }
 }
 
-// Select Panel Styling
 ::ng-deep .mat-mdc-select-panel {
   border-radius: 12px;
-  box-shadow: $shadow-md;
-  border: 1px solid $border-color;
+  box-shadow: 0 16px 36px -24px hsl(0 0% 0% / 0.6);
+  border: 1px solid hsl(var(--border));
   margin-top: 8px;
 
   .mat-mdc-option {
@@ -396,18 +382,18 @@
     transition: all 0.2s ease;
 
     &:hover {
-      background-color: $hover-bg;
+      background-color: hsl(var(--primary) / 0.08);
     }
 
     &.mat-mdc-option-active {
-      background-color: $primary-lighter;
-      color: $primary-color;
+      background-color: hsl(var(--secondary));
+      color: hsl(var(--primary));
       font-weight: 500;
     }
 
     &.mdc-list-item--selected {
-      background-color: $primary-lighter;
-      color: $primary-color;
+      background-color: hsl(var(--secondary));
+      color: hsl(var(--primary));
       font-weight: 600;
 
       &::after {

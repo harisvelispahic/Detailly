@@ -1,12 +1,7 @@
-@use '../../../../../styles/palette-bridge' as *;
-
-// src/app/modules/shared/components/fit-confirm-dialog/fit-fit-confirm-dialog.component.scss
-
 .confirm-dialog {
   padding: 8px;
   min-width: 400px;
 
-  // Icon Container
   .dialog-icon {
     width: 80px;
     height: 80px;
@@ -25,54 +20,51 @@
     }
 
     &.icon-success {
-      background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
-      box-shadow: $shadow-primary;
+      background: linear-gradient(135deg, hsl(var(--success)) 0%, hsl(142 76% 26%) 100%);
+      box-shadow: var(--shadow-primary);
     }
 
     &.icon-error {
-      background: linear-gradient(135deg, $error-color 0%, darken($error-color, 10%) 100%);
-      box-shadow: $shadow-danger;
+      background: linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(0 72% 41%) 100%);
+      box-shadow: var(--shadow-danger);
     }
 
     &.icon-warning {
-      background: linear-gradient(135deg, $warning-color 0%, darken($warning-color, 10%) 100%);
-      box-shadow: $shadow-warning;
+      background: linear-gradient(135deg, hsl(var(--warning)) 0%, hsl(38 92% 40%) 100%);
+      box-shadow: var(--shadow-warning);
     }
 
     &.icon-question {
-      background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
-      box-shadow: $shadow-primary;
+      background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+      box-shadow: var(--shadow-primary);
     }
 
     &.icon-info {
-      background: linear-gradient(135deg, $info-color 0%, darken($info-color, 10%) 100%);
-      box-shadow: $shadow-info;
+      background: linear-gradient(135deg, hsl(var(--info)) 0%, hsl(200 90% 40%) 100%);
+      box-shadow: 0 18px 34px -18px hsl(var(--info) / 0.35);
     }
   }
 
-  // Title
   h2[mat-dialog-title] {
     text-align: center;
     font-size: 24px;
     font-weight: 600;
-    color: $text-primary;
+    color: hsl(var(--foreground));
     margin: 0 0 16px;
   }
 
-  // Content
   mat-dialog-content {
     text-align: center;
     padding: 0 24px 24px;
 
     .dialog-message {
-      color: $text-secondary;
+      color: hsl(var(--muted-foreground));
       font-size: 16px;
       line-height: 1.6;
       margin: 0;
     }
   }
 
-  // Actions
   mat-dialog-actions {
     padding: 16px 24px 24px;
     gap: 12px;
@@ -95,31 +87,29 @@
         height: 20px;
       }
 
-      // Raised buttons
       &[mat-raised-button] {
-        box-shadow: $shadow-primary;
+        box-shadow: var(--shadow-primary);
 
         &:hover {
           transform: translateY(-2px);
-          box-shadow: $shadow-primary;
+          box-shadow: var(--shadow-primary);
         }
 
         &.mat-warn {
-          box-shadow: $shadow-danger;
+          box-shadow: var(--shadow-danger);
 
           &:hover {
-            box-shadow: $shadow-danger;
+            box-shadow: var(--shadow-danger);
           }
         }
       }
 
-      // Stroked buttons
       &[mat-stroked-button] {
-        border: 2px solid $border-color;
+        border: 2px solid hsl(var(--border));
 
         &:hover {
           background-color: hsl(270 70% 60% / 0.04);
-          border-color: $text-secondary;
+          border-color: hsl(var(--muted-foreground));
           transform: translateY(-2px);
         }
       }
@@ -127,7 +117,6 @@
   }
 }
 
-// Animation
 @keyframes scaleIn {
   from {
     transform: scale(0);
@@ -139,7 +128,6 @@
   }
 }
 
-// Responsive
 @media (max-width: 600px) {
   .confirm-dialog {
     min-width: 100%;

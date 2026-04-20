@@ -1,24 +1,20 @@
-// Import order status styles
-@use '../../../../styles/palette-bridge' as *;
 @import 'admin-orders-status-styles';
 
-// Container
 .container {
   padding: 24px;
   max-width: 1600px;
   margin: 0 auto;
-  background: $gradient-page;
+  background: var(--gradient-page);
   min-height: 100vh;
 }
 
-// Header Card
 .header-card {
-  background: $card;
+  background: hsl(var(--card));
   border-radius: 16px;
   padding: 24px 32px;
   margin-bottom: 24px;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
 
   .header-card-content {
     display: flex;
@@ -35,12 +31,12 @@
       .title-icon {
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+        background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: $shadow-primary;
+        box-shadow: var(--shadow-primary);
 
         mat-icon {
           color: white;
@@ -54,7 +50,7 @@
         margin: 0;
         font-size: 28px;
         font-weight: 600;
-        color: $text-primary;
+        color: hsl(var(--foreground));
         letter-spacing: -0.5px;
       }
     }
@@ -90,15 +86,15 @@
 
       .clear-filters-btn {
         height: 44px;
-        border-color: $primary-color;
-        color: $primary-color;
+        border-color: hsl(var(--primary));
+        color: hsl(var(--primary));
 
         mat-icon {
           margin-right: 8px;
         }
 
         &:hover:not(:disabled) {
-          background-color: $primary-soft;
+          background-color: hsl(var(--primary) / 0.08);
         }
 
         &:disabled {
@@ -109,22 +105,21 @@
   }
 }
 
-// Error Container
 .error-container {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   padding: 24px;
-  background: $gradient-danger-soft;
-  border: 1px solid $error-border-soft;
+  background: var(--gradient-danger-soft);
+  border: 1px solid hsl(var(--destructive) / 0.32);
   border-radius: 12px;
-  box-shadow: $shadow-danger;
+  box-shadow: var(--shadow-danger);
 
   mat-icon {
     font-size: 32px;
     width: 32px;
     height: 32px;
-    color: $error-color;
+    color: hsl(var(--destructive));
     flex-shrink: 0;
   }
 
@@ -135,18 +130,18 @@
       margin: 0 0 8px 0;
       font-size: 18px;
       font-weight: 600;
-      color: $error-color;
+      color: hsl(var(--destructive));
     }
 
     .error-message {
       margin: 0 0 16px 0;
-      color: $error-color;
+      color: hsl(var(--destructive));
       line-height: 1.5;
     }
 
     button {
-      border-color: $error-color;
-      color: $error-color;
+      border-color: hsl(var(--destructive));
+      color: hsl(var(--destructive));
 
       mat-icon {
         margin-right: 8px;
@@ -155,22 +150,21 @@
   }
 }
 
-// Table Card
 .table-card {
-  background: $card;
+  background: hsl(var(--card));
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: $shadow-sm;
-  border: 1px solid $border-color;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid hsl(var(--border));
 
   .orders-table {
     width: 100%;
 
     th {
-      background: $gradient-surface;
-      border-bottom: 2px solid $primary-color;
+      background: var(--gradient-surface);
+      border-bottom: 2px solid hsl(var(--primary));
       font-weight: 600;
-      color: $primary-dark;
+      color: hsl(270 70% 52%);
       padding: 20px 16px;
 
       .header-cell {
@@ -182,21 +176,20 @@
           font-size: 20px;
           width: 20px;
           height: 20px;
-          color: $primary-color;
+          color: hsl(var(--primary));
         }
       }
     }
 
     td {
       padding: 16px;
-      border-bottom: 1px solid $border-color;
-      color: $text-primary;
+      border-bottom: 1px solid hsl(var(--border));
+      color: hsl(var(--foreground));
     }
 
-    // Column-specific styles
     .order-ref {
       font-weight: 600;
-      color: $primary-color;
+      color: hsl(var(--primary));
       font-size: 15px;
     }
 
@@ -207,12 +200,12 @@
 
       .customer-name {
         font-weight: 500;
-        color: $text-primary;
+        color: hsl(var(--foreground));
       }
 
       .customer-address {
         font-size: 13px;
-        color: $text-muted;
+        color: hsl(var(--muted-foreground));
       }
     }
 
@@ -223,19 +216,19 @@
 
       .date {
         font-weight: 500;
-        color: $text-primary;
+        color: hsl(var(--foreground));
       }
 
       .time {
         font-size: 13px;
-        color: $text-muted;
+        color: hsl(var(--muted-foreground));
       }
     }
 
     .amount {
       font-weight: 600;
       font-size: 16px;
-      color: $success-color;
+      color: hsl(var(--success));
     }
 
     .action-buttons {
@@ -249,20 +242,20 @@
         transition: all 0.2s ease;
 
         &.view-btn {
-          color: $primary-color;
-          background: $primary-soft;
+          color: hsl(var(--primary));
+          background: hsl(var(--primary) / 0.08);
 
           &:hover:not(:disabled) {
-            background: $primary-lighter;
+            background: hsl(var(--secondary));
             transform: scale(1.1);
           }
         }
 
         &.status-btn {
-          background: $primary-soft;
+          background: hsl(var(--primary) / 0.08);
 
           &:hover:not(:disabled) {
-            background: $primary-soft-strong;
+            background: hsl(var(--primary) / 0.16);
             transform: scale(1.1);
           }
 
@@ -280,17 +273,15 @@
       }
     }
 
-    // Row hover
     .data-row {
       cursor: pointer;
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: $hover-bg;
+        background-color: hsl(var(--primary) / 0.08);
       }
     }
 
-    // No data
     .no-data-row {
       td {
         border-bottom: none;
@@ -306,11 +297,11 @@
             font-size: 72px;
             width: 72px;
             height: 72px;
-            color: $primary-border-soft;
+            color: hsl(var(--primary) / 0.3);
           }
 
           p {
-            color: $text-secondary;
+            color: hsl(var(--muted-foreground));
             font-size: 16px;
             margin: 0;
           }
@@ -321,12 +312,11 @@
 
   .paginator-wrapper {
     padding: 16px;
-    background: $primary-lighter;
-    border-top: 1px solid $border-color;
+    background: hsl(var(--secondary));
+    border-top: 1px solid hsl(var(--border));
   }
 }
 
-// Responsive
 @media (max-width: 1200px) {
   .header-card {
     .header-card-content {
