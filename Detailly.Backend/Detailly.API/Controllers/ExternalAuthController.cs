@@ -1,67 +1,57 @@
-﻿using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
-using MediatR;
+using Detailly.Application.Abstractions;
+using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+
+namespace Detailly.API.Controllers;
 
 [ApiController]
-[Route("api/auth/external")]
-public sealed class ExternalAuthController : ControllerBase
+[Route("auth/external")]
+public sealed class ExternalAuthController(
+    ISender sender,
+    IExternalAuthService externalAuthService,
+    IConfiguration configuration) : ControllerBase
 {
     [HttpGet("google")]
     [AllowAnonymous]
     public IActionResult GoogleLogin([FromQuery] string returnUrl)
     {
-        // Force ABSOLUTE redirect URI (Google requires this)
-        var callbackUrl = Url.Action(
-            action: nameof(GoogleCallback),
+        if (!IsReturnUrlAllowed(returnUrl))
+            return BadRequest("Invalid returnUrl.");
+
+        var finalizeUrl = Url.Action(
+            action: nameof(GoogleFinalize),
             controller: "ExternalAuth",
             values: new { returnUrl },
             protocol: Request.Scheme);
 
-        Console.WriteLine("=== REQUEST INFO ===");
-        Console.WriteLine($"Scheme: {Request.Scheme}");
-        Console.WriteLine($"Host: {Request.Host}");
-        Console.WriteLine($"PathBase: {Request.PathBase}");
-        Console.WriteLine($"Path: {Request.Path}");
-        Console.WriteLine("====================");
-
-        var props = new AuthenticationProperties
-        {
-            RedirectUri = callbackUrl!
-        };
-
-        return Challenge(props, "Google");
+        return Challenge(new AuthenticationProperties { RedirectUri = finalizeUrl! }, "Google");
     }
 
-
-    [HttpGet("google/callback")]
+    [HttpGet("google/finalize")]
     [AllowAnonymous]
-    public async Task<IActionResult> GoogleCallback(
-        [FromQuery] string returnUrl,
-        [FromServices] IMediator mediator)
+    public async Task<IActionResult> GoogleFinalize([FromQuery] string returnUrl, CancellationToken ct)
     {
-        // Authenticate the EXTERNAL cookie, not "Google"
-        var result = await HttpContext.AuthenticateAsync("External");
-
-        if (!result.Succeeded || result.Principal is null)
+        var principal = await externalAuthService.ExchangeExternalCookieAsync(ct);
+        if (principal is null)
             return Unauthorized();
 
-        // Optional cleanup
-        await HttpContext.SignOutAsync("External");
+        var tokens = await sender.Send(new ExternalLoginCommand("Google", principal), ct);
 
-        var tokens = await mediator.Send(new ExternalLoginCommand(
-            Provider: "Google",
-            Principal: result.Principal));
-
-        var redirectUrl =
+        return Redirect(
             $"{returnUrl}?accessToken={Uri.EscapeDataString(tokens.AccessToken)}" +
-            $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}";
-
-        return Redirect(redirectUrl);
+            $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}");
     }
 
-    [HttpGet("/test")]
-    [AllowAnonymous]
-    public IActionResult Test([FromQuery] string accessToken, [FromQuery] string refreshToken)
-    => Ok(new { accessToken = accessToken?.Length, refreshToken = refreshToken?.Length });
+    private bool IsReturnUrlAllowed(string returnUrl)
+    {
+        if (!Uri.TryCreate(returnUrl, UriKind.Absolute, out var uri))
+            return false;
+
+        var allowed = configuration
+            .GetSection("Authentication:AllowedReturnHosts")
+            .Get<string[]>() ?? [];
+
+        return allowed.Any(h => uri.Authority.Equals(h, StringComparison.OrdinalIgnoreCase));
+    }
 }

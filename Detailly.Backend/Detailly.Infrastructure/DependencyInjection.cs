@@ -5,6 +5,7 @@ using Detailly.Infrastructure.Background;
 using Detailly.Infrastructure.Booking;
 using Detailly.Infrastructure.Common;
 using Detailly.Infrastructure.Database;
+using Detailly.Infrastructure.ExternalAuth;
 using Detailly.Infrastructure.Payments.Stripe;
 using Detailly.Shared.Constants;
 using Detailly.Shared.Options;
@@ -70,6 +71,9 @@ public static class DependencyInjection
 
         // Booking quote service, for calculating price and availability without creating a booking
         services.AddScoped<IBookingQuoteService, BookingQuoteService>();
+
+        // External auth (Google OAuth cookie exchange)
+        services.AddScoped<IExternalAuthService, ExternalAuthService>();
 
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);

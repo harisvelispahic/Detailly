@@ -70,9 +70,13 @@ public static class DependencyInjection
         {
             options.ClientId = configuration["Authentication:Google:ClientId"]!;
             options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
-            options.CallbackPath = "/api/auth/external/google/callback";
-
+            options.CallbackPath = "/auth/external/google/callback";
             options.SignInScheme = "External";
+
+            // SameSite=None requires Secure — set Lax so the correlation cookie
+            // survives the cross-origin redirect from Google on both HTTP and HTTPS
+            options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+            options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
 
         services.AddAuthorization(o =>
