@@ -11,6 +11,7 @@ namespace Detailly.Domain.Entities.Identity;
 
 public sealed class ApplicationUserEntity : BaseEntity
 {
+    public const string ExternalOnlyPasswordHash = "EXTERNAL_ONLY";
     public int TokenVersion { get; set; } = 0;  // For global revocation
 
     public bool IsManager { get; set; } = false;

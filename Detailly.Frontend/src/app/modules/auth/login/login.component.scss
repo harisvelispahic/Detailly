@@ -247,6 +247,38 @@ form {
   }
 }
 
+.google-button {
+  width: 100%;
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: hsl(240 15% 12%);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  color: hsl(var(--foreground));
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease;
+
+  &:hover {
+    background: hsl(240 15% 16%);
+    border-color: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  &:active {
+    background: hsl(240 15% 10%);
+  }
+}
+
+.google-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
 .register-prompt {
   text-align: center;
   font-size: 0.9rem;

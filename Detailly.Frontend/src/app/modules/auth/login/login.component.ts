@@ -5,6 +5,7 @@ import { BaseComponent } from '../../../core/components/base-classes/base-compon
 import { AuthFacadeService } from '../../../core/services/auth/auth-facade.service';
 import { LoginCommand } from '../../../api-services/auth/auth-api.model';
 import { CurrentUserService } from '../../../core/services/auth/current-user.service';
+import { GoogleOAuthService } from '../../../core/services/auth/google-oauth.service';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ export class LoginComponent extends BaseComponent {
   private auth = inject(AuthFacadeService);
   private router = inject(Router);
   private currentUser = inject(CurrentUserService);
+  private googleOAuth = inject(GoogleOAuthService);
   hidePassword = true;
 
   form = this.fb.group({
@@ -24,6 +26,10 @@ export class LoginComponent extends BaseComponent {
     password: ['User123!', [Validators.required]],
     rememberMe: [false],
   });
+
+  loginWithGoogle(): void {
+    this.googleOAuth.initiateLogin();
+  }
 
   onSubmit(): void {
     if (this.form.invalid || this.isLoading) return;

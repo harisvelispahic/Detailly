@@ -39,7 +39,7 @@ public sealed class ExternalAuthController(
         var tokens = await sender.Send(new ExternalLoginCommand("Google", principal), ct);
 
         return Redirect(
-            $"{returnUrl}?accessToken={Uri.EscapeDataString(tokens.AccessToken)}" +
+            $"{returnUrl}#accessToken={Uri.EscapeDataString(tokens.AccessToken)}" +
             $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}");
     }
 

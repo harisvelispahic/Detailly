@@ -15,6 +15,7 @@ import {
 import { AuthStorageService } from './auth-storage.service';
 import { CurrentUserDto } from './current-user.dto';
 import { JwtPayloadDto } from './jwt-payload.dto';
+import { REFRESH_TOKEN_EXPIRY_DAYS } from './auth.constants';
 
 import * as Sentry from '@sentry/angular';
 
@@ -106,6 +107,24 @@ export class AuthFacadeService {
         this.decodeAndSetUser(response.accessToken); // update current usera
       }),
     );
+  }
+
+  /**
+   * Stores tokens received from the Google OAuth redirect fragment.
+   */
+  storeExternalLoginTokens(accessToken: string, refreshToken: string): void {
+    const payload = jwtDecode<{ exp: number }>(accessToken);
+    const accessExpiry = new Date(payload.exp * 1000).toISOString();
+    const refreshExpiry = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
+    this.storage.saveLogin({
+      accessToken,
+      refreshToken,
+      accessTokenExpiresAtUtc: accessExpiry,
+      refreshTokenExpiresAtUtc: refreshExpiry,
+    });
+
+    this.decodeAndSetUser(accessToken);
   }
 
   /**

@@ -14,6 +14,9 @@ public sealed class LoginCommandHandler(
             .FirstOrDefaultAsync(x => x.Email.ToLower() == email && x.IsEnabled && !x.IsDeleted, ct)
             ?? throw new DetaillyNotFoundException("User was not found or was disabled.");
 
+        if (user.PasswordHash == ApplicationUserEntity.ExternalOnlyPasswordHash)
+            throw new DetaillyUnauthorizedException("This account uses Google login.");
+
         var verify = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
         if (verify == PasswordVerificationResult.Failed)
             throw new DetaillyUnauthorizedException("Wrong credentials.");

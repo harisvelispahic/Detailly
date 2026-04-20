@@ -96,7 +96,7 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                 LastName = lastName,
                 Email = email,
                 Username = email.Split('@')[0],
-                PasswordHash = "",
+                PasswordHash = ApplicationUserEntity.ExternalOnlyPasswordHash,
                 IsEnabled = true,
                 IsAdmin = false,
                 IsEmployee = false,
