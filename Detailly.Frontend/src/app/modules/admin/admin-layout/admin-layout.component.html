@@ -94,6 +94,21 @@
         <span matListItemTitle>{{ 'ADMIN_PANEL.MENU.SETTINGS' | translate }}</span>
       </a>
 
+      <mat-divider></mat-divider>
+
+      <!-- SWITCH VIEW SECTION -->
+      <div class="nav-section-title">Switch View</div>
+
+      <a mat-list-item routerLink="/" class="switch-view-item switch-view-item--public">
+        <mat-icon matListItemIcon>public</mat-icon>
+        <span matListItemTitle>Public Site</span>
+      </a>
+
+      <a mat-list-item routerLink="/staff" class="switch-view-item switch-view-item--staff">
+        <mat-icon matListItemIcon>badge</mat-icon>
+        <span matListItemTitle>Staff Panel</span>
+      </a>
+
       <!-- LOGOUT -->
       <a mat-list-item routerLink="/auth/logout" routerLinkActive="active" class="logout-item">
         <mat-icon matListItemIcon>logout</mat-icon>

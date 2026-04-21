@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
+import { SharedModule } from '../shared/shared-module';
 import { StaffRoutingModule } from './staff-routing-module';
+import { StaffLayoutComponent } from './staff-layout/staff-layout.component';
 import { StaffHomeComponent } from './pages/staff-home/staff-home.component';
 
 @NgModule({
-  declarations: [StaffHomeComponent],
-  imports: [CommonModule, StaffRoutingModule],
+  declarations: [StaffLayoutComponent, StaffHomeComponent],
+  imports: [SharedModule, StaffRoutingModule],
 })
 export class StaffModule {}

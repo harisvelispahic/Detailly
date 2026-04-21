@@ -1,0 +1,68 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- SIDEBAR -->
+  <mat-sidenav mode="side" opened class="sidenav">
+    <!-- SIDEBAR HEADER WITH USER INFO -->
+    <div class="sidebar-header">
+      <div class="user-info">
+        <div class="user-avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="user-details">
+          <div class="user-email">{{ auth.currentUser()?.email }}</div>
+          <div class="user-role">
+            @if (auth.isManager()) {
+              <mat-chip class="role-chip manager">
+                <mat-icon>manage_accounts</mat-icon>
+                Manager
+              </mat-chip>
+            } @else if (auth.isEmployee()) {
+              <mat-chip class="role-chip employee">
+                <mat-icon>badge</mat-icon>
+                Employee
+              </mat-chip>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NAVIGATION MENU -->
+    <mat-nav-list>
+      <!-- STAFF SECTION -->
+      <div class="nav-section-title">Staff Panel</div>
+
+      <a mat-list-item routerLink="/staff" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+
+      <mat-divider></mat-divider>
+
+      <!-- SWITCH VIEW SECTION -->
+      <div class="nav-section-title">Switch View</div>
+
+      <a mat-list-item routerLink="/" class="switch-view-item switch-view-item--public">
+        <mat-icon matListItemIcon>public</mat-icon>
+        <span matListItemTitle>Public Site</span>
+      </a>
+
+      @if (auth.isAdmin()) {
+        <a mat-list-item routerLink="/admin" class="switch-view-item switch-view-item--admin">
+          <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+          <span matListItemTitle>Admin Panel</span>
+        </a>
+      }
+
+      <!-- LOGOUT -->
+      <a mat-list-item routerLink="/auth/logout" routerLinkActive="active" class="logout-item">
+        <mat-icon matListItemIcon>logout</mat-icon>
+        <span matListItemTitle>Sign Out</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- MAIN CONTENT -->
+  <mat-sidenav-content class="main-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

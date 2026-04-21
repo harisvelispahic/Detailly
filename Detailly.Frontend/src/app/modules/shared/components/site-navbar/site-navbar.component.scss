@@ -179,6 +179,18 @@
   display: none;
 }
 
+.site-navbar__icon-button--staff:hover {
+  color: hsl(var(--success));
+  border-color: hsl(var(--success) / 0.22);
+  background: hsl(var(--success) / 0.1);
+}
+
+.site-navbar__icon-button--admin:hover {
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive) / 0.22);
+  background: hsl(var(--destructive) / 0.1);
+}
+
 .site-navbar__mobile-toggle {
   display: inline-flex;
 }
