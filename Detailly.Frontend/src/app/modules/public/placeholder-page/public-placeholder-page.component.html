@@ -4,33 +4,31 @@
   <app-container size="xl">
     <div class="public-placeholder-page__grid">
       <div class="public-placeholder-page__content">
-        <span *ngIf="page.eyebrow" class="public-placeholder-page__eyebrow">{{ page.eyebrow }}</span>
+        @if (page.eyebrow) {
+          <span class="public-placeholder-page__eyebrow">{{ page.eyebrow }}</span>
+        }
 
         <h1 class="public-placeholder-page__title">
           {{ page.title }}
-          <span *ngIf="page.accent" class="gradient-text">{{ page.accent }}</span>
+          @if (page.accent) {
+            <span class="gradient-text">{{ page.accent }}</span>
+          }
         </h1>
 
         <p class="public-placeholder-page__description">{{ page.description }}</p>
 
         <div class="public-placeholder-page__actions">
-          <a
-            *ngIf="page.primaryLabel && page.primaryRoute"
-            mat-raised-button
-            color="primary"
-            [routerLink]="page.primaryRoute"
-          >
-            {{ page.primaryLabel }}
-            <mat-icon>arrow_forward</mat-icon>
-          </a>
-
-          <a
-            *ngIf="page.secondaryLabel && page.secondaryRoute"
-            mat-stroked-button
-            [routerLink]="page.secondaryRoute"
-          >
-            {{ page.secondaryLabel }}
-          </a>
+          @if (page.primaryLabel && page.primaryRoute) {
+            <a mat-raised-button color="primary" [routerLink]="page.primaryRoute">
+              {{ page.primaryLabel }}
+              <mat-icon>arrow_forward</mat-icon>
+            </a>
+          }
+          @if (page.secondaryLabel && page.secondaryRoute) {
+            <a mat-stroked-button [routerLink]="page.secondaryRoute">
+              {{ page.secondaryLabel }}
+            </a>
+          }
         </div>
       </div>
 
@@ -43,12 +41,14 @@
         </app-card-header>
 
         <app-card-content>
-          <ul *ngIf="page.highlights?.length" class="public-placeholder-page__list">
-            <li *ngFor="let item of page.highlights">
-              <mat-icon>check_circle</mat-icon>
-              <span>{{ item }}</span>
-            </li>
-          </ul>
+          @if (page.highlights?.length) {
+            <ul class="public-placeholder-page__list">
+              <li *ngFor="let item of page.highlights">
+                <mat-icon>check_circle</mat-icon>
+                <span>{{ item }}</span>
+              </li>
+            </ul>
+          }
         </app-card-content>
       </app-card>
     </div>

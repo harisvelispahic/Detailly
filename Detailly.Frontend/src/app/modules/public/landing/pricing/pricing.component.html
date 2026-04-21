@@ -17,7 +17,9 @@
         [class.popular]="tier.popular"
       >
         <!-- Popular Badge -->
-        <div *ngIf="tier.popular" class="popular-badge">Most Popular</div>
+        @if (tier.popular) {
+          <div class="popular-badge">Most Popular</div>
+        }
 
         <!-- Tier Header -->
         <div class="tier-header">

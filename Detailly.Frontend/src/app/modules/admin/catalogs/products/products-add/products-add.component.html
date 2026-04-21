@@ -62,23 +62,29 @@
           />
           <span matTextPrefix>KM&nbsp;</span>
           <mat-icon matSuffix>payments</mat-icon>
-          <mat-error *ngIf="hasError('price')">
-            {{ getErrorMessage('price') }}
-          </mat-error>
+          @if (hasError('price')) {
+            <mat-error>
+              {{ getErrorMessage('price') }}
+            </mat-error>
+          }
         </mat-form-field>
 
         <!-- Category -->
         <mat-form-field appearance="outline" class="half-width">
           <mat-label>{{ 'PRODUCTS.FORM.CATEGORY' | translate }}</mat-label>
           <mat-select formControlName="categoryId">
-            <mat-option *ngFor="let category of categories" [value]="category.id">
-              {{ category.name }}
-            </mat-option>
+            @for (category of categories; track category.id) {
+              <mat-option [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            }
           </mat-select>
           <mat-icon matSuffix>category</mat-icon>
-          <mat-error *ngIf="hasError('categoryId')">
-            {{ getErrorMessage('categoryId') }}
-          </mat-error>
+          @if (hasError('categoryId')) {
+            <mat-error>
+              {{ getErrorMessage('categoryId') }}
+            </mat-error>
+          }
         </mat-form-field>
       </div>
 

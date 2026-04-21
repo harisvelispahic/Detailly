@@ -13,18 +13,22 @@
         autocomplete="off"
       />
       <mat-icon matSuffix>label</mat-icon>
-      <mat-error *ngIf="form.get('name')?.invalid">
-        {{ getErrorMessage('name') }}
-      </mat-error>
+      @if (form.get('name')?.invalid) {
+        <mat-error>
+          {{ getErrorMessage('name') }}
+        </mat-error>
+      }
       <mat-hint align="end">{{ form.get('name')?.value?.length || 0 }}/100</mat-hint>
     </mat-form-field>
   </form>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading && !form" class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>{{ 'PRODUCT_CATEGORIES.FORM.LOADING' | translate }}</p>
-  </div>
+  @if (isLoading && !form) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>{{ 'PRODUCT_CATEGORIES.FORM.LOADING' | translate }}</p>
+    </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
@@ -40,8 +44,11 @@
     (click)="onSubmit()"
     [disabled]="!form || form.invalid || isLoading"
   >
-    <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
-    <mat-icon *ngIf="!isLoading">{{ isEditMode ? 'edit' : 'save' }}</mat-icon>
+    @if (isLoading) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      <mat-icon>{{ isEditMode ? 'edit' : 'save' }}</mat-icon>
+    }
     {{
       isEditMode
         ? ('PRODUCT_CATEGORIES.FORM.UPDATE' | translate)

@@ -123,15 +123,7 @@ export class SiteNavbarComponent {
   }
 
   logout(): void {
-    this.auth.logout().subscribe({
-      next: () => {
-        this.closeMobileMenu();
-        this.router.navigate(['/']);
-      },
-      error: () => {
-        this.closeMobileMenu();
-        this.router.navigate(['/']);
-      },
-    });
+    this.closeMobileMenu();
+    this.router.navigate(['/auth/logout']);
   }
 }

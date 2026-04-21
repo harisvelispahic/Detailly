@@ -1,4 +1,6 @@
 <label [attr.for]="for" class="label-text">
   <ng-content></ng-content>
-  <span *ngIf="required" class="required-indicator">*</span>
+  @if (required) {
+    <span class="required-indicator">*</span>
+  }
 </label>

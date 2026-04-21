@@ -37,9 +37,11 @@
           rows="4"
         ></textarea>
         <mat-icon matSuffix>description</mat-icon>
-        <mat-error *ngIf="hasError('description')">
-          {{ getErrorMessage('description') }}
-        </mat-error>
+        @if (hasError('description')) {
+          <mat-error>
+            {{ getErrorMessage('description') }}
+          </mat-error>
+        }
       </mat-form-field>
 
       <!-- Price and Category Row -->
@@ -56,9 +58,11 @@
           />
           <span matTextPrefix>KM&nbsp;</span>
           <mat-icon matSuffix>payments</mat-icon>
-          <mat-error *ngIf="hasError('price')">
-            {{ getErrorMessage('price') }}
-          </mat-error>
+          @if (hasError('price')) {
+            <mat-error>
+              {{ getErrorMessage('price') }}
+            </mat-error>
+          }
         </mat-form-field>
 
         <!-- Category -->
@@ -70,9 +74,11 @@
             </mat-option>
           </mat-select>
           <mat-icon matSuffix>category</mat-icon>
-          <mat-error *ngIf="hasError('categoryId')">
-            {{ getErrorMessage('categoryId') }}
-          </mat-error>
+          @if (hasError('categoryId')) {
+            <mat-error>
+              {{ getErrorMessage('categoryId') }}
+            </mat-error>
+          }
         </mat-form-field>
       </div>
 

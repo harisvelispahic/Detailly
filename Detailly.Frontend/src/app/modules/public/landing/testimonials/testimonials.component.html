@@ -14,33 +14,35 @@
     <!-- Testimonial Carousel -->
     <div class="testimonial-carousel">
       <!-- Current Review Card -->
-      <div *ngIf="currentReview" class="review-card">
-        <!-- Star Rating -->
-        <div class="star-rating">
-          <mat-icon
-            *ngFor="let star of getRatingArray(currentReview.rating)"
-            [class.filled]="star < currentReview.rating"
-          >
-            star
-          </mat-icon>
-        </div>
+      @if (currentReview) {
+        <div class="review-card">
+          <!-- Star Rating -->
+          <div class="star-rating">
+            <mat-icon
+              *ngFor="let star of getRatingArray(currentReview.rating)"
+              [class.filled]="star < currentReview.rating"
+            >
+              star
+            </mat-icon>
+          </div>
 
-        <!-- Review Text -->
-        <p class="review-text">"{{ currentReview.comment }}"</p>
+          <!-- Review Text -->
+          <p class="review-text">"{{ currentReview.comment }}"</p>
 
-        <!-- Reviewer Info -->
-        <div class="reviewer-info">
-          <img
-            [src]="currentReview.userAvatar"
-            [alt]="currentReview.userName"
-            class="reviewer-avatar"
-          />
-          <div class="reviewer-details">
-            <div class="reviewer-name">{{ currentReview.userName }}</div>
-            <div class="reviewer-service">{{ currentReview.serviceName }}</div>
+          <!-- Reviewer Info -->
+          <div class="reviewer-info">
+            <img
+              [src]="currentReview.userAvatar"
+              [alt]="currentReview.userName"
+              class="reviewer-avatar"
+            />
+            <div class="reviewer-details">
+              <div class="reviewer-name">{{ currentReview.userName }}</div>
+              <div class="reviewer-service">{{ currentReview.serviceName }}</div>
+            </div>
           </div>
         </div>
-      </div>
+      }
 
       <!-- Navigation Controls -->
       <div class="carousel-controls">

@@ -22,14 +22,16 @@
       </div>
 
       <div class="site-navbar__actions">
-        <div *ngIf="isAdmin() || isManager() || isEmployee()" class="site-navbar__badge">
-          <app-badge variant="default">
-            <span class="site-navbar__role">
-              <mat-icon>admin_panel_settings</mat-icon>
-              {{ getRoleLabel() }} Mode
-            </span>
-          </app-badge>
-        </div>
+        @if (isAdmin() || isManager() || isEmployee()) {
+          <div class="site-navbar__badge">
+            <app-badge variant="default">
+              <span class="site-navbar__role">
+                <mat-icon>admin_panel_settings</mat-icon>
+                {{ getRoleLabel() }} Mode
+              </span>
+            </app-badge>
+          </div>
+        }
 
         <a
           routerLink="/search"
@@ -49,15 +51,16 @@
           <mat-icon>person</mat-icon>
         </a>
 
-        <button
-          *ngIf="isAuthenticated()"
-          type="button"
-          class="site-navbar__icon-button site-navbar__icon-button--desktop site-navbar__icon-button--logout"
-          (click)="logout()"
-          aria-label="Sign out"
-        >
-          <mat-icon>logout</mat-icon>
-        </button>
+        @if (isAuthenticated()) {
+          <button
+            type="button"
+            class="site-navbar__icon-button site-navbar__icon-button--desktop site-navbar__icon-button--logout"
+            (click)="logout()"
+            aria-label="Sign out"
+          >
+            <mat-icon>logout</mat-icon>
+          </button>
+        }
 
         <button
           type="button"
@@ -86,14 +89,16 @@
           <span>{{ link.label }}</span>
         </a>
 
-        <div *ngIf="isAdmin() || isManager() || isEmployee()" class="site-mobile-menu__role">
-          <app-badge variant="default">
-            <span class="site-navbar__role">
-              <mat-icon>admin_panel_settings</mat-icon>
-              {{ getRoleLabel() }} Mode
-            </span>
-          </app-badge>
-        </div>
+        @if (isAdmin() || isManager() || isEmployee()) {
+          <div class="site-mobile-menu__role">
+            <app-badge variant="default">
+              <span class="site-navbar__role">
+                <mat-icon>admin_panel_settings</mat-icon>
+                {{ getRoleLabel() }} Mode
+              </span>
+            </app-badge>
+          </div>
+        }
 
         <div class="site-mobile-menu__actions">
           <a routerLink="/search" class="site-mobile-menu__action" (click)="closeMobileMenu()">
@@ -110,15 +115,12 @@
             <span>{{ isAuthenticated() ? 'My Account' : 'Sign In' }}</span>
           </a>
 
-          <button
-            *ngIf="isAuthenticated()"
-            type="button"
-            class="site-mobile-menu__action"
-            (click)="logout()"
-          >
-            <mat-icon>logout</mat-icon>
-            <span>Sign Out</span>
-          </button>
+          @if (isAuthenticated()) {
+            <button type="button" class="site-mobile-menu__action" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Sign Out</span>
+            </button>
+          }
         </div>
       </div>
     </div>

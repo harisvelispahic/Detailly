@@ -4,7 +4,7 @@
       <div class="header-icon">
         <mat-icon>logout</mat-icon>
       </div>
-      <mat-card-title>{{ 'AUTH.LOGOUT.TITLE' | translate }}</mat-card-title>
+      <mat-card-title>Logout</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
@@ -12,13 +12,13 @@
         <mat-icon class="logout-icon">check_circle</mat-icon>
       </div>
 
-      <p class="logout-message">{{ 'AUTH.LOGOUT.MESSAGE' | translate }}</p>
+      <p class="logout-message">Logging out of the system...</p>
 
       <div class="logout-progress">
         <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
         <div class="logout-countdown">
           <mat-icon class="countdown-icon">schedule</mat-icon>
-          <span>{{ 'AUTH.LOGOUT.REDIRECT_IN' | translate : { seconds: countdownSeconds } }}</span>
+          <span>Redirecting in {{ countdownSeconds }}s</span>
         </div>
       </div>
     </mat-card-content>
