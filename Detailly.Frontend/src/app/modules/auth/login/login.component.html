@@ -71,7 +71,7 @@
 
           <div class="form-row">
             <mat-checkbox formControlName="rememberMe" color="primary">
-              {{ 'AUTH.LOGIN.REMEMBER_ME' | translate }}
+              Remember me
             </mat-checkbox>
             <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
           </div>
@@ -85,7 +85,7 @@
               [disabled]="form.invalid || isLoading"
             >
               <ng-container *ngIf="!isLoading; else loadingTpl">
-                {{ 'AUTH.LOGIN.BUTTON' | translate }}
+                Sign In
                 <mat-icon>arrow_forward</mat-icon>
               </ng-container>
               <ng-template #loadingTpl>
