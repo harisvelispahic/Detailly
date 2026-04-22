@@ -24,8 +24,6 @@ public sealed class UpdateAddressCommandValidator : AbstractValidator<UpdateAddr
             .MaximumLength(20).WithMessage("Postal code cannot exceed 20 characters.");
 
         RuleFor(x => x.Region)
-            .Must(x => x == null || !string.IsNullOrWhiteSpace(x))
-            .WithMessage("Region cannot be empty or whitespace only.")
             .MaximumLength(100).WithMessage("Region cannot exceed 100 characters.");
 
         RuleFor(x => x.Country)

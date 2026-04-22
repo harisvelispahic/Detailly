@@ -21,10 +21,14 @@ public sealed class UpdateUserCommandHandler(
 
         var user = await context.ApplicationUsers
             .Include(x => x.Image)
+            .Include(x => x.ExternalLogins)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (user == null)
             throw new DetaillyNotFoundException("User not found.");
+
+        if (request.Email != null && user.ExternalLogins.Any())
+            throw new DetaillyForbiddenException("Email cannot be changed for OAuth-registered accounts.");
 
         // PERSONAL INFO
         if (request.FirstName != null)
@@ -57,8 +61,8 @@ public sealed class UpdateUserCommandHandler(
             user.Username = normalizedUsername;
         }
 
-        if (request.Phone != null)
-            user.Phone = request.Phone.Trim();
+        if (request.Phone is not null)
+            user.Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
 
         if (request.CompanyName != null)
             user.CompanyName = request.CompanyName.Trim();

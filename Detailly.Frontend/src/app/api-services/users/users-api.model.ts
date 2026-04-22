@@ -19,7 +19,9 @@ export interface GetUserByIdQueryDto {
   lastName: string;
   username: string;
   email: string;
+  phone?: string | null;
   companyName?: string | null;
+  isOAuthUser: boolean;
 }
 
 export interface UpdateUserCommand {

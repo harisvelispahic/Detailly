@@ -1,267 +1,281 @@
 <section class="profile-page">
-  <app-container size="xl">
-
+  <app-container size="lg">
     <!-- Page header -->
     <div class="profile-page__header">
-      <h1 class="profile-page__title">
-        My <span class="gradient-text">Profile</span>
-      </h1>
+      <h1 class="profile-page__title">My <span class="gradient-text">Profile</span></h1>
       <p class="profile-page__subtitle">
-        Manage your account information, vehicles, and addresses
+        Manage your account information, funds, vehicles, and addresses
       </p>
     </div>
 
-    <!-- Main grid -->
-    <div class="profile-page__grid">
-
-      <!-- === PROFILE INFORMATION === -->
-      <div class="profile-page__card">
-        <div class="profile-page__card-header">
-          <div class="profile-page__card-title-row">
-            <mat-icon class="profile-page__card-icon">person</mat-icon>
-            <div>
-              <h2 class="profile-page__card-title">Profile Information</h2>
-              <p class="profile-page__card-subtitle">Your personal account details</p>
-            </div>
-          </div>
-          <button
-            mat-stroked-button
-            class="profile-page__edit-btn"
-            (click)="openEditProfile()"
-            [disabled]="!user"
-          >
-            <mat-icon>edit</mat-icon>
-            Edit
-          </button>
-        </div>
-
-        <div *ngIf="isLoadingUser" class="profile-page__loading">
-          <mat-spinner diameter="32"></mat-spinner>
-        </div>
-
-        <ng-container *ngIf="!isLoadingUser && user">
-          <!-- Avatar + username row -->
-          <div class="profile-page__user-hero">
-            <div class="profile-page__avatar">
-              <span>{{ userInitials }}</span>
-            </div>
-            <div>
-              <p class="profile-page__username">{{ user.username }}</p>
-              <p class="profile-page__account-type">{{ accountType }}</p>
-            </div>
-          </div>
-
-          <!-- Detail rows -->
-          <div class="profile-page__detail-list">
-            <div class="profile-page__detail-row">
-              <div class="profile-page__detail-label">
-                <mat-icon>person_outline</mat-icon>
-                Full Name
-              </div>
-              <span class="profile-page__detail-value">{{ userFullName }}</span>
-            </div>
-
-            <div class="profile-page__detail-row">
-              <div class="profile-page__detail-label">
-                <mat-icon>mail_outline</mat-icon>
-                Email Address
-              </div>
-              <span class="profile-page__detail-value">{{ user.email }}</span>
-            </div>
-
-            <div class="profile-page__detail-row" *ngIf="user.companyName">
-              <div class="profile-page__detail-label">
-                <mat-icon>business</mat-icon>
-                Company
-              </div>
-              <span class="profile-page__detail-value">{{ user.companyName }}</span>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-
-      <!-- === MY VEHICLES === -->
-      <div class="profile-page__card">
-        <div class="profile-page__card-header">
-          <div class="profile-page__card-title-row">
-            <mat-icon class="profile-page__card-icon">directions_car</mat-icon>
-            <div>
-              <h2 class="profile-page__card-title">My Vehicles</h2>
-              <p class="profile-page__card-subtitle">Manage your registered vehicles</p>
-            </div>
-          </div>
-          <button mat-raised-button color="primary" (click)="openAddVehicle()">
-            <mat-icon>add</mat-icon>
-            Add Vehicle
-          </button>
-        </div>
-
-        <div *ngIf="isLoadingVehicles" class="profile-page__loading">
-          <mat-spinner diameter="32"></mat-spinner>
-        </div>
-
-        <div *ngIf="!isLoadingVehicles && vehicles.length === 0" class="profile-page__empty">
-          <mat-icon>directions_car</mat-icon>
-          <p>No vehicles registered yet</p>
-          <button mat-stroked-button (click)="openAddVehicle()">
-            <mat-icon>add</mat-icon>
-            Add Your First Vehicle
-          </button>
-        </div>
-
-        <div *ngIf="!isLoadingVehicles && vehicles.length > 0" class="profile-page__item-list">
-          <div *ngFor="let v of vehicles" class="profile-page__item">
-            <div class="profile-page__item-icon-wrap">
-              <mat-icon>directions_car</mat-icon>
-            </div>
-            <div class="profile-page__item-body">
-              <strong>{{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}</strong>
-              <div class="profile-page__item-meta">
-                <span class="profile-page__tag">{{ v.vehicleCategory.name }}</span>
-                <span *ngIf="v.licencePlate">{{ v.licencePlate }}</span>
+    <!-- Two independent columns -->
+    <div class="profile-page__cols">
+      <!-- ===== LEFT COLUMN ===== -->
+      <div class="profile-page__col">
+        <!-- PROFILE INFORMATION -->
+        <div class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-card__title-row">
+              <mat-icon class="profile-card__icon">person</mat-icon>
+              <div>
+                <h2 class="profile-card__title">Profile Information</h2>
+                <p class="profile-card__subtitle">Your personal account details</p>
               </div>
             </div>
-            <div class="profile-page__item-actions">
-              <button
-                mat-icon-button
-                class="profile-page__icon-btn--edit"
-                (click)="openEditVehicle(v)"
-                matTooltip="Edit vehicle"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                class="profile-page__icon-btn--delete"
-                (click)="deleteVehicle(v)"
-                [disabled]="isDeletingVehicleId === v.id"
-                matTooltip="Remove vehicle"
-              >
-                <mat-spinner *ngIf="isDeletingVehicleId === v.id" diameter="16"></mat-spinner>
-                <mat-icon *ngIf="isDeletingVehicleId !== v.id">delete</mat-icon>
-              </button>
-            </div>
+            <button
+              mat-stroked-button
+              class="profile-card__edit-btn"
+              (click)="openEditProfile()"
+              [disabled]="!user"
+            >
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
           </div>
-        </div>
-      </div>
 
-      <!-- === MY ADDRESSES (full width) === -->
-      <div class="profile-page__card profile-page__card--full">
-        <div class="profile-page__card-header">
-          <div class="profile-page__card-title-row">
-            <mat-icon class="profile-page__card-icon">location_on</mat-icon>
-            <div>
-              <h2 class="profile-page__card-title">My Addresses</h2>
-              <p class="profile-page__card-subtitle">Manage your delivery addresses</p>
-            </div>
+          <div *ngIf="isLoadingUser" class="profile-card__loading">
+            <mat-spinner diameter="32"></mat-spinner>
           </div>
-          <button mat-raised-button color="primary" (click)="openAddAddress()">
-            <mat-icon>add</mat-icon>
-            Add Address
-          </button>
-        </div>
 
-        <div *ngIf="isLoadingAddresses" class="profile-page__loading">
-          <mat-spinner diameter="32"></mat-spinner>
-        </div>
-
-        <div *ngIf="!isLoadingAddresses && addresses.length === 0" class="profile-page__empty">
-          <mat-icon>location_off</mat-icon>
-          <p>No addresses saved yet</p>
-          <button mat-stroked-button (click)="openAddAddress()">
-            <mat-icon>add</mat-icon>
-            Add Your First Address
-          </button>
-        </div>
-
-        <div *ngIf="!isLoadingAddresses && addresses.length > 0" class="profile-page__address-grid">
-          <div *ngFor="let a of addresses" class="profile-page__item">
-            <div class="profile-page__item-icon-wrap">
-              <mat-icon>place</mat-icon>
-            </div>
-            <div class="profile-page__item-body">
-              <strong>{{ a.street }}</strong>
-              <div class="profile-page__item-meta">
-                <span>{{ a.city }}, {{ a.postalCode }}</span>
-                <span *ngIf="a.region">{{ a.region }},</span>
-                <span>{{ a.country }}</span>
+          <ng-container *ngIf="!isLoadingUser && user">
+            <div class="profile-card__user-hero">
+              <div class="profile-card__avatar">{{ userInitials }}</div>
+              <div>
+                <p class="profile-card__username">{{ user.username }}</p>
+                <p class="profile-card__account-type">{{ accountType }}</p>
               </div>
             </div>
-            <div class="profile-page__item-actions">
-              <button
-                mat-icon-button
-                class="profile-page__icon-btn--edit"
-                (click)="openEditAddress(a)"
-                matTooltip="Edit address"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                class="profile-page__icon-btn--delete"
-                (click)="deleteAddress(a)"
-                [disabled]="isDeletingAddressId === a.id"
-                matTooltip="Remove address"
-              >
-                <mat-spinner *ngIf="isDeletingAddressId === a.id" diameter="16"></mat-spinner>
-                <mat-icon *ngIf="isDeletingAddressId !== a.id">delete</mat-icon>
-              </button>
+
+            <div class="profile-card__fields">
+              <div class="profile-card__field">
+                <span class="profile-card__field-label">
+                  <mat-icon>person_outline</mat-icon>Full Name
+                </span>
+                <span class="profile-card__field-value">{{ userFullName }}</span>
+              </div>
+
+              <div class="profile-card__field">
+                <span class="profile-card__field-label">
+                  <mat-icon>mail_outline</mat-icon>Email Address
+                </span>
+                <span class="profile-card__field-value">{{ user.email }}</span>
+              </div>
+
+              <div class="profile-card__field">
+                <span class="profile-card__field-label">
+                  <mat-icon>phone</mat-icon>Phone Number
+                </span>
+                <span
+                  class="profile-card__field-value"
+                  [class.profile-card__field-value--empty]="!user.phone"
+                >
+                  <em *ngIf="!user.phone">Not provided</em>
+                  <ng-container *ngIf="user.phone">{{
+                    formatPhoneDisplay(user.phone)
+                  }}</ng-container>
+                </span>
+              </div>
+
+              <div class="profile-card__field" *ngIf="isFleet">
+                <span class="profile-card__field-label">
+                  <mat-icon>business</mat-icon>Company
+                </span>
+                <span
+                  class="profile-card__field-value"
+                  [class.profile-card__field-value--empty]="!user.companyName"
+                >
+                  <em *ngIf="!user.companyName">Not provided</em>
+                  <ng-container *ngIf="user.companyName">{{ user.companyName }}</ng-container>
+                </span>
+              </div>
             </div>
-          </div>
+          </ng-container>
         </div>
-      </div>
 
-      <!-- === MANAGE FUNDS (full width) === -->
-      <div class="profile-page__card profile-page__card--full">
-        <div class="profile-page__card-header">
-          <div class="profile-page__card-title-row">
-            <mat-icon class="profile-page__card-icon">account_balance_wallet</mat-icon>
-            <div>
-              <h2 class="profile-page__card-title">Manage Funds</h2>
-              <p class="profile-page__card-subtitle">Your wallet balance and top-up history</p>
+        <!-- MANAGE FUNDS -->
+        <div class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-card__title-row">
+              <mat-icon class="profile-card__icon">account_balance_wallet</mat-icon>
+              <div>
+                <h2 class="profile-card__title">Manage Funds</h2>
+                <p class="profile-card__subtitle">Your wallet balance and top-up history</p>
+              </div>
             </div>
-          </div>
-          <a mat-raised-button color="primary" [routerLink]="['/client/wallet/top-up']">
-            <mat-icon>add</mat-icon>
-            Top Up
-          </a>
-        </div>
-
-        <div *ngIf="isLoadingWallet" class="profile-page__loading">
-          <mat-spinner diameter="32"></mat-spinner>
-        </div>
-
-        <div *ngIf="!isLoadingWallet && wallet" class="profile-page__wallet">
-          <div class="profile-page__wallet-balance">
-            <span class="profile-page__wallet-label">Available Balance</span>
-            <span class="profile-page__wallet-amount">
-              {{ wallet.balance | number:'1.2-2' }}
-              <span class="profile-page__wallet-currency">{{ wallet.currency }}</span>
-            </span>
+            <a mat-raised-button color="primary" [routerLink]="['/client/wallet/top-up']">
+              <mat-icon>add</mat-icon>Top Up
+            </a>
           </div>
 
-          <div class="profile-page__wallet-stats">
-            <div class="profile-page__wallet-stat">
-              <span class="profile-page__wallet-stat-label">Total Deposited</span>
-              <span class="profile-page__wallet-stat-value">
-                {{ wallet.totalDeposited | number:'1.2-2' }} {{ wallet.currency }}
+          <div *ngIf="isLoadingWallet" class="profile-card__loading">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+
+          <ng-container *ngIf="!isLoadingWallet && wallet">
+            <div class="profile-card__wallet-balance">
+              <span class="profile-card__wallet-label">Available Balance</span>
+              <span class="profile-card__wallet-amount">
+                {{ wallet.balance | number: '1.2-2' }}
+                <span class="profile-card__wallet-currency">{{ wallet.currency }}</span>
               </span>
             </div>
-            <div class="profile-page__wallet-stat">
-              <span class="profile-page__wallet-stat-label">Bonus on Top-Up</span>
-              <span class="profile-page__wallet-stat-value profile-page__wallet-stat-value--bonus">
-                +{{ wallet.percentageAdded }}%
-              </span>
+
+            <div class="profile-card__wallet-stats">
+              <div class="profile-card__wallet-stat">
+                <span class="profile-card__wallet-stat-label">Total Deposited</span>
+                <span class="profile-card__wallet-stat-value">
+                  {{ wallet.totalDeposited | number: '1.2-2' }} {{ wallet.currency }}
+                </span>
+              </div>
+              <div class="profile-card__wallet-stat">
+                <span class="profile-card__wallet-stat-label">Bonus on Top-Up</span>
+                <span
+                  class="profile-card__wallet-stat-value profile-card__wallet-stat-value--bonus"
+                >
+                  +{{ wallet.percentageAdded }}%
+                </span>
+              </div>
+            </div>
+          </ng-container>
+
+          <div *ngIf="!isLoadingWallet && !wallet" class="profile-card__empty">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <p>Wallet information unavailable</p>
+          </div>
+        </div>
+      </div>
+      <!-- end left col -->
+
+      <!-- ===== RIGHT COLUMN ===== -->
+      <div class="profile-page__col">
+        <!-- MY VEHICLES -->
+        <div class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-card__title-row">
+              <mat-icon class="profile-card__icon">directions_car</mat-icon>
+              <div>
+                <h2 class="profile-card__title">My Vehicles</h2>
+                <p class="profile-card__subtitle">Manage your registered vehicles</p>
+              </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="openAddVehicle()">
+              <mat-icon>add</mat-icon>Add Vehicle
+            </button>
+          </div>
+
+          <div *ngIf="isLoadingVehicles" class="profile-card__loading">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+
+          <div *ngIf="!isLoadingVehicles && vehicles.length === 0" class="profile-card__empty">
+            <mat-icon>directions_car</mat-icon>
+            <p>No vehicles registered yet</p>
+            <button mat-stroked-button (click)="openAddVehicle()">
+              <mat-icon>add</mat-icon>Add Your First Vehicle
+            </button>
+          </div>
+
+          <div *ngIf="!isLoadingVehicles && vehicles.length > 0" class="profile-card__list">
+            <div *ngFor="let v of vehicles" class="profile-card__item">
+              <div class="profile-card__item-icon">
+                <mat-icon>directions_car</mat-icon>
+              </div>
+              <div class="profile-card__item-body">
+                <strong>{{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}</strong>
+                <span>
+                  <span class="profile-card__tag">{{ v.vehicleCategory.name }}</span>
+                  <ng-container *ngIf="v.licencePlate">&nbsp; {{ v.licencePlate }}</ng-container>
+                </span>
+              </div>
+              <div class="profile-card__item-actions">
+                <button
+                  mat-icon-button
+                  class="profile-card__btn-edit"
+                  (click)="openEditVehicle(v)"
+                  matTooltip="Edit"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="profile-card__btn-delete"
+                  (click)="deleteVehicle(v)"
+                  [disabled]="isDeletingVehicleId === v.id"
+                  matTooltip="Remove"
+                >
+                  <mat-spinner *ngIf="isDeletingVehicleId === v.id" diameter="16"></mat-spinner>
+                  <mat-icon *ngIf="isDeletingVehicleId !== v.id">delete</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <div *ngIf="!isLoadingWallet && !wallet" class="profile-page__empty">
-          <mat-icon>account_balance_wallet</mat-icon>
-          <p>Wallet information unavailable</p>
+        <!-- MY ADDRESSES -->
+        <div class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-card__title-row">
+              <mat-icon class="profile-card__icon">location_on</mat-icon>
+              <div>
+                <h2 class="profile-card__title">My Addresses</h2>
+                <p class="profile-card__subtitle">Manage your delivery addresses</p>
+              </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="openAddAddress()">
+              <mat-icon>add</mat-icon>Add Address
+            </button>
+          </div>
+
+          <div *ngIf="isLoadingAddresses" class="profile-card__loading">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+
+          <div *ngIf="!isLoadingAddresses && addresses.length === 0" class="profile-card__empty">
+            <mat-icon>location_off</mat-icon>
+            <p>No addresses saved yet</p>
+            <button mat-stroked-button (click)="openAddAddress()">
+              <mat-icon>add</mat-icon>Add Your First Address
+            </button>
+          </div>
+
+          <div *ngIf="!isLoadingAddresses && addresses.length > 0" class="profile-card__list">
+            <div *ngFor="let a of addresses" class="profile-card__item">
+              <div class="profile-card__item-icon">
+                <mat-icon>place</mat-icon>
+              </div>
+              <div class="profile-card__item-body">
+                <strong>{{ a.street }}</strong>
+                <span
+                  >{{ a.city }}, {{ a.postalCode
+                  }}<ng-container *ngIf="a.region">, {{ a.region }}</ng-container
+                  >, {{ a.country }}</span
+                >
+              </div>
+              <div class="profile-card__item-actions">
+                <button
+                  mat-icon-button
+                  class="profile-card__btn-edit"
+                  (click)="openEditAddress(a)"
+                  matTooltip="Edit"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="profile-card__btn-delete"
+                  (click)="deleteAddress(a)"
+                  [disabled]="isDeletingAddressId === a.id"
+                  matTooltip="Remove"
+                >
+                  <mat-spinner *ngIf="isDeletingAddressId === a.id" diameter="16"></mat-spinner>
+                  <mat-icon *ngIf="isDeletingAddressId !== a.id">delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
+      <!-- end right col -->
     </div>
   </app-container>
 </section>

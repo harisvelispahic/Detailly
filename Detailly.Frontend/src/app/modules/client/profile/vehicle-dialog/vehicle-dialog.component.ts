@@ -40,7 +40,10 @@ export class VehicleDialogComponent implements OnInit {
     this.form = this.fb.group({
       brand: [v?.brand ?? '', Validators.required],
       model: [v?.model ?? '', Validators.required],
-      yearOfManufacture: [v?.yearOfManufacture ?? new Date().getFullYear(), [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)]],
+      yearOfManufacture: [
+        v?.yearOfManufacture ?? new Date().getFullYear(),
+        [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)],
+      ],
       vehicleCategoryId: [null, Validators.required],
       licencePlate: [v?.licencePlate ?? '', Validators.required],
       notes: [v?.notes ?? ''],
@@ -56,20 +59,19 @@ export class VehicleDialogComponent implements OnInit {
         this.categories = cats;
         if (currentCategoryName) {
           const match = cats.find(c => c.name === currentCategoryName);
-          if (match) {
-            this.form.patchValue({ vehicleCategoryId: match.id });
-          }
+          if (match) this.form.patchValue({ vehicleCategoryId: match.id });
         }
         this.isLoadingCategories = false;
       },
-      error: () => {
-        this.isLoadingCategories = false;
-      },
+      error: () => { this.isLoadingCategories = false; },
     });
   }
 
   submit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.error = undefined;
     this.isLoading = true;
     const value = this.form.value;
@@ -77,18 +79,12 @@ export class VehicleDialogComponent implements OnInit {
     if (this.isEdit) {
       this.vehicles.update(this.data.vehicle!.id, value).subscribe({
         next: () => this.dialogRef.close(true),
-        error: (err) => {
-          this.error = err?.error?.message ?? 'Update failed.';
-          this.isLoading = false;
-        },
+        error: (err) => { this.error = err?.error?.message ?? 'Update failed.'; this.isLoading = false; },
       });
     } else {
       this.vehicles.create(value).subscribe({
         next: () => this.dialogRef.close(true),
-        error: (err) => {
-          this.error = err?.error?.message ?? 'Create failed.';
-          this.isLoading = false;
-        },
+        error: (err) => { this.error = err?.error?.message ?? 'Create failed.'; this.isLoading = false; },
       });
     }
   }

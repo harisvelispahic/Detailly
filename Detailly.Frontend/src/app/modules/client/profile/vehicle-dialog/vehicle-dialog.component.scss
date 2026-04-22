@@ -81,4 +81,9 @@
     align-items: center;
     gap: 0.4rem;
   }
+
+  button[type="submit"]:disabled {
+    opacity: 0.4 !important;
+    filter: grayscale(0.85) !important;
+  }
 }

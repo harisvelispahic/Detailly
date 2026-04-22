@@ -27,7 +27,9 @@ public class GetUserByIdQueryHandler(
                 LastName = u.LastName,
                 Username = u.Username,
                 Email = u.Email,
-                CompanyName = u.CompanyName
+                Phone = u.Phone,
+                CompanyName = u.CompanyName,
+                IsOAuthUser = u.ExternalLogins.Any()
             })
             .FirstOrDefaultAsync(ct);
 

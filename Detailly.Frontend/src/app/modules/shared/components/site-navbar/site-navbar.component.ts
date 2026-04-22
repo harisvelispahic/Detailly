@@ -89,20 +89,10 @@ export class SiteNavbarComponent {
 
   isAccountActive(): boolean {
     const currentUrl = this.router.url.split('?')[0].split('#')[0];
-    const accountRoute = this.getAccountRoute();
-
-    return currentUrl === accountRoute || currentUrl.startsWith(`${accountRoute}/`);
+    return currentUrl === '/client/profile' || currentUrl.startsWith('/client/profile/');
   }
 
   getAccountRoute(): string {
-    if (this.isAdmin()) {
-      return '/admin';
-    }
-
-    if (this.isManager() || this.isEmployee()) {
-      return '/staff';
-    }
-
     if (this.isAuthenticated()) {
       return '/client/profile';
     }
