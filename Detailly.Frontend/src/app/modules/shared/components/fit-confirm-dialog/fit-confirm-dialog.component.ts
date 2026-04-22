@@ -1,9 +1,6 @@
-// src/app/modules/shared/components/fit-confirm-dialog/fit-fit-confirm-dialog.component.ts
-
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateService } from '@ngx-translate/core';
-import { DialogConfig, DialogButton, DialogType, DialogResult } from '../../models/dialog-config.model';
+import { DialogConfig, DialogButton, DialogButtonConfig, DialogType, DialogResult } from '../../models/dialog-config.model';
 
 @Component({
   selector: 'app-fit-confirm-dialog',
@@ -14,10 +11,19 @@ import { DialogConfig, DialogButton, DialogType, DialogResult } from '../../mode
 export class FitConfirmDialogComponent {
   DialogType = DialogType;
 
+  private readonly buttonLabels: Record<string, string> = {
+    [DialogButton.OK]: 'OK',
+    [DialogButton.CANCEL]: 'Cancel',
+    [DialogButton.YES]: 'Yes',
+    [DialogButton.NO]: 'No',
+    [DialogButton.CLOSE]: 'Close',
+    [DialogButton.DELETE]: 'Delete',
+    [DialogButton.SAVE]: 'Save'
+  };
+
   constructor(
     public dialogRef: MatDialogRef<FitConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public config: DialogConfig,
-    private translate: TranslateService
+    @Inject(MAT_DIALOG_DATA) public config: DialogConfig
   ) {}
 
   onButtonClick(button: DialogButton, result?: any): void {
@@ -30,17 +36,12 @@ export class FitConfirmDialogComponent {
 
   getIconClass(): string {
     switch (this.config.type) {
-      case DialogType.SUCCESS:
-        return 'icon-success';
-      case DialogType.ERROR:
-        return 'icon-error';
-      case DialogType.WARNING:
-        return 'icon-warning';
-      case DialogType.QUESTION:
-        return 'icon-question';
+      case DialogType.SUCCESS: return 'icon-success';
+      case DialogType.ERROR:   return 'icon-error';
+      case DialogType.WARNING: return 'icon-warning';
+      case DialogType.QUESTION: return 'icon-question';
       case DialogType.INFO:
-      default:
-        return 'icon-info';
+      default: return 'icon-info';
     }
   }
 
@@ -50,65 +51,41 @@ export class FitConfirmDialogComponent {
     }
 
     switch (this.config.type) {
-      case DialogType.SUCCESS:
-        return 'check_circle';
-      case DialogType.ERROR:
-        return 'error';
-      case DialogType.WARNING:
-        return 'warning';
-      case DialogType.QUESTION:
-        return 'help';
+      case DialogType.SUCCESS: return 'check_circle';
+      case DialogType.ERROR:   return 'error';
+      case DialogType.WARNING: return 'warning';
+      case DialogType.QUESTION: return 'help';
       case DialogType.INFO:
-      default:
-        return 'info';
+      default: return 'info';
     }
   }
 
   getButtonIcon(buttonType: DialogButton): string {
     switch (buttonType) {
       case DialogButton.OK:
-        return 'check';
-      case DialogButton.YES:
-        return 'check';
+      case DialogButton.YES:  return 'check';
       case DialogButton.NO:
-        return 'close';
       case DialogButton.CANCEL:
-        return 'close';
-      case DialogButton.DELETE:
-        return 'delete';
-      case DialogButton.SAVE:
-        return 'save';
-      case DialogButton.CLOSE:
-        return 'close';
-      default:
-        return 'check';
+      case DialogButton.CLOSE: return 'close';
+      case DialogButton.DELETE: return 'delete';
+      case DialogButton.SAVE:   return 'save';
+      default: return 'check';
     }
   }
 
-  getButtonLabel(button: any): string {
-    // Ako ima custom label, koristi ga
+  getButtonLabel(button: DialogButtonConfig): string {
     if (button.label) {
       return button.label;
     }
 
-    // Ako ima translation key, koristi ga
-    if (button.translationKey) {
-      return this.translate.instant(button.translationKey);
-    }
-
-    // Inače koristi default translation
-    return this.translate.instant(`DIALOGS.BUTTONS.${button.type.toUpperCase()}`);
+    return this.buttonLabels[button.type] ?? button.type;
   }
 
   getTitle(): string {
-    return this.config.titleKey
-      ? this.translate.instant(this.config.titleKey, this.config.titleParams)
-      : this.config.title ?? '';
+    return this.config.title ?? '';
   }
 
   getMessage(): string {
-    return this.config.messageKey
-      ? this.translate.instant(this.config.messageKey, this.config.messageParams)
-      : this.config.message ?? '';
+    return this.config.message ?? '';
   }
 }

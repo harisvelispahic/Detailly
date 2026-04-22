@@ -113,7 +113,7 @@ export class ProductCategoriesComponent
   }
 
   onDelete(category: ListProductCategoriesQueryDto): void {
-    this.dialogHelper.productCategory.confirmDelete(category.name).subscribe(result => {
+    this.dialogHelper.productCategory.confirmDelete(category.name).subscribe((result) => {
       if (result && result.button === DialogButton.DELETE) {
         this.performDelete(category);
       }
@@ -134,10 +134,7 @@ export class ProductCategoriesComponent
         const errorMessage = this.extractErrorMessage(err);
 
         // Show error dialog instead of toast
-        this.dialogHelper.showError(
-          'DIALOGS.TITLES.ERROR',
-          'PRODUCT_CATEGORIES.DIALOGS.ERROR_DELETE'
-        ).subscribe();
+        this.dialogHelper.showError('Error', 'Error deleting category.').subscribe();
 
         console.error('Delete category error:', err);
       },
@@ -164,11 +161,12 @@ export class ProductCategoriesComponent
 
         if (err.status === 409) {
           // Business rule conflict - show dialog for important errors
-          this.dialogHelper.showWarning(
-            'DIALOGS.TITLES.WARNING',
-            errorMessage || 'PRODUCT_CATEGORIES.DIALOGS.ERROR_TOGGLE',
-            { name: category.name }
-          ).subscribe();
+          this.dialogHelper
+            .showWarning(
+              'Warning',
+              errorMessage || `Error changing status of category "${category.name}".`,
+            )
+            .subscribe();
         } else {
           // Generic error - just toast
           this.toaster.error(errorMessage || 'Failed to change category status');
