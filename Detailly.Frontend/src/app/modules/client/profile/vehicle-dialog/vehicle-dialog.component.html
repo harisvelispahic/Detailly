@@ -1,0 +1,67 @@
+<div class="vd">
+  <div class="vd__header">
+    <div class="vd__title-row">
+      <mat-icon class="vd__icon">directions_car</mat-icon>
+      <h2 class="vd__title">{{ isEdit ? 'Edit Vehicle' : 'Add Vehicle' }}</h2>
+    </div>
+    <button mat-icon-button (click)="cancel()" class="vd__close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="vd__form">
+    <div class="vd__row">
+      <mat-form-field appearance="outline" class="vd__field">
+        <mat-label>Brand</mat-label>
+        <input matInput formControlName="brand" placeholder="e.g. BMW" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="vd__field">
+        <mat-label>Model</mat-label>
+        <input matInput formControlName="model" placeholder="e.g. M3" />
+      </mat-form-field>
+    </div>
+
+    <div class="vd__row">
+      <mat-form-field appearance="outline" class="vd__field">
+        <mat-label>Year</mat-label>
+        <input matInput type="number" formControlName="yearOfManufacture" placeholder="2024" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="vd__field">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="vehicleCategoryId" [disabled]="isLoadingCategories">
+          <mat-option *ngFor="let cat of categories" [value]="cat.id">
+            {{ cat.name }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="isLoadingCategories">Loading...</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="vd__field vd__field--full">
+      <mat-label>Licence Plate</mat-label>
+      <input matInput formControlName="licencePlate" placeholder="e.g. ABC-1234" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="vd__field vd__field--full">
+      <mat-label>Notes (optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="2" placeholder="Any notes..."></textarea>
+    </mat-form-field>
+
+    <div *ngIf="error" class="vd__error">{{ error }}</div>
+
+    <div class="vd__actions">
+      <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="form.invalid || isLoading"
+      >
+        <mat-spinner *ngIf="isLoading" diameter="18"></mat-spinner>
+        <span>{{ isEdit ? 'Save Changes' : 'Add Vehicle' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

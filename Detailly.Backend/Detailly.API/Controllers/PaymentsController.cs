@@ -6,6 +6,7 @@ using Detailly.Application.Modules.Payment.Wallet.Commands.PayBooking;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.TopUp;
 using Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
+using Detailly.Application.Modules.Payment.Wallet.Queries.GetMyWallet;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -14,6 +15,17 @@ namespace Detailly.API.Controllers;
 [Route("[controller]")]
 public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : ControllerBase
 {
+    // -------------------------------
+    // 0) GET MY WALLET
+    // -------------------------------
+    [HttpGet("wallet/my")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
+    public async Task<ActionResult<GetMyWalletQueryDto>> GetMyWallet(CancellationToken ct)
+    {
+        var result = await sender.Send(new GetMyWalletQuery(), ct);
+        return Ok(result);
+    }
+
     // -------------------------------
     // 1) TOP UP WALLET (instant/internal)
     // -------------------------------

@@ -12,6 +12,9 @@ import { BookingDetailsPageComponent } from './bookings/booking-details-page/boo
 import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/booking-pay-card-page.component';
 import { ClientLayoutComponent } from './client-layout/client-layout.component';
 import { ProfilePageComponent } from './profile/profile-page/profile-page.component';
+import { VehicleDialogComponent } from './profile/vehicle-dialog/vehicle-dialog.component';
+import { AddressDialogComponent } from './profile/address-dialog/address-dialog.component';
+import { EditProfileDialogComponent } from './profile/edit-profile-dialog/edit-profile-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,9 @@ import { ProfilePageComponent } from './profile/profile-page/profile-page.compon
     BookingDetailsPageComponent,
     BookingPayCardPageComponent,
     ProfilePageComponent,
+    VehicleDialogComponent,
+    AddressDialogComponent,
+    EditProfileDialogComponent,
   ],
   imports: [SharedModule, ClientRoutingModule, FormsModule],
   exports: [FormsModule],

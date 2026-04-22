@@ -1,0 +1,84 @@
+.epd {
+  padding: 1.5rem;
+  min-width: 480px;
+
+  @media (max-width: 600px) {
+    min-width: unset;
+    padding: 1rem;
+  }
+}
+
+.epd__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.epd__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.epd__icon {
+  color: hsl(var(--primary));
+}
+
+.epd__title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.epd__close-btn {
+  color: hsl(var(--muted-foreground));
+}
+
+.epd__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.epd__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.epd__field {
+  width: 100%;
+}
+
+.epd__field--full {
+  width: 100%;
+}
+
+.epd__error {
+  padding: 0.6rem 0.9rem;
+  border-radius: calc(var(--radius) - 2px);
+  background: hsl(var(--destructive) / 0.12);
+  border: 1px solid hsl(var(--destructive) / 0.3);
+  color: hsl(var(--destructive));
+  font-size: 0.85rem;
+}
+
+.epd__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+}

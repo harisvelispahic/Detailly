@@ -3,11 +3,22 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface WalletDto {
+  balance: number;
+  currency: string;
+  totalDeposited: number;
+  percentageAdded: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PaymentsService {
   private baseUrl = `${environment.apiUrl}/Payments`;
 
   constructor(private http: HttpClient) {}
+
+  getMyWallet(): Observable<WalletDto> {
+    return this.http.get<WalletDto>(`${this.baseUrl}/wallet/my`);
+  }
 
   // -----------------------------
   // BOOKINGS

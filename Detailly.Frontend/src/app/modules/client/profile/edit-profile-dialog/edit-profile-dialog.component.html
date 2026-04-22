@@ -1,0 +1,55 @@
+<div class="epd">
+  <div class="epd__header">
+    <div class="epd__title-row">
+      <mat-icon class="epd__icon">person</mat-icon>
+      <h2 class="epd__title">Edit Profile</h2>
+    </div>
+    <button mat-icon-button (click)="cancel()" class="epd__close-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="epd__form">
+    <div class="epd__row">
+      <mat-form-field appearance="outline" class="epd__field">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="epd__field">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="epd__field epd__field--full">
+      <mat-label>Username</mat-label>
+      <input matInput formControlName="username" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="epd__field epd__field--full">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="epd__field epd__field--full">
+      <mat-label>Company Name (optional)</mat-label>
+      <input matInput formControlName="companyName" />
+    </mat-form-field>
+
+    <div *ngIf="error" class="epd__error">{{ error }}</div>
+
+    <div class="epd__actions">
+      <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="form.invalid || isLoading"
+      >
+        <mat-spinner *ngIf="isLoading" diameter="18"></mat-spinner>
+        <span>Save Changes</span>
+      </button>
+    </div>
+  </form>
+</div>
