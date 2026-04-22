@@ -8,24 +8,29 @@
   </div>
 
   <form [formGroup]="form" (ngSubmit)="submit()" class="ad__form">
-
     <mat-form-field appearance="outline" subscriptSizing="fixed" class="ad__full">
       <mat-label>Street</mat-label>
       <input matInput formControlName="street" placeholder="e.g. 123 Main St" />
-      <mat-error *ngIf="form.get('street')?.hasError('required')">Street is required</mat-error>
+      @if (form.get('street')?.hasError('required')) {
+        <mat-error>Street is required</mat-error>
+      }
     </mat-form-field>
 
     <div class="ad__row">
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>City</mat-label>
         <input matInput formControlName="city" placeholder="e.g. Sarajevo" />
-        <mat-error *ngIf="form.get('city')?.hasError('required')">City is required</mat-error>
+        @if (form.get('city')?.hasError('required')) {
+          <mat-error>City is required</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>Postal Code</mat-label>
         <input matInput formControlName="postalCode" placeholder="e.g. 71000" />
-        <mat-error *ngIf="form.get('postalCode')?.hasError('required')">Postal code is required</mat-error>
+        @if (form.get('postalCode')?.hasError('required')) {
+          <mat-error>Postal code is required</mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -51,21 +56,34 @@
           [displayWith]="displayCountry"
           (optionSelected)="onCountrySelected($event.option.value)"
         >
-          <mat-option *ngFor="let c of filteredCountries" [value]="c">
-            <span class="fi fi-{{ c.iso2 }} ad__country-flag"></span>
-            <span>{{ c.name }}</span>
-          </mat-option>
+          @for (c of filteredCountries; track $index) {
+            <mat-option [value]="c">
+              <span class="fi fi-{{ c.iso2 }} ad__country-flag"></span>
+              <span>{{ c.name }}</span>
+            </mat-option>
+          }
         </mat-autocomplete>
-        <mat-error *ngIf="form.get('country')?.hasError('required')">Country is required</mat-error>
+        @if (form.get('country')?.hasError('required')) {
+          <mat-error>Country is required</mat-error>
+        }
       </mat-form-field>
     </div>
 
-    <div *ngIf="error" class="ad__error">{{ error }}</div>
+    @if (error) {
+      <div class="ad__error">{{ error }}</div>
+    }
 
     <div class="ad__actions">
       <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-      <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid || isLoading">
-        <mat-spinner *ngIf="isLoading" diameter="18"></mat-spinner>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="form.invalid || isLoading"
+      >
+        @if (isLoading) {
+          <mat-spinner diameter="18"></mat-spinner>
+        }
         <span>{{ isEdit ? 'Save Changes' : 'Add Address' }}</span>
       </button>
     </div>

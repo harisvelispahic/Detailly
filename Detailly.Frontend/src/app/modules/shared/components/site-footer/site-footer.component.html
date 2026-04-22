@@ -28,22 +28,21 @@
       <div class="site-footer__column">
         <h3>Quick Links</h3>
 
-        <a *ngFor="let link of quickLinks" [routerLink]="resolveRoute(link)" class="site-footer__link">
-          {{ link.label }}
-        </a>
+        @for (link of quickLinks; track $index) {
+          <a [routerLink]="resolveRoute(link)" class="site-footer__link">
+            {{ link.label }}
+          </a>
+        }
       </div>
 
       <div class="site-footer__column">
         <h3>Our Services</h3>
 
-        <a
-          *ngFor="let service of services"
-          routerLink="/book-now"
-          [queryParams]="{ service: service }"
-          class="site-footer__link"
-        >
-          {{ service }}
-        </a>
+        @for (service of services; track $index) {
+          <a routerLink="/book-now" [queryParams]="{ service: service }" class="site-footer__link">
+            {{ service }}
+          </a>
+        }
       </div>
 
       <div class="site-footer__column">
@@ -67,12 +66,14 @@
     </div>
 
     <div class="site-footer__bottom">
-      <p>&copy; 2026 Detailly. All rights reserved.</p>
+      <p>&copy; {{ currentYear }} Detailly. All rights reserved.</p>
 
       <div class="site-footer__legal">
-        <a *ngFor="let link of legalLinks" [routerLink]="resolveRoute(link)" class="site-footer__link">
-          {{ link.label }}
-        </a>
+        @for (link of legalLinks; track $index) {
+          <a [routerLink]="resolveRoute(link)" class="site-footer__link">
+            {{ link.label }}
+          </a>
+        }
       </div>
     </div>
   </div>

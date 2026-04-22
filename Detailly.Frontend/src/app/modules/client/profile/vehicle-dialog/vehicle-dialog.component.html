@@ -12,13 +12,17 @@
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>Brand</mat-label>
         <input matInput formControlName="brand" placeholder="e.g. BMW" />
-        <mat-error *ngIf="form.get('brand')?.hasError('required')">Brand is required</mat-error>
+        @if (form.get('brand')?.hasError('required')) {
+          <mat-error>Brand is required</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>Model</mat-label>
         <input matInput formControlName="model" placeholder="e.g. M3" />
-        <mat-error *ngIf="form.get('model')?.hasError('required')">Model is required</mat-error>
+        @if (form.get('model')?.hasError('required')) {
+          <mat-error>Model is required</mat-error>
+        }
       </mat-form-field>
     </div>
 
@@ -32,38 +36,36 @@
           placeholder="2024"
           min="1900"
         />
-        <mat-error *ngIf="form.get('yearOfManufacture')?.hasError('required')"
-          >Year is required</mat-error
-        >
-        <mat-error
-          *ngIf="
-            form.get('yearOfManufacture')?.hasError('min') ||
-            form.get('yearOfManufacture')?.hasError('max')
-          "
-          >Enter a valid year</mat-error
-        >
+        @if (form.get('yearOfManufacture')?.hasError('required')) {
+          <mat-error>Year is required</mat-error>
+        }
+        @if (form.get('yearOfManufacture')?.hasError('min') || form.get('yearOfManufacture')?.hasError('max')) {
+          <mat-error>Enter a valid year</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>Category</mat-label>
         <mat-select formControlName="vehicleCategoryId" [disabled]="isLoadingCategories">
-          <mat-option *ngFor="let cat of categories" [value]="cat.id">
-            {{ cat.name }}
-          </mat-option>
+          @for (cat of categories; track cat.id) {
+            <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+          }
         </mat-select>
-        <mat-hint *ngIf="isLoadingCategories">Loading categories…</mat-hint>
-        <mat-error *ngIf="form.get('vehicleCategoryId')?.hasError('required')"
-          >Category is required</mat-error
-        >
+        @if (isLoadingCategories) {
+          <mat-hint>Loading categories…</mat-hint>
+        }
+        @if (form.get('vehicleCategoryId')?.hasError('required')) {
+          <mat-error>Category is required</mat-error>
+        }
       </mat-form-field>
     </div>
 
     <mat-form-field appearance="outline" subscriptSizing="fixed" class="vd__full">
       <mat-label>Licence Plate</mat-label>
       <input matInput formControlName="licencePlate" placeholder="e.g. ABC-1234" />
-      <mat-error *ngIf="form.get('licencePlate')?.hasError('required')"
-        >Licence plate is required</mat-error
-      >
+      @if (form.get('licencePlate')?.hasError('required')) {
+        <mat-error>Licence plate is required</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="fixed" class="vd__full">
@@ -71,7 +73,9 @@
       <textarea matInput formControlName="notes" rows="2" placeholder="Any notes…"></textarea>
     </mat-form-field>
 
-    <div *ngIf="error" class="vd__error">{{ error }}</div>
+    @if (error) {
+      <div class="vd__error">{{ error }}</div>
+    }
 
     <div class="vd__actions">
       <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
@@ -81,7 +85,9 @@
         color="primary"
         [disabled]="form.invalid || isLoading"
       >
-        <mat-spinner *ngIf="isLoading" diameter="18"></mat-spinner>
+        @if (isLoading) {
+          <mat-spinner diameter="18"></mat-spinner>
+        }
         <span>{{ isEdit ? 'Save Changes' : 'Add Vehicle' }}</span>
       </button>
     </div>

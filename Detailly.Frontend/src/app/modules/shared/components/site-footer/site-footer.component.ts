@@ -19,6 +19,8 @@ export class SiteFooterComponent {
 
   readonly isAuthenticated = this.auth.isAuthenticated;
 
+  currentYear = new Date().getFullYear();
+
   readonly quickLinks: FooterLink[] = [
     { label: 'Shop Products', route: '/search' },
     { label: 'Book a Service', route: '/book-now' },

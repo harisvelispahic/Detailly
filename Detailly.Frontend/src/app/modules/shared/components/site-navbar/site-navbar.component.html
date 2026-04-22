@@ -10,15 +10,16 @@
       </a>
 
       <div class="site-navbar__links">
-        <a
-          *ngFor="let link of navLinks"
-          [routerLink]="resolveRoute(link)"
-          class="site-navbar__link"
-          [class.site-navbar__link--active]="isLinkActive(link)"
-          [attr.aria-current]="isLinkActive(link) ? 'page' : null"
-        >
-          {{ link.label }}
-        </a>
+        @for (link of navLinks; track $index) {
+          <a
+            [routerLink]="resolveRoute(link)"
+            class="site-navbar__link"
+            [class.site-navbar__link--active]="isLinkActive(link)"
+            [attr.aria-current]="isLinkActive(link) ? 'page' : null"
+          >
+            {{ link.label }}
+          </a>
+        }
       </div>
 
       <div class="site-navbar__actions">
@@ -100,16 +101,17 @@
   <div class="site-mobile-menu" [class.site-mobile-menu--open]="isMenuOpen">
     <div class="site-mobile-menu__container">
       <div class="site-mobile-menu__panel">
-        <a
-          *ngFor="let link of navLinks"
-          [routerLink]="resolveRoute(link)"
-          class="site-mobile-menu__link"
-          [class.site-mobile-menu__link--active]="isLinkActive(link)"
-          (click)="closeMobileMenu()"
-        >
-          <mat-icon>{{ link.icon }}</mat-icon>
-          <span>{{ link.label }}</span>
-        </a>
+        @for (link of navLinks; track $index) {
+          <a
+            [routerLink]="resolveRoute(link)"
+            class="site-mobile-menu__link"
+            [class.site-mobile-menu__link--active]="isLinkActive(link)"
+            (click)="closeMobileMenu()"
+          >
+            <mat-icon>{{ link.icon }}</mat-icon>
+            <span>{{ link.label }}</span>
+          </a>
+        }
 
         @if (isAdmin() || isManager() || isEmployee()) {
           <div class="site-mobile-menu__role">
