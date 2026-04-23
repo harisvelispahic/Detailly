@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../api-services/payments/payments-api.service';
 import { environment } from '../../../../environments/environment';
@@ -6,14 +7,17 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-wallet-topup',
   templateUrl: './wallet-topup.component.html',
+  styleUrl: './wallet-topup.component.scss',
   standalone: false,
 })
 export class WalletTopUpComponent implements OnInit {
-  amount: number = 0;
+  amount: number | null = null;
   description: string = '';
+  readonly amountPresets = [10, 25, 50, 100];
 
   isLoading = false;
   isReady = false;
+  paymentSucceeded = false;
 
   cardError?: string;
   successMessage?: string;
@@ -21,7 +25,10 @@ export class WalletTopUpComponent implements OnInit {
   private stripe: Stripe | null = null;
   private card!: StripeCardElement;
 
-  constructor(private payments: PaymentsService) {}
+  constructor(
+    private payments: PaymentsService,
+    private router: Router,
+  ) {}
 
   async ngOnInit() {
     this.stripe = await loadStripe(environment.stripePublishableKey);
@@ -32,10 +39,33 @@ export class WalletTopUpComponent implements OnInit {
     }
 
     const elements = this.stripe.elements();
-    this.card = elements.create('card');
+    this.card = elements.create('card', {
+      style: {
+        base: {
+          color: '#f2f2f5',
+          fontFamily: "'Inter', sans-serif",
+          fontSize: '15px',
+          fontSmoothing: 'antialiased',
+          '::placeholder': { color: '#6b6b82' },
+          iconColor: '#f2f2f5',
+        },
+        invalid: {
+          color: '#ef4444',
+          iconColor: '#ef4444',
+        },
+      },
+    });
     this.card.mount('#card-element');
 
     this.isReady = true;
+  }
+
+  setAmount(value: number) {
+    this.amount = value;
+  }
+
+  goToProfile() {
+    this.router.navigate(['/client/profile']);
   }
 
   async pay() {
@@ -45,14 +75,12 @@ export class WalletTopUpComponent implements OnInit {
     if (!this.stripe || !this.isReady) return;
 
     if (!this.amount || this.amount <= 0) {
-      this.cardError = 'Enter a valid amount.';
-      alert('❌ Enter a valid amount.');
+      this.cardError = 'Please enter a valid amount.';
       return;
     }
 
     this.isLoading = true;
 
-    // Ask backend to create wallet top-up payment intent
     this.payments
       .createWalletTopUpCardIntent({
         amount: this.amount,
@@ -60,44 +88,30 @@ export class WalletTopUpComponent implements OnInit {
       })
       .subscribe({
         next: async (res) => {
-          const clientSecret = res.clientSecret;
-
-          const result = await this.stripe!.confirmCardPayment(clientSecret, {
-            payment_method: {
-              card: this.card,
-            },
+          const result = await this.stripe!.confirmCardPayment(res.clientSecret, {
+            payment_method: { card: this.card },
           });
 
           this.isLoading = false;
 
           if (result.error) {
-            const msg = result.error.message ?? 'Payment failed.';
-            this.cardError = msg;
-            alert(`❌ Wallet top up failed: ${msg}`);
+            this.cardError = result.error.message ?? 'Payment failed.';
             return;
           }
 
-          // Stripe can return statuses like succeeded / processing / requires_action
           const status = result.paymentIntent?.status;
 
           if (status === 'succeeded') {
-            this.successMessage =
-              'Payment successful ✅ Wallet will update after webhook confirmation.';
-            alert('✅ Wallet top up successful!');
+            this.successMessage = 'Payment successful! Your wallet balance will update shortly.';
           } else {
-            this.successMessage =
-              'Payment submitted ✅ Wallet will update after webhook confirmation.';
-            alert(`ℹ️ Payment submitted (status: ${status ?? 'unknown'})`);
+            this.successMessage = `Payment submitted (status: ${status ?? 'unknown'}). Your wallet will update after confirmation.`;
           }
 
-          // reset input
-          this.amount = 0;
-          this.description = '';
+          this.paymentSucceeded = true;
         },
         error: () => {
           this.isLoading = false;
-          this.cardError = 'Failed to create payment intent.';
-          alert('❌ Failed to create payment intent.');
+          this.cardError = 'Failed to create payment intent. Please try again.';
         },
       });
   }

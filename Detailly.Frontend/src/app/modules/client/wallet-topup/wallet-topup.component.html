@@ -1,29 +1,262 @@
-<h2>Wallet Top Up</h2>
+<div class="topup-page">
+  <div class="topup-card fade-in">
+    <!-- Header -->
+    <div class="topup-header">
+      <div class="topup-header__icon-wrap">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.75"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5v9m-4.5-4.5h9" />
+        </svg>
+      </div>
+      <h1 class="topup-header__title">Top Up Wallet</h1>
+      <p class="topup-header__subtitle">Add funds to your account using a credit or debit card.</p>
+    </div>
 
-@if (isLoading) {
-<div>Loading...</div>
-} @if (cardError) {
-<div style="color: red">
-  {{ cardError }}
+    <!-- Body -->
+    <div class="topup-body">
+      <!-- Error alert -->
+      @if (cardError) {
+        <div class="topup-alert topup-alert--error">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+            />
+          </svg>
+          <span>{{ cardError }}</span>
+        </div>
+      }
+
+      <!-- Success alert -->
+      @if (successMessage) {
+        <div class="topup-alert topup-alert--success">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+          <span>{{ successMessage }}</span>
+        </div>
+      }
+
+      <!-- Amount field -->
+      <div class="field-group">
+        <label class="field-label">Amount</label>
+        <div class="field-input-wrap">
+          <span class="field-currency-symbol">BAM</span>
+          <input
+            #amountInput="ngModel"
+            name="amount"
+            class="field-input field-input--amount"
+            [class.field-input--invalid]="amountInput.touched && amountInput.invalid"
+            type="number"
+            min="1"
+            step="0.01"
+            [(ngModel)]="amount"
+            required
+            placeholder="0.00"
+          />
+        </div>
+
+        @if (amountInput.touched && amountInput.hasError('required')) {
+          <span class="field-error">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>
+            Amount is required.
+          </span>
+        }
+        @if (amountInput.touched && amountInput.hasError('min')) {
+          <span class="field-error">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
+              />
+            </svg>
+            Minimum amount is 1 BAM.
+          </span>
+        }
+
+        <!-- Quick-select amounts -->
+        <div class="quick-amounts">
+          @for (preset of amountPresets; track preset) {
+            <button
+              type="button"
+              class="quick-amount-btn"
+              [class.active]="amount === preset"
+              (click)="setAmount(preset)"
+            >
+              {{ preset }} BAM
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Description field -->
+      <div class="field-group">
+        <label class="field-label">
+          Note
+          <span style="color: hsl(var(--muted-foreground)); font-weight: 400">(optional)</span>
+        </label>
+        <input
+          class="field-input"
+          type="text"
+          [(ngModel)]="description"
+          name="description"
+          placeholder="e.g. Monthly top-up"
+        />
+      </div>
+
+      <hr class="topup-divider" />
+
+      <!-- Stripe card element -->
+      <div class="field-group">
+        <label class="field-label">Card details</label>
+
+        @if (!isReady) {
+          <div class="stripe-loading">
+            <span class="spinner"></span>
+            <span>Loading payment form…</span>
+          </div>
+        }
+
+        <div
+          class="stripe-card-wrap"
+          [style.display]="isReady ? 'block' : 'none'"
+          id="card-element"
+        ></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="topup-actions">
+        <!-- Primary action: Pay now → Go to Profile after success -->
+        @if (paymentSucceeded) {
+          <button class="topup-submit" type="button" (click)="goToProfile()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+              />
+            </svg>
+            <span>Go to Profile</span>
+          </button>
+        } @else {
+          <button
+            class="topup-submit"
+            type="button"
+            (click)="pay()"
+            [disabled]="isLoading || !isReady"
+          >
+            @if (isLoading) {
+              <span class="btn-spinner"></span>
+              <span>Processing…</span>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+                />
+              </svg>
+              <span>Pay now</span>
+            }
+          </button>
+        }
+
+        <!-- Back button — hidden after successful payment -->
+        @if (!paymentSucceeded) {
+        <button class="topup-back-btn" type="button" (click)="goToProfile()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
+          Back to Profile
+        </button>
+        }
+      </div>
+
+      <!-- Security note -->
+      <p class="topup-footer-note">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.75"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"
+          />
+        </svg>
+        Secured by Stripe. Your card details are never stored on our servers.
+      </p>
+    </div>
+  </div>
 </div>
-} @if (successMessage) {
-<div style="color: green">
-  {{ successMessage }}
-</div>
-}
-
-<div style="margin-top: 12px">
-  <label>Amount</label>
-  <input type="number" min="1" step="0.01" [(ngModel)]="amount" placeholder="e.g. 50.00" />
-</div>
-
-<div style="margin-top: 12px">
-  <label>Description (optional)</label>
-  <input type="text" [(ngModel)]="description" placeholder="Top up wallet" />
-</div>
-
-<hr />
-
-<div id="card-element" style="padding: 12px; border: 1px solid hsl(var(--border))"></div>
-
-<button (click)="pay()" [disabled]="isLoading || !isReady" style="margin-top: 12px">Pay now</button>
