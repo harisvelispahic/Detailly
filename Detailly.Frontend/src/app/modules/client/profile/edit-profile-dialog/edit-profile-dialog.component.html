@@ -46,7 +46,7 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="epd__full">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="epd__full" [class.epd__email-field--oauth]="isOAuth">
       <mat-label>Email</mat-label>
       <input matInput type="email" formControlName="email" />
       @if (isOAuth) {

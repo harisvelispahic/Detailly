@@ -141,6 +141,19 @@
   }
 }
 
+// ---- OAuth email field ----
+
+.epd__email-field--oauth {
+  ::ng-deep {
+    .mat-mdc-input-element:disabled {
+      color: hsl(var(--muted-foreground)) !important;
+      -webkit-text-fill-color: hsl(var(--muted-foreground)) !important;
+      user-select: none;
+      pointer-events: none;
+    }
+  }
+}
+
 // ---- OAuth badge ----
 
 .epd__oauth-suffix {
