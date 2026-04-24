@@ -1,6 +1,5 @@
 <section class="booking-details">
   <app-container size="lg">
-
     <!-- Back nav -->
     <div class="booking-details__nav">
       <button class="back-btn" type="button" (click)="back()">
@@ -28,7 +27,6 @@
     <!-- Content -->
     @if (!isLoading && booking) {
       <div class="fade-in">
-
         <!-- Header -->
         <div class="booking-details__header">
           <div class="booking-details__title-row">
@@ -45,7 +43,6 @@
 
         <!-- Two-column grid -->
         <div class="booking-details__grid">
-
           <!-- Left: core info -->
           <div class="info-card">
             <h3 class="info-card__title">
@@ -59,7 +56,9 @@
             </div>
             <div class="info-row">
               <span class="info-row__label">Time</span>
-              <span class="info-row__value">{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span>
+              <span class="info-row__value"
+                >{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span
+              >
             </div>
             <div class="info-row">
               <span class="info-row__label">Duration</span>
@@ -90,13 +89,12 @@
 
             <div class="info-row info-row--total">
               <span class="info-row__label">Total</span>
-              <span class="info-row__price">{{ booking.totalPrice | number:'1.2-2' }} BAM</span>
+              <span class="info-row__price">{{ booking.totalPrice | number: '1.2-2' }} BAM</span>
             </div>
           </div>
 
           <!-- Right: add-ons, payment, notes -->
           <div class="booking-details__side">
-
             <!-- Add-ons -->
             @if (booking.addons && booking.addons.length > 0) {
               <div class="info-card">
@@ -108,9 +106,13 @@
                   <div class="addon-item">
                     <div class="addon-item__left">
                       <span class="addon-item__name">{{ addon.name }}</span>
-                      <span class="addon-item__meta">{{ formatDuration(addon.durationMinutesSnapshot) }}</span>
+                      <span class="addon-item__meta">{{
+                        formatDuration(addon.durationMinutesSnapshot)
+                      }}</span>
                     </div>
-                    <span class="addon-item__price">{{ addon.priceSnapshot | number:'1.2-2' }} BAM</span>
+                    <span class="addon-item__price"
+                      >{{ addon.priceSnapshot | number: '1.2-2' }} BAM</span
+                    >
                   </div>
                 }
               </div>
@@ -125,7 +127,10 @@
                 </h3>
                 <div class="info-row">
                   <span class="info-row__label">Payment Status</span>
-                  <span class="payment-badge" [ngClass]="getPaymentStatusClass(effectivePaymentStatus!)">
+                  <span
+                    class="payment-badge"
+                    [ngClass]="getPaymentStatusClass(effectivePaymentStatus!)"
+                  >
                     {{ getPaymentStatusLabel(effectivePaymentStatus!) }}
                   </span>
                 </div>
@@ -142,7 +147,6 @@
                 <p class="notes-text">{{ booking.notes }}</p>
               </div>
             }
-
           </div>
         </div>
 
@@ -151,15 +155,23 @@
           <div class="expiry-banner">
             <mat-icon>timer</mat-icon>
             <span>
-              Your slot is temporarily reserved. Complete payment before it expires to confirm your booking.
+              Your slot is temporarily reserved. Complete payment before it expires to confirm your
+              booking.
             </span>
+            @if (secondsRemaining !== null) {
+              <span
+                class="expiry-banner__countdown"
+                [class.expiry-banner__countdown--urgent]="secondsRemaining <= 60"
+              >
+                {{ countdownDisplay }}
+              </span>
+            }
           </div>
         }
 
         <!-- Actions -->
         @if (canPay || canCancel) {
           <div class="actions-card">
-
             @if (canPay) {
               <a class="btn-pay" [routerLink]="['/client/bookings', booking.id, 'pay']">
                 <mat-icon>payments</mat-icon>
@@ -202,12 +214,9 @@
                 </div>
               </div>
             }
-
           </div>
         }
-
       </div>
     }
-
   </app-container>
 </section>

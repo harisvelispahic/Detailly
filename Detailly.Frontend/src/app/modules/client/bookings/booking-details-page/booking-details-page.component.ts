@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingsService } from '../../../../api-services/bookings/bookings-api.service';
 import {
@@ -16,7 +16,7 @@ import { DialogButton, DialogType } from '../../../shared/models/dialog-config.m
   styleUrl: './booking-details-page.component.scss',
   standalone: false,
 })
-export class BookingDetailsPageComponent implements OnInit {
+export class BookingDetailsPageComponent implements OnInit, OnDestroy {
   id!: number;
 
   isLoading = false;
@@ -26,6 +26,9 @@ export class BookingDetailsPageComponent implements OnInit {
   booking?: GetBookingByIdQueryDto;
 
   cancelReason = '';
+
+  secondsRemaining: number | null = null;
+  private countdownInterval?: ReturnType<typeof setInterval>;
 
   BookingStatus = BookingStatus;
   ServiceMode = ServiceMode;
@@ -43,6 +46,10 @@ export class BookingDetailsPageComponent implements OnInit {
     this.load();
   }
 
+  ngOnDestroy(): void {
+    clearInterval(this.countdownInterval);
+  }
+
   load(): void {
     this.isLoading = true;
     this.error = undefined;
@@ -51,12 +58,42 @@ export class BookingDetailsPageComponent implements OnInit {
       next: (res) => {
         this.booking = res;
         this.isLoading = false;
+        this.startCountdown();
       },
       error: () => {
         this.error = 'Failed to load booking details.';
         this.isLoading = false;
       },
     });
+  }
+
+  private startCountdown(): void {
+    clearInterval(this.countdownInterval);
+    this.secondsRemaining = null;
+
+    if (
+      this.booking?.status !== BookingStatus.PendingPayment ||
+      !this.booking.reservationExpiresAtUtc
+    )
+      return;
+
+    const update = () => {
+      const diff = Math.floor(
+        (this.parseUtc(this.booking!.reservationExpiresAtUtc!).getTime() - Date.now()) / 1000,
+      );
+      this.secondsRemaining = Math.max(0, diff);
+      if (this.secondsRemaining === 0) clearInterval(this.countdownInterval);
+    };
+
+    update();
+    this.countdownInterval = setInterval(update, 1000);
+  }
+
+  get countdownDisplay(): string {
+    if (this.secondsRemaining == null) return '';
+    const m = Math.floor(this.secondsRemaining / 60);
+    const s = this.secondsRemaining % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
   cancel(): void {
@@ -112,14 +149,14 @@ export class BookingDetailsPageComponent implements OnInit {
 
   get durationMinutes(): number {
     if (!this.booking) return 0;
-    const start = new Date(this.booking.startUtc);
-    const end = new Date(this.booking.endUtc);
+    const start = this.parseUtc(this.booking.startUtc);
+    const end = this.parseUtc(this.booking.endUtc);
     return Math.round((end.getTime() - start.getTime()) / 60000);
   }
 
   get refundNote(): string {
     if (!this.booking) return '';
-    const hoursUntilStart = (new Date(this.booking.startUtc).getTime() - Date.now()) / 3_600_000;
+    const hoursUntilStart = (this.parseUtc(this.booking.startUtc).getTime() - Date.now()) / 3_600_000;
     if (hoursUntilStart >= 48) return '100% refund — more than 48 hours before start';
     if (hoursUntilStart >= 24) return '50% refund — between 24 and 48 hours before start';
     if (hoursUntilStart > 0) return '25% refund — less than 24 hours before start';
@@ -200,8 +237,12 @@ export class BookingDetailsPageComponent implements OnInit {
     return this.booking.paymentStatus;
   }
 
+  private parseUtc(dateStr: string): Date {
+    return new Date(dateStr.endsWith('Z') ? dateStr : `${dateStr}Z`);
+  }
+
   formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-GB', {
+    return this.parseUtc(dateStr).toLocaleDateString('en-GB', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
@@ -210,7 +251,7 @@ export class BookingDetailsPageComponent implements OnInit {
   }
 
   formatTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('en-US', {
+    return this.parseUtc(dateStr).toLocaleString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,

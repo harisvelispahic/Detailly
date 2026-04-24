@@ -35,7 +35,8 @@ public static class DependencyInjection
                     });
                 };
             })
-            .AddNewtonsoftJson();
+            .AddNewtonsoftJson(opts =>
+                opts.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc);
 
         // Typed options + validation on startup
         services.AddOptions<JwtOptions>()
