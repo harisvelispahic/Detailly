@@ -7,6 +7,8 @@ import {
   PaymentTransactionStatus,
   ServiceMode,
 } from '../../../../api-services/bookings/bookings-api.models';
+import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
+import { DialogButton, DialogType } from '../../../shared/models/dialog-config.model';
 
 @Component({
   selector: 'app-booking-details-page',
@@ -33,6 +35,7 @@ export class BookingDetailsPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private bookingsService: BookingsService,
+    private dialogHelper: DialogHelperService,
   ) {}
 
   ngOnInit(): void {
@@ -57,22 +60,40 @@ export class BookingDetailsPageComponent implements OnInit {
   }
 
   cancel(): void {
-    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    const message =
+      this.booking?.status === BookingStatus.Confirmed
+        ? `${this.refundNote}. This action cannot be undone.`
+        : 'This will release your reservation. This action cannot be undone.';
 
-    this.isCancelling = true;
-    this.error = undefined;
+    this.dialogHelper
+      .open({
+        type: DialogType.WARNING,
+        title: 'Cancel Booking',
+        message,
+        icon: 'cancel',
+        buttons: [
+          { type: DialogButton.CANCEL },
+          { type: DialogButton.YES, label: 'Yes, Cancel Booking', color: 'warn' },
+        ],
+      })
+      .subscribe((result) => {
+        if (result?.button !== DialogButton.YES) return;
 
-    this.bookingsService
-      .cancelBooking(this.id, { reason: this.cancelReason?.trim() || null })
-      .subscribe({
-        next: () => {
-          this.isCancelling = false;
-          this.load();
-        },
-        error: (err) => {
-          this.isCancelling = false;
-          this.error = err?.error?.message ?? 'Failed to cancel booking.';
-        },
+        this.isCancelling = true;
+        this.error = undefined;
+
+        this.bookingsService
+          .cancelBooking(this.id, { reason: this.cancelReason?.trim() || null })
+          .subscribe({
+            next: () => {
+              this.isCancelling = false;
+              this.load();
+            },
+            error: (err) => {
+              this.isCancelling = false;
+              this.error = err?.error?.message ?? 'Failed to cancel booking.';
+            },
+          });
       });
   }
 
@@ -171,6 +192,12 @@ export class BookingDetailsPageComponent implements OnInit {
       default:
         return 'payment-badge--unpaid';
     }
+  }
+
+  get effectivePaymentStatus(): PaymentTransactionStatus | null {
+    if (this.booking?.paymentStatus == null) return null;
+    if (this.booking.status === BookingStatus.Cancelled) return PaymentTransactionStatus.Refunded;
+    return this.booking.paymentStatus;
   }
 
   formatDate(dateStr: string): string {
