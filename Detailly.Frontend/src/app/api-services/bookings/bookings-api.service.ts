@@ -6,7 +6,10 @@ import {
   CancelBookingCommand,
   GetBookingByIdQueryDto,
   ListMyBookingsQueryDto,
+  ListMyBookingsRequest,
 } from './bookings-api.models';
+import { PageResult } from '../../core/models/paging/page-result';
+import { buildHttpParams } from '../../core/models/build-http-params';
 
 @Injectable({ providedIn: 'root' })
 export class BookingsService {
@@ -14,8 +17,9 @@ export class BookingsService {
 
   constructor(private http: HttpClient) {}
 
-  listMine(): Observable<ListMyBookingsQueryDto[]> {
-    return this.http.get<ListMyBookingsQueryDto[]>(`${this.baseUrl}/my`);
+  listMine(request?: ListMyBookingsRequest): Observable<PageResult<ListMyBookingsQueryDto>> {
+    const params = request ? buildHttpParams(request as any) : undefined;
+    return this.http.get<PageResult<ListMyBookingsQueryDto>>(`${this.baseUrl}/my`, { params });
   }
 
   getById(id: number): Observable<GetBookingByIdQueryDto> {

@@ -1,6 +1,12 @@
 import { PageResult } from '../../core/models/paging/page-result';
 import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
 
+export class ListMyBookingsRequest extends BasePagedQuery {
+  constructor() {
+    super();
+  }
+}
+
 export enum BookingStatus {
   Draft = 0, // User is building booking (no payment intent yet)
   PendingPayment = 1, // Payment intent created, waiting for payment

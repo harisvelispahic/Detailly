@@ -1,32 +1,156 @@
-<div class="container">
-  <h2>My Bookings</h2>
+<section class="appointments-page">
+  <app-container size="lg">
+    <!-- ===== HEADER ===== -->
+    <div class="appointments-page__header">
+      <div class="appointments-page__header-text">
+        <h1 class="appointments-page__title">My <span class="gradient-text">Appointments</span></h1>
+        <p class="appointments-page__subtitle">View and manage your detailing appointments</p>
+      </div>
+      <button
+        mat-stroked-button
+        class="appointments-page__export-btn"
+        disabled
+        matTooltip="Coming soon"
+      >
+        <mat-icon>download</mat-icon>
+        Export Report
+      </button>
+    </div>
 
-  <div *ngIf="isLoading">Loading...</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
+    <!-- ===== STATS ===== -->
+    @if (!isLoading && !errorMessage) {
+      <div class="appointments-page__stats">
+        <div class="stat-card">
+          <mat-icon class="stat-card__icon">event</mat-icon>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Total Bookings</span>
+            <span class="stat-card__value">{{ totalItems }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-card__icon stat-card__icon--upcoming">schedule</mat-icon>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Upcoming</span>
+            <span class="stat-card__value">{{ upcomingCount }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-card__icon stat-card__icon--completed">check_circle</mat-icon>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Completed</span>
+            <span class="stat-card__value">{{ completedCount }}</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <mat-icon class="stat-card__icon stat-card__icon--spent">attach_money</mat-icon>
+          <div class="stat-card__body">
+            <span class="stat-card__label">Total Spent</span>
+            <span class="stat-card__value">BAM {{ totalSpent | number: '1.0-0' }}</span>
+          </div>
+        </div>
+      </div>
+    }
 
-  <div *ngIf="!isLoading && bookings.length === 0">You have no bookings yet.</div>
+    <!-- ===== FILTERS ===== -->
+    <div class="appointments-page__filters">
+      <div class="appointments-page__search">
+        <mat-icon class="appointments-page__search-icon">search</mat-icon>
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Search by service..."
+          class="appointments-page__search-input"
+        />
+        @if (searchControl.value) {
+          <button
+            mat-icon-button
+            class="appointments-page__search-clear"
+            (click)="searchControl.setValue('')"
+            aria-label="Clear search"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+      <mat-form-field appearance="outline" class="appointments-page__status-filter">
+        <mat-select [(ngModel)]="statusFilter" placeholder="All Status">
+          @for (opt of statusOptions; track opt.value) {
+            <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-  <table *ngIf="!isLoading && bookings.length > 0" class="table">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Status</th>
-        <th></th>
-      </tr>
-    </thead>
+    <!-- ===== LOADING ===== -->
+    @if (isLoading) {
+      <div class="appointments-page__loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
 
-    <tbody>
-      <tr *ngFor="let b of bookings">
-        <td>{{ b.id }}</td>
-        <td>{{ b.startUtc }}</td>
-        <td>{{ b.endUtc }}</td>
-        <td>{{ b.status }}</td>
-        <td>
-          <button type="button" (click)="openDetails(b.id)">Details</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+    <!-- ===== ERROR ===== -->
+    @if (!isLoading && errorMessage) {
+      <div class="appointments-page__error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="reload()">Try Again</button>
+      </div>
+    }
+
+    <!-- ===== EMPTY STATE ===== -->
+    @if (!isLoading && !errorMessage && filteredItems.length === 0) {
+      <div class="appointments-page__empty">
+        <mat-icon>event_busy</mat-icon>
+        @if (searchControl.value || statusFilter !== null) {
+          <p>No appointments match your filters</p>
+          <button mat-stroked-button (click)="clearFilters()">Clear Filters</button>
+        } @else {
+          <p>You have no appointments yet</p>
+          <a mat-raised-button color="primary" routerLink="/book-now">Book Now</a>
+        }
+      </div>
+    }
+
+    <!-- ===== APPOINTMENTS LIST ===== -->
+    @if (!isLoading && !errorMessage && filteredItems.length > 0) {
+      <div class="appointments-list">
+        @for (booking of filteredItems; track booking.id) {
+          <div class="appointment-card" (click)="openDetails(booking.id)">
+            <!-- Date block -->
+            <div class="appointment-card__date" [ngClass]="getDateColorClass(booking.status)">
+              <span class="appointment-card__month">{{ getDateMonth(booking.startUtc) }}</span>
+              <span class="appointment-card__day">{{ getDateDay(booking.startUtc) }}</span>
+            </div>
+
+            <!-- Content -->
+            <div class="appointment-card__content">
+              <div class="appointment-card__top">
+                <span class="appointment-card__service">{{ booking.servicePackageName }}</span>
+                <span class="appointment-card__status" [ngClass]="getStatusClass(booking.status)">
+                  {{ getStatusLabel(booking.status) }}
+                </span>
+              </div>
+              <div class="appointment-card__meta">
+                <span class="appointment-card__meta-item">
+                  <mat-icon>schedule</mat-icon>
+                  {{ formatTime(booking.startUtc) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="appointment-card__right">
+              <span class="appointment-card__price"
+                >BAM {{ booking.totalPrice | number: '1.0-0' }}</span
+              >
+              <mat-icon class="appointment-card__chevron">chevron_right</mat-icon>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Paginator -->
+      <app-fit-paginator-bar [vm]="this"></app-fit-paginator-bar>
+    }
+  </app-container>
+</section>
