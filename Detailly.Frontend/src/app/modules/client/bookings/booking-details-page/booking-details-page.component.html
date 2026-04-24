@@ -161,9 +161,9 @@
           <div class="actions-card">
 
             @if (canPay) {
-              <a class="btn-pay" [routerLink]="['/client/bookings/pay', booking.id]">
-                <mat-icon>credit_card</mat-icon>
-                Pay by Card
+              <a class="btn-pay" [routerLink]="['/client/bookings', booking.id, 'pay']">
+                <mat-icon>payments</mat-icon>
+                Pay Booking
               </a>
             }
 

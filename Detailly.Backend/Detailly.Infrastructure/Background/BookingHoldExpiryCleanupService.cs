@@ -49,6 +49,7 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
 
         // Find holds that are still PendingPayment but expired
         var expired = await db.Bookings
+            .Include(b => b.PaymentTransactions)
             .Where(b =>
                 !b.IsDeleted &&
                 b.Status == BookingStatus.PendingPayment &&
@@ -62,8 +63,14 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
         foreach (var b in expired)
         {
             b.Status = BookingStatus.Expired;
-            b.ReservationExpiresAtUtc = null; // clean up hold field
+            b.ReservationExpiresAtUtc = null;
             b.ModifiedAtUtc = now;
+
+            foreach (var tx in b.PaymentTransactions)
+            {
+                if (tx.Status == PaymentTransactionStatus.Pending)
+                    tx.Status = PaymentTransactionStatus.Unpaid;
+            }
         }
 
         await db.SaveChangesAsync(ct);

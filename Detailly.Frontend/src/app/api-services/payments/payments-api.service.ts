@@ -30,6 +30,10 @@ export class PaymentsService {
     );
   }
 
+  payBookingWithWallet(bookingId: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/bookings/wallet/${bookingId}`, {});
+  }
+
   // -----------------------------
   // ORDERS
   // -----------------------------

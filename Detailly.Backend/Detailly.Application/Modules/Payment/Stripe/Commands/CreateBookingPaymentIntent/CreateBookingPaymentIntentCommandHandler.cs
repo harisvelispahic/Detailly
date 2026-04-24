@@ -8,7 +8,7 @@ public class CreateBookingPaymentIntentCommandHandler
     : IRequestHandler<CreateBookingPaymentIntentCommand, CreateBookingPaymentIntentResult>
 {
     // If a PaymentIntent has been Pending for longer than this, allow replacing it with a new one.
-    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromSeconds(10);
 
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;

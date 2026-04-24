@@ -8,6 +8,7 @@ import { OrderDetailsComponent } from './orders/order-details/order-details.comp
 import { MyBookingsPageComponent } from './bookings/my-bookings-page/my-bookings-page.component';
 import { BookingDetailsPageComponent } from './bookings/booking-details-page/booking-details-page.component';
 import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/booking-pay-card-page.component';
+import { BookingPaymentPageComponent } from './bookings/booking-payment-page/booking-payment-page.component';
 import { ClientLayoutComponent } from './client-layout/client-layout.component';
 import { ProfilePageComponent } from './profile/profile-page/profile-page.component';
 
@@ -47,14 +48,14 @@ const routes: Routes = [
         data: { requireAuth: true },
       },
       {
-        path: 'bookings/:id',
-        component: BookingDetailsPageComponent,
+        path: 'bookings/:id/pay',
+        component: BookingPaymentPageComponent,
         canActivate: [myAuthGuard],
         data: { requireAuth: true },
       },
       {
-        path: 'bookings/pay/:bookingId',
-        component: BookingPayCardPageComponent,
+        path: 'bookings/:id',
+        component: BookingDetailsPageComponent,
         canActivate: [myAuthGuard],
         data: { requireAuth: true },
       },

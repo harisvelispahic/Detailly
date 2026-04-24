@@ -1,0 +1,205 @@
+<section class="booking-payment">
+  <app-container size="md">
+
+    <!-- Back nav -->
+    <div class="booking-payment__nav">
+      <button class="back-btn" type="button" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Booking
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="booking-payment__loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (!isLoading && error && !booking) {
+      <div class="booking-payment__error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-stroked-button (click)="loadBooking()">Try Again</button>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!isLoading && booking) {
+      <div class="fade-in">
+
+        <!-- Page title -->
+        <div class="booking-payment__header">
+          <h1 class="booking-payment__title">Complete Payment</h1>
+          <p class="booking-payment__subtitle">{{ booking.servicePackageName }}</p>
+        </div>
+
+        <!-- Booking summary card -->
+        <div class="summary-card">
+          <div class="summary-card__row">
+            <span class="summary-card__label">
+              <mat-icon>calendar_today</mat-icon>
+              Date
+            </span>
+            <span class="summary-card__value">{{ formatDate(booking.startUtc) }}</span>
+          </div>
+          <div class="summary-card__row">
+            <span class="summary-card__label">
+              <mat-icon>schedule</mat-icon>
+              Time
+            </span>
+            <span class="summary-card__value">{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span>
+          </div>
+          <div class="summary-card__divider"></div>
+          <div class="summary-card__total-row">
+            <span class="summary-card__total-label">Total due</span>
+            <span class="summary-card__total-amount">{{ booking.totalPrice | number:'1.2-2' }} BAM</span>
+          </div>
+        </div>
+
+        <!-- Method picker -->
+        <p class="booking-payment__section-label">Choose payment method</p>
+        <div class="method-picker">
+
+          <!-- Wallet option -->
+          <button
+            class="method-card"
+            [class.method-card--active]="selectedMethod === 'wallet'"
+            type="button"
+            (click)="selectMethod('wallet')"
+          >
+            <mat-icon class="method-card__icon">account_balance_wallet</mat-icon>
+            <span class="method-card__label">Wallet</span>
+            @if (walletBalance != null) {
+              <span class="method-card__balance">{{ walletBalance | number:'1.2-2' }} {{ walletCurrency }}</span>
+            }
+          </button>
+
+          <!-- Card option -->
+          <button
+            class="method-card"
+            [class.method-card--active]="selectedMethod === 'card'"
+            type="button"
+            (click)="selectMethod('card')"
+          >
+            <mat-icon class="method-card__icon">credit_card</mat-icon>
+            <span class="method-card__label">Card</span>
+            <span class="method-card__balance">Via Stripe</span>
+          </button>
+
+        </div>
+
+        <!-- Wallet payment panel -->
+        @if (selectedMethod === 'wallet') {
+          <div class="payment-panel fade-in">
+
+            @if (walletBalance != null) {
+              <div class="wallet-info">
+                <div class="wallet-info__row">
+                  <span class="wallet-info__label">Wallet balance</span>
+                  <span class="wallet-info__amount">{{ walletBalance | number:'1.2-2' }} {{ walletCurrency }}</span>
+                </div>
+                <div class="wallet-info__row">
+                  <span class="wallet-info__label">Amount due</span>
+                  <span class="wallet-info__amount">{{ booking.totalPrice | number:'1.2-2' }} BAM</span>
+                </div>
+                <div class="wallet-info__divider"></div>
+                <div class="wallet-info__row">
+                  <span class="wallet-info__label">Balance after payment</span>
+                  <span class="wallet-info__amount" [class.wallet-info__amount--negative]="!hasSufficientBalance">
+                    {{ (walletBalance - booking.totalPrice) | number:'1.2-2' }} {{ walletCurrency }}
+                  </span>
+                </div>
+              </div>
+
+              @if (!hasSufficientBalance) {
+                <div class="balance-warning">
+                  <mat-icon>warning_amber</mat-icon>
+                  <span>Insufficient balance. Please top up your wallet or pay by card.</span>
+                </div>
+                <button class="btn-topup" type="button" (click)="topUpWallet()">
+                  <mat-icon>add_card</mat-icon>
+                  Top-up Wallet
+                </button>
+              }
+            }
+
+            @if (error) {
+              <div class="payment-error">
+                <mat-icon>error_outline</mat-icon>
+                <span>{{ error }}</span>
+              </div>
+            }
+
+            <button
+              class="btn-pay-action"
+              type="button"
+              (click)="payWithWallet()"
+              [disabled]="isPayingWallet || !hasSufficientBalance"
+            >
+              @if (isPayingWallet) {
+                <mat-spinner diameter="18" class="btn-pay-action__spinner"></mat-spinner>
+                Processing...
+              } @else {
+                <mat-icon>account_balance_wallet</mat-icon>
+                Pay with Wallet
+              }
+            </button>
+
+          </div>
+        }
+
+        <!-- Card payment panel -->
+        @if (selectedMethod === 'card') {
+          <div class="payment-panel fade-in">
+
+            @if (isInitializingCard) {
+              <div class="card-loading">
+                <mat-spinner diameter="28"></mat-spinner>
+                <span>Preparing secure payment...</span>
+              </div>
+            }
+
+            <!-- Always in DOM so Stripe can mount; hidden only while initializing -->
+            <div
+              id="stripe-card-element"
+              class="stripe-element"
+              [style.display]="isInitializingCard ? 'none' : 'block'"
+            ></div>
+
+            @if (cardError) {
+              <div class="payment-error">
+                <mat-icon>error_outline</mat-icon>
+                <span>{{ cardError }}</span>
+              </div>
+            }
+
+            <button
+              class="btn-pay-action"
+              type="button"
+              (click)="payWithCard()"
+              [disabled]="isPayingCard || isInitializingCard || !isCardReady"
+            >
+              @if (isPayingCard) {
+                <mat-spinner diameter="18" class="btn-pay-action__spinner"></mat-spinner>
+                Processing...
+              } @else {
+                <mat-icon>lock</mat-icon>
+                Pay with Card
+              }
+            </button>
+
+            <p class="card-note">
+              <mat-icon>shield</mat-icon>
+              Secured by Stripe. Your card details are never stored on our servers.
+            </p>
+
+          </div>
+        }
+
+      </div>
+    }
+
+  </app-container>
+</section>
