@@ -7,6 +7,11 @@ export class ListMyBookingsRequest extends BasePagedQuery {
   }
 }
 
+export enum ServiceMode {
+  InShop = 0,
+  Mobile = 1,
+}
+
 export enum BookingStatus {
   Draft = 0, // User is building booking (no payment intent yet)
   PendingPayment = 1, // Payment intent created, waiting for payment
@@ -37,6 +42,7 @@ export interface ListMyBookingsQueryDto {
 export interface GetBookingByIdQueryDto {
   id: number;
   status: BookingStatus;
+  serviceMode: ServiceMode;
   startUtc: string;
   endUtc: string;
   totalPrice: number;

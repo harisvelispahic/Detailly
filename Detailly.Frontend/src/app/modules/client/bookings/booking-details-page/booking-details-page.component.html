@@ -1,37 +1,213 @@
-<div class="container">
-  <button type="button" (click)="back()">← Back</button>
+<section class="booking-details">
+  <app-container size="lg">
 
-  <h2>Booking Details</h2>
-
-  <div *ngIf="isLoading">Loading...</div>
-  <div *ngIf="error" class="error">{{ error }}</div>
-
-  <div *ngIf="!isLoading && booking">
-    <p><b>ID:</b> {{ booking?.id }}</p>
-    <p><b>Status:</b> {{ booking?.status }}</p>
-    <p><b>Start:</b> {{ booking?.startUtc }}</p>
-    <p><b>End:</b> {{ booking?.endUtc }}</p>
-    <p><b>Total:</b> {{ booking?.totalPrice }}</p>
-
-    <div style="margin-top: 16px">
-      <label>Cancel reason (optional)</label><br />
-      <input type="text" placeholder="Reason..." style="width: 100%; max-width: 480px" />
-      <!-- <input
-        type="text"
-        [(ngModel)]="cancelReason"
-        placeholder="Reason..."
-        style="width: 100%; max-width: 480px"
-      /> -->
-    </div>
-
-    <div style="margin-top: 12px">
-      <a [routerLink]="['/client/bookings/pay', booking.id]"> Pay by card </a>
-    </div>
-
-    <div style="margin-top: 12px">
-      <button type="button" (click)="cancel()" [disabled]="isCancelling">
-        {{ isCancelling ? 'Cancelling...' : 'Cancel Booking' }}
+    <!-- Back nav -->
+    <div class="booking-details__nav">
+      <button class="back-btn" type="button" (click)="back()">
+        <mat-icon>arrow_back</mat-icon>
+        My Appointments
       </button>
     </div>
-  </div>
-</div>
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="booking-details__loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (!isLoading && error) {
+      <div class="booking-details__error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-stroked-button (click)="load()">Try Again</button>
+      </div>
+    }
+
+    <!-- Content -->
+    @if (!isLoading && booking) {
+      <div class="fade-in">
+
+        <!-- Header -->
+        <div class="booking-details__header">
+          <div class="booking-details__title-row">
+            <h1 class="booking-details__title">{{ booking.servicePackageName }}</h1>
+            <span class="booking-status" [ngClass]="getStatusClass(booking.status)">
+              {{ getStatusLabel(booking.status) }}
+            </span>
+          </div>
+          <p class="booking-details__subtitle">
+            <mat-icon class="booking-details__date-icon">calendar_today</mat-icon>
+            {{ formatDate(booking.startUtc) }}
+          </p>
+        </div>
+
+        <!-- Two-column grid -->
+        <div class="booking-details__grid">
+
+          <!-- Left: core info -->
+          <div class="info-card">
+            <h3 class="info-card__title">
+              <mat-icon>receipt_long</mat-icon>
+              Booking Details
+            </h3>
+
+            <div class="info-row">
+              <span class="info-row__label">Date</span>
+              <span class="info-row__value">{{ formatDate(booking.startUtc) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">Time</span>
+              <span class="info-row__value">{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">Duration</span>
+              <span class="info-row__value">{{ formatDuration(durationMinutes) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">Service Mode</span>
+              <span class="info-row__value info-row__value--mode">
+                @if (booking.serviceMode === ServiceMode.InShop) {
+                  <mat-icon>store</mat-icon> In-Shop
+                } @else {
+                  <mat-icon>directions_car</mat-icon> Mobile
+                }
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-row__label">Technicians</span>
+              <span class="info-row__value">{{ booking.requiredEmployees }}</span>
+            </div>
+            @if (booking.serviceMode === ServiceMode.InShop) {
+              <div class="info-row">
+                <span class="info-row__label">Bays</span>
+                <span class="info-row__value">{{ booking.requiredBays }}</span>
+              </div>
+            }
+
+            <div class="info-row info-row--separator"></div>
+
+            <div class="info-row info-row--total">
+              <span class="info-row__label">Total</span>
+              <span class="info-row__price">{{ booking.totalPrice | number:'1.2-2' }} BAM</span>
+            </div>
+          </div>
+
+          <!-- Right: add-ons, payment, notes -->
+          <div class="booking-details__side">
+
+            <!-- Add-ons -->
+            @if (booking.addons && booking.addons.length > 0) {
+              <div class="info-card">
+                <h3 class="info-card__title">
+                  <mat-icon>add_circle_outline</mat-icon>
+                  Add-ons
+                </h3>
+                @for (addon of booking.addons; track addon.bookingItemId) {
+                  <div class="addon-item">
+                    <div class="addon-item__left">
+                      <span class="addon-item__name">{{ addon.name }}</span>
+                      <span class="addon-item__meta">{{ formatDuration(addon.durationMinutesSnapshot) }}</span>
+                    </div>
+                    <span class="addon-item__price">{{ addon.priceSnapshot | number:'1.2-2' }} BAM</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Payment info -->
+            @if (booking.paymentStatus != null) {
+              <div class="info-card">
+                <h3 class="info-card__title">
+                  <mat-icon>payment</mat-icon>
+                  Payment
+                </h3>
+                <div class="info-row">
+                  <span class="info-row__label">Payment Status</span>
+                  <span class="payment-badge" [ngClass]="getPaymentStatusClass(booking.paymentStatus!)">
+                    {{ getPaymentStatusLabel(booking.paymentStatus!) }}
+                  </span>
+                </div>
+              </div>
+            }
+
+            <!-- Notes -->
+            @if (booking.notes) {
+              <div class="info-card">
+                <h3 class="info-card__title">
+                  <mat-icon>notes</mat-icon>
+                  Notes
+                </h3>
+                <p class="notes-text">{{ booking.notes }}</p>
+              </div>
+            }
+
+          </div>
+        </div>
+
+        <!-- Reservation expiry banner (PendingPayment only) -->
+        @if (booking.status === BookingStatus.PendingPayment && booking.reservationExpiresAtUtc) {
+          <div class="expiry-banner">
+            <mat-icon>timer</mat-icon>
+            <span>
+              Your slot is temporarily reserved. Complete payment before it expires to confirm your booking.
+            </span>
+          </div>
+        }
+
+        <!-- Actions -->
+        @if (canPay || canCancel) {
+          <div class="actions-card">
+
+            @if (canPay) {
+              <a class="btn-pay" [routerLink]="['/client/bookings/pay', booking.id]">
+                <mat-icon>credit_card</mat-icon>
+                Pay by Card
+              </a>
+            }
+
+            @if (canCancel) {
+              <div class="cancel-panel">
+                <h4 class="cancel-panel__title">Cancel Booking</h4>
+
+                @if (booking.status === BookingStatus.Confirmed) {
+                  <div class="cancel-panel__refund-note">
+                    <mat-icon>info_outline</mat-icon>
+                    <span>{{ refundNote }}</span>
+                  </div>
+                }
+
+                <div class="cancel-panel__form">
+                  <input
+                    class="cancel-panel__input"
+                    type="text"
+                    [(ngModel)]="cancelReason"
+                    placeholder="Cancellation reason (optional)..."
+                  />
+                  <button
+                    class="btn-cancel"
+                    type="button"
+                    (click)="cancel()"
+                    [disabled]="isCancelling"
+                  >
+                    @if (isCancelling) {
+                      <mat-spinner diameter="16" class="btn-cancel__spinner"></mat-spinner>
+                      Cancelling...
+                    } @else {
+                      <mat-icon>cancel</mat-icon>
+                      Cancel Booking
+                    }
+                  </button>
+                </div>
+              </div>
+            }
+
+          </div>
+        }
+
+      </div>
+    }
+
+  </app-container>
+</section>

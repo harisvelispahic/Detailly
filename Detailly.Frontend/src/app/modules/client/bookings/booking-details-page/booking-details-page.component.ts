@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingsService } from '../../../../api-services/bookings/bookings-api.service';
-import { GetBookingByIdQueryDto } from '../../../../api-services/bookings/bookings-api.models';
+import {
+  BookingStatus,
+  GetBookingByIdQueryDto,
+  PaymentTransactionStatus,
+  ServiceMode,
+} from '../../../../api-services/bookings/bookings-api.models';
 
 @Component({
   selector: 'app-booking-details-page',
   templateUrl: './booking-details-page.component.html',
+  styleUrl: './booking-details-page.component.scss',
   standalone: false,
 })
 export class BookingDetailsPageComponent implements OnInit {
@@ -17,7 +23,11 @@ export class BookingDetailsPageComponent implements OnInit {
   error?: string;
   booking?: GetBookingByIdQueryDto;
 
-  cancelReason: string = '';
+  cancelReason = '';
+
+  BookingStatus = BookingStatus;
+  ServiceMode = ServiceMode;
+  PaymentTransactionStatus = PaymentTransactionStatus;
 
   constructor(
     private route: ActivatedRoute,
@@ -47,7 +57,7 @@ export class BookingDetailsPageComponent implements OnInit {
   }
 
   cancel(): void {
-    if (!confirm('Cancel this booking?')) return;
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
 
     this.isCancelling = true;
     this.error = undefined;
@@ -57,12 +67,10 @@ export class BookingDetailsPageComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isCancelling = false;
-          alert('✅ Booking cancelled.');
-          this.load(); // refresh status
+          this.load();
         },
         error: (err) => {
           this.isCancelling = false;
-          // best-effort message
           this.error = err?.error?.message ?? 'Failed to cancel booking.';
         },
       });
@@ -70,5 +78,122 @@ export class BookingDetailsPageComponent implements OnInit {
 
   back(): void {
     this.router.navigate(['/client/bookings']);
+  }
+
+  get canCancel(): boolean {
+    const s = this.booking?.status;
+    return s === BookingStatus.Confirmed || s === BookingStatus.PendingPayment;
+  }
+
+  get canPay(): boolean {
+    return this.booking?.status === BookingStatus.PendingPayment;
+  }
+
+  get durationMinutes(): number {
+    if (!this.booking) return 0;
+    const start = new Date(this.booking.startUtc);
+    const end = new Date(this.booking.endUtc);
+    return Math.round((end.getTime() - start.getTime()) / 60000);
+  }
+
+  get refundNote(): string {
+    if (!this.booking) return '';
+    const hoursUntilStart = (new Date(this.booking.startUtc).getTime() - Date.now()) / 3_600_000;
+    if (hoursUntilStart >= 48) return '100% refund — more than 48 hours before start';
+    if (hoursUntilStart >= 24) return '50% refund — between 24 and 48 hours before start';
+    if (hoursUntilStart > 0) return '25% refund — less than 24 hours before start';
+    return 'No refund — appointment has already started or passed';
+  }
+
+  getStatusLabel(status: BookingStatus): string {
+    switch (status) {
+      case BookingStatus.Draft:
+        return 'Draft';
+      case BookingStatus.PendingPayment:
+        return 'Pending Payment';
+      case BookingStatus.Confirmed:
+        return 'Confirmed';
+      case BookingStatus.Cancelled:
+        return 'Cancelled';
+      case BookingStatus.Completed:
+        return 'Completed';
+      case BookingStatus.Expired:
+        return 'Expired';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  getStatusClass(status: BookingStatus): string {
+    switch (status) {
+      case BookingStatus.Confirmed:
+        return 'status--confirmed';
+      case BookingStatus.PendingPayment:
+        return 'status--pending';
+      case BookingStatus.Completed:
+        return 'status--completed';
+      case BookingStatus.Cancelled:
+        return 'status--cancelled';
+      case BookingStatus.Expired:
+        return 'status--expired';
+      default:
+        return 'status--draft';
+    }
+  }
+
+  getPaymentStatusLabel(status: PaymentTransactionStatus): string {
+    switch (status) {
+      case PaymentTransactionStatus.Unpaid:
+        return 'Unpaid';
+      case PaymentTransactionStatus.Pending:
+        return 'Pending';
+      case PaymentTransactionStatus.Paid:
+        return 'Paid';
+      case PaymentTransactionStatus.Failed:
+        return 'Failed';
+      case PaymentTransactionStatus.Refunded:
+        return 'Refunded';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  getPaymentStatusClass(status: PaymentTransactionStatus): string {
+    switch (status) {
+      case PaymentTransactionStatus.Paid:
+        return 'payment-badge--paid';
+      case PaymentTransactionStatus.Pending:
+        return 'payment-badge--pending';
+      case PaymentTransactionStatus.Failed:
+        return 'payment-badge--failed';
+      case PaymentTransactionStatus.Refunded:
+        return 'payment-badge--refunded';
+      default:
+        return 'payment-badge--unpaid';
+    }
+  }
+
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+
+  formatTime(dateStr: string): string {
+    return new Date(dateStr).toLocaleString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  }
+
+  formatDuration(minutes: number): string {
+    if (minutes < 60) return `${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 }
