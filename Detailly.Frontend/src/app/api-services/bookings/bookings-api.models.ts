@@ -1,4 +1,3 @@
-import { PageResult } from '../../core/models/paging/page-result';
 import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
 
 export class ListMyBookingsRequest extends BasePagedQuery {
@@ -69,4 +68,28 @@ export interface BookingAddonDto {
 
 export interface CancelBookingCommand {
   reason?: string | null;
+}
+
+export interface CreateBookingHoldCommand {
+  servicePackageId: number;
+  addonItemIds?: number[];
+  serviceMode: ServiceMode;
+  shopLocationId: number;
+  serviceAddressId?: number;
+  startUtc: string;
+  vehicleIds?: number[];
+  notes?: string;
+}
+
+export interface AvailabilitySlotDto {
+  startUtc: string;
+  endUtc: string;
+}
+
+export interface GetAvailabilityRequest {
+  dateUtc: string;
+  servicePackageId: number;
+  addonItemIds?: number[];
+  serviceMode: ServiceMode;
+  shopLocationId: number;
 }

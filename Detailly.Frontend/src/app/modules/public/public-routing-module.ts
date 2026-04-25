@@ -5,6 +5,7 @@ import { SearchProductsComponent } from './search-products/search-products.compo
 import { LandingComponent } from './landing/landing.component';
 import { PublicPlaceholderPageComponent } from './placeholder-page/public-placeholder-page.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
+import { BookingWizardComponent } from './booking-wizard/booking-wizard.component';
 
 const routes: Routes = [
   {
@@ -31,23 +32,7 @@ const routes: Routes = [
       },
       {
         path: 'book-now',
-        component: PublicPlaceholderPageComponent,
-        data: {
-          eyebrow: 'Booking',
-          title: 'Book Your Next',
-          accent: 'Detail',
-          description:
-            'The full multi-step booking experience is still to be implemented, but this route now exists so the new navbar and footer behave like the React shell.',
-          highlights: [
-            'Service and add-on selection',
-            'Vehicle, address, and schedule flow',
-            'Confirmation and checkout handoff',
-          ],
-          primaryLabel: 'Browse Products',
-          primaryRoute: '/search',
-          secondaryLabel: 'Read Reviews',
-          secondaryRoute: '/reviews',
-        },
+        component: BookingWizardComponent,
       },
       {
         path: 'reviews',

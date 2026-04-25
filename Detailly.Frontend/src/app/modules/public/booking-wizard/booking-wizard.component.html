@@ -1,0 +1,413 @@
+<div class="booking-wizard-page">
+  <div class="booking-wizard-container">
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <ng-container *ngFor="let label of stepLabels; let i = index">
+        <div class="step-indicator__step"
+             [class.step-indicator__step--active]="currentStep === i + 1"
+             [class.step-indicator__step--completed]="currentStep > i + 1">
+          <div class="step-indicator__circle">
+            <mat-icon *ngIf="currentStep > i + 1">check</mat-icon>
+            <mat-icon *ngIf="currentStep <= i + 1">{{ stepIcons[i] }}</mat-icon>
+          </div>
+          <span class="step-indicator__label">{{ label }}</span>
+        </div>
+        <div *ngIf="i < stepLabels.length - 1"
+             class="step-indicator__connector"
+             [class.step-indicator__connector--completed]="currentStep > i + 1">
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- ══════════════════════════ STEP 1: SERVICE ══════════════════════════ -->
+    <div *ngIf="currentStep === 1" class="step-content fade-in">
+      <div class="step-header">
+        <h2 class="step-header__title">Choose Your <span class="gradient-text">Service</span></h2>
+        <p class="step-header__subtitle">Select the detailing package that suits your needs</p>
+      </div>
+
+      <div *ngIf="isLoadingPackages" class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!isLoadingPackages" class="packages-grid">
+        <div *ngFor="let pkg of packages"
+             class="package-card"
+             [class.package-card--selected]="selectedPackage?.id === pkg.id"
+             (click)="selectPackage(pkg)">
+          <div class="package-card__header">
+            <div class="package-card__icon">
+              <mat-icon>auto_fix_high</mat-icon>
+            </div>
+            <div class="package-card__price">${{ pkg.price | number:'1.0-0' }}</div>
+          </div>
+          <div class="package-card__body">
+            <h3 class="package-card__name">{{ pkg.name }}</h3>
+            <p class="package-card__duration">
+              <mat-icon>schedule</mat-icon>
+              {{ pkg.estimatedDurationHours }}h
+            </p>
+            <ul class="package-card__items">
+              <li *ngFor="let item of pkg.items | slice:0:4">
+                <mat-icon>check</mat-icon>
+                {{ item.name }}
+              </li>
+            </ul>
+          </div>
+          <div *ngIf="selectedPackage?.id === pkg.id" class="package-card__selected-badge">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add-ons -->
+      <ng-container *ngIf="selectedPackage">
+        <div class="addons-section">
+          <h3 class="addons-section__title">Add-on Services</h3>
+
+          <div *ngIf="isLoadingAddons" class="loading-state loading-state--small">
+            <mat-spinner diameter="28"></mat-spinner>
+          </div>
+
+          <p *ngIf="!isLoadingAddons && availableAddons.length === 0" class="empty-state-small">
+            No add-ons available for this package.
+          </p>
+
+          <div *ngIf="!isLoadingAddons && availableAddons.length > 0" class="addons-grid">
+            <div *ngFor="let addon of availableAddons"
+                 class="addon-row"
+                 [class.addon-row--selected]="isAddonSelected(addon.id)"
+                 (click)="toggleAddon(addon.id)">
+              <mat-icon class="addon-row__toggle"
+                        [class.addon-row__toggle--active]="isAddonSelected(addon.id)">
+                {{ isAddonSelected(addon.id) ? 'check_circle' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <div class="addon-row__info">
+                <span class="addon-row__name">{{ addon.name }}</span>
+                <span *ngIf="addon.description" class="addon-row__desc">{{ addon.description }}</span>
+              </div>
+              <span class="addon-row__price">+${{ addon.price | number:'1.0-0' }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- ══════════════════════════ STEP 2: VEHICLE ══════════════════════════ -->
+    <div *ngIf="currentStep === 2" class="step-content fade-in">
+      <div class="step-header">
+        <h2 class="step-header__title">Select Your <span class="gradient-text">Vehicle</span></h2>
+        <p class="step-header__subtitle">
+          Choose from your saved vehicles
+          <span *ngIf="isFleet()"> — fleet accounts may select multiple</span>
+        </p>
+      </div>
+
+      <div *ngIf="isLoadingVehicles" class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!isLoadingVehicles">
+        <div *ngIf="vehicles.length > 0" class="vehicles-list">
+          <div *ngFor="let vehicle of vehicles"
+               class="vehicle-card"
+               [class.vehicle-card--selected]="isVehicleSelected(vehicle.id)"
+               (click)="selectVehicle(vehicle.id)">
+            <div class="vehicle-card__icon">
+              <mat-icon>directions_car</mat-icon>
+            </div>
+            <div class="vehicle-card__info">
+              <span class="vehicle-card__name">
+                {{ vehicle.yearOfManufacture }} {{ vehicle.brand }} {{ vehicle.model }}
+              </span>
+              <span class="vehicle-card__meta">
+                {{ vehicle.vehicleCategory.name }}&nbsp;&bull;&nbsp;{{ vehicle.licencePlate }}
+              </span>
+            </div>
+            <mat-icon class="vehicle-card__selector">
+              <ng-container *ngIf="isFleet()">
+                {{ isVehicleSelected(vehicle.id) ? 'check_box' : 'check_box_outline_blank' }}
+              </ng-container>
+              <ng-container *ngIf="!isFleet()">
+                {{ isVehicleSelected(vehicle.id) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+              </ng-container>
+            </mat-icon>
+          </div>
+        </div>
+
+        <div *ngIf="vehicles.length === 0 && !showAddVehicleForm" class="empty-vehicles">
+          <mat-icon class="empty-vehicles__icon">directions_car</mat-icon>
+          <p>You have no saved vehicles yet.</p>
+        </div>
+
+        <!-- Add vehicle separator + trigger -->
+        <ng-container *ngIf="!showAddVehicleForm">
+          <div class="add-vehicle-separator">
+            <span>{{ vehicles.length > 0 ? 'OR ADD NEW VEHICLE' : 'ADD A VEHICLE' }}</span>
+          </div>
+          <div class="add-vehicle-trigger">
+            <button mat-stroked-button (click)="openAddVehicleForm()">
+              <mat-icon>add</mat-icon>
+              Add a Vehicle
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- Inline add vehicle form -->
+        <div *ngIf="showAddVehicleForm" class="add-vehicle-form fade-in">
+          <h4 class="add-vehicle-form__title">Add New Vehicle</h4>
+          <form [formGroup]="addVehicleForm" class="add-vehicle-form__fields">
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Brand</mat-label>
+                <input matInput formControlName="brand" placeholder="e.g., BMW">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Model</mat-label>
+                <input matInput formControlName="model" placeholder="e.g., M3">
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Year</mat-label>
+                <input matInput type="number" formControlName="yearOfManufacture" placeholder="e.g., 2022">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>License Plate</mat-label>
+                <input matInput formControlName="licencePlate" placeholder="e.g., ABC-1234">
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="form-field--full">
+              <mat-label>Vehicle Category</mat-label>
+              <mat-select formControlName="vehicleCategoryId">
+                <mat-option *ngFor="let cat of vehicleCategories" [value]="cat.id">
+                  {{ cat.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <p *ngIf="addVehicleError" class="form-error">{{ addVehicleError }}</p>
+            <div class="add-vehicle-form__actions">
+              <button mat-button type="button" (click)="cancelAddVehicle()">Cancel</button>
+              <button mat-raised-button color="primary" type="button"
+                      (click)="submitAddVehicle()" [disabled]="isAddingVehicle">
+                <mat-spinner *ngIf="isAddingVehicle" diameter="16" class="btn-spinner"></mat-spinner>
+                {{ isAddingVehicle ? 'Adding...' : 'Add Vehicle' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ STEP 3: DATE & TIME ══════════════════════ -->
+    <div *ngIf="currentStep === 3" class="step-content fade-in">
+      <div class="step-header">
+        <h2 class="step-header__title">Pick a <span class="gradient-text">Date & Time</span></h2>
+        <p class="step-header__subtitle">Choose your preferred appointment slot</p>
+      </div>
+
+      <div class="service-mode-badge">
+        <mat-icon>store</mat-icon>
+        <span>In-Shop Service</span>
+        <span class="service-mode-badge__note">· Home service coming soon</span>
+      </div>
+
+      <div class="datetime-layout">
+        <!-- Calendar -->
+        <div class="calendar-panel">
+          <div class="calendar-header">
+            <button mat-icon-button (click)="prevMonth()" aria-label="Previous month">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span class="calendar-header__month">{{ getMonthYear() }}</span>
+            <button mat-icon-button (click)="nextMonth()" aria-label="Next month">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+          <div class="calendar-grid__header">
+            <span *ngFor="let day of dayLabels">{{ day }}</span>
+          </div>
+          <div *ngFor="let week of calendarWeeks" class="calendar-grid__week">
+            <div *ngFor="let day of week"
+                 class="calendar-grid__day"
+                 [class.calendar-grid__day--empty]="!day"
+                 [class.calendar-grid__day--today]="day && isToday(day)"
+                 [class.calendar-grid__day--selected]="day && isSelectedDate(day)"
+                 [class.calendar-grid__day--past]="day && isPastDate(day)"
+                 (click)="day && !isPastDate(day) ? selectDate(day) : null">
+              {{ day?.getDate() }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Time Slots -->
+        <div class="timeslots-panel">
+          <div class="timeslots-header">
+            <mat-icon>schedule</mat-icon>
+            <span>Select Time</span>
+            <span *ngIf="selectedDate" class="timeslots-header__date">
+              &mdash; {{ formatSelectedDate() }}
+            </span>
+          </div>
+
+          <div *ngIf="!selectedDate" class="timeslots-empty">
+            <mat-icon>calendar_today</mat-icon>
+            <p>Select a date to see available slots</p>
+          </div>
+
+          <div *ngIf="selectedDate && isLoadingSlots" class="loading-state loading-state--small">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+
+          <div *ngIf="selectedDate && !isLoadingSlots && availableSlots.length === 0" class="timeslots-empty">
+            <mat-icon>event_busy</mat-icon>
+            <p>No available slots on this day.<br>Try a different date.</p>
+          </div>
+
+          <div *ngIf="selectedDate && !isLoadingSlots && availableSlots.length > 0" class="timeslots-grid">
+            <button *ngFor="let slot of availableSlots"
+                    class="timeslot-btn"
+                    [class.timeslot-btn--selected]="isSlotSelected(slot)"
+                    (click)="selectSlot(slot)">
+              {{ formatSlotTime(slot.startUtc) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="notes-section">
+        <h4 class="notes-section__title">Additional Notes <span class="notes-optional">(Optional)</span></h4>
+        <textarea class="notes-textarea"
+                  [(ngModel)]="notes"
+                  placeholder="Any special requests or information we should know..."
+                  rows="3">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════ STEP 4: CONFIRM ══════════════════════════ -->
+    <div *ngIf="currentStep === 4" class="step-content fade-in">
+      <div class="step-header">
+        <h2 class="step-header__title">Confirm Your <span class="gradient-text">Booking</span></h2>
+        <p class="step-header__subtitle">Review your booking details before confirming</p>
+      </div>
+
+      <div class="summary-card">
+        <!-- Service -->
+        <div class="summary-row">
+          <div class="summary-row__icon">
+            <mat-icon>auto_fix_high</mat-icon>
+          </div>
+          <div class="summary-row__content">
+            <span class="summary-row__label">Service</span>
+            <span class="summary-row__value">{{ selectedPackage?.name }}</span>
+            <div *ngIf="selectedAddonsList.length > 0" class="summary-row__addons">
+              <span *ngFor="let addon of selectedAddonsList" class="addon-chip">
+                + {{ addon.name }}
+              </span>
+            </div>
+          </div>
+          <span class="summary-row__price">${{ selectedPackage?.price | number:'1.0-0' }}</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <!-- Vehicle -->
+        <div class="summary-row">
+          <div class="summary-row__icon">
+            <mat-icon>directions_car</mat-icon>
+          </div>
+          <div class="summary-row__content">
+            <span class="summary-row__label">Vehicle</span>
+            <span *ngFor="let v of selectedVehiclesList" class="summary-row__value">
+              {{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}
+            </span>
+          </div>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <!-- Date & Time -->
+        <div class="summary-row">
+          <div class="summary-row__icon">
+            <mat-icon>event</mat-icon>
+          </div>
+          <div class="summary-row__content">
+            <span class="summary-row__label">Date & Time</span>
+            <span class="summary-row__value">
+              {{ formatSelectedDate() }} at {{ formatSelectedSlotTime() }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <ng-container *ngIf="notes">
+          <div class="summary-divider"></div>
+          <div class="summary-row">
+            <div class="summary-row__icon">
+              <mat-icon>notes</mat-icon>
+            </div>
+            <div class="summary-row__content">
+              <span class="summary-row__label">Notes</span>
+              <span class="summary-row__value">{{ notes }}</span>
+            </div>
+          </div>
+        </ng-container>
+
+        <div class="summary-divider"></div>
+
+        <!-- Total -->
+        <div class="summary-total">
+          <div class="summary-total__label">
+            <strong>Total</strong>
+            <span *ngIf="totalAddonPrice > 0" class="summary-total__note">
+              Including ${{ totalAddonPrice | number:'1.0-0' }} in add-ons
+            </span>
+          </div>
+          <span class="summary-total__price gradient-text">${{ totalPrice | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="submitError" class="submit-error">
+        <mat-icon>error_outline</mat-icon>
+        {{ submitError }}
+      </div>
+
+      <p class="confirm-notice">
+        <mat-icon>info_outline</mat-icon>
+        Your slot will be held for 10 minutes. Complete payment to confirm your appointment.
+      </p>
+    </div>
+
+    <!-- ══════════════════════════ FOOTER ══════════════════════════════════ -->
+    <div class="wizard-footer">
+      <button *ngIf="currentStep > 1" mat-stroked-button class="footer-btn footer-btn--back"
+              (click)="prevStep()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+
+      <div class="footer-spacer"></div>
+
+      <button *ngIf="currentStep < 4" mat-raised-button color="primary"
+              class="footer-btn footer-btn--continue"
+              (click)="nextStep()"
+              [disabled]="(currentStep === 1 && !canProceedStep1)
+                       || (currentStep === 2 && !canProceedStep2)
+                       || (currentStep === 3 && !canProceedStep3)">
+        Continue
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button *ngIf="currentStep === 4" mat-raised-button color="primary"
+              class="footer-btn footer-btn--confirm"
+              (click)="confirmBooking()" [disabled]="isSubmitting">
+        <mat-spinner *ngIf="isSubmitting" diameter="18" class="btn-spinner"></mat-spinner>
+        {{ isSubmitting ? 'Booking...' : 'Confirm Booking' }}
+      </button>
+    </div>
+
+  </div>
+</div>

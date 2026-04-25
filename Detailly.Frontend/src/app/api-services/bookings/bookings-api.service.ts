@@ -1,9 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  AvailabilitySlotDto,
   CancelBookingCommand,
+  CreateBookingHoldCommand,
+  GetAvailabilityRequest,
   GetBookingByIdQueryDto,
   ListMyBookingsQueryDto,
   ListMyBookingsRequest,
@@ -28,5 +31,25 @@ export class BookingsService {
 
   cancelBooking(bookingId: number, body?: CancelBookingCommand): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/cancel/${bookingId}`, body ?? {});
+  }
+
+  createHold(command: CreateBookingHoldCommand): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(this.baseUrl, command);
+  }
+
+  getAvailability(request: GetAvailabilityRequest): Observable<AvailabilitySlotDto[]> {
+    let params = new HttpParams()
+      .set('dateUtc', request.dateUtc)
+      .set('servicePackageId', request.servicePackageId.toString())
+      .set('serviceMode', request.serviceMode.toString())
+      .set('shopLocationId', request.shopLocationId.toString());
+
+    if (request.addonItemIds && request.addonItemIds.length > 0) {
+      request.addonItemIds.forEach(id => {
+        params = params.append('addonItemIds', id.toString());
+      });
+    }
+
+    return this.http.get<AvailabilitySlotDto[]>(`${this.baseUrl}/availability`, { params });
   }
 }
