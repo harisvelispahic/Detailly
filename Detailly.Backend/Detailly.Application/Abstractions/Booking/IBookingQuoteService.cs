@@ -11,5 +11,7 @@ public interface IBookingQuoteService
         List<int>? vehicleIds,
         int? customerId,
         bool isFleet,
-        CancellationToken ct);
+        CancellationToken ct,
+        int? serviceAddressId = null,
+        int? shopLocationId = null);
 }

@@ -10,6 +10,7 @@ public class BookingEntity : BaseEntity
 {
     // Pricing snapshot
     public required decimal TotalPrice { get; set; }
+    public decimal? MobileSurchargeFee { get; set; }
 
 
     // Scheduling snapshot

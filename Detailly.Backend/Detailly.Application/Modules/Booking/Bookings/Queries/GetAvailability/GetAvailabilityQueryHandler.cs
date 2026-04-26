@@ -20,7 +20,9 @@ public sealed class GetAvailabilityQueryHandler(
             vehicleIds: null,
             customerId: null,
             isFleet: false,
-            ct);
+            ct,
+            serviceAddressId: null,
+            shopLocationId: null);
 
         // 2) Opening hours (per location + day)
         var date = request.DateUtc.Date;

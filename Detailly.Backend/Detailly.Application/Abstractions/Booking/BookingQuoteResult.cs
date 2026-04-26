@@ -9,6 +9,7 @@ public sealed class BookingQuoteResult
     public required int RequiredBays { get; init; }
 
     public required decimal TotalPrice { get; init; }
+    public decimal MobileSurchargeFee { get; init; }
 
     public required List<AddonSnapshot> Addons { get; init; } = new();
 

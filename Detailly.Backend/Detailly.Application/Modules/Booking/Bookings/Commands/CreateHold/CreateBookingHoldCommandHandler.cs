@@ -21,6 +21,10 @@ public sealed class CreateBookingHoldCommandHandler(
 
         var customerId = appCurrentUser.ApplicationUserId.Value;
 
+        if (appCurrentUser.IsFleet && request.ServiceMode == ServiceMode.InShop)
+            throw new DetaillyBusinessRuleException("FLEET_INSHOP_NOT_ALLOWED",
+                "Fleet customers can only book mobile (on-address) services.");
+
         // 30-min boundary rule
         if (request.StartUtc.Second != 0 || request.StartUtc.Minute % 30 != 0)
             throw new DetaillyBusinessRuleException("BOOKING_TIME_INVALID",
@@ -54,7 +58,9 @@ public sealed class CreateBookingHoldCommandHandler(
             request.VehicleIds,
             customerId,
             appCurrentUser.IsFleet,
-            ct);
+            ct,
+            serviceAddressId: request.ServiceAddressId,
+            shopLocationId: request.ShopLocationId);
 
         var endUtc = request.StartUtc.AddMinutes(quote.TotalDurationMinutes);
         var totalPrice = quote.TotalPrice;
@@ -120,6 +126,7 @@ public sealed class CreateBookingHoldCommandHandler(
         var booking = new BookingEntity
         {
             TotalPrice = totalPrice,
+            MobileSurchargeFee = quote.MobileSurchargeFee > 0 ? quote.MobileSurchargeFee : null,
             StartUtc = request.StartUtc,
             EndUtc = endUtc,
             RequiredEmployees = requiredEmployees,

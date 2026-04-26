@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
 
 namespace Detailly.Infrastructure;
 
@@ -68,6 +69,15 @@ public static class DependencyInjection
 
         // Booking hold expiry cleanup service
         services.AddHostedService<BookingHoldExpiryCleanupService>();
+
+        // OpenRouteService options (mobile pricing + API key)
+        services.AddOptions<OpenRouteServiceOptions>()
+            .Bind(configuration.GetSection(OpenRouteServiceOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        // Road distance service (OpenRouteService Directions API)
+        services.AddHttpClient<IRoadDistanceService, OrsRoadDistanceService>();
 
         // Booking quote service, for calculating price and availability without creating a booking
         services.AddScoped<IBookingQuoteService, BookingQuoteService>();
