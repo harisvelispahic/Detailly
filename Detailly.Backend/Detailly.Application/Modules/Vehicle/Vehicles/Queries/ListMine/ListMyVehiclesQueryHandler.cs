@@ -30,7 +30,8 @@ public class ListMyVehiclesQueryHandler(IAppDbContext ctx, IAppCurrentUser appCu
                 Notes = x.Notes,
                 VehicleCategory = new ListMyVehiclesQueryDtoVehicleCategory
                 {
-                    Name = x.VehicleCategory.Name
+                    Name = x.VehicleCategory.Name,
+                    BasePriceMultiplier = x.VehicleCategory.BasePriceMultiplier,
                 },
             });
 

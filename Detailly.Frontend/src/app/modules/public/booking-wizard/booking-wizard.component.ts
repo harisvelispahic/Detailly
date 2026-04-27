@@ -7,6 +7,7 @@ import { ServicePackagesApiService } from '../../../api-services/service-package
 import { BookingsService } from '../../../api-services/bookings/bookings-api.service';
 import { VehiclesApiService } from '../../../api-services/vehicles/vehicles-api.service';
 import { VehicleCategoriesApiService } from '../../../api-services/vehicle-categories/vehicle-categories-api.service';
+import { AddressesApiService } from '../../../api-services/addresses/addresses-api.service';
 import { DialogHelperService } from '../../shared/services/dialog-helper.service';
 import { DialogButton, DialogType } from '../../shared/models/dialog-config.model';
 
@@ -16,11 +17,17 @@ import {
 } from '../../../api-services/service-packages/service-packages-api.models';
 import { ListMyVehiclesQueryDto } from '../../../api-services/vehicles/vehicles-api.model';
 import { VehicleCategoryDto } from '../../../api-services/vehicle-categories/vehicle-categories-api.model';
+import { ListMyAddressesQueryDto } from '../../../api-services/addresses/addresses-api.model';
 import {
   ServiceMode,
   CreateBookingHoldCommand,
   AvailabilitySlotDto,
 } from '../../../api-services/bookings/bookings-api.models';
+
+// Fleet discount constants — must match appsettings.json["FleetDiscount"]
+const FLEET_BASE_DISCOUNT_PCT = 2;
+const FLEET_PER_VEHICLE_DISCOUNT_PCT = 1;
+const FLEET_MAX_DISCOUNT_PCT = 8;
 
 @Component({
   selector: 'app-booking-wizard',
@@ -34,12 +41,16 @@ export class BookingWizardComponent implements OnInit {
   private readonly bookingsService = inject(BookingsService);
   private readonly vehiclesService = inject(VehiclesApiService);
   private readonly vehicleCategoriesService = inject(VehicleCategoriesApiService);
+  private readonly addressesService = inject(AddressesApiService);
   private readonly dialogHelper = inject(DialogHelperService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   readonly isAuthenticated = computed(() => this.currentUserService.isAuthenticated());
   readonly isFleet = computed(() => this.currentUserService.isFleet());
+
+  // Expose enum to template
+  readonly ServiceMode = ServiceMode;
 
   currentStep = 1;
   readonly stepLabels = ['Service', 'Vehicle', 'Date & Time', 'Confirm'];
@@ -65,8 +76,11 @@ export class BookingWizardComponent implements OnInit {
   addVehicleError?: string;
 
   // Step 3
-  readonly serviceMode = ServiceMode.InShop;
   readonly shopLocationId = 1;
+  selectedServiceMode: ServiceMode = ServiceMode.InShop;
+  selectedAddressId?: number;
+  addresses: ListMyAddressesQueryDto[] = [];
+  isLoadingAddresses = false;
   calendarYear = new Date().getFullYear();
   calendarMonth = new Date().getMonth();
   calendarWeeks: (Date | null)[][] = [];
@@ -83,6 +97,10 @@ export class BookingWizardComponent implements OnInit {
   ngOnInit(): void {
     this.buildCalendar();
     this.loadPackages();
+    // Fleet customers are always mobile
+    if (this.isFleet()) {
+      this.selectedServiceMode = ServiceMode.Mobile;
+    }
     this.addVehicleForm = this.fb.group({
       brand: ['', Validators.required],
       model: ['', Validators.required],
@@ -158,10 +176,14 @@ export class BookingWizardComponent implements OnInit {
     if (this.currentStep === 2) {
       if (this.selectedVehicleIds.size === 0) return;
       this.currentStep = 3;
+      // Pre-load addresses so they're ready if user picks Mobile
+      if (this.selectedServiceMode === ServiceMode.Mobile) {
+        this.loadAddressesIfNeeded();
+      }
       return;
     }
     if (this.currentStep === 3) {
-      if (!this.selectedSlot) return;
+      if (!this.canProceedStep3) return;
       this.currentStep = 4;
     }
   }
@@ -247,6 +269,46 @@ export class BookingWizardComponent implements OnInit {
     });
   }
 
+  // ── Step 3: Service Mode ──────────────────────────────────────────────────
+
+  selectServiceMode(mode: ServiceMode): void {
+    if (this.selectedServiceMode === mode) return;
+    this.selectedServiceMode = mode;
+    this.selectedSlot = undefined;
+    this.availableSlots = [];
+    if (mode !== ServiceMode.Mobile) {
+      this.selectedAddressId = undefined;
+    } else {
+      this.loadAddressesIfNeeded();
+    }
+    if (this.selectedDate) {
+      this.loadAvailability();
+    }
+  }
+
+  loadAddressesIfNeeded(): void {
+    if (this.addresses.length === 0 && !this.isLoadingAddresses) {
+      this.loadAddresses();
+    }
+  }
+
+  loadAddresses(): void {
+    this.isLoadingAddresses = true;
+    this.addressesService.listMine().subscribe({
+      next: (result) => {
+        this.addresses = result.items;
+        this.isLoadingAddresses = false;
+      },
+      error: () => {
+        this.isLoadingAddresses = false;
+      },
+    });
+  }
+
+  selectAddress(id: number): void {
+    this.selectedAddressId = id;
+  }
+
   // ── Step 3: Calendar & Availability ──────────────────────────────────────
 
   buildCalendar(): void {
@@ -315,7 +377,7 @@ export class BookingWizardComponent implements OnInit {
         dateUtc,
         servicePackageId: this.selectedPackage.id,
         addonItemIds: Array.from(this.selectedAddonIds),
-        serviceMode: this.serviceMode,
+        serviceMode: this.selectedServiceMode,
         shopLocationId: this.shopLocationId,
       })
       .subscribe({
@@ -344,8 +406,9 @@ export class BookingWizardComponent implements OnInit {
     const command: CreateBookingHoldCommand = {
       servicePackageId: this.selectedPackage.id,
       addonItemIds: Array.from(this.selectedAddonIds),
-      serviceMode: this.serviceMode,
+      serviceMode: this.selectedServiceMode,
       shopLocationId: this.shopLocationId,
+      serviceAddressId: this.selectedAddressId,
       startUtc: this.selectedSlot.startUtc,
       vehicleIds: Array.from(this.selectedVehicleIds),
       notes: this.notes || undefined,
@@ -383,6 +446,52 @@ export class BookingWizardComponent implements OnInit {
           this.router.navigate(['/client/bookings']);
         }
       });
+  }
+
+  // ── Price Breakdown (Step 4) ──────────────────────────────────────────────
+
+  get vehicleMultiplier(): number {
+    const multipliers = this.selectedVehiclesList
+      .map((v) => v.vehicleCategory.basePriceMultiplier)
+      .filter((m) => m > 0);
+    if (multipliers.length === 0) return 1;
+    return Math.max(...multipliers);
+  }
+
+  get adjustedBasePrice(): number {
+    return (this.selectedPackage?.price ?? 0) * this.vehicleMultiplier;
+  }
+
+  get totalAddonPrice(): number {
+    return this.availableAddons
+      .filter((a) => this.selectedAddonIds.has(a.id))
+      .reduce((sum, a) => sum + a.price, 0);
+  }
+
+  get subtotalBeforeDiscount(): number {
+    return this.adjustedBasePrice + this.totalAddonPrice;
+  }
+
+  get fleetDiscountPercent(): number {
+    if (!this.isFleet()) return 0;
+    const n = this.selectedVehicleIds.size;
+    if (n === 0) return 0;
+    return Math.min(
+      FLEET_BASE_DISCOUNT_PCT + (n - 1) * FLEET_PER_VEHICLE_DISCOUNT_PCT,
+      FLEET_MAX_DISCOUNT_PCT,
+    );
+  }
+
+  get fleetDiscountAmount(): number {
+    return (this.subtotalBeforeDiscount * this.fleetDiscountPercent) / 100;
+  }
+
+  get serviceTotal(): number {
+    return this.subtotalBeforeDiscount - this.fleetDiscountAmount;
+  }
+
+  get isMobile(): boolean {
+    return this.selectedServiceMode === ServiceMode.Mobile;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -434,14 +543,8 @@ export class BookingWizardComponent implements OnInit {
     return this.selectedSlot ? this.formatSlotTime(this.selectedSlot.startUtc) : '';
   }
 
-  get totalPrice(): number {
-    return (this.selectedPackage?.price ?? 0) + this.totalAddonPrice;
-  }
-
-  get totalAddonPrice(): number {
-    return this.availableAddons
-      .filter((a) => this.selectedAddonIds.has(a.id))
-      .reduce((sum, a) => sum + a.price, 0);
+  formatAddress(addr: ListMyAddressesQueryDto): string {
+    return `${addr.street}, ${addr.city}`;
   }
 
   get selectedAddonsList(): GetAvailableAddonsQueryDto[] {
@@ -450,6 +553,10 @@ export class BookingWizardComponent implements OnInit {
 
   get selectedVehiclesList(): ListMyVehiclesQueryDto[] {
     return this.vehicles.filter((v) => this.selectedVehicleIds.has(v.id));
+  }
+
+  get selectedAddress(): ListMyAddressesQueryDto | undefined {
+    return this.addresses.find((a) => a.id === this.selectedAddressId);
   }
 
   get canProceedStep1(): boolean {
@@ -461,6 +568,8 @@ export class BookingWizardComponent implements OnInit {
   }
 
   get canProceedStep3(): boolean {
-    return !!this.selectedSlot;
+    if (!this.selectedSlot) return false;
+    if (this.selectedServiceMode === ServiceMode.Mobile && !this.selectedAddressId) return false;
+    return true;
   }
 }

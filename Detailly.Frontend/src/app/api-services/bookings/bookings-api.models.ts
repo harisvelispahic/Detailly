@@ -45,8 +45,13 @@ export interface GetBookingByIdQueryDto {
   startUtc: string;
   endUtc: string;
   totalPrice: number;
+  mobileSurchargeFee?: number | null;
+  fleetDiscountPercent?: number | null;
   requiredEmployees: number;
   requiredBays: number;
+  travelTimeMinutes?: number | null;
+  departureUtc?: string | null;
+  returnUtc?: string | null;
   reservationExpiresAtUtc?: string | null;
   notes?: string | null;
   servicePackageId: number;

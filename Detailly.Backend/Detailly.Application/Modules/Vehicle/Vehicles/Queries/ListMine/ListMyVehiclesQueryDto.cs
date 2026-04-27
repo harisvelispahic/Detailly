@@ -14,6 +14,7 @@ public class ListMyVehiclesQueryDto
 public class ListMyVehiclesQueryDtoVehicleCategory
 {
     public required string Name { get; init; }
+    public required decimal BasePriceMultiplier { get; init; }
 }
 
 

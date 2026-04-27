@@ -257,6 +257,11 @@
         color: hsl(var(--primary));
       }
     }
+
+    &--discount {
+      color: hsl(var(--success));
+      font-weight: 600;
+    }
   }
 
   &__price {

@@ -207,10 +207,84 @@
         <p class="step-header__subtitle">Choose your preferred appointment slot</p>
       </div>
 
-      <div class="service-mode-badge">
-        <mat-icon>store</mat-icon>
-        <span>In-Shop Service</span>
-        <span class="service-mode-badge__note">· Home service coming soon</span>
+      <!-- Service mode selector (hidden for fleet — always Mobile) -->
+      <div *ngIf="!isFleet()" class="service-mode-toggle">
+        <button class="service-mode-toggle__option"
+                [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.InShop"
+                (click)="selectServiceMode(ServiceMode.InShop)">
+          <div class="service-mode-toggle__icon">
+            <mat-icon>store</mat-icon>
+          </div>
+          <div class="service-mode-toggle__text">
+            <span class="service-mode-toggle__label">In-Shop</span>
+            <span class="service-mode-toggle__desc">Bring your vehicle to us</span>
+          </div>
+          <mat-icon class="service-mode-toggle__check">
+            {{ selectedServiceMode === ServiceMode.InShop ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </mat-icon>
+        </button>
+        <button class="service-mode-toggle__option"
+                [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.Mobile"
+                (click)="selectServiceMode(ServiceMode.Mobile)">
+          <div class="service-mode-toggle__icon">
+            <mat-icon>home_pin</mat-icon>
+          </div>
+          <div class="service-mode-toggle__text">
+            <span class="service-mode-toggle__label">On-Site</span>
+            <span class="service-mode-toggle__desc">We come to your address</span>
+          </div>
+          <mat-icon class="service-mode-toggle__check">
+            {{ selectedServiceMode === ServiceMode.Mobile ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </mat-icon>
+        </button>
+      </div>
+
+      <!-- Fleet badge (fleet is always Mobile) -->
+      <div *ngIf="isFleet()" class="fleet-mode-badge">
+        <mat-icon>home_pin</mat-icon>
+        <span>Fleet bookings are always On-Site</span>
+      </div>
+
+      <!-- Address picker for Mobile -->
+      <div *ngIf="selectedServiceMode === ServiceMode.Mobile" class="address-selector fade-in">
+        <h4 class="address-selector__title">
+          <mat-icon>location_on</mat-icon>
+          Service Address
+        </h4>
+
+        <div *ngIf="isLoadingAddresses" class="loading-state loading-state--small">
+          <mat-spinner diameter="28"></mat-spinner>
+        </div>
+
+        <ng-container *ngIf="!isLoadingAddresses">
+          <p *ngIf="addresses.length === 0" class="address-selector__empty">
+            You have no saved addresses. Add one in your
+            <a routerLink="/client/profile">profile</a> before booking on-site.
+          </p>
+
+          <div *ngIf="addresses.length > 0" class="address-cards">
+            <div *ngFor="let addr of addresses"
+                 class="address-card"
+                 [class.address-card--selected]="selectedAddressId === addr.id"
+                 (click)="selectAddress(addr.id)">
+              <div class="address-card__icon">
+                <mat-icon>home</mat-icon>
+              </div>
+              <div class="address-card__info">
+                <span class="address-card__street">{{ addr.street }}</span>
+                <span class="address-card__city">{{ addr.city }}, {{ addr.postalCode }}</span>
+              </div>
+              <mat-icon class="address-card__check">
+                {{ selectedAddressId === addr.id ? 'radio_button_checked' : 'radio_button_unchecked' }}
+              </mat-icon>
+            </div>
+          </div>
+
+          <p *ngIf="addresses.length > 0 && !selectedAddressId" class="address-selector__hint">
+            <mat-icon>info_outline</mat-icon>
+            Select an address to continue
+          </p>
+        </ng-container>
       </div>
 
       <div class="datetime-layout">
@@ -291,11 +365,12 @@
     <div *ngIf="currentStep === 4" class="step-content fade-in">
       <div class="step-header">
         <h2 class="step-header__title">Confirm Your <span class="gradient-text">Booking</span></h2>
-        <p class="step-header__subtitle">Review your booking details before confirming</p>
+        <p class="step-header__subtitle">Review your booking details and transparent price breakdown before confirming</p>
       </div>
 
       <div class="summary-card">
-        <!-- Service -->
+
+        <!-- Service row -->
         <div class="summary-row">
           <div class="summary-row__icon">
             <mat-icon>auto_fix_high</mat-icon>
@@ -309,12 +384,11 @@
               </span>
             </div>
           </div>
-          <span class="summary-row__price">${{ selectedPackage?.price | number:'1.0-0' }}</span>
         </div>
 
         <div class="summary-divider"></div>
 
-        <!-- Vehicle -->
+        <!-- Vehicle row -->
         <div class="summary-row">
           <div class="summary-row__icon">
             <mat-icon>directions_car</mat-icon>
@@ -323,13 +397,14 @@
             <span class="summary-row__label">Vehicle</span>
             <span *ngFor="let v of selectedVehiclesList" class="summary-row__value">
               {{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}
+              <span class="summary-row__vehicle-cat">({{ v.vehicleCategory.name }})</span>
             </span>
           </div>
         </div>
 
         <div class="summary-divider"></div>
 
-        <!-- Date & Time -->
+        <!-- Date & Time row -->
         <div class="summary-row">
           <div class="summary-row__icon">
             <mat-icon>event</mat-icon>
@@ -338,6 +413,22 @@
             <span class="summary-row__label">Date & Time</span>
             <span class="summary-row__value">
               {{ formatSelectedDate() }} at {{ formatSelectedSlotTime() }}
+            </span>
+          </div>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <!-- Service mode + address row -->
+        <div class="summary-row">
+          <div class="summary-row__icon">
+            <mat-icon>{{ isMobile ? 'home_pin' : 'store' }}</mat-icon>
+          </div>
+          <div class="summary-row__content">
+            <span class="summary-row__label">Service Type</span>
+            <span class="summary-row__value">{{ isMobile ? 'On-Site (Mobile)' : 'In-Shop' }}</span>
+            <span *ngIf="isMobile && selectedAddress" class="summary-row__address">
+              {{ selectedAddress.street }}, {{ selectedAddress.city }}
             </span>
           </div>
         </div>
@@ -358,15 +449,78 @@
 
         <div class="summary-divider"></div>
 
-        <!-- Total -->
-        <div class="summary-total">
-          <div class="summary-total__label">
-            <strong>Total</strong>
-            <span *ngIf="totalAddonPrice > 0" class="summary-total__note">
-              Including ${{ totalAddonPrice | number:'1.0-0' }} in add-ons
+        <!-- Price breakdown -->
+        <div class="price-breakdown">
+          <div class="price-breakdown__title">
+            <mat-icon>receipt_long</mat-icon>
+            Price Breakdown
+          </div>
+
+          <!-- Base package price -->
+          <div class="breakdown-line">
+            <span class="breakdown-line__label">{{ selectedPackage?.name }}</span>
+            <span class="breakdown-line__value">${{ (selectedPackage?.price ?? 0) | number:'1.2-2' }}</span>
+          </div>
+
+          <!-- Vehicle category multiplier (shown only if it's above 1x) -->
+          <div *ngIf="vehicleMultiplier > 1" class="breakdown-line breakdown-line--modifier">
+            <span class="breakdown-line__label">
+              <mat-icon>directions_car</mat-icon>
+              Vehicle category adjustment
+            </span>
+            <span class="breakdown-line__value breakdown-line__value--multiplier">
+              &times;{{ vehicleMultiplier | number:'1.2-2' }}
             </span>
           </div>
-          <span class="summary-total__price gradient-text">${{ totalPrice | number:'1.0-0' }}</span>
+
+          <!-- Add-ons -->
+          <div *ngFor="let addon of selectedAddonsList" class="breakdown-line breakdown-line--addon">
+            <span class="breakdown-line__label">
+              <mat-icon>add_circle_outline</mat-icon>
+              {{ addon.name }}
+            </span>
+            <span class="breakdown-line__value">+${{ addon.price | number:'1.2-2' }}</span>
+          </div>
+
+          <!-- Subtotal (only shown when multiplier or addons are present) -->
+          <ng-container *ngIf="vehicleMultiplier > 1 || selectedAddonsList.length > 0">
+            <div class="breakdown-separator"></div>
+            <div class="breakdown-line breakdown-line--subtotal">
+              <span class="breakdown-line__label">Subtotal</span>
+              <span class="breakdown-line__value">${{ subtotalBeforeDiscount | number:'1.2-2' }}</span>
+            </div>
+          </ng-container>
+
+          <!-- Fleet discount -->
+          <div *ngIf="isFleet() && fleetDiscountPercent > 0" class="breakdown-line breakdown-line--discount">
+            <span class="breakdown-line__label">
+              <mat-icon>local_offer</mat-icon>
+              Fleet discount ({{ fleetDiscountPercent }}%)
+            </span>
+            <span class="breakdown-line__value breakdown-line__value--discount">
+              &minus;${{ fleetDiscountAmount | number:'1.2-2' }}
+            </span>
+          </div>
+
+          <!-- Mobile travel fee -->
+          <div *ngIf="isMobile" class="breakdown-line breakdown-line--surcharge">
+            <span class="breakdown-line__label">
+              <mat-icon>local_shipping</mat-icon>
+              Travel fee
+              <span class="breakdown-line__label-note">(based on distance)</span>
+            </span>
+            <span class="breakdown-line__value breakdown-line__value--tbd">TBD</span>
+          </div>
+
+          <!-- Total -->
+          <div class="breakdown-separator breakdown-separator--bold"></div>
+          <div class="breakdown-total">
+            <div class="breakdown-total__label">
+              <strong>{{ isMobile ? 'Estimated Total' : 'Total' }}</strong>
+              <span *ngIf="isMobile" class="breakdown-total__note">Travel fee added at booking</span>
+            </div>
+            <span class="breakdown-total__price gradient-text">${{ serviceTotal | number:'1.2-2' }}</span>
+          </div>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ export interface ListMyVehiclesQueryDto {
   yearOfManufacture: number;
   licencePlate?: string | null;
   notes?: string | null;
-  vehicleCategory: { name: string };
+  vehicleCategory: { name: string; basePriceMultiplier: number };
 }
 
 export interface CreateVehicleCommand {

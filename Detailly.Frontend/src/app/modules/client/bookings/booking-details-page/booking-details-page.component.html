@@ -74,6 +74,24 @@
                 }
               </span>
             </div>
+            @if (booking.serviceMode === ServiceMode.Mobile && booking.travelTimeMinutes) {
+              <div class="info-row">
+                <span class="info-row__label">Travel Time</span>
+                <span class="info-row__value">{{ booking.travelTimeMinutes }} min (each way)</span>
+              </div>
+            }
+            @if (booking.departureUtc) {
+              <div class="info-row">
+                <span class="info-row__label">Team Departs</span>
+                <span class="info-row__value">{{ formatTime(booking.departureUtc) }}</span>
+              </div>
+            }
+            @if (booking.returnUtc) {
+              <div class="info-row">
+                <span class="info-row__label">Team Returns</span>
+                <span class="info-row__value">{{ formatTime(booking.returnUtc) }}</span>
+              </div>
+            }
             <div class="info-row">
               <span class="info-row__label">Technicians</span>
               <span class="info-row__value">{{ booking.requiredEmployees }}</span>
@@ -87,6 +105,21 @@
 
             <div class="info-row info-row--separator"></div>
 
+            <!-- Price breakdown -->
+            @if (booking.fleetDiscountPercent != null && booking.fleetDiscountPercent > 0) {
+              <div class="info-row">
+                <span class="info-row__label">Fleet Discount</span>
+                <span class="info-row__value info-row__value--discount">
+                  {{ booking.fleetDiscountPercent }}% applied
+                </span>
+              </div>
+            }
+            @if (booking.mobileSurchargeFee != null && booking.mobileSurchargeFee > 0) {
+              <div class="info-row">
+                <span class="info-row__label">Travel Fee</span>
+                <span class="info-row__value">{{ booking.mobileSurchargeFee | number: '1.2-2' }} BAM</span>
+              </div>
+            }
             <div class="info-row info-row--total">
               <span class="info-row__label">Total</span>
               <span class="info-row__price">{{ booking.totalPrice | number: '1.2-2' }} BAM</span>
