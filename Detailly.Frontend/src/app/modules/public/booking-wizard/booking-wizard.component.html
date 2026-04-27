@@ -461,34 +461,46 @@
             Price Breakdown
           </div>
 
-          <!-- Base package price -->
-          <div class="breakdown-line">
-            <span class="breakdown-line__label">{{ selectedPackage?.name }}</span>
-            <span class="breakdown-line__value">${{ (selectedPackage?.price ?? 0) | number:'1.2-2' }}</span>
-          </div>
+          <!-- FLEET: one line per vehicle showing (package + addons) × multiplier -->
+          <ng-container *ngIf="isFleet()">
+            <div *ngFor="let v of selectedVehiclesList" class="breakdown-line">
+              <span class="breakdown-line__label">
+                {{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}
+                <span class="breakdown-line__label-note">({{ v.vehicleCategory.name }} &times;{{ v.vehicleCategory.basePriceMultiplier | number:'1.2-2' }})</span>
+              </span>
+              <span class="breakdown-line__value">${{ vehiclePriceFor(v) | number:'1.2-2' }}</span>
+            </div>
+          </ng-container>
 
-          <!-- Vehicle category multiplier (shown only if it's above 1x) -->
-          <div *ngIf="vehicleMultiplier > 1" class="breakdown-line breakdown-line--modifier">
-            <span class="breakdown-line__label">
-              <mat-icon>directions_car</mat-icon>
-              Vehicle category adjustment
-            </span>
-            <span class="breakdown-line__value breakdown-line__value--multiplier">
-              &times;{{ vehicleMultiplier | number:'1.2-2' }}
-            </span>
-          </div>
+          <!-- NON-FLEET: package line, add-ons, then vehicle multiplier applied to the total -->
+          <ng-container *ngIf="!isFleet()">
+            <div class="breakdown-line">
+              <span class="breakdown-line__label">{{ selectedPackage?.name }}</span>
+              <span class="breakdown-line__value">${{ (selectedPackage?.price ?? 0) | number:'1.2-2' }}</span>
+            </div>
 
-          <!-- Add-ons -->
-          <div *ngFor="let addon of selectedAddonsList" class="breakdown-line breakdown-line--addon">
-            <span class="breakdown-line__label">
-              <mat-icon>add_circle_outline</mat-icon>
-              {{ addon.name }}
-            </span>
-            <span class="breakdown-line__value">+${{ addon.price | number:'1.2-2' }}</span>
-          </div>
+            <div *ngFor="let addon of selectedAddonsList" class="breakdown-line breakdown-line--addon">
+              <span class="breakdown-line__label">
+                <mat-icon>add_circle_outline</mat-icon>
+                {{ addon.name }}
+              </span>
+              <span class="breakdown-line__value">+${{ addon.price | number:'1.2-2' }}</span>
+            </div>
 
-          <!-- Subtotal (only shown when multiplier or addons are present) -->
-          <ng-container *ngIf="vehicleMultiplier > 1 || selectedAddonsList.length > 0">
+            <!-- Vehicle multiplier row — shown when multiplier ≠ 1.0, after addons so it visually applies to the sum -->
+            <div *ngIf="singleVehicleMultiplier !== 1" class="breakdown-line breakdown-line--modifier">
+              <span class="breakdown-line__label">
+                <mat-icon>directions_car</mat-icon>
+                Vehicle category adjustment
+              </span>
+              <span class="breakdown-line__value breakdown-line__value--multiplier">
+                &times;{{ singleVehicleMultiplier | number:'1.2-2' }}
+              </span>
+            </div>
+          </ng-container>
+
+          <!-- Subtotal — shown when there is anything to aggregate -->
+          <ng-container *ngIf="singleVehicleMultiplier !== 1 || selectedAddonsList.length > 0 || isFleet()">
             <div class="breakdown-separator"></div>
             <div class="breakdown-line breakdown-line--subtotal">
               <span class="breakdown-line__label">Subtotal</span>

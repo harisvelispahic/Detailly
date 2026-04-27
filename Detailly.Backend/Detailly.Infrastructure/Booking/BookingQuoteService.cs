@@ -81,14 +81,16 @@ public sealed class BookingQuoteService(
             throw new DetaillyBusinessRuleException("BOOKING_DURATION_INVALID", "Package duration is invalid.");
 
         // -------------------------
-        // Vehicle multiplier
+        // Vehicle price calculation (per-vehicle)
         // -------------------------
         var distinctVehicleIds = (vehicleIds ?? new List<int>())
             .Where(id => id > 0)
             .Distinct()
             .ToList();
 
-        decimal vehicleMultiplier = 1.0m;
+        var numVehicles = Math.Max(1, distinctVehicleIds.Count);
+        var baseServicePrice = package.Price + addonsPrice;
+        decimal totalPrice;
 
         if (distinctVehicleIds.Count > 0)
         {
@@ -124,18 +126,19 @@ public sealed class BookingQuoteService(
 
             var categoryMultiplierById = categories.ToDictionary(x => x.Id, x => x.BasePriceMultiplier);
 
-            vehicleMultiplier = vehicles
-                .Select(v => categoryMultiplierById[v.VehicleCategoryId])
-                .DefaultIfEmpty(1.0m)
-                .Max();
-
-            if (vehicleMultiplier <= 0)
-                vehicleMultiplier = 1.0m;
+            // Each vehicle is priced at (packagePrice + addonsPrice) × its own category multiplier.
+            // For non-fleet this is a single vehicle; for fleet each vehicle contributes independently.
+            totalPrice = vehicles.Sum(v =>
+            {
+                var m = categoryMultiplierById[v.VehicleCategoryId];
+                return baseServicePrice * (m > 0 ? m : 1.0m);
+            });
         }
-
-        var numVehicles = Math.Max(1, distinctVehicleIds.Count);
-
-        var totalPrice = (package.Price + addonsPrice) * vehicleMultiplier;
+        else
+        {
+            // No vehicles specified (e.g. availability query) — multiplier defaults to 1.0
+            totalPrice = baseServicePrice;
+        }
 
         // -------------------------
         // Fleet discount

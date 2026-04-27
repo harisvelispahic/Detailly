@@ -468,16 +468,17 @@ export class BookingWizardComponent implements OnInit {
 
   // ── Price Breakdown (Step 4) ──────────────────────────────────────────────
 
-  get vehicleMultiplier(): number {
-    const multipliers = this.selectedVehiclesList
-      .map((v) => v.vehicleCategory.basePriceMultiplier)
-      .filter((m) => m > 0);
-    if (multipliers.length === 0) return 1;
-    return Math.max(...multipliers);
+  // Vehicle multiplier for the single selected vehicle (non-fleet only)
+  get singleVehicleMultiplier(): number {
+    const vehicles = this.selectedVehiclesList;
+    if (vehicles.length !== 1) return 1;
+    const m = vehicles[0].vehicleCategory.basePriceMultiplier;
+    return m > 0 ? m : 1;
   }
 
-  get adjustedBasePrice(): number {
-    return (this.selectedPackage?.price ?? 0) * this.vehicleMultiplier;
+  // Base price of the service before any vehicle multiplier (package + addons)
+  get baseServicePrice(): number {
+    return (this.selectedPackage?.price ?? 0) + this.totalAddonPrice;
   }
 
   get totalAddonPrice(): number {
@@ -486,8 +487,17 @@ export class BookingWizardComponent implements OnInit {
       .reduce((sum, a) => sum + a.price, 0);
   }
 
+  // Price for a single vehicle: (package + addons) × that vehicle's multiplier
+  vehiclePriceFor(vehicle: ListMyVehiclesQueryDto): number {
+    const m = vehicle.vehicleCategory.basePriceMultiplier;
+    return this.baseServicePrice * (m > 0 ? m : 1);
+  }
+
+  // Sum of per-vehicle prices — matches the backend formula exactly
   get subtotalBeforeDiscount(): number {
-    return this.adjustedBasePrice + this.totalAddonPrice;
+    const vehicles = this.selectedVehiclesList;
+    if (vehicles.length === 0) return this.baseServicePrice;
+    return vehicles.reduce((sum, v) => sum + this.vehiclePriceFor(v), 0);
   }
 
   get fleetDiscountPercent(): number {

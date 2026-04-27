@@ -137,13 +137,14 @@ perVehicleDurationMinutes = package.BaseDurationMinutes + addonsDuration
 
 Must be > 0 or throws `BOOKING_DURATION_INVALID`.
 
-**5. Vehicle multiplier (price only):**
+**5. Per-vehicle pricing:**
 
-- No vehicles → multiplier = 1.0
+- No vehicles → `totalPrice = package.Price + addonsPrice` (multiplier = 1.0)
 - Non-fleet with >1 vehicle → `BOOKING_VEHICLE_COUNT_INVALID`
 - Validates ownership: all vehicles must belong to `customerId`
-- Multiplier = **max** `VehicleCategory.BasePriceMultiplier` across all selected vehicles
-- If multiplier ≤ 0, defaults to 1.0
+- Each vehicle contributes `(package.Price + addonsPrice) × vehicle.Category.BasePriceMultiplier` to the total
+- If a vehicle's multiplier ≤ 0, it defaults to 1.0
+- `totalPrice = Σ_i [(package.Price + addonsPrice) × multiplier_i]`
 
 **6. Capacity figures (before k-optimization, done in the hold handler):**
 
@@ -167,7 +168,7 @@ Note: For `Mobile + fleet`, these are the _base_ figures. The hold handler overr
 
 **7. Fleet discount:**
 
-Only runs when `isFleet = true`. Applied to the service price before the mobile surcharge is added.
+Only runs when `isFleet = true`. Applied to the sum of per-vehicle prices (step 5 result) before the mobile surcharge is added.
 
 ```
 N = number of vehicles (minimum 1)
@@ -723,7 +724,7 @@ Bound to `OpenRouteServiceOptions`. Used only by `BookingQuoteService`.
 | Start time alignment           | Must be on 30-minute boundary, seconds = 0                       |
 | Start time future              | Must be strictly after `DateTime.UtcNow`                         |
 | Fleet + InShop                 | Forbidden — error at both quote and hold level                   |
-| Fleet discount                 | 2% base + 1% per vehicle, capped at 8%; applied to service price, not surcharge |
+| Fleet discount                 | 2% base + 1% per vehicle, capped at 8%; applied to sum of per-vehicle prices, not surcharge |
 | Mobile requires address        | `ServiceAddressId` required; must be owned by the customer       |
 | InShop forbids address         | `ServiceAddressId` must be null                                  |
 | Non-fleet vehicle count        | Exactly 1 vehicle if any vehicle is provided                     |
