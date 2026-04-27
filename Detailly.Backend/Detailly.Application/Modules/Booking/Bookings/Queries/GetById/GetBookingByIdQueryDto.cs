@@ -12,8 +12,12 @@ public sealed class GetBookingByIdQueryDto
     public required DateTime EndUtc { get; set; }
 
     public required decimal TotalPrice { get; set; }
+    public decimal? MobileSurchargeFee { get; set; }
     public required int RequiredEmployees { get; set; }
     public required int RequiredBays { get; set; }
+    public int? TravelTimeMinutes { get; set; }
+    public DateTime? DepartureUtc { get; set; }
+    public DateTime? ReturnUtc { get; set; }
 
     public DateTime? ReservationExpiresAtUtc { get; set; }
     public string? Notes { get; set; }

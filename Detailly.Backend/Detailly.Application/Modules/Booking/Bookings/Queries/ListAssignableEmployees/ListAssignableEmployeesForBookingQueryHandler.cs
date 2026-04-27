@@ -27,6 +27,10 @@ public sealed class ListAssignableEmployeesForBookingQueryHandler(IAppDbContext 
         if (booking.Status is BookingStatus.Cancelled or BookingStatus.Expired)
             return new List<ListAssignableEmployeesForBookingQueryDto>();
 
+        var travelMinutes = booking.TravelTimeMinutes ?? 0;
+        var departureUtc  = booking.StartUtc.AddMinutes(-travelMinutes);
+        var returnUtc     = booking.EndUtc.AddMinutes(travelMinutes);
+
         var shiftMode = booking.ServiceMode == ServiceMode.InShop
             ? EmployeeWorkMode.InShop
             : EmployeeWorkMode.Mobile;
@@ -35,15 +39,15 @@ public sealed class ListAssignableEmployeesForBookingQueryHandler(IAppDbContext 
             .Select(a => a.EmployeeId)
             .ToList();
 
-        // Employees with shift fully covering the booking interval
+        // Employees with shift fully covering the booking's effective [departure, return] window
         var shiftCoveringEmployees = await context.EmployeeShifts
             .AsNoTracking()
             .Where(s =>
                 !s.IsDeleted &&
                 s.ShopLocationId == booking.ShopLocationId &&
                 s.EmployeeWorkMode == shiftMode &&
-                s.StartUtc <= booking.StartUtc &&
-                s.EndUtc >= booking.EndUtc)
+                s.StartUtc <= departureUtc &&
+                s.EndUtc >= returnUtc)
             .Select(s => s.EmployeeId)
             .Distinct()
             .ToListAsync(ct);
@@ -65,9 +69,10 @@ public sealed class ListAssignableEmployeesForBookingQueryHandler(IAppDbContext 
             })
             .ToListAsync(ct);
 
-        // Find which employees are already assigned to other bookings overlapping this booking time
-        // (Confirmed/Completed are the ones that matter operationally; you can include PendingPayment holds if you want)
-        var overlappingAssignedEmployeeIds = await context.BookingEmployeeAssignments
+        // Find which employees are already assigned to other bookings whose effective window
+        // overlaps with this booking's [departure, return]. SQL pre-filter + in-memory precision
+        // (matches the same pattern used in CreateBookingHoldCommandHandler).
+        var candidateConflicts = await context.BookingEmployeeAssignments
             .AsNoTracking()
             .Where(a =>
                 !a.IsDeleted &&
@@ -75,11 +80,21 @@ public sealed class ListAssignableEmployeesForBookingQueryHandler(IAppDbContext 
                 a.Booking.ShopLocationId == booking.ShopLocationId &&
                 a.Booking.ServiceMode == booking.ServiceMode &&
                 (a.Booking.Status == BookingStatus.Confirmed || a.Booking.Status == BookingStatus.Completed) &&
-                a.Booking.StartUtc < booking.EndUtc &&
-                a.Booking.EndUtc > booking.StartUtc)
+                a.Booking.StartUtc < returnUtc &&
+                a.Booking.EndUtc > departureUtc)
+            .Select(a => new { a.EmployeeId, a.Booking.StartUtc, a.Booking.EndUtc, a.Booking.TravelTimeMinutes })
+            .ToListAsync(ct);
+
+        var overlappingAssignedEmployeeIds = candidateConflicts
+            .Where(a =>
+            {
+                var bDep = a.StartUtc.AddMinutes(-(a.TravelTimeMinutes ?? 0));
+                var bRet = a.EndUtc.AddMinutes(a.TravelTimeMinutes ?? 0);
+                return bDep < returnUtc && bRet > departureUtc;
+            })
             .Select(a => a.EmployeeId)
             .Distinct()
-            .ToListAsync(ct);
+            .ToList();
 
         var results = employees
             .Where(e => !alreadyAssignedEmployeeIds.Contains(e.Id))

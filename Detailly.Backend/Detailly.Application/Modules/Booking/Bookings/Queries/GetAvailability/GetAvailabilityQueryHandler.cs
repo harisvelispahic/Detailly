@@ -89,7 +89,8 @@ public sealed class GetAvailabilityQueryHandler(
                 b.StartUtc,
                 b.EndUtc,
                 b.RequiredEmployees,
-                b.RequiredBays
+                b.RequiredBays,
+                b.TravelTimeMinutes
             })
             .ToListAsync(ct);
 
@@ -126,9 +127,15 @@ public sealed class GetAvailabilityQueryHandler(
                 .Distinct()
                 .Count();
 
-            // Demand: employees used by overlapping blocking bookings
+            // Demand: employees used by overlapping blocking bookings.
+            // Use each blocker's widened [departure, return] window so mobile travel time is respected.
             var usedEmployees = blockingBookings
-                .Where(b => b.StartUtc < end && b.EndUtc > start)
+                .Where(b =>
+                {
+                    var bDep = b.StartUtc.AddMinutes(-(b.TravelTimeMinutes ?? 0));
+                    var bRet = b.EndUtc.AddMinutes(b.TravelTimeMinutes ?? 0);
+                    return bDep < end && bRet > start;
+                })
                 .Sum(b => b.RequiredEmployees);
 
             if (availableEmployees - usedEmployees < requiredEmployees)
@@ -137,7 +144,12 @@ public sealed class GetAvailabilityQueryHandler(
             if (request.ServiceMode == ServiceMode.InShop)
             {
                 var usedBays = blockingBookings
-                    .Where(b => b.StartUtc < end && b.EndUtc > start)
+                    .Where(b =>
+                    {
+                        var bDep = b.StartUtc.AddMinutes(-(b.TravelTimeMinutes ?? 0));
+                        var bRet = b.EndUtc.AddMinutes(b.TravelTimeMinutes ?? 0);
+                        return bDep < end && bRet > start;
+                    })
                     .Sum(b => b.RequiredBays);
 
                 if (totalBays - usedBays < requiredBays)

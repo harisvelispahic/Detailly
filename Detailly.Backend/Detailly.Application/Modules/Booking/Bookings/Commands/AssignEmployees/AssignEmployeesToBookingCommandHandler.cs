@@ -39,6 +39,10 @@ public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context
         // if (booking.Status != BookingStatus.Confirmed)
         //     throw new DetaillyBusinessRuleException("BOOKING_NOT_CONFIRMED", "Assign employees only after booking is confirmed.");
 
+        var travelMinutes = booking.TravelTimeMinutes ?? 0;
+        var departureUtc  = booking.StartUtc.AddMinutes(-travelMinutes);
+        var returnUtc     = booking.EndUtc.AddMinutes(travelMinutes);
+
         if (employeeIds.Count > booking.RequiredEmployees)
             throw new DetaillyBusinessRuleException("ASSIGN_TOO_MANY",
                 $"Too many employees. Booking requires {booking.RequiredEmployees}.");
@@ -56,14 +60,14 @@ public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context
             ? EmployeeWorkMode.InShop
             : EmployeeWorkMode.Mobile;
 
-        // Validate each employee has a shift covering this interval
+        // Validate each employee has a shift covering the full effective [departure, return] window
         var shiftCoveringEmployees = await context.EmployeeShifts
             .Where(s =>
                 !s.IsDeleted &&
                 s.ShopLocationId == booking.ShopLocationId &&
                 s.EmployeeWorkMode == shiftMode &&
-                s.StartUtc <= booking.StartUtc &&
-                s.EndUtc >= booking.EndUtc &&
+                s.StartUtc <= departureUtc &&
+                s.EndUtc >= returnUtc &&
                 employeeIds.Contains(s.EmployeeId))
             .Select(s => s.EmployeeId)
             .Distinct()
@@ -73,18 +77,29 @@ public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context
             throw new DetaillyBusinessRuleException("ASSIGN_NOT_ON_SHIFT",
                 "One or more employees do not have a shift covering the booking time.");
 
-        // Validate no overlaps with other assigned bookings
-        var overlappingEmployeeIds = await context.BookingEmployeeAssignments
+        // Validate no overlaps with other assigned bookings.
+        // SQL pre-filter + in-memory precision to account for other bookings' travel time.
+        var candidateConflicts = await context.BookingEmployeeAssignments
             .Where(a =>
                 !a.IsDeleted &&
                 employeeIds.Contains(a.EmployeeId) &&
                 a.BookingId != booking.Id &&
                 (a.Booking.Status == BookingStatus.Confirmed || a.Booking.Status == BookingStatus.Completed) &&
-                a.Booking.StartUtc < booking.EndUtc &&
-                a.Booking.EndUtc > booking.StartUtc)
+                a.Booking.StartUtc < returnUtc &&
+                a.Booking.EndUtc > departureUtc)
+            .Select(a => new { a.EmployeeId, a.Booking.StartUtc, a.Booking.EndUtc, a.Booking.TravelTimeMinutes })
+            .ToListAsync(ct);
+
+        var overlappingEmployeeIds = candidateConflicts
+            .Where(a =>
+            {
+                var bDep = a.StartUtc.AddMinutes(-(a.TravelTimeMinutes ?? 0));
+                var bRet = a.EndUtc.AddMinutes(a.TravelTimeMinutes ?? 0);
+                return bDep < returnUtc && bRet > departureUtc;
+            })
             .Select(a => a.EmployeeId)
             .Distinct()
-            .ToListAsync(ct);
+            .ToList();
 
         if (overlappingEmployeeIds.Count > 0)
             throw new DetaillyBusinessRuleException("ASSIGN_OVERLAP",
