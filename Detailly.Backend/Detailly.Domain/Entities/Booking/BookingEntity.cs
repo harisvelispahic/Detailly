@@ -22,6 +22,8 @@ public class BookingEntity : BaseEntity
     public required int RequiredEmployees { get; set; }
     public required int RequiredBays { get; set; } = 1;
 
+    // One-way travel time (minutes) for mobile bookings — widens the capacity overlap window
+    public int? TravelTimeMinutes { get; set; }
 
     // Hold/expiry (used while PendingPayment)
     public DateTime? ReservationExpiresAtUtc { get; set; }

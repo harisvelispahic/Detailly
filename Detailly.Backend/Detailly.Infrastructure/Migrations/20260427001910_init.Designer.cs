@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260419220808_20042026_1")]
-    partial class _20042026_1
+    [Migration("20260427001910_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,6 +81,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<decimal?>("MobileSurchargeFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -117,6 +121,9 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("TravelTimeMinutes")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1156,6 +1163,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal?>("DistanceFromShopKm")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1181,6 +1192,12 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Street")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("TravelMetadataLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TravelTimeFromShopMinutes")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

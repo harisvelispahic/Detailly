@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class _20042026_1 : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -199,6 +199,9 @@ namespace Detailly.Infrastructure.Migrations
                     Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Latitude = table.Column<decimal>(type: "decimal(9,6)", precision: 18, scale: 2, nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(9,6)", precision: 18, scale: 2, nullable: true),
+                    DistanceFromShopKm = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    TravelTimeFromShopMinutes = table.Column<int>(type: "int", nullable: true),
+                    TravelMetadataLocationId = table.Column<int>(type: "int", nullable: true),
                     ApplicationUserId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -298,10 +301,12 @@ namespace Detailly.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MobileSurchargeFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     StartUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RequiredEmployees = table.Column<int>(type: "int", nullable: false),
                     RequiredBays = table.Column<int>(type: "int", nullable: false),
+                    TravelTimeMinutes = table.Column<int>(type: "int", nullable: true),
                     ReservationExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),

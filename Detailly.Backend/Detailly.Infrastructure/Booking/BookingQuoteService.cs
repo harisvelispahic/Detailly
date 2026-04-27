@@ -74,12 +74,10 @@ public sealed class BookingQuoteService(
         var addonsEmployeesMax = addons.Count == 0 ? 0 : addons.Max(x => x.RequiredEmployees);
         var addonsPrice = addons.Sum(x => x.Price);
 
-        var totalDurationMinutes = baseDuration + addonsDuration;
-        if (totalDurationMinutes <= 0)
+        // Per-vehicle duration is always base + addons regardless of how many vehicles
+        var perVehicleDurationMinutes = baseDuration + addonsDuration;
+        if (perVehicleDurationMinutes <= 0)
             throw new DetaillyBusinessRuleException("BOOKING_DURATION_INVALID", "Package duration is invalid.");
-
-        var requiredEmployees = Math.Max(baseEmployees, addonsEmployeesMax);
-        var requiredBays = serviceMode == ServiceMode.InShop ? 1 : 0;
 
         // -------------------------
         // Vehicle multiplier
@@ -137,17 +135,47 @@ public sealed class BookingQuoteService(
         var totalPrice = (package.Price + addonsPrice) * vehicleMultiplier;
 
         // -------------------------
-        // Mobile surcharge (road distance)
+        // Capacity figures
+        //
+        // InShop fleet: vehicles are serviced in parallel (one bay + employee group each).
+        // Mobile / non-fleet: the handler does k-optimisation for fleet; single vehicle otherwise.
+        // -------------------------
+        int requiredEmployees;
+        int requiredBays;
+        int totalDurationMinutes;
+
+        var numVehicles = Math.Max(1, distinctVehicleIds.Count);
+
+        if (serviceMode == ServiceMode.InShop && isFleet && numVehicles > 1)
+        {
+            // Parallel bays: each vehicle needs its own bay and employee group simultaneously.
+            var baseRequiredPerVehicle = Math.Max(baseEmployees, addonsEmployeesMax);
+            requiredEmployees = baseRequiredPerVehicle * numVehicles;
+            requiredBays = numVehicles;
+            totalDurationMinutes = perVehicleDurationMinutes; // all work happens in parallel
+        }
+        else
+        {
+            requiredEmployees = Math.Max(baseEmployees, addonsEmployeesMax);
+            requiredBays = serviceMode == ServiceMode.InShop ? 1 : 0;
+            totalDurationMinutes = perVehicleDurationMinutes;
+        }
+
+        // -------------------------
+        // Mobile surcharge + travel time (road distance via ORS)
         // -------------------------
         decimal mobileSurchargeFee = 0m;
+        int travelTimeMinutes = 0;
 
         if (serviceMode == ServiceMode.Mobile && serviceAddressId is not null && shopLocationId is not null)
         {
-            mobileSurchargeFee = await CalculateMobileSurchargeAsync(
+            var travel = await CalculateMobileTravelAsync(
                 serviceAddressId.Value,
                 shopLocationId.Value,
                 ct);
 
+            mobileSurchargeFee = travel.SurchargeFee;
+            travelTimeMinutes = travel.TravelTimeMinutes;
             totalPrice += mobileSurchargeFee;
         }
 
@@ -155,10 +183,12 @@ public sealed class BookingQuoteService(
         {
             ServicePackageId = servicePackageId,
             TotalDurationMinutes = totalDurationMinutes,
+            PerVehicleDurationMinutes = perVehicleDurationMinutes,
             RequiredEmployees = requiredEmployees,
             RequiredBays = requiredBays,
             TotalPrice = totalPrice,
             MobileSurchargeFee = mobileSurchargeFee,
+            TravelTimeMinutes = travelTimeMinutes,
             Addons = addons.Select(a => new BookingQuoteResult.AddonSnapshot
             {
                 ServicePackageItemId = a.Id,
@@ -169,14 +199,15 @@ public sealed class BookingQuoteService(
         };
     }
 
-    private async Task<decimal> CalculateMobileSurchargeAsync(
+    private record MobileTravelResult(decimal SurchargeFee, int TravelTimeMinutes);
+
+    private async Task<MobileTravelResult> CalculateMobileTravelAsync(
         int serviceAddressId,
         int shopLocationId,
         CancellationToken ct)
     {
         var opts = pricingOptions.Value;
 
-        // Load service address (with cached distance)
         var serviceAddress = await context.Addresses
             .FirstOrDefaultAsync(a => a.Id == serviceAddressId && !a.IsDeleted, ct);
 
@@ -186,7 +217,6 @@ public sealed class BookingQuoteService(
         if (serviceAddress.Latitude is null || serviceAddress.Longitude is null)
             return ApplyFallback(opts, $"Address {serviceAddressId} has no coordinates — cannot calculate road distance.");
 
-        // Load the shop location's address for its coordinates
         var shopAddress = await context.Locations
             .AsNoTracking()
             .Where(l => l.Id == shopLocationId && !l.IsDeleted)
@@ -196,45 +226,51 @@ public sealed class BookingQuoteService(
         if (shopAddress is null || shopAddress.Latitude is null || shopAddress.Longitude is null)
             return ApplyFallback(opts, $"Shop location {shopLocationId} has no coordinates — cannot calculate road distance.");
 
-        // Use cached distance if it was computed for the same shop
         decimal distanceKm;
+        int travelTimeMinutes;
+
+        // Use cached values when they were computed for the same shop
         if (serviceAddress.DistanceFromShopKm is not null &&
-            serviceAddress.DistanceFromShopLocationId == shopLocationId)
+            serviceAddress.TravelTimeFromShopMinutes is not null &&
+            serviceAddress.TravelMetadataLocationId == shopLocationId)
         {
             distanceKm = serviceAddress.DistanceFromShopKm.Value;
+            travelTimeMinutes = serviceAddress.TravelTimeFromShopMinutes.Value;
         }
         else
         {
-            var apiResult = await roadDistanceService.GetRoadDistanceKmAsync(
+            var apiResult = await roadDistanceService.GetRoadTravelAsync(
                 shopAddress.Latitude.Value, shopAddress.Longitude.Value,
                 serviceAddress.Latitude.Value, serviceAddress.Longitude.Value,
                 ct);
 
             if (apiResult is null)
-                return ApplyFallback(opts, "Road distance API returned no result.");
+                return ApplyFallback(opts, "Road travel API returned no result.");
 
-            distanceKm = apiResult.Value;
+            distanceKm = apiResult.DistanceKm;
+            travelTimeMinutes = apiResult.TravelTimeMinutes;
 
             // Persist cache (best-effort — don't fail the quote if this save fails)
             try
             {
                 serviceAddress.DistanceFromShopKm = distanceKm;
-                serviceAddress.DistanceFromShopLocationId = shopLocationId;
+                serviceAddress.TravelTimeFromShopMinutes = travelTimeMinutes;
+                serviceAddress.TravelMetadataLocationId = shopLocationId;
                 await context.SaveChangesAsync(ct);
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Failed to cache distance for address {AddressId}.", serviceAddressId);
+                logger.LogWarning(ex, "Failed to cache travel info for address {AddressId}.", serviceAddressId);
             }
         }
 
-        return ComputeSurcharge(distanceKm, opts);
+        return new MobileTravelResult(ComputeSurcharge(distanceKm, opts), travelTimeMinutes);
     }
 
-    private decimal ApplyFallback(OpenRouteServiceOptions opts, string reason)
+    private MobileTravelResult ApplyFallback(OpenRouteServiceOptions opts, string reason)
     {
-        logger.LogWarning("Mobile surcharge fallback applied ({Reason}). Using fixed fee {Fee}.", reason, opts.FallbackSurcharge);
-        return opts.FallbackSurcharge;
+        logger.LogWarning("Mobile travel fallback applied ({Reason}). Using fixed fee {Fee}, travel time 0.", reason, opts.FallbackSurcharge);
+        return new MobileTravelResult(opts.FallbackSurcharge, 0);
     }
 
     private static decimal ComputeSurcharge(decimal distanceKm, OpenRouteServiceOptions opts)

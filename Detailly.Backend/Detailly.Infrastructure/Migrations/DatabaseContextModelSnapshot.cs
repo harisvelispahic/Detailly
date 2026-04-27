@@ -119,6 +119,9 @@ namespace Detailly.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("TravelTimeMinutes")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -1161,9 +1164,6 @@ namespace Detailly.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("DistanceFromShopLocationId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1189,6 +1189,12 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Street")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("TravelMetadataLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TravelTimeFromShopMinutes")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

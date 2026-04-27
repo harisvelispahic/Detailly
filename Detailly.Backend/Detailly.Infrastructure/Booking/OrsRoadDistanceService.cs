@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Detailly.Infrastructure.Booking;
 
 /// <summary>
-/// Calculates road distance between two coordinates using the OpenRouteService Directions API.
+/// Calculates road distance and travel time using the OpenRouteService Directions API.
 /// ORS uses GeoJSON coordinate order: longitude first, latitude second.
 /// Parameters arrive as (lat, lng) but are passed to ORS as "lng,lat".
 /// </summary>
@@ -24,10 +24,19 @@ public sealed class OrsRoadDistanceService(
         decimal toLat, decimal toLng,
         CancellationToken ct)
     {
+        var result = await GetRoadTravelAsync(fromLat, fromLng, toLat, toLng, ct);
+        return result?.DistanceKm;
+    }
+
+    public async Task<RoadTravelInfo?> GetRoadTravelAsync(
+        decimal fromLat, decimal fromLng,
+        decimal toLat, decimal toLng,
+        CancellationToken ct)
+    {
         var apiKey = options.Value.ApiKey;
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            logger.LogWarning("OpenRouteService ApiKey is not configured — road distance cannot be determined.");
+            logger.LogWarning("OpenRouteService ApiKey is not configured — road travel info cannot be determined.");
             return null;
         }
 
@@ -49,14 +58,16 @@ public sealed class OrsRoadDistanceService(
             using var stream = await response.Content.ReadAsStreamAsync(ct);
             using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
-            var meters = doc.RootElement
+            var summary = doc.RootElement
                 .GetProperty("features")[0]
                 .GetProperty("properties")
-                .GetProperty("summary")
-                .GetProperty("distance")
-                .GetDecimal();
+                .GetProperty("summary");
 
-            return Math.Round(meters / 1000m, 2);
+            var distanceKm = Math.Round(summary.GetProperty("distance").GetDecimal() / 1000m, 2);
+            var durationSeconds = summary.GetProperty("duration").GetDecimal();
+            var travelTimeMinutes = (int)Math.Ceiling(durationSeconds / 60m);
+
+            return new RoadTravelInfo(distanceKm, travelTimeMinutes);
         }
         catch (Exception ex)
         {

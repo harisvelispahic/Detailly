@@ -26,9 +26,10 @@ public class AddressEntity : BaseEntity
     public decimal? Latitude { get; set; }
     public decimal? Longitude { get; set; }
 
-    // Cached road distance to a specific shop location (populated lazily by the quote service)
+    // Cached road metrics to a specific shop location (populated lazily by the quote service)
     public decimal? DistanceFromShopKm { get; set; }
-    public int? DistanceFromShopLocationId { get; set; }
+    public int? TravelTimeFromShopMinutes { get; set; }
+    public int? TravelMetadataLocationId { get; set; }
 
     // Foreign keys
 
