@@ -17,6 +17,9 @@ public sealed class BookingQuoteResult
     public required decimal TotalPrice { get; init; }
     public decimal MobileSurchargeFee { get; init; }
 
+    /// <summary>Fleet discount percentage applied to the service price. 0 for non-fleet bookings.</summary>
+    public decimal FleetDiscountPercent { get; init; }
+
     /// <summary>One-way travel time in minutes from the shop to the service address. 0 for InShop.</summary>
     public int TravelTimeMinutes { get; init; }
 

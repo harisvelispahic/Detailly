@@ -13,6 +13,7 @@ public sealed class BookingQuoteService(
     IAppDbContext context,
     IRoadDistanceService roadDistanceService,
     IOptions<OpenRouteServiceOptions> pricingOptions,
+    IOptions<FleetDiscountOptions> fleetDiscountOptions,
     ILogger<BookingQuoteService> logger) : IBookingQuoteService
 {
     public async Task<BookingQuoteResult> CalculateAsync(
@@ -132,7 +133,24 @@ public sealed class BookingQuoteService(
                 vehicleMultiplier = 1.0m;
         }
 
+        var numVehicles = Math.Max(1, distinctVehicleIds.Count);
+
         var totalPrice = (package.Price + addonsPrice) * vehicleMultiplier;
+
+        // -------------------------
+        // Fleet discount
+        //
+        // Applied to the service price only (not the mobile surcharge).
+        // Formula: min(BaseDiscountPercent + (N-1) × PerVehicleDiscountPercent, MaxDiscountPercent)
+        // -------------------------
+        decimal fleetDiscountPercent = 0m;
+        if (isFleet)
+        {
+            var discountOpts = fleetDiscountOptions.Value;
+            var raw = discountOpts.BaseDiscountPercent + (numVehicles - 1) * discountOpts.PerVehicleDiscountPercent;
+            fleetDiscountPercent = Math.Min(raw, discountOpts.MaxDiscountPercent);
+            totalPrice *= (1m - fleetDiscountPercent / 100m);
+        }
 
         // -------------------------
         // Capacity figures
@@ -143,8 +161,6 @@ public sealed class BookingQuoteService(
         int requiredEmployees;
         int requiredBays;
         int totalDurationMinutes;
-
-        var numVehicles = Math.Max(1, distinctVehicleIds.Count);
 
         if (serviceMode == ServiceMode.InShop && isFleet && numVehicles > 1)
         {
@@ -188,6 +204,7 @@ public sealed class BookingQuoteService(
             RequiredBays = requiredBays,
             TotalPrice = totalPrice,
             MobileSurchargeFee = mobileSurchargeFee,
+            FleetDiscountPercent = fleetDiscountPercent,
             TravelTimeMinutes = travelTimeMinutes,
             Addons = addons.Select(a => new BookingQuoteResult.AddonSnapshot
             {

@@ -279,6 +279,7 @@ public sealed class CreateBookingHoldCommandHandler(
         {
             TotalPrice           = totalPrice,
             MobileSurchargeFee   = quote.MobileSurchargeFee > 0 ? quote.MobileSurchargeFee : null,
+            FleetDiscountPercent = quote.FleetDiscountPercent > 0 ? quote.FleetDiscountPercent : null,
             StartUtc             = request.StartUtc,
             EndUtc               = endUtc,
             RequiredEmployees    = requiredEmployees,

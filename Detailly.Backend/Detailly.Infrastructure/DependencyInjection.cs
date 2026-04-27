@@ -76,6 +76,12 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        // Fleet discount options
+        services.AddOptions<FleetDiscountOptions>()
+            .Bind(configuration.GetSection(FleetDiscountOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         // Road distance service (OpenRouteService Directions API)
         services.AddHttpClient<IRoadDistanceService, OrsRoadDistanceService>();
 

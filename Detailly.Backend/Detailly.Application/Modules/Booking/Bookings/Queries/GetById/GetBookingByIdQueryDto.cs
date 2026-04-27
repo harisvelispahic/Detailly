@@ -13,6 +13,7 @@ public sealed class GetBookingByIdQueryDto
 
     public required decimal TotalPrice { get; set; }
     public decimal? MobileSurchargeFee { get; set; }
+    public decimal? FleetDiscountPercent { get; set; }
     public required int RequiredEmployees { get; set; }
     public required int RequiredBays { get; set; }
     public int? TravelTimeMinutes { get; set; }

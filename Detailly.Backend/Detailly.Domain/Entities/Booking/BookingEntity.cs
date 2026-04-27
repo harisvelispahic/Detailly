@@ -12,6 +12,9 @@ public class BookingEntity : BaseEntity
     public required decimal TotalPrice { get; set; }
     public decimal? MobileSurchargeFee { get; set; }
 
+    /// <summary>Fleet discount percentage applied to the service price at hold creation time. Null for non-fleet bookings.</summary>
+    public decimal? FleetDiscountPercent { get; set; }
+
 
     // Scheduling snapshot
     public required DateTime StartUtc { get; set; }
