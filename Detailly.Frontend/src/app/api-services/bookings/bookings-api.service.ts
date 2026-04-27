@@ -7,6 +7,7 @@ import {
   CancelBookingCommand,
   CreateBookingHoldCommand,
   GetAvailabilityRequest,
+  GetAvailabilityResponse,
   GetBookingByIdQueryDto,
   ListMyBookingsQueryDto,
   ListMyBookingsRequest,
@@ -37,7 +38,7 @@ export class BookingsService {
     return this.http.post<{ id: number }>(this.baseUrl, command);
   }
 
-  getAvailability(request: GetAvailabilityRequest): Observable<AvailabilitySlotDto[]> {
+  getAvailability(request: GetAvailabilityRequest): Observable<GetAvailabilityResponse> {
     let params = new HttpParams()
       .set('dateUtc', request.dateUtc)
       .set('servicePackageId', request.servicePackageId.toString())
@@ -50,6 +51,10 @@ export class BookingsService {
       });
     }
 
-    return this.http.get<AvailabilitySlotDto[]>(`${this.baseUrl}/availability`, { params });
+    if (request.serviceAddressId != null) {
+      params = params.set('serviceAddressId', request.serviceAddressId.toString());
+    }
+
+    return this.http.get<GetAvailabilityResponse>(`${this.baseUrl}/availability`, { params });
   }
 }

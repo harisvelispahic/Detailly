@@ -66,7 +66,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpGet("availability")]
     [AllowAnonymous]
-    public async Task<List<GetAvailabilityQueryDto>> GetAvailability(
+    public async Task<GetAvailabilityResult> GetAvailability(
         [FromQuery] GetAvailabilityQuery query,
         CancellationToken ct)
     {

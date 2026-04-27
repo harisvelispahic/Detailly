@@ -91,10 +91,17 @@ export interface AvailabilitySlotDto {
   endUtc: string;
 }
 
+export interface GetAvailabilityResponse {
+  slots: AvailabilitySlotDto[];
+  travelTimeMinutes: number;
+  mobileSurchargeFee: number;
+}
+
 export interface GetAvailabilityRequest {
   dateUtc: string;
   servicePackageId: number;
   addonItemIds?: number[];
   serviceMode: ServiceMode;
   shopLocationId: number;
+  serviceAddressId?: number;
 }

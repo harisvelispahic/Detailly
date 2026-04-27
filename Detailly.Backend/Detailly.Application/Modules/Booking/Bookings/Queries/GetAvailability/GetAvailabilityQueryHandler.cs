@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Abstractions.Booking;
+using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
@@ -6,13 +6,13 @@ namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 public sealed class GetAvailabilityQueryHandler(
     IAppDbContext context,
     IBookingQuoteService quoteService)
-    : IRequestHandler<GetAvailabilityQuery, List<GetAvailabilityQueryDto>>
+    : IRequestHandler<GetAvailabilityQuery, GetAvailabilityResult>
 {
-    public async Task<List<GetAvailabilityQueryDto>> Handle(GetAvailabilityQuery request, CancellationToken ct)
+    public async Task<GetAvailabilityResult> Handle(GetAvailabilityQuery request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        // 1) Quote (single source of truth for duration/employees/bays)
+        // 1) Quote — now includes travel time when serviceAddressId is provided for mobile
         var quote = await quoteService.CalculateAsync(
             request.ServicePackageId,
             request.AddonItemIds,
@@ -21,11 +21,16 @@ public sealed class GetAvailabilityQueryHandler(
             customerId: null,
             isFleet: false,
             ct,
-            serviceAddressId: null,
-            shopLocationId: null);
+            serviceAddressId: request.ServiceAddressId,
+            shopLocationId: request.ServiceAddressId.HasValue ? request.ShopLocationId : null);
+
+        var travelTimeMinutes   = quote.TravelTimeMinutes;
+        var totalDurationMinutes = quote.TotalDurationMinutes;
+        var requiredEmployees   = quote.RequiredEmployees;
+        var requiredBays        = quote.RequiredBays;
 
         // 2) Opening hours (per location + day)
-        var date = request.DateUtc.Date;
+        var date      = request.DateUtc.Date;
         var dayOfWeek = (int)date.DayOfWeek; // Sunday=0 ... Saturday=6
 
         var opening = await context.LocationOpeningHours
@@ -36,22 +41,22 @@ public sealed class GetAvailabilityQueryHandler(
                 x.DayOfWeek == dayOfWeek,
                 ct);
 
-        // If no row exists OR explicitly closed -> no availability
         if (opening is null || opening.IsClosed)
-            return new List<GetAvailabilityQueryDto>();
+            return new GetAvailabilityResult
+            {
+                TravelTimeMinutes  = travelTimeMinutes,
+                MobileSurchargeFee = quote.MobileSurchargeFee,
+            };
 
-        // Build the daily window from opening hours, if missing assume 8am-8pm UTC (can be configured per location + day)
-        var windowStart = date.Add(opening.OpenTimeUtc ?? new TimeSpan(8, 0, 0));
-        var windowEnd = date.Add(opening.CloseTimeUtc ?? new TimeSpan(20, 0, 0));
+        var windowStart = date.Add(opening.OpenTimeUtc  ?? new TimeSpan(8,  0, 0));
+        var windowEnd   = date.Add(opening.CloseTimeUtc ?? new TimeSpan(20, 0, 0));
 
-        // Safety: invalid config
         if (windowEnd <= windowStart)
-            return new List<GetAvailabilityQueryDto>();
-
-        // For convenience
-        var totalDurationMinutes = quote.TotalDurationMinutes;
-        var requiredEmployees = quote.RequiredEmployees;
-        var requiredBays = quote.RequiredBays;
+            return new GetAvailabilityResult
+            {
+                TravelTimeMinutes  = travelTimeMinutes,
+                MobileSurchargeFee = quote.MobileSurchargeFee,
+            };
 
         // 3) Fetch total bays ONCE if InShop
         int totalBays = 0;
@@ -63,9 +68,12 @@ public sealed class GetAvailabilityQueryHandler(
                 .Select(l => l.TotalBays)
                 .FirstOrDefaultAsync(ct);
 
-            // If location missing or configured as 0 bays -> no availability
             if (totalBays <= 0)
-                return new List<GetAvailabilityQueryDto>();
+                return new GetAvailabilityResult
+                {
+                    TravelTimeMinutes  = travelTimeMinutes,
+                    MobileSurchargeFee = quote.MobileSurchargeFee,
+                };
         }
 
         // 4) Prefetch blocking bookings for the day-window
@@ -81,7 +89,7 @@ public sealed class GetAvailabilityQueryHandler(
                      b.ReservationExpiresAtUtc != null &&
                      b.ReservationExpiresAtUtc > now)
                 ) &&
-                b.EndUtc > windowStart &&
+                b.EndUtc   > windowStart &&
                 b.StartUtc < windowEnd
             )
             .Select(b => new
@@ -94,16 +102,21 @@ public sealed class GetAvailabilityQueryHandler(
             })
             .ToListAsync(ct);
 
-        // 5) Prefetch shifts (filter by mode)
+        // 5) Prefetch shifts (filter by mode).
+        // For mobile, a shift must cover [departure, return] where departure = start - travel.
+        // The earliest departure is windowStart - travelTimeMinutes, so widen the fetch window.
+        var shiftFetchStart = windowStart.AddMinutes(-travelTimeMinutes);
+        var shiftMode = request.ServiceMode == ServiceMode.InShop
+            ? EmployeeWorkMode.InShop
+            : EmployeeWorkMode.Mobile;
+
         var shifts = await context.EmployeeShifts
             .AsNoTracking()
             .Where(s =>
                 !s.IsDeleted &&
                 s.ShopLocationId == request.ShopLocationId &&
-                s.EmployeeWorkMode == (request.ServiceMode == ServiceMode.InShop
-                    ? EmployeeWorkMode.InShop
-                    : EmployeeWorkMode.Mobile) &&
-                s.EndUtc > windowStart &&
+                s.EmployeeWorkMode == shiftMode &&
+                s.EndUtc   > shiftFetchStart &&
                 s.StartUtc < windowEnd
             )
             .Select(s => new { s.EmployeeId, s.StartUtc, s.EndUtc })
@@ -114,27 +127,29 @@ public sealed class GetAvailabilityQueryHandler(
         // 6) Generate candidate start times every 30 minutes
         for (var start = windowStart; start < windowEnd; start = start.AddMinutes(30))
         {
-            // Optional UX: don't show past starts
             if (start < now) continue;
 
             var end = start.AddMinutes(totalDurationMinutes);
             if (end > windowEnd) break;
 
-            // Supply: employees whose shift fully covers [start, end)
+            // Effective window for this slot, widened by travel time for mobile
+            var departure   = start.AddMinutes(-travelTimeMinutes);
+            var returnTime  = end.AddMinutes(travelTimeMinutes);
+
+            // Supply: employees whose shift fully covers the effective window [departure, returnTime]
             var availableEmployees = shifts
-                .Where(s => s.StartUtc <= start && s.EndUtc >= end)
+                .Where(s => s.StartUtc <= departure && s.EndUtc >= returnTime)
                 .Select(s => s.EmployeeId)
                 .Distinct()
                 .Count();
 
-            // Demand: employees used by overlapping blocking bookings.
-            // Use each blocker's widened [departure, return] window so mobile travel time is respected.
+            // Demand: blockers whose effective window intersects [departure, returnTime]
             var usedEmployees = blockingBookings
                 .Where(b =>
                 {
                     var bDep = b.StartUtc.AddMinutes(-(b.TravelTimeMinutes ?? 0));
                     var bRet = b.EndUtc.AddMinutes(b.TravelTimeMinutes ?? 0);
-                    return bDep < end && bRet > start;
+                    return bDep < returnTime && bRet > departure;
                 })
                 .Sum(b => b.RequiredEmployees);
 
@@ -148,7 +163,7 @@ public sealed class GetAvailabilityQueryHandler(
                     {
                         var bDep = b.StartUtc.AddMinutes(-(b.TravelTimeMinutes ?? 0));
                         var bRet = b.EndUtc.AddMinutes(b.TravelTimeMinutes ?? 0);
-                        return bDep < end && bRet > start;
+                        return bDep < returnTime && bRet > departure;
                     })
                     .Sum(b => b.RequiredBays);
 
@@ -159,10 +174,15 @@ public sealed class GetAvailabilityQueryHandler(
             results.Add(new GetAvailabilityQueryDto
             {
                 StartUtc = start,
-                EndUtc = end
+                EndUtc   = end,
             });
         }
 
-        return results;
+        return new GetAvailabilityResult
+        {
+            Slots              = results,
+            TravelTimeMinutes  = travelTimeMinutes,
+            MobileSurchargeFee = quote.MobileSurchargeFee,
+        };
     }
 }

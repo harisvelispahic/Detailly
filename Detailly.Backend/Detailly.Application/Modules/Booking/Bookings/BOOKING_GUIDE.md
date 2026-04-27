@@ -112,7 +112,7 @@ Task<BookingQuoteResult> CalculateAsync(
     int? shopLocationId = null)
 ```
 
-`serviceAddressId` and `shopLocationId` are optional — passing both enables the mobile surcharge and travel time calculation. When either is null (e.g., availability check), travel time = 0 and surcharge = 0.
+`serviceAddressId` and `shopLocationId` are optional — passing both enables the mobile surcharge and travel time calculation via ORS. When either is null, travel time = 0 and surcharge = 0. `GetAvailabilityQueryHandler` now forwards both when `ServiceAddressId` is provided by the caller, making mobile availability slots accurate for the given address.
 
 ### Calculation steps
 
@@ -428,35 +428,47 @@ Runs inside an explicit transaction.
 **Input:**
 
 ```
-DateUtc          DateTime   — only the date part is used
-ServicePackageId int
-AddonItemIds     List<int>?
-ServiceMode      enum
-ShopLocationId   int
+DateUtc           DateTime   — only the date part is used
+ServicePackageId  int
+AddonItemIds      List<int>?
+ServiceMode       enum
+ShopLocationId    int
+ServiceAddressId  int?       — optional; when provided for Mobile, enables real travel time
 ```
 
-No `VehicleIds` or `ServiceAddressId` — the quote is called with `vehicleIds: null`, `isFleet: false`, `serviceAddressId: null`, `shopLocationId: null`. This means:
+The quote is always called with `vehicleIds: null`, `isFleet: false`. `ServiceAddressId` and `ShopLocationId` are forwarded to `IBookingQuoteService` only when `ServiceAddressId` is provided:
 
-- Vehicle multiplier = 1.0 (no vehicle-specific pricing)
-- Travel time = 0, mobile surcharge = 0
-- The availability result is **approximate for mobile** (it cannot know the caller's travel time without an address)
+- If `ServiceAddressId` is null → travel time = 0, mobile surcharge = 0 (approximate for mobile)
+- If `ServiceAddressId` is provided → real ORS travel time and surcharge are computed and returned; slot windows are widened accordingly (accurate for mobile)
+
+In all cases, vehicle multiplier = 1.0 (no vehicle-specific pricing without a vehicle selection).
 
 **Algorithm:**
 
-1. Get `LocationOpeningHours` for the date's `DayOfWeek`. If missing or `IsClosed` → return empty
-2. Build day window: `[OpenTimeUtc, CloseTimeUtc]`
-3. Fetch `TotalBays` for InShop (if 0 or location missing → return empty)
-4. Pre-fetch blocking bookings for the day with status `Confirmed` or active `PendingPayment` — selects `StartUtc`, `EndUtc`, `RequiredEmployees`, `RequiredBays`, `TravelTimeMinutes`
-5. Pre-fetch employee shifts where mode and location match and shift overlaps the day window
-6. Iterate candidate start times every 30 minutes from `windowStart` to `windowEnd - totalDuration`:
+1. Run quote via `IBookingQuoteService.CalculateAsync(...)` — supplies real travel time when `ServiceAddressId` is present
+2. Get `LocationOpeningHours` for the date's `DayOfWeek`. If missing or `IsClosed` → return empty result (with travel time and surcharge from quote)
+3. Build day window: `[OpenTimeUtc, CloseTimeUtc]`
+4. Fetch `TotalBays` for InShop (if 0 or location missing → return empty)
+5. Pre-fetch blocking bookings for the day with status `Confirmed` or active `PendingPayment` — selects `StartUtc`, `EndUtc`, `RequiredEmployees`, `RequiredBays`, `TravelTimeMinutes`
+6. Pre-fetch employee shifts where mode and location match. Shift fetch window is widened: `[windowStart - travelTimeMinutes, windowEnd]` so that shifts covering early mobile departures are included
+7. Iterate candidate start times every 30 minutes from `windowStart` to `windowEnd - totalDuration`:
    - Skip past starts (`< now`)
-   - `availableEmployees` = distinct employees whose shift covers `[start, end]` exactly
-   - `usedEmployees` = sum of `RequiredEmployees` from blocking bookings whose **effective window** `[b.StartUtc - TravelTime, b.EndUtc + TravelTime]` overlaps `[start, end]`
+   - Effective window: `departure = start - travelTimeMinutes`, `returnTime = end + travelTimeMinutes`
+   - `availableEmployees` = distinct employees whose shift fully covers `[departure, returnTime]`
+   - `usedEmployees` = sum of `RequiredEmployees` from blocking bookings whose effective window `[b.StartUtc - b.TravelTime, b.EndUtc + b.TravelTime]` overlaps `[departure, returnTime]`
    - If `availableEmployees - usedEmployees < requiredEmployees` → skip
    - InShop: same bay check using `usedBays`
    - Otherwise: emit `{ StartUtc, EndUtc }`
 
-**Returns:** `List<GetAvailabilityQueryDto>` — `{ StartUtc, EndUtc }` per available slot.
+**Returns:** `GetAvailabilityResult`
+
+```
+Slots              List<GetAvailabilityQueryDto>   — { StartUtc, EndUtc } per available slot
+TravelTimeMinutes  int                             — 0 for InShop or when no address provided
+MobileSurchargeFee decimal                         — 0 for InShop or when no address provided
+```
+
+`TravelTimeMinutes` and `MobileSurchargeFee` are always returned so the frontend can display real price and travel time estimates before the hold is created.
 
 The hard capacity gate is in `CreateBookingHoldCommandHandler` (inside a transaction). Availability is a best-effort display.
 
@@ -632,7 +644,7 @@ This widened window is used consistently in:
 - `CreateBookingHoldCommandHandler` — capacity check
 - `AssignEmployeesToBookingCommandHandler` — shift coverage and overlap check
 - `ListAssignableEmployeesForBookingQueryHandler` — shift coverage and overlap check
-- `GetAvailabilityQueryHandler` — blocker overlap check (but NOT candidate shift coverage, because availability doesn't know the caller's address/travel time)
+- `GetAvailabilityQueryHandler` — both shift coverage and blocker overlap use `[departure, returnTime]` when `ServiceAddressId` is provided (travel time comes from the quote); when `ServiceAddressId` is null, travel time = 0 so the windows collapse to `[start, end]` (InShop-equivalent behaviour)
 
 ### Employee shifts
 
@@ -730,14 +742,18 @@ Bound to `OpenRouteServiceOptions`. Used only by `BookingQuoteService`.
 ### Booking flow
 
 ```
-1. GET  /Bookings/availability?...      → list available { StartUtc, EndUtc } slots
-2. POST /Bookings                        → CreateHold → returns BookingId (int)
+1. GET  /Bookings/availability?...      → GetAvailabilityResult { Slots, TravelTimeMinutes, MobileSurchargeFee }
+         Required params: dateUtc, servicePackageId, serviceMode, shopLocationId
+         Optional: addonItemIds, serviceAddressId (Mobile only — enables real travel time + surcharge)
+2. POST /Bookings                        → CreateHold → returns { id: BookingId }
 3a. POST /Payments/bookings/{id}/wallet  → pay with wallet → booking confirmed
 3b. POST /Payments/bookings/{id}/card-intent → get Stripe ClientSecret
          → confirm via Stripe.js
          → Stripe fires webhook → booking confirmed asynchronously
 4. GET  /Bookings/{id}                  → poll or show booking details
 ```
+
+`TravelTimeMinutes` and `MobileSurchargeFee` from step 1 can be surfaced to the user before they commit to the hold. The values are approximate (vehicle multiplier = 1.0, no fleet discount) but the travel fee is real when `serviceAddressId` is provided.
 
 ### Staff flow
 
@@ -760,3 +776,4 @@ For mobile bookings, use `DepartureUtc` and `ReturnUtc` to show when the team le
 - **Hold expiry** — `ReservationExpiresAtUtc` is set and respected in all queries, but no background job currently soft-deletes or transitions expired holds. Availability and capacity checks filter them out dynamically.
 - **Holidays** — opening hours are per day-of-week only. No holiday table exists yet.
 - **Per-location timezones** — all times are UTC throughout.
+- **Vehicle-specific availability pricing** — `GetAvailabilityQuery` always uses vehicle multiplier = 1.0 and `isFleet: false`. Slots are capacity-correct but the displayed price is approximate until the hold is created with real vehicle data.

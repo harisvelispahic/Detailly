@@ -330,16 +330,21 @@
             <p>Select a date to see available slots</p>
           </div>
 
+          <div *ngIf="selectedDate && isMobile && !selectedAddressId && !isLoadingSlots" class="timeslots-empty">
+            <mat-icon>location_on</mat-icon>
+            <p>Select an address above to see available slots</p>
+          </div>
+
           <div *ngIf="selectedDate && isLoadingSlots" class="loading-state loading-state--small">
             <mat-spinner diameter="32"></mat-spinner>
           </div>
 
-          <div *ngIf="selectedDate && !isLoadingSlots && availableSlots.length === 0" class="timeslots-empty">
+          <div *ngIf="selectedDate && (!isMobile || selectedAddressId) && !isLoadingSlots && availableSlots.length === 0" class="timeslots-empty">
             <mat-icon>event_busy</mat-icon>
             <p>No available slots on this day.<br>Try a different date.</p>
           </div>
 
-          <div *ngIf="selectedDate && !isLoadingSlots && availableSlots.length > 0" class="timeslots-grid">
+          <div *ngIf="selectedDate && (!isMobile || selectedAddressId) && !isLoadingSlots && availableSlots.length > 0" class="timeslots-grid">
             <button *ngFor="let slot of availableSlots"
                     class="timeslot-btn"
                     [class.timeslot-btn--selected]="isSlotSelected(slot)"
@@ -507,19 +512,20 @@
             <span class="breakdown-line__label">
               <mat-icon>local_shipping</mat-icon>
               Travel fee
-              <span class="breakdown-line__label-note">(based on distance)</span>
+              <span *ngIf="travelTimeMinutes > 0" class="breakdown-line__label-note">({{ travelTimeMinutes }} min away)</span>
+              <span *ngIf="travelTimeMinutes === 0" class="breakdown-line__label-note">(based on distance)</span>
             </span>
-            <span class="breakdown-line__value breakdown-line__value--tbd">TBD</span>
+            <span *ngIf="mobileSurchargeFee > 0" class="breakdown-line__value">+${{ mobileSurchargeFee | number:'1.2-2' }}</span>
+            <span *ngIf="mobileSurchargeFee === 0" class="breakdown-line__value">Included</span>
           </div>
 
           <!-- Total -->
           <div class="breakdown-separator breakdown-separator--bold"></div>
           <div class="breakdown-total">
             <div class="breakdown-total__label">
-              <strong>{{ isMobile ? 'Estimated Total' : 'Total' }}</strong>
-              <span *ngIf="isMobile" class="breakdown-total__note">Travel fee added at booking</span>
+              <strong>Total</strong>
             </div>
-            <span class="breakdown-total__price gradient-text">${{ serviceTotal | number:'1.2-2' }}</span>
+            <span class="breakdown-total__price gradient-text">${{ grandTotal | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>

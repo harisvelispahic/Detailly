@@ -89,6 +89,8 @@ export class BookingWizardComponent implements OnInit {
   selectedSlot?: AvailabilitySlotDto;
   isLoadingSlots = false;
   notes = '';
+  travelTimeMinutes = 0;
+  mobileSurchargeFee = 0;
 
   // Step 4
   isSubmitting = false;
@@ -276,6 +278,8 @@ export class BookingWizardComponent implements OnInit {
     this.selectedServiceMode = mode;
     this.selectedSlot = undefined;
     this.availableSlots = [];
+    this.travelTimeMinutes = 0;
+    this.mobileSurchargeFee = 0;
     if (mode !== ServiceMode.Mobile) {
       this.selectedAddressId = undefined;
     } else {
@@ -306,7 +310,15 @@ export class BookingWizardComponent implements OnInit {
   }
 
   selectAddress(id: number): void {
+    if (this.selectedAddressId === id) return;
     this.selectedAddressId = id;
+    this.selectedSlot = undefined;
+    this.availableSlots = [];
+    this.travelTimeMinutes = 0;
+    this.mobileSurchargeFee = 0;
+    if (this.selectedDate) {
+      this.loadAvailability();
+    }
   }
 
   // ── Step 3: Calendar & Availability ──────────────────────────────────────
@@ -363,6 +375,9 @@ export class BookingWizardComponent implements OnInit {
 
   loadAvailability(): void {
     if (!this.selectedDate || !this.selectedPackage) return;
+    // For mobile, wait until an address is chosen — travel time gates which slots are possible
+    if (this.selectedServiceMode === ServiceMode.Mobile && !this.selectedAddressId) return;
+
     const dateUtc = new Date(
       Date.UTC(
         this.selectedDate.getFullYear(),
@@ -379,10 +394,13 @@ export class BookingWizardComponent implements OnInit {
         addonItemIds: Array.from(this.selectedAddonIds),
         serviceMode: this.selectedServiceMode,
         shopLocationId: this.shopLocationId,
+        serviceAddressId: this.selectedAddressId,
       })
       .subscribe({
-        next: (slots) => {
-          this.availableSlots = slots;
+        next: (response) => {
+          this.availableSlots = response.slots;
+          this.travelTimeMinutes = response.travelTimeMinutes;
+          this.mobileSurchargeFee = response.mobileSurchargeFee;
           this.isLoadingSlots = false;
         },
         error: () => {
@@ -492,6 +510,10 @@ export class BookingWizardComponent implements OnInit {
 
   get isMobile(): boolean {
     return this.selectedServiceMode === ServiceMode.Mobile;
+  }
+
+  get grandTotal(): number {
+    return this.serviceTotal + this.mobileSurchargeFee;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
