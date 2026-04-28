@@ -2,11 +2,10 @@
   <app-container size="xl">
     <div class="shop-page__header">
       <p class="shop-page__eyebrow">Catalog</p>
-      <h1 class="shop-page__title">
-        Shop <span class="gradient-text">Products</span>
-      </h1>
+      <h1 class="shop-page__title">Shop <span class="gradient-text">Products</span></h1>
       <p class="shop-page__subtitle">
-        Premium detailing products for the same finish featured across the public Detailly experience.
+        Premium detailing products for the same finish featured across the public Detailly
+        experience.
       </p>
     </div>
 
@@ -30,9 +29,11 @@
           <h2>Filters</h2>
 
           <div class="shop-page__filter-group">
-            <button *ngFor="let category of categories" type="button" class="shop-page__filter-chip">
-              {{ category }}
-            </button>
+            @for (category of categories; track $index) {
+              <button type="button" class="shop-page__filter-chip">
+                {{ category }}
+              </button>
+            }
           </div>
 
           <div class="shop-page__price-block">
@@ -43,30 +44,32 @@
       </aside>
 
       <div class="shop-page__grid">
-        <article *ngFor="let product of products" class="product-card">
-          <div class="product-card__visual" [style.background]="product.accent">
-            <span>{{ product.category }}</span>
-          </div>
+        @for (product of products; track $index) {
+          <article class="product-card">
+            <div class="product-card__visual" [style.background]="product.accent">
+              <span>{{ product.category }}</span>
+            </div>
 
-          <div class="product-card__body">
-            <div class="product-card__meta">
-              <p>{{ product.category }}</p>
-              <div>
-                <mat-icon>star</mat-icon>
-                <span>{{ product.rating }}</span>
+            <div class="product-card__body">
+              <div class="product-card__meta">
+                <p>{{ product.category }}</p>
+                <div>
+                  <mat-icon>star</mat-icon>
+                  <span>{{ product.rating }}</span>
+                </div>
+              </div>
+
+              <h3>{{ product.name }}</h3>
+
+              <div class="product-card__footer">
+                <strong>{{ product.price }}</strong>
+                <button type="button" class="product-card__action" aria-label="Add to cart">
+                  <mat-icon>add_shopping_cart</mat-icon>
+                </button>
               </div>
             </div>
-
-            <h3>{{ product.name }}</h3>
-
-            <div class="product-card__footer">
-              <strong>{{ product.price }}</strong>
-              <button type="button" class="product-card__action" aria-label="Add to cart">
-                <mat-icon>add_shopping_cart</mat-icon>
-              </button>
-            </div>
-          </div>
-        </article>
+          </article>
+        }
       </div>
     </div>
   </app-container>

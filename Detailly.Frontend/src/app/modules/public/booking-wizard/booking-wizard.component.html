@@ -1,22 +1,28 @@
 <div class="booking-wizard-page">
   <div class="booking-wizard-container">
-
     <!-- Step Indicator -->
     <div class="step-indicator">
       <ng-container *ngFor="let label of stepLabels; let i = index">
-        <div class="step-indicator__step"
-             [class.step-indicator__step--active]="currentStep === i + 1"
-             [class.step-indicator__step--completed]="currentStep > i + 1">
+        <div
+          class="step-indicator__step"
+          [class.step-indicator__step--active]="currentStep === i + 1"
+          [class.step-indicator__step--completed]="currentStep > i + 1"
+        >
           <div class="step-indicator__circle">
-            <mat-icon *ngIf="currentStep > i + 1">check</mat-icon>
-            <mat-icon *ngIf="currentStep <= i + 1">{{ stepIcons[i] }}</mat-icon>
+            @if (currentStep > i + 1) {
+              <mat-icon>check</mat-icon>
+            }
+            @if (currentStep <= i + 1) {
+              <mat-icon>{{ stepIcons[i] }}</mat-icon>
+            }
           </div>
           <span class="step-indicator__label">{{ label }}</span>
         </div>
-        <div *ngIf="i < stepLabels.length - 1"
-             class="step-indicator__connector"
-             [class.step-indicator__connector--completed]="currentStep > i + 1">
-        </div>
+        <div
+          *ngIf="i < stepLabels.length - 1"
+          class="step-indicator__connector"
+          [class.step-indicator__connector--completed]="currentStep > i + 1"
+        ></div>
       </ng-container>
     </div>
 
@@ -27,39 +33,45 @@
         <p class="step-header__subtitle">Select the detailing package that suits your needs</p>
       </div>
 
-      <div *ngIf="isLoadingPackages" class="loading-state">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
-
-      <div *ngIf="!isLoadingPackages" class="packages-grid">
-        <div *ngFor="let pkg of packages"
-             class="package-card"
-             [class.package-card--selected]="selectedPackage?.id === pkg.id"
-             (click)="selectPackage(pkg)">
-          <div class="package-card__header">
-            <div class="package-card__icon">
-              <mat-icon>auto_fix_high</mat-icon>
+      @if (isLoadingPackages) {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      } @else {
+        <div class="packages-grid">
+          <div
+            *ngFor="let pkg of packages"
+            class="package-card"
+            [class.package-card--selected]="selectedPackage?.id === pkg.id"
+            (click)="selectPackage(pkg)"
+          >
+            <div class="package-card__header">
+              <div class="package-card__icon">
+                <mat-icon>auto_fix_high</mat-icon>
+              </div>
+              <div class="package-card__price">${{ pkg.price | number: '1.0-0' }}</div>
             </div>
-            <div class="package-card__price">${{ pkg.price | number:'1.0-0' }}</div>
-          </div>
-          <div class="package-card__body">
-            <h3 class="package-card__name">{{ pkg.name }}</h3>
-            <p class="package-card__duration">
-              <mat-icon>schedule</mat-icon>
-              {{ pkg.estimatedDurationHours }}h
-            </p>
-            <ul class="package-card__items">
-              <li *ngFor="let item of pkg.items | slice:0:4">
-                <mat-icon>check</mat-icon>
-                {{ item.name }}
-              </li>
-            </ul>
-          </div>
-          <div *ngIf="selectedPackage?.id === pkg.id" class="package-card__selected-badge">
-            <mat-icon>check_circle</mat-icon>
+            <div class="package-card__body">
+              <h3 class="package-card__name">{{ pkg.name }}</h3>
+              <p class="package-card__duration">
+                <mat-icon>schedule</mat-icon>
+                {{ pkg.estimatedDurationHours }}h
+              </p>
+              <ul class="package-card__items">
+                <li *ngFor="let item of pkg.items | slice: 0 : 4">
+                  <mat-icon>check</mat-icon>
+                  {{ item.name }}
+                </li>
+              </ul>
+            </div>
+            @if (selectedPackage?.id === pkg.id) {
+              <div class="package-card__selected-badge">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
 
       <!-- Add-ons -->
       <ng-container *ngIf="selectedPackage">
@@ -75,19 +87,25 @@
           </p>
 
           <div *ngIf="!isLoadingAddons && availableAddons.length > 0" class="addons-grid">
-            <div *ngFor="let addon of availableAddons"
-                 class="addon-row"
-                 [class.addon-row--selected]="isAddonSelected(addon.id)"
-                 (click)="toggleAddon(addon.id)">
-              <mat-icon class="addon-row__toggle"
-                        [class.addon-row__toggle--active]="isAddonSelected(addon.id)">
+            <div
+              *ngFor="let addon of availableAddons"
+              class="addon-row"
+              [class.addon-row--selected]="isAddonSelected(addon.id)"
+              (click)="toggleAddon(addon.id)"
+            >
+              <mat-icon
+                class="addon-row__toggle"
+                [class.addon-row__toggle--active]="isAddonSelected(addon.id)"
+              >
                 {{ isAddonSelected(addon.id) ? 'check_circle' : 'radio_button_unchecked' }}
               </mat-icon>
               <div class="addon-row__info">
                 <span class="addon-row__name">{{ addon.name }}</span>
-                <span *ngIf="addon.description" class="addon-row__desc">{{ addon.description }}</span>
+                <span *ngIf="addon.description" class="addon-row__desc">{{
+                  addon.description
+                }}</span>
               </div>
-              <span class="addon-row__price">+${{ addon.price | number:'1.0-0' }}</span>
+              <span class="addon-row__price">+${{ addon.price | number: '1.0-0' }}</span>
             </div>
           </div>
         </div>
@@ -110,10 +128,12 @@
 
       <div *ngIf="!isLoadingVehicles">
         <div *ngIf="vehicles.length > 0" class="vehicles-list">
-          <div *ngFor="let vehicle of vehicles"
-               class="vehicle-card"
-               [class.vehicle-card--selected]="isVehicleSelected(vehicle.id)"
-               (click)="selectVehicle(vehicle.id)">
+          <div
+            *ngFor="let vehicle of vehicles"
+            class="vehicle-card"
+            [class.vehicle-card--selected]="isVehicleSelected(vehicle.id)"
+            (click)="selectVehicle(vehicle.id)"
+          >
             <div class="vehicle-card__icon">
               <mat-icon>directions_car</mat-icon>
             </div>
@@ -130,7 +150,9 @@
                 {{ isVehicleSelected(vehicle.id) ? 'check_box' : 'check_box_outline_blank' }}
               </ng-container>
               <ng-container *ngIf="!isFleet()">
-                {{ isVehicleSelected(vehicle.id) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                {{
+                  isVehicleSelected(vehicle.id) ? 'radio_button_checked' : 'radio_button_unchecked'
+                }}
               </ng-container>
             </mat-icon>
           </div>
@@ -161,21 +183,26 @@
             <div class="form-row">
               <mat-form-field appearance="outline">
                 <mat-label>Brand</mat-label>
-                <input matInput formControlName="brand" placeholder="e.g., BMW">
+                <input matInput formControlName="brand" placeholder="e.g., BMW" />
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Model</mat-label>
-                <input matInput formControlName="model" placeholder="e.g., M3">
+                <input matInput formControlName="model" placeholder="e.g., M3" />
               </mat-form-field>
             </div>
             <div class="form-row">
               <mat-form-field appearance="outline">
                 <mat-label>Year</mat-label>
-                <input matInput type="number" formControlName="yearOfManufacture" placeholder="e.g., 2022">
+                <input
+                  matInput
+                  type="number"
+                  formControlName="yearOfManufacture"
+                  placeholder="e.g., 2022"
+                />
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>License Plate</mat-label>
-                <input matInput formControlName="licencePlate" placeholder="e.g., ABC-1234">
+                <input matInput formControlName="licencePlate" placeholder="e.g., ABC-1234" />
               </mat-form-field>
             </div>
             <mat-form-field appearance="outline" class="form-field--full">
@@ -189,9 +216,18 @@
             <p *ngIf="addVehicleError" class="form-error">{{ addVehicleError }}</p>
             <div class="add-vehicle-form__actions">
               <button mat-button type="button" (click)="cancelAddVehicle()">Cancel</button>
-              <button mat-raised-button color="primary" type="button"
-                      (click)="submitAddVehicle()" [disabled]="isAddingVehicle">
-                <mat-spinner *ngIf="isAddingVehicle" diameter="16" class="btn-spinner"></mat-spinner>
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="submitAddVehicle()"
+                [disabled]="isAddingVehicle"
+              >
+                <mat-spinner
+                  *ngIf="isAddingVehicle"
+                  diameter="16"
+                  class="btn-spinner"
+                ></mat-spinner>
                 {{ isAddingVehicle ? 'Adding...' : 'Add Vehicle' }}
               </button>
             </div>
@@ -209,9 +245,11 @@
 
       <!-- Service mode selector (hidden for fleet — always Mobile) -->
       <div *ngIf="!isFleet()" class="service-mode-toggle">
-        <button class="service-mode-toggle__option"
-                [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.InShop"
-                (click)="selectServiceMode(ServiceMode.InShop)">
+        <button
+          class="service-mode-toggle__option"
+          [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.InShop"
+          (click)="selectServiceMode(ServiceMode.InShop)"
+        >
           <div class="service-mode-toggle__icon">
             <mat-icon>store</mat-icon>
           </div>
@@ -220,12 +258,18 @@
             <span class="service-mode-toggle__desc">Bring your vehicle to us</span>
           </div>
           <mat-icon class="service-mode-toggle__check">
-            {{ selectedServiceMode === ServiceMode.InShop ? 'radio_button_checked' : 'radio_button_unchecked' }}
+            {{
+              selectedServiceMode === ServiceMode.InShop
+                ? 'radio_button_checked'
+                : 'radio_button_unchecked'
+            }}
           </mat-icon>
         </button>
-        <button class="service-mode-toggle__option"
-                [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.Mobile"
-                (click)="selectServiceMode(ServiceMode.Mobile)">
+        <button
+          class="service-mode-toggle__option"
+          [class.service-mode-toggle__option--active]="selectedServiceMode === ServiceMode.Mobile"
+          (click)="selectServiceMode(ServiceMode.Mobile)"
+        >
           <div class="service-mode-toggle__icon">
             <mat-icon>home_pin</mat-icon>
           </div>
@@ -234,7 +278,11 @@
             <span class="service-mode-toggle__desc">We come to your address</span>
           </div>
           <mat-icon class="service-mode-toggle__check">
-            {{ selectedServiceMode === ServiceMode.Mobile ? 'radio_button_checked' : 'radio_button_unchecked' }}
+            {{
+              selectedServiceMode === ServiceMode.Mobile
+                ? 'radio_button_checked'
+                : 'radio_button_unchecked'
+            }}
           </mat-icon>
         </button>
       </div>
@@ -263,10 +311,12 @@
           </p>
 
           <div *ngIf="addresses.length > 0" class="address-cards">
-            <div *ngFor="let addr of addresses"
-                 class="address-card"
-                 [class.address-card--selected]="selectedAddressId === addr.id"
-                 (click)="selectAddress(addr.id)">
+            <div
+              *ngFor="let addr of addresses"
+              class="address-card"
+              [class.address-card--selected]="selectedAddressId === addr.id"
+              (click)="selectAddress(addr.id)"
+            >
               <div class="address-card__icon">
                 <mat-icon>home</mat-icon>
               </div>
@@ -275,7 +325,9 @@
                 <span class="address-card__city">{{ addr.city }}, {{ addr.postalCode }}</span>
               </div>
               <mat-icon class="address-card__check">
-                {{ selectedAddressId === addr.id ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                {{
+                  selectedAddressId === addr.id ? 'radio_button_checked' : 'radio_button_unchecked'
+                }}
               </mat-icon>
             </div>
           </div>
@@ -303,13 +355,15 @@
             <span *ngFor="let day of dayLabels">{{ day }}</span>
           </div>
           <div *ngFor="let week of calendarWeeks" class="calendar-grid__week">
-            <div *ngFor="let day of week"
-                 class="calendar-grid__day"
-                 [class.calendar-grid__day--empty]="!day"
-                 [class.calendar-grid__day--today]="day && isToday(day)"
-                 [class.calendar-grid__day--selected]="day && isSelectedDate(day)"
-                 [class.calendar-grid__day--past]="day && isPastDate(day)"
-                 (click)="day && !isPastDate(day) ? selectDate(day) : null">
+            <div
+              *ngFor="let day of week"
+              class="calendar-grid__day"
+              [class.calendar-grid__day--empty]="!day"
+              [class.calendar-grid__day--today]="day && isToday(day)"
+              [class.calendar-grid__day--selected]="day && isSelectedDate(day)"
+              [class.calendar-grid__day--past]="day && isPastDate(day)"
+              (click)="day && !isPastDate(day) ? selectDate(day) : null"
+            >
               {{ day?.getDate() }}
             </div>
           </div>
@@ -330,7 +384,10 @@
             <p>Select a date to see available slots</p>
           </div>
 
-          <div *ngIf="selectedDate && isMobile && !selectedAddressId && !isLoadingSlots" class="timeslots-empty">
+          <div
+            *ngIf="selectedDate && isMobile && !selectedAddressId && !isLoadingSlots"
+            class="timeslots-empty"
+          >
             <mat-icon>location_on</mat-icon>
             <p>Select an address above to see available slots</p>
           </div>
@@ -339,16 +396,34 @@
             <mat-spinner diameter="32"></mat-spinner>
           </div>
 
-          <div *ngIf="selectedDate && (!isMobile || selectedAddressId) && !isLoadingSlots && availableSlots.length === 0" class="timeslots-empty">
+          <div
+            *ngIf="
+              selectedDate &&
+              (!isMobile || selectedAddressId) &&
+              !isLoadingSlots &&
+              availableSlots.length === 0
+            "
+            class="timeslots-empty"
+          >
             <mat-icon>event_busy</mat-icon>
-            <p>No available slots on this day.<br>Try a different date.</p>
+            <p>No available slots on this day.<br />Try a different date.</p>
           </div>
 
-          <div *ngIf="selectedDate && (!isMobile || selectedAddressId) && !isLoadingSlots && availableSlots.length > 0" class="timeslots-grid">
-            <button *ngFor="let slot of availableSlots"
-                    class="timeslot-btn"
-                    [class.timeslot-btn--selected]="isSlotSelected(slot)"
-                    (click)="selectSlot(slot)">
+          <div
+            *ngIf="
+              selectedDate &&
+              (!isMobile || selectedAddressId) &&
+              !isLoadingSlots &&
+              availableSlots.length > 0
+            "
+            class="timeslots-grid"
+          >
+            <button
+              *ngFor="let slot of availableSlots"
+              class="timeslot-btn"
+              [class.timeslot-btn--selected]="isSlotSelected(slot)"
+              (click)="selectSlot(slot)"
+            >
               {{ formatSlotTime(slot.startUtc) }}
             </button>
           </div>
@@ -357,11 +432,15 @@
 
       <!-- Notes -->
       <div class="notes-section">
-        <h4 class="notes-section__title">Additional Notes <span class="notes-optional">(Optional)</span></h4>
-        <textarea class="notes-textarea"
-                  [(ngModel)]="notes"
-                  placeholder="Any special requests or information we should know..."
-                  rows="3">
+        <h4 class="notes-section__title">
+          Additional Notes <span class="notes-optional">(Optional)</span>
+        </h4>
+        <textarea
+          class="notes-textarea"
+          [(ngModel)]="notes"
+          placeholder="Any special requests or information we should know..."
+          rows="3"
+        >
         </textarea>
       </div>
     </div>
@@ -370,11 +449,12 @@
     <div *ngIf="currentStep === 4" class="step-content fade-in">
       <div class="step-header">
         <h2 class="step-header__title">Confirm Your <span class="gradient-text">Booking</span></h2>
-        <p class="step-header__subtitle">Review your booking details and transparent price breakdown before confirming</p>
+        <p class="step-header__subtitle">
+          Review your booking details and transparent price breakdown before confirming
+        </p>
       </div>
 
       <div class="summary-card">
-
         <!-- Service row -->
         <div class="summary-row">
           <div class="summary-row__icon">
@@ -466,9 +546,13 @@
             <div *ngFor="let v of selectedVehiclesList" class="breakdown-line">
               <span class="breakdown-line__label">
                 {{ v.yearOfManufacture }} {{ v.brand }} {{ v.model }}
-                <span class="breakdown-line__label-note">({{ v.vehicleCategory.name }} &times;{{ v.vehicleCategory.basePriceMultiplier | number:'1.2-2' }})</span>
+                <span class="breakdown-line__label-note"
+                  >({{ v.vehicleCategory.name }} &times;{{
+                    v.vehicleCategory.basePriceMultiplier | number: '1.2-2'
+                  }})</span
+                >
               </span>
-              <span class="breakdown-line__value">${{ vehiclePriceFor(v) | number:'1.2-2' }}</span>
+              <span class="breakdown-line__value">${{ vehiclePriceFor(v) | number: '1.2-2' }}</span>
             </div>
           </ng-container>
 
@@ -476,46 +560,61 @@
           <ng-container *ngIf="!isFleet()">
             <div class="breakdown-line">
               <span class="breakdown-line__label">{{ selectedPackage?.name }}</span>
-              <span class="breakdown-line__value">${{ (selectedPackage?.price ?? 0) | number:'1.2-2' }}</span>
+              <span class="breakdown-line__value"
+                >${{ selectedPackage?.price ?? 0 | number: '1.2-2' }}</span
+              >
             </div>
 
-            <div *ngFor="let addon of selectedAddonsList" class="breakdown-line breakdown-line--addon">
+            <div
+              *ngFor="let addon of selectedAddonsList"
+              class="breakdown-line breakdown-line--addon"
+            >
               <span class="breakdown-line__label">
                 <mat-icon>add_circle_outline</mat-icon>
                 {{ addon.name }}
               </span>
-              <span class="breakdown-line__value">+${{ addon.price | number:'1.2-2' }}</span>
+              <span class="breakdown-line__value">+${{ addon.price | number: '1.2-2' }}</span>
             </div>
 
             <!-- Vehicle multiplier row — shown when multiplier ≠ 1.0, after addons so it visually applies to the sum -->
-            <div *ngIf="singleVehicleMultiplier !== 1" class="breakdown-line breakdown-line--modifier">
+            <div
+              *ngIf="singleVehicleMultiplier !== 1"
+              class="breakdown-line breakdown-line--modifier"
+            >
               <span class="breakdown-line__label">
                 <mat-icon>directions_car</mat-icon>
                 Vehicle category adjustment
               </span>
               <span class="breakdown-line__value breakdown-line__value--multiplier">
-                &times;{{ singleVehicleMultiplier | number:'1.2-2' }}
+                &times;{{ singleVehicleMultiplier | number: '1.2-2' }}
               </span>
             </div>
           </ng-container>
 
           <!-- Subtotal — shown when there is anything to aggregate -->
-          <ng-container *ngIf="singleVehicleMultiplier !== 1 || selectedAddonsList.length > 0 || isFleet()">
+          <ng-container
+            *ngIf="singleVehicleMultiplier !== 1 || selectedAddonsList.length > 0 || isFleet()"
+          >
             <div class="breakdown-separator"></div>
             <div class="breakdown-line breakdown-line--subtotal">
               <span class="breakdown-line__label">Subtotal</span>
-              <span class="breakdown-line__value">${{ subtotalBeforeDiscount | number:'1.2-2' }}</span>
+              <span class="breakdown-line__value"
+                >${{ subtotalBeforeDiscount | number: '1.2-2' }}</span
+              >
             </div>
           </ng-container>
 
           <!-- Fleet discount -->
-          <div *ngIf="isFleet() && fleetDiscountPercent > 0" class="breakdown-line breakdown-line--discount">
+          <div
+            *ngIf="isFleet() && fleetDiscountPercent > 0"
+            class="breakdown-line breakdown-line--discount"
+          >
             <span class="breakdown-line__label">
               <mat-icon>local_offer</mat-icon>
               Fleet discount ({{ fleetDiscountPercent }}%)
             </span>
             <span class="breakdown-line__value breakdown-line__value--discount">
-              &minus;${{ fleetDiscountAmount | number:'1.2-2' }}
+              &minus;${{ fleetDiscountAmount | number: '1.2-2' }}
             </span>
           </div>
 
@@ -524,10 +623,16 @@
             <span class="breakdown-line__label">
               <mat-icon>local_shipping</mat-icon>
               Travel fee
-              <span *ngIf="travelTimeMinutes > 0" class="breakdown-line__label-note">({{ travelTimeMinutes }} min away)</span>
-              <span *ngIf="travelTimeMinutes === 0" class="breakdown-line__label-note">(based on distance)</span>
+              <span *ngIf="travelTimeMinutes > 0" class="breakdown-line__label-note"
+                >({{ travelTimeMinutes }} min away)</span
+              >
+              <span *ngIf="travelTimeMinutes === 0" class="breakdown-line__label-note"
+                >(based on distance)</span
+              >
             </span>
-            <span *ngIf="mobileSurchargeFee > 0" class="breakdown-line__value">+${{ mobileSurchargeFee | number:'1.2-2' }}</span>
+            <span *ngIf="mobileSurchargeFee > 0" class="breakdown-line__value"
+              >+${{ mobileSurchargeFee | number: '1.2-2' }}</span
+            >
             <span *ngIf="mobileSurchargeFee === 0" class="breakdown-line__value">Included</span>
           </div>
 
@@ -537,7 +642,9 @@
             <div class="breakdown-total__label">
               <strong>Total</strong>
             </div>
-            <span class="breakdown-total__price gradient-text">${{ grandTotal | number:'1.2-2' }}</span>
+            <span class="breakdown-total__price gradient-text"
+              >${{ grandTotal | number: '1.2-2' }}</span
+            >
           </div>
         </div>
       </div>
@@ -555,31 +662,45 @@
 
     <!-- ══════════════════════════ FOOTER ══════════════════════════════════ -->
     <div class="wizard-footer">
-      <button *ngIf="currentStep > 1" mat-stroked-button class="footer-btn footer-btn--back"
-              (click)="prevStep()">
+      <button
+        *ngIf="currentStep > 1"
+        mat-stroked-button
+        class="footer-btn footer-btn--back"
+        (click)="prevStep()"
+      >
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>
 
       <div class="footer-spacer"></div>
 
-      <button *ngIf="currentStep < 4" mat-raised-button color="primary"
-              class="footer-btn footer-btn--continue"
-              (click)="nextStep()"
-              [disabled]="(currentStep === 1 && !canProceedStep1)
-                       || (currentStep === 2 && !canProceedStep2)
-                       || (currentStep === 3 && !canProceedStep3)">
+      <button
+        *ngIf="currentStep < 4"
+        mat-raised-button
+        color="primary"
+        class="footer-btn footer-btn--continue"
+        (click)="nextStep()"
+        [disabled]="
+          (currentStep === 1 && !canProceedStep1) ||
+          (currentStep === 2 && !canProceedStep2) ||
+          (currentStep === 3 && !canProceedStep3)
+        "
+      >
         Continue
         <mat-icon>arrow_forward</mat-icon>
       </button>
 
-      <button *ngIf="currentStep === 4" mat-raised-button color="primary"
-              class="footer-btn footer-btn--confirm"
-              (click)="confirmBooking()" [disabled]="isSubmitting">
+      <button
+        *ngIf="currentStep === 4"
+        mat-raised-button
+        color="primary"
+        class="footer-btn footer-btn--confirm"
+        (click)="confirmBooking()"
+        [disabled]="isSubmitting"
+      >
         <mat-spinner *ngIf="isSubmitting" diameter="18" class="btn-spinner"></mat-spinner>
         {{ isSubmitting ? 'Booking...' : 'Confirm Booking' }}
       </button>
     </div>
-
   </div>
 </div>

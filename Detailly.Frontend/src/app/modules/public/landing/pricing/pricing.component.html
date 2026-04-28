@@ -11,47 +11,47 @@
 
     <!-- Pricing Tiers Grid -->
     <div class="pricing-grid">
-      <div
-        *ngFor="let tier of pricingTiers; let i = index"
-        class="pricing-card"
-        [class.popular]="tier.popular"
-      >
-        <!-- Popular Badge -->
-        @if (tier.popular) {
-          <div class="popular-badge">Most Popular</div>
-        }
+      @for (tier of pricingTiers; track $index) {
+        <div class="pricing-card" [class.popular]="tier.popular">
+          <!-- Popular Badge -->
+          @if (tier.popular) {
+            <div class="popular-badge">Most Popular</div>
+          }
 
-        <!-- Tier Header -->
-        <div class="tier-header">
-          <h3 class="tier-name">{{ tier.name }}</h3>
-          <p class="tier-description">{{ tier.description }}</p>
+          <!-- Tier Header -->
+          <div class="tier-header">
+            <h3 class="tier-name">{{ tier.name }}</h3>
+            <p class="tier-description">{{ tier.description }}</p>
+          </div>
+
+          <!-- Price -->
+          <div class="price-section">
+            <span class="price-amount">${{ tier.price }}</span>
+            <span class="price-unit">/service</span>
+          </div>
+
+          <!-- Features List -->
+          <ul class="features-list">
+            @for (feature of tier.features; track $index) {
+              <li class="feature-item">
+                <mat-icon class="check-icon">check_circle</mat-icon>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+
+          <!-- CTA Button -->
+          <button
+            mat-raised-button
+            [color]="tier.popular ? 'primary' : ''"
+            [class.popular-btn]="tier.popular"
+            class="book-btn"
+            (click)="bookNow()"
+          >
+            Book Now
+          </button>
         </div>
-
-        <!-- Price -->
-        <div class="price-section">
-          <span class="price-amount">${{ tier.price }}</span>
-          <span class="price-unit">/service</span>
-        </div>
-
-        <!-- Features List -->
-        <ul class="features-list">
-          <li *ngFor="let feature of tier.features" class="feature-item">
-            <mat-icon class="check-icon">check_circle</mat-icon>
-            <span>{{ feature }}</span>
-          </li>
-        </ul>
-
-        <!-- CTA Button -->
-        <button
-          mat-raised-button
-          [color]="tier.popular ? 'primary' : ''"
-          [class.popular-btn]="tier.popular"
-          class="book-btn"
-          (click)="bookNow()"
-        >
-          Book Now
-        </button>
-      </div>
+      }
     </div>
   </div>
 </section>

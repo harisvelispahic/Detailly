@@ -43,10 +43,12 @@
         <app-card-content>
           @if (page.highlights?.length) {
             <ul class="public-placeholder-page__list">
-              <li *ngFor="let item of page.highlights">
-                <mat-icon>check_circle</mat-icon>
-                <span>{{ item }}</span>
-              </li>
+              @for (item of page.highlights; track $index) {
+                <li>
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ item }}</span>
+                </li>
+              }
             </ul>
           }
         </app-card-content>

@@ -18,12 +18,9 @@
         <div class="review-card">
           <!-- Star Rating -->
           <div class="star-rating">
-            <mat-icon
-              *ngFor="let star of getRatingArray(currentReview.rating)"
-              [class.filled]="star < currentReview.rating"
-            >
-              star
-            </mat-icon>
+            @for (star of getRatingArray(currentReview.rating); track $index) {
+              <mat-icon [class.filled]="star < currentReview.rating">star</mat-icon>
+            }
           </div>
 
           <!-- Review Text -->
@@ -58,13 +55,14 @@
 
         <!-- Dot Indicators -->
         <div class="dot-indicators">
-          <button
-            *ngFor="let review of reviews; let i = index"
-            class="dot"
-            [class.active]="i === currentReviewIndex"
-            (click)="goToReview(i)"
-            [attr.aria-label]="'Go to review ' + (i + 1)"
-          ></button>
+          @for (review of reviews; track $index) {
+            <button
+              class="dot"
+              [class.active]="$index === currentReviewIndex"
+              (click)="goToReview($index)"
+              [attr.aria-label]="'Go to review ' + ($index + 1)"
+            ></button>
+          }
         </div>
 
         <!-- Next Button -->

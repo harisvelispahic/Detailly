@@ -3,11 +3,15 @@
 
   <h2>Pay Booking (Card)</h2>
 
-  <div *ngIf="isLoading">Loading...</div>
+  @if (isLoading) {
+    <div>Loading...</div>
+  }
 
-  <div *ngIf="cardError" style="color: red; margin: 8px 0">
-    {{ cardError }}
-  </div>
+  @if (cardError) {
+    <div style="color: red; margin: 8px 0">
+      {{ cardError }}
+    </div>
+  }
 
   <div id="card-element" style="margin: 16px 0"></div>
 

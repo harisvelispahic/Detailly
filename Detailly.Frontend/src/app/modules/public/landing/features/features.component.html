@@ -13,17 +13,15 @@
 
     <!-- Features Grid -->
     <div class="features-grid">
-      <div
-        *ngFor="let feature of features; let i = index"
-        class="feature-card"
-        [style.animation-delay]="i * 100 + 'ms'"
-      >
-        <div class="feature-icon">
-          <mat-icon>{{ feature.icon }}</mat-icon>
+      @for (feature of features; track $index) {
+        <div class="feature-card" [style.animation-delay]="$index * 100 + 'ms'">
+          <div class="feature-icon">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
         </div>
-        <h3 class="feature-title">{{ feature.title }}</h3>
-        <p class="feature-description">{{ feature.description }}</p>
-      </div>
+      }
     </div>
   </div>
 </section>
