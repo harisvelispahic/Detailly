@@ -1,4 +1,4 @@
-@import '../admin-orders-status-styles.scss';
+@use '../admin-orders-status-styles.scss';
 
 .dialog-container {
   display: flex;
@@ -405,7 +405,12 @@
       display: block;
       overflow-x: auto;
 
-      thead, tbody, tfoot, tr, th, td {
+      thead,
+      tbody,
+      tfoot,
+      tr,
+      th,
+      td {
         display: block;
       }
 

@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
-import {LoadingBarService} from '../../../../core/services/loading-bar.service';
+import { LoadingBarService } from '../../../../core/services/loading-bar.service';
 
 @Component({
-  selector: 'app-fit-loading-bar',
+  selector: 'app-loading-bar',
   standalone: false,
-  templateUrl: './fit-loading-bar.component.html',
-  styleUrl: './fit-loading-bar.component.scss',
+  templateUrl: './loading-bar.component.html',
+  styleUrl: './loading-bar.component.scss',
 })
-export class FitLoadingBarComponent {
+export class LoadingBarComponent {
   /**
    * Inject LoadingBarService to access loading state
    * Component subscribes to loading$ observable to show/hide bar

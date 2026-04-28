@@ -1,4 +1,4 @@
-@import 'admin-orders-status-styles';
+@use 'admin-orders-status-styles';
 
 .container {
   padding: 24px;
@@ -345,7 +345,8 @@
       display: block;
       overflow-x: auto;
 
-      th, td {
+      th,
+      td {
         white-space: nowrap;
       }
     }

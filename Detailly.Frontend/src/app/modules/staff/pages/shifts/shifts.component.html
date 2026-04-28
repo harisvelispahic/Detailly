@@ -74,7 +74,7 @@
 
   <!-- Skeleton -->
   @if (isLoading && !errorMessage) {
-    <app-fit-table-skeleton [rows]="8" [columns]="5" [showActions]="true"></app-fit-table-skeleton>
+    <app-table-skeleton [rows]="8" [columns]="5" [showActions]="true"></app-table-skeleton>
   }
 
   <!-- Error -->
@@ -208,7 +208,7 @@
           </table>
 
           <div class="shifts__paginator">
-            <app-fit-paginator-bar [vm]="this"></app-fit-paginator-bar>
+            <app-paginator-bar [vm]="this"></app-paginator-bar>
           </div>
         </ng-container>
       }

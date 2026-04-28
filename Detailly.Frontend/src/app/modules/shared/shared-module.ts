@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FitPaginatorBarComponent } from './components/fit-paginator-bar/fit-paginator-bar.component';
+import { PaginatorBarComponent } from './components/paginator-bar/paginator-bar.component';
 import { materialModules } from './material-modules';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { FitConfirmDialogComponent } from './components/fit-confirm-dialog/fit-confirm-dialog.component';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { DialogHelperService } from './services/dialog-helper.service';
-import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading-bar.component';
-import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
+import { LoadingBarComponent } from './components/loading-bar/loading-bar.component';
+import { TableSkeletonComponent } from './components/table-skeleton/table-skeleton.component';
 import { SiteNavbarComponent } from './components/site-navbar/site-navbar.component';
 import { SiteFooterComponent } from './components/site-footer/site-footer.component';
 import { DashboardLayoutComponent } from './components/dashboard-layout/dashboard-layout.component';
@@ -54,10 +54,10 @@ const UI_COMPONENTS = [
 
 @NgModule({
   declarations: [
-    FitPaginatorBarComponent,
-    FitConfirmDialogComponent,
-    FitLoadingBarComponent,
-    FitTableSkeletonComponent,
+    PaginatorBarComponent,
+    ConfirmDialogComponent,
+    LoadingBarComponent,
+    TableSkeletonComponent,
     SiteNavbarComponent,
     SiteFooterComponent,
     DashboardLayoutComponent,
@@ -73,14 +73,14 @@ const UI_COMPONENTS = [
   ],
   providers: [DialogHelperService],
   exports: [
-    FitPaginatorBarComponent,
+    PaginatorBarComponent,
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
     TranslatePipe,
     FormsModule,
-    FitLoadingBarComponent,
-    FitTableSkeletonComponent,
+    LoadingBarComponent,
+    TableSkeletonComponent,
     SiteNavbarComponent,
     SiteFooterComponent,
     DashboardLayoutComponent,
