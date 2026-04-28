@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { StaffLayoutComponent } from './staff-layout/staff-layout.component';
+
+import { DashboardLayoutComponent } from '../shared/components/dashboard-layout/dashboard-layout.component';
 import { StaffHomeComponent } from './pages/staff-home/staff-home.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: StaffLayoutComponent,
+    component: DashboardLayoutComponent,
     children: [
       { path: '', component: StaffHomeComponent },
     ],

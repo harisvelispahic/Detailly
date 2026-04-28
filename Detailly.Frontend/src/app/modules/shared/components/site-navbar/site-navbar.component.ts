@@ -112,6 +112,10 @@ export class SiteNavbarComponent {
     return 'Account';
   }
 
+  getDashboardLabel(): string {
+    return this.isAdmin() ? 'Admin Dashboard' : 'Staff Dashboard';
+  }
+
   logout(): void {
     this.closeMobileMenu();
     this.router.navigate(['/auth/logout']);

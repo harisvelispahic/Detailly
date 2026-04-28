@@ -38,21 +38,10 @@
           <a
             routerLink="/staff"
             class="site-navbar__icon-button site-navbar__icon-button--desktop site-navbar__icon-button--staff"
-            aria-label="Go to staff panel"
-            title="Staff Panel"
+            [attr.aria-label]="getDashboardLabel()"
+            [title]="getDashboardLabel()"
           >
-            <mat-icon>badge</mat-icon>
-          </a>
-        }
-
-        @if (isAdmin()) {
-          <a
-            routerLink="/admin"
-            class="site-navbar__icon-button site-navbar__icon-button--desktop site-navbar__icon-button--admin"
-            aria-label="Go to admin panel"
-            title="Admin Panel"
-          >
-            <mat-icon>admin_panel_settings</mat-icon>
+            <mat-icon>dashboard</mat-icon>
           </a>
         }
 
@@ -127,15 +116,8 @@
         <div class="site-mobile-menu__actions">
           @if (isAdmin() || isManager() || isEmployee()) {
             <a routerLink="/staff" class="site-mobile-menu__action" (click)="closeMobileMenu()">
-              <mat-icon>badge</mat-icon>
-              <span>Staff Panel</span>
-            </a>
-          }
-
-          @if (isAdmin()) {
-            <a routerLink="/admin" class="site-mobile-menu__action" (click)="closeMobileMenu()">
-              <mat-icon>admin_panel_settings</mat-icon>
-              <span>Admin Panel</span>
+              <mat-icon>dashboard</mat-icon>
+              <span>Staff Dashboard</span>
             </a>
           }
 

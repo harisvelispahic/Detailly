@@ -1,1 +1,93 @@
-<p>staff-home works!</p>
+<div class="staff-home">
+
+  <!-- Hero greeting -->
+  <div class="staff-home__hero">
+    <div class="staff-home__hero-content">
+      <p class="staff-home__greeting">Welcome back</p>
+      <h1 class="staff-home__title">{{ roleLabel() }} Dashboard</h1>
+      <p class="staff-home__subtitle">
+        Here's your workspace. Use the sidebar to navigate to your tools.
+      </p>
+    </div>
+
+    <div class="staff-home__hero-badge">
+      <mat-icon>{{ roleIcon() }}</mat-icon>
+    </div>
+  </div>
+
+  <!-- Quick-action cards -->
+  <div class="staff-home__grid">
+
+    <!-- All roles: home -->
+    <div class="staff-home__card staff-home__card--primary">
+      <mat-icon>home</mat-icon>
+      <div>
+        <h3>Dashboard</h3>
+        <p>You're here — your overview and hub.</p>
+      </div>
+    </div>
+
+    <!-- Management+ -->
+    @if (auth.isAdmin() || auth.isManager()) {
+      <div class="staff-home__card staff-home__card--info">
+        <mat-icon>analytics</mat-icon>
+        <div>
+          <h3>Reports <span class="tag tag--soon">Coming soon</span></h3>
+          <p>Performance metrics and summaries.</p>
+        </div>
+      </div>
+    }
+
+    <!-- Admin — legacy features pending reimplementation -->
+    @if (auth.isAdmin()) {
+      <div class="staff-home__legacy-section">
+        <p class="staff-home__legacy-label">
+          <mat-icon>warning_amber</mat-icon>
+          Legacy Admin — pending reimplementation
+        </p>
+
+        <div class="staff-home__grid staff-home__grid--nested">
+
+          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/orders">
+            <mat-icon>shopping_cart</mat-icon>
+            <div>
+              <h3>Orders <span class="tag tag--legacy">Legacy</span></h3>
+              <p>View and manage customer orders.</p>
+            </div>
+            <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+          </a>
+
+          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/products">
+            <mat-icon>inventory_2</mat-icon>
+            <div>
+              <h3>Products <span class="tag tag--legacy">Legacy</span></h3>
+              <p>Manage the service catalogue.</p>
+            </div>
+            <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+          </a>
+
+          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/product-categories">
+            <mat-icon>category</mat-icon>
+            <div>
+              <h3>Categories <span class="tag tag--legacy">Legacy</span></h3>
+              <p>Organise services into categories.</p>
+            </div>
+            <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+          </a>
+
+          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/settings">
+            <mat-icon>settings</mat-icon>
+            <div>
+              <h3>Settings <span class="tag tag--legacy">Legacy</span></h3>
+              <p>Configure platform preferences.</p>
+            </div>
+            <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+          </a>
+
+        </div>
+      </div>
+    }
+
+  </div>
+
+</div>

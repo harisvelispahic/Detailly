@@ -1,0 +1,180 @@
+<div class="dashboard" [class.sidebar-open]="isSidebarOpen()">
+
+  <!-- Mobile backdrop — tap to close -->
+  <div class="dashboard__backdrop" (click)="closeSidebar()"></div>
+
+  <!-- ── SIDEBAR ──────────────────────────────────────────────────────────── -->
+  <aside class="dashboard__sidebar">
+
+    <!-- Brand strip -->
+    <div class="sidebar__brand">
+      <img
+        src="/assets/images/detailly-logo-transparent.png"
+        alt="Detailly"
+        class="sidebar__logo"
+      />
+      <!-- Close button — mobile only -->
+      <button type="button" class="sidebar__close" (click)="closeSidebar()" aria-label="Close menu">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Navigation — scrollable -->
+    <nav class="sidebar__nav">
+
+      <!-- ── WORKSPACE (all staff) ──────────────────────────────────────── -->
+      <p class="sidebar__group-label">Workspace</p>
+
+      <a
+        class="sidebar__item"
+        routerLink="/staff"
+        routerLinkActive="sidebar__item--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidebar()"
+      >
+        <mat-icon class="sidebar__item-icon">home</mat-icon>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- ── MANAGEMENT (manager + admin) ──────────────────────────────── -->
+      @if (auth.isAdmin() || auth.isManager()) {
+        <p class="sidebar__group-label">Management</p>
+
+        <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">
+          <mat-icon class="sidebar__item-icon">analytics</mat-icon>
+          <span>Reports</span>
+          <span class="sidebar__badge sidebar__badge--soon">Soon</span>
+        </span>
+      }
+
+      <!-- ── ADMIN — LEGACY (admin only) ───────────────────────────────── -->
+      @if (auth.isAdmin()) {
+        <p class="sidebar__group-label">
+          Admin
+          <span class="sidebar__badge sidebar__badge--legacy">Legacy</span>
+        </p>
+
+        <a
+          class="sidebar__item sidebar__item--legacy"
+          routerLink="/admin/product-categories"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+          title="Pending reimplementation"
+        >
+          <mat-icon class="sidebar__item-icon">category</mat-icon>
+          <span>Categories</span>
+          <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
+        </a>
+
+        <a
+          class="sidebar__item sidebar__item--legacy"
+          routerLink="/admin/products"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+          title="Pending reimplementation"
+        >
+          <mat-icon class="sidebar__item-icon">inventory_2</mat-icon>
+          <span>Products</span>
+          <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
+        </a>
+
+        <a
+          class="sidebar__item sidebar__item--legacy"
+          routerLink="/admin/orders"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+          title="Pending reimplementation"
+        >
+          <mat-icon class="sidebar__item-icon">shopping_cart</mat-icon>
+          <span>Orders</span>
+          <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
+        </a>
+
+        <a
+          class="sidebar__item sidebar__item--legacy"
+          routerLink="/admin/settings"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+          title="Pending reimplementation"
+        >
+          <mat-icon class="sidebar__item-icon">settings</mat-icon>
+          <span>Settings</span>
+          <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
+        </a>
+      }
+
+    </nav>
+
+    <!-- ── SIDEBAR BOTTOM ─────────────────────────────────────────────── -->
+    <div class="sidebar__bottom">
+
+      <!-- User info card -->
+      <div class="sidebar__user-card">
+        <div class="sidebar__avatar">{{ initials() }}</div>
+        <div class="sidebar__user-meta">
+          <span class="sidebar__user-email">{{ auth.currentUser()?.email }}</span>
+          <div class="sidebar__user-role">
+            @if (auth.isAdmin()) {
+              <span class="role-pill role-pill--admin">
+                <mat-icon>admin_panel_settings</mat-icon>
+                Admin
+              </span>
+            } @else if (auth.isManager()) {
+              <span class="role-pill role-pill--manager">
+                <mat-icon>manage_accounts</mat-icon>
+                Manager
+              </span>
+            } @else {
+              <span class="role-pill role-pill--employee">
+                <mat-icon>badge</mat-icon>
+                Employee
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar__bottom-divider"></div>
+
+      <a class="sidebar__item sidebar__item--public" routerLink="/" (click)="closeSidebar()">
+        <mat-icon class="sidebar__item-icon">public</mat-icon>
+        <span>Public Site</span>
+      </a>
+
+      <a class="sidebar__logout" routerLink="/auth/logout">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
+      </a>
+
+    </div>
+
+  </aside>
+
+  <!-- ── CONTENT WRAPPER ─────────────────────────────────────────────────── -->
+  <div class="dashboard__main">
+
+    <!-- Mobile top bar (hidden on desktop) -->
+    <header class="dashboard__mobile-bar">
+      <button
+        type="button"
+        class="dashboard__menu-btn"
+        (click)="toggleSidebar()"
+        aria-label="Open menu"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+      <img
+        src="/assets/images/detailly-logo-transparent.png"
+        alt="Detailly"
+        class="dashboard__mobile-logo"
+      />
+    </header>
+
+    <!-- Page content -->
+    <main class="dashboard__content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

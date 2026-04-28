@@ -11,6 +11,7 @@ import { FitLoadingBarComponent } from './components/fit-loading-bar/fit-loading
 import { FitTableSkeletonComponent } from './components/fit-table-skeleton/fit-table-skeleton.component';
 import { SiteNavbarComponent } from './components/site-navbar/site-navbar.component';
 import { SiteFooterComponent } from './components/site-footer/site-footer.component';
+import { DashboardLayoutComponent } from './components/dashboard-layout/dashboard-layout.component';
 
 // UI Primitives
 import { ButtonComponent } from './components/ui/button/button.component';
@@ -59,6 +60,7 @@ const UI_COMPONENTS = [
     FitTableSkeletonComponent,
     SiteNavbarComponent,
     SiteFooterComponent,
+    DashboardLayoutComponent,
     ...UI_COMPONENTS,
   ],
   imports: [
@@ -81,6 +83,7 @@ const UI_COMPONENTS = [
     FitTableSkeletonComponent,
     SiteNavbarComponent,
     SiteFooterComponent,
+    DashboardLayoutComponent,
     ...materialModules,
     ...UI_COMPONENTS,
   ],
