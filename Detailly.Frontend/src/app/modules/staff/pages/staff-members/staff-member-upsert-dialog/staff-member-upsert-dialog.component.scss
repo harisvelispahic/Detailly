@@ -1,0 +1,203 @@
+.upsert-dialog {
+  min-width: 480px;
+  max-width: 560px;
+}
+
+// ── Header ────────────────────────────────────────────────────────────
+.upsert-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 24px 0;
+}
+
+.upsert-dialog__header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  box-shadow: var(--shadow-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    color: hsl(var(--primary-foreground));
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.upsert-dialog__title {
+  margin: 0 0 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.upsert-dialog__subtitle {
+  margin: 0;
+  font-size: 0.825rem;
+  color: hsl(var(--muted-foreground));
+}
+
+// ── Content ───────────────────────────────────────────────────────────
+.upsert-dialog__content {
+  padding: 20px 24px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upsert-dialog__row {
+  display: flex;
+  gap: 12px;
+
+  .upsert-dialog__field { flex: 1; }
+}
+
+.upsert-dialog__field {
+  width: 100%;
+}
+
+.upsert-dialog__field-full {
+  width: 100%;
+}
+
+// ── Phone ─────────────────────────────────────────────────────────────
+.upsert-dialog__phone-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.upsert-dialog__phone-country {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.upsert-dialog__phone-number {
+  flex: 1;
+}
+
+.upsert-dialog__flag {
+  margin-right: 6px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.upsert-dialog__option-flag {
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.upsert-dialog__option-dial {
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+// ── Role section ──────────────────────────────────────────────────────
+.upsert-dialog__role-section {
+  padding: 16px;
+  background: hsl(var(--surface-1));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  margin-top: 4px;
+}
+
+.upsert-dialog__role-label {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.upsert-dialog__role-toggle {
+  width: 100%;
+
+  mat-button-toggle {
+    flex: 1;
+  }
+
+  ::ng-deep .mat-button-toggle-label-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0 12px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  ::ng-deep .mat-button-toggle-checked {
+    background: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+  }
+}
+
+.upsert-dialog__role-hint {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: hsl(var(--muted-foreground));
+}
+
+// ── Mismatch hint ─────────────────────────────────────────────────────
+.mismatch-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: hsl(var(--destructive)) !important;
+  font-size: 0.75rem;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+}
+
+// ── Actions ───────────────────────────────────────────────────────────
+.upsert-dialog__actions {
+  padding: 12px 24px 20px !important;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    min-width: 130px;
+    justify-content: center;
+  }
+}
+
+.submit-button--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .upsert-dialog {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .upsert-dialog__row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .upsert-dialog__actions {
+    flex-direction: column-reverse;
+
+    button { width: 100%; }
+  }
+}

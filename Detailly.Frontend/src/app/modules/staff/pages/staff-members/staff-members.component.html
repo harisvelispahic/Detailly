@@ -1,0 +1,190 @@
+<div class="staff-members">
+
+  <!-- Header card -->
+  <div class="staff-members__header-card">
+    <div class="staff-members__header-inner">
+      <div class="staff-members__title-section">
+        <div class="staff-members__title-icon">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div>
+          <h1 class="staff-members__title">Staff Members</h1>
+          <p class="staff-members__subtitle">Manage employees and managers</p>
+        </div>
+      </div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="staff-members__new-btn"
+        (click)="openCreateDialog()"
+      >
+        <mat-icon>person_add</mat-icon>
+        Add Staff Member
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="staff-members__filters">
+      <mat-form-field appearance="outline" class="staff-members__filter-field staff-members__filter-field--search">
+        <mat-label>Search</mat-label>
+        <input matInput [formControl]="searchCtrl" placeholder="Name, username, email…" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="staff-members__filter-field">
+        <mat-label>Role</mat-label>
+        <mat-select [(ngModel)]="roleFilter" (selectionChange)="onRoleFilterChange($event.value)">
+          <mat-option [value]="null">All roles</mat-option>
+          <mat-option [value]="false">Employees</mat-option>
+          <mat-option [value]="true">Managers</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>badge</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="5" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="staff-members__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="staff-members__error-title">Failed to load staff members</p>
+        <p class="staff-members__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadPagedData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="staff-members__table-card">
+      <table mat-table [dataSource]="items" class="staff-members__table">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="staff-members__th"><mat-icon>person</mat-icon> Name</div>
+          </th>
+          <td mat-cell *matCellDef="let m">
+            <div class="staff-members__name-cell">
+              <span class="staff-members__full-name">{{ m.firstName }} {{ m.lastName }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Username -->
+        <ng-container matColumnDef="username">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="staff-members__th"><mat-icon>alternate_email</mat-icon> Username</div>
+          </th>
+          <td mat-cell *matCellDef="let m">
+            <span class="staff-members__username">{{ m.username }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Email -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="staff-members__th"><mat-icon>mail</mat-icon> Email</div>
+          </th>
+          <td mat-cell *matCellDef="let m">
+            <span class="staff-members__email">{{ m.email }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Phone -->
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="staff-members__th"><mat-icon>phone</mat-icon> Phone</div>
+          </th>
+          <td mat-cell *matCellDef="let m">
+            @if (m.phone) {
+              <span class="staff-members__phone">{{ m.phone }}</span>
+            } @else {
+              <span class="staff-members__no-phone">—</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Role -->
+        <ng-container matColumnDef="role">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="staff-members__th"><mat-icon>badge</mat-icon> Role</div>
+          </th>
+          <td mat-cell *matCellDef="let m">
+            @if (m.isManager) {
+              <span class="staff-members__role-badge staff-members__role-badge--manager">
+                <mat-icon>manage_accounts</mat-icon>
+                Manager
+              </span>
+            } @else {
+              <span class="staff-members__role-badge staff-members__role-badge--employee">
+                <mat-icon>badge</mat-icon>
+                Employee
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let m">
+            <div class="staff-members__actions">
+              @if (canEdit(m)) {
+                <button
+                  mat-icon-button
+                  class="staff-members__action-btn staff-members__action-btn--edit"
+                  (click)="openEditDialog(m, $event)"
+                  matTooltip="Edit"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+              }
+              @if (canDelete(m)) {
+                <button
+                  mat-icon-button
+                  class="staff-members__action-btn staff-members__action-btn--delete"
+                  (click)="deleteMember(m, $event)"
+                  matTooltip="Delete"
+                >
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              }
+              @if (!canEdit(m) && !canDelete(m)) {
+                <span class="staff-members__read-only" matTooltip="Read only">
+                  <mat-icon>visibility</mat-icon>
+                </span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="staff-members__row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="staff-members__empty">
+              <mat-icon>group_off</mat-icon>
+              <p>No staff members found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="staff-members__paginator">
+        <app-paginator-bar [vm]="this"></app-paginator-bar>
+      </div>
+    </div>
+  }
+
+</div>

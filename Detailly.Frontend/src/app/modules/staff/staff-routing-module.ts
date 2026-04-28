@@ -5,6 +5,7 @@ import { DashboardLayoutComponent } from '../shared/components/dashboard-layout/
 import { StaffHomeComponent } from './pages/staff-home/staff-home.component';
 import { ShiftsComponent } from './pages/shifts/shifts.component';
 import { MyShiftsComponent } from './pages/my-shifts/my-shifts.component';
+import { StaffMembersComponent } from './pages/staff-members/staff-members.component';
 import { myAuthData, myAuthGuard } from '../../core/guards/my-auth-guard';
 
 const routes: Routes = [
@@ -24,6 +25,12 @@ const routes: Routes = [
         component: MyShiftsComponent,
         canActivate: [myAuthGuard],
         data: myAuthData({ requireAuth: true, requireEmployee: true }),
+      },
+      {
+        path: 'staff-members',
+        component: StaffMembersComponent,
+        canActivate: [myAuthGuard],
+        data: myAuthData({ requireAuth: true, requireAdminOrManager: true }),
       },
     ],
   },

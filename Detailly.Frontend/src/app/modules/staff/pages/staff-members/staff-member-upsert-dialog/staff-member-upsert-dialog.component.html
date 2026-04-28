@@ -1,0 +1,217 @@
+<div class="upsert-dialog">
+
+  <div class="upsert-dialog__header">
+    <div class="upsert-dialog__header-icon">
+      <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="upsert-dialog__title">{{ isEditMode ? 'Edit Staff Member' : 'Add Staff Member' }}</h2>
+      <p class="upsert-dialog__subtitle">
+        {{ isEditMode ? 'Update the details below' : 'Fill in the details to create a new staff member' }}
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="upsert-dialog__content">
+    <form [formGroup]="form" (ngSubmit)="onSave()" id="staff-form">
+
+      <!-- Name row -->
+      <div class="upsert-dialog__row">
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" placeholder="John" autocomplete="given-name" />
+          @if (form.get('firstName')?.hasError('required')) {
+            <mat-error>First name is required</mat-error>
+          }
+          @if (form.get('firstName')?.hasError('maxlength')) {
+            <mat-error>Too long</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" placeholder="Doe" autocomplete="family-name" />
+          @if (form.get('lastName')?.hasError('required')) {
+            <mat-error>Last name is required</mat-error>
+          }
+          @if (form.get('lastName')?.hasError('maxlength')) {
+            <mat-error>Too long</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Username -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" placeholder="johndoe" autocomplete="username" />
+        <mat-icon matPrefix>alternate_email</mat-icon>
+        @if (form.get('username')?.hasError('required')) {
+          <mat-error>Username is required</mat-error>
+        }
+        @if (form.get('username')?.hasError('minlength')) {
+          <mat-error>At least 3 characters</mat-error>
+        }
+        @if (form.get('username')?.hasError('maxlength')) {
+          <mat-error>Too long</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="john@example.com" autocomplete="email" />
+        <mat-icon matPrefix>mail</mat-icon>
+        @if (form.get('email')?.hasError('required')) {
+          <mat-error>Email is required</mat-error>
+        }
+        @if (form.get('email')?.hasError('email')) {
+          <mat-error>Enter a valid email</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Password (create mode only) -->
+      @if (!isEditMode) {
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            placeholder="Min. 8 characters"
+            autocomplete="new-password"
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.get('password')?.hasError('required')) {
+            <mat-error>Password is required</mat-error>
+          }
+          @if (form.get('password')?.hasError('minlength')) {
+            <mat-error>At least 8 characters</mat-error>
+          }
+          @if (form.get('password')?.hasError('passwordStrength')) {
+            <mat-error>Uppercase, lowercase, digit, and special character required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="fixed"
+          class="upsert-dialog__field-full"
+          [class.field-mismatch]="passwordMismatch"
+        >
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            formControlName="confirmPassword"
+            [type]="hideConfirmPassword ? 'password' : 'text'"
+            placeholder="Repeat your password"
+            autocomplete="new-password"
+          />
+          <mat-icon matPrefix>lock_reset</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.get('confirmPassword')?.hasError('required')) {
+            <mat-error>Please confirm your password</mat-error>
+          }
+          @if (passwordMismatch) {
+            <mat-hint class="mismatch-hint">
+              <mat-icon>error</mat-icon>
+              Passwords do not match
+            </mat-hint>
+          }
+        </mat-form-field>
+      }
+
+      <!-- Phone -->
+      <div class="upsert-dialog__phone-group">
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__phone-country">
+          <span matPrefix class="fi fi-{{ selectedCountry.iso2 }} upsert-dialog__flag"></span>
+          <input
+            matInput
+            [formControl]="countrySearchCtrl"
+            [matAutocomplete]="countryAuto"
+            (focus)="onCountryFocus()"
+            (blur)="onCountryBlur()"
+            aria-label="Country dial code"
+          />
+          <mat-autocomplete
+            #countryAuto="matAutocomplete"
+            [displayWith]="displayCountry"
+            (optionSelected)="onCountrySelected($event)"
+          >
+            @for (country of filteredCountries; track country.iso2) {
+              <mat-option [value]="country">
+                <span class="fi fi-{{ country.iso2 }} upsert-dialog__option-flag"></span>
+                <span class="upsert-dialog__option-dial">+{{ country.dialCode }}</span>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__phone-number">
+          <mat-label>Phone (optional)</mat-label>
+          <input
+            matInput
+            type="tel"
+            inputmode="numeric"
+            [value]="phoneDisplay"
+            (input)="onPhoneInput($event)"
+            placeholder="60 555 33 33"
+          />
+          <mat-icon matPrefix>phone</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Role selector -->
+      <div class="upsert-dialog__role-section">
+        <p class="upsert-dialog__role-label">Role</p>
+        <mat-button-toggle-group formControlName="isManager" class="upsert-dialog__role-toggle">
+          <mat-button-toggle [value]="false">
+            <mat-icon>badge</mat-icon>
+            Employee
+          </mat-button-toggle>
+          <mat-button-toggle [value]="true" [disabled]="!data.isAdmin">
+            <mat-icon>manage_accounts</mat-icon>
+            Manager
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+        @if (!data.isAdmin) {
+          <p class="upsert-dialog__role-hint">Only admins can assign the Manager role.</p>
+        }
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="upsert-dialog__actions">
+    <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isSubmitting">
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      form="staff-form"
+      [disabled]="form.invalid || isSubmitting"
+      [class.submit-button--disabled]="form.invalid || isSubmitting"
+      (click)="onSave()"
+    >
+      @if (!isSubmitting) {
+        <mat-icon>{{ isEditMode ? 'save' : 'person_add' }}</mat-icon>
+      }
+      @if (!isSubmitting) {
+        {{ isEditMode ? 'Save Changes' : 'Create Member' }}
+      }
+      @if (isSubmitting) {
+        <mat-progress-spinner mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
+      }
+      @if (isSubmitting) {
+        <span>{{ isEditMode ? 'Saving…' : 'Creating…' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+
+</div>

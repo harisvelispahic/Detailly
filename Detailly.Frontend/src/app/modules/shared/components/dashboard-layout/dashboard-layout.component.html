@@ -54,6 +54,16 @@
 
         <a
           class="sidebar__item"
+          routerLink="/staff/staff-members"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">group</mat-icon>
+          <span>Staff Members</span>
+        </a>
+
+        <a
+          class="sidebar__item"
           routerLink="/staff/shifts"
           routerLinkActive="sidebar__item--active"
           (click)="closeSidebar()"
