@@ -92,6 +92,21 @@
   }
 }
 
+// ── Location trigger / option ─────────────────────────────────────
+.shift-dialog__loc-trigger,
+.shift-dialog__loc-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
 // ── Actions ───────────────────────────────────────────────────────
 .shift-dialog__actions {
   display: flex;

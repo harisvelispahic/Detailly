@@ -110,10 +110,7 @@
                 <div class="shifts__th"><mat-icon>person</mat-icon> Employee</div>
               </th>
               <td mat-cell *matCellDef="let s">
-                <div class="shifts__employee">
-                  <span class="shifts__employee-name">{{ s.employeeName }}</span>
-                  <span class="shifts__employee-id">ID {{ s.employeeId }}</span>
-                </div>
+                <span class="shifts__employee-name">{{ s.employeeName }}</span>
               </td>
             </ng-container>
 

@@ -10,7 +10,7 @@ import {
 import { EmployeeShiftsApiService } from '../../../../../api-services/employee-shifts/employee-shifts-api.service';
 import { LocationDto, LocationOpeningHoursDto } from '../../../../../api-services/locations/locations-api.models';
 import { LocationsApiService } from '../../../../../api-services/locations/locations-api.service';
-import { EmployeeDto } from '../../../../../api-services/employees/employees-api.models';
+import { EmployeeDto, ListEmployeesRequest } from '../../../../../api-services/employees/employees-api.models';
 import { EmployeesApiService } from '../../../../../api-services/employees/employees-api.service';
 import { ToasterService } from '../../../../../core/services/toaster.service';
 
@@ -59,6 +59,11 @@ export class ShiftUpsertDialogComponent implements OnInit {
     return this.data.shift !== null;
   }
 
+  get selectedLocation(): LocationDto | undefined {
+    const id = this.form?.get('shopLocationId')?.value;
+    return id ? this.data.locations.find((l) => l.id === id) : undefined;
+  }
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: ShiftUpsertDialogData) {}
 
   ngOnInit(): void {
@@ -68,47 +73,71 @@ export class ShiftUpsertDialogComponent implements OnInit {
       ? this.utcIsoToLocalDate(shift.startUtc)
       : (this.data.date ?? new Date());
 
+    // Field order: location → date → times → employee → work mode
     this.form = this.fb.group(
       {
-        employeeId: [shift?.employeeId ?? null, Validators.required],
         shopLocationId: [shift?.shopLocationId ?? this.data.locationId ?? null, Validators.required],
-        employeeWorkMode: [shift?.employeeWorkMode ?? EmployeeWorkMode.InShop, Validators.required],
         date: [initialDate, Validators.required],
         startTime: [
-          shift ? this.extractUtcTime(shift.startUtc) : '09:00',
+          shift ? this.utcIsoToLocalTime(shift.startUtc) : '09:00',
           [Validators.required, Validators.pattern(TIME_PATTERN)],
         ],
         endTime: [
-          shift ? this.extractUtcTime(shift.endUtc) : '17:00',
+          shift ? this.utcIsoToLocalTime(shift.endUtc) : '17:00',
           [Validators.required, Validators.pattern(TIME_PATTERN)],
         ],
+        employeeId: [shift?.employeeId ?? null, Validators.required],
+        employeeWorkMode: [shift?.employeeWorkMode ?? EmployeeWorkMode.InShop, Validators.required],
       },
       { validators: endAfterStartValidator },
     );
 
-    this.loadEmployees();
-
-    // When location changes, update default times from opening hours
+    // Location change → reload opening hours and apply defaults to times
     this.form.get('shopLocationId')!.valueChanges.subscribe((locationId: number) => {
       if (locationId) this.loadAndApplyOpeningHours(locationId);
     });
 
-    // Load opening hours for pre-selected location
+    // Date change → re-apply opening hours for the new weekday, reload employee availability
+    this.form.get('date')!.valueChanges.subscribe((date: Date) => {
+      if (date) {
+        if (!this.isEditMode) {
+          this.applyTodayHours();
+          this.form.patchValue({ employeeId: null }, { emitEvent: false });
+        }
+        this.loadEmployees();
+      }
+    });
+
+    // Initial loads
+    this.loadEmployees();
+
     const initialLocationId = shift?.shopLocationId ?? this.data.locationId;
     if (initialLocationId) {
-      this.loadOpeningHours(initialLocationId);
+      this.loadAndApplyOpeningHours(initialLocationId);
     }
   }
 
   private loadEmployees(): void {
+    const request = new ListEmployeesRequest();
+    const date: Date | null = this.form.get('date')?.value ?? null;
+    if (date) {
+      request.dateUtc = this.formatLocalDate(date) + 'T00:00:00.000Z';
+    }
+    if (this.isEditMode && this.data.shift) {
+      request.excludeShiftId = this.data.shift.id;
+    }
+
     this.isLoadingEmployees = true;
-    this.employeesApi.list().subscribe({
-      next: (list) => {
-        this.employees = list;
+    this.form.get('employeeId')?.disable();
+    this.employeesApi.list(request).subscribe({
+      next: (res) => {
+        this.employees = res.items;
         this.isLoadingEmployees = false;
+        this.form.get('employeeId')?.enable();
       },
       error: () => {
         this.isLoadingEmployees = false;
+        this.form.get('employeeId')?.enable();
         this.toaster.error('Failed to load employees');
       },
     });
@@ -123,16 +152,6 @@ export class ShiftUpsertDialogComponent implements OnInit {
     });
   }
 
-  private loadOpeningHours(locationId: number): void {
-    this.locationsApi.getOpeningHours(locationId).subscribe({
-      next: (hours) => {
-        this.openingHoursCache = hours;
-        // Only apply defaults when creating — not when editing
-        if (!this.isEditMode) this.applyTodayHours();
-      },
-    });
-  }
-
   private applyTodayHours(): void {
     const selectedDate: Date = this.form.value.date ?? new Date();
     const dayOfWeek = selectedDate.getDay(); // 0=Sunday
@@ -141,12 +160,16 @@ export class ShiftUpsertDialogComponent implements OnInit {
     if (!todayHours || todayHours.isClosed) return;
 
     if (todayHours.openHour != null && todayHours.openMinute != null) {
-      const start = this.formatHhmm(todayHours.openHour, todayHours.openMinute);
-      this.form.patchValue({ startTime: start }, { emitEvent: false });
+      this.form.patchValue(
+        { startTime: this.formatHhmm(todayHours.openHour, todayHours.openMinute) },
+        { emitEvent: false },
+      );
     }
     if (todayHours.closeHour != null && todayHours.closeMinute != null) {
-      const end = this.formatHhmm(todayHours.closeHour, todayHours.closeMinute);
-      this.form.patchValue({ endTime: end }, { emitEvent: false });
+      this.form.patchValue(
+        { endTime: this.formatHhmm(todayHours.closeHour, todayHours.closeMinute) },
+        { emitEvent: false },
+      );
     }
   }
 
@@ -156,9 +179,20 @@ export class ShiftUpsertDialogComponent implements OnInit {
     const { employeeId, shopLocationId, employeeWorkMode, date, startTime, endTime } =
       this.form.value;
 
-    const dateStr = this.formatLocalDate(new Date(date));
-    const startUtc = `${dateStr}T${startTime}:00.000Z`;
-    const endUtc = `${dateStr}T${endTime}:00.000Z`;
+    // Build local datetimes and let the browser convert to UTC ISO strings
+    const localDate = new Date(date);
+    const [startH, startM] = (startTime as string).split(':').map(Number);
+    const [endH, endM] = (endTime as string).split(':').map(Number);
+
+    const startLocal = new Date(
+      localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), startH, startM, 0,
+    );
+    const endLocal = new Date(
+      localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), endH, endM, 0,
+    );
+
+    const startUtc = startLocal.toISOString();
+    const endUtc = endLocal.toISOString();
 
     this.isSubmitting = true;
 
@@ -199,13 +233,13 @@ export class ShiftUpsertDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  private extractUtcTime(isoStr: string): string {
-    return isoStr.substring(11, 16);
+  private utcIsoToLocalTime(isoStr: string): string {
+    const d = new Date(isoStr);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
   private utcIsoToLocalDate(isoStr: string): Date {
-    const [y, m, d] = isoStr.substring(0, 10).split('-').map(Number);
-    return new Date(y, m - 1, d);
+    return new Date(isoStr);
   }
 
   private formatLocalDate(date: Date): string {

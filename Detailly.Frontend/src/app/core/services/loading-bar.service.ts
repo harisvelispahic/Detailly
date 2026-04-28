@@ -46,9 +46,7 @@ export class LoadingBarService {
     this.activeRequests++;
 
     if (this.activeRequests === 1) {
-      // Only show loading bar when transitioning from 0 to 1 active requests
-      // This prevents flickering when multiple requests are active
-      this.loadingSubject.next(true);
+      Promise.resolve().then(() => this.loadingSubject.next(true));
     }
   }
 
@@ -62,9 +60,8 @@ export class LoadingBarService {
     this.activeRequests--;
 
     if (this.activeRequests <= 0) {
-      // All requests complete, hide loading bar
-      this.activeRequests = 0; // Ensure counter doesn't go negative
-      this.loadingSubject.next(false);
+      this.activeRequests = 0;
+      Promise.resolve().then(() => this.loadingSubject.next(false));
     }
   }
 
@@ -76,7 +73,7 @@ export class LoadingBarService {
    */
   forceHide(): void {
     this.activeRequests = 0;
-    this.loadingSubject.next(false);
+    Promise.resolve().then(() => this.loadingSubject.next(false));
   }
 
   /**

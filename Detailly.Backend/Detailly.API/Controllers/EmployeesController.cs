@@ -1,3 +1,4 @@
+using Detailly.Application.Common;
 using Detailly.Application.Modules.Identity.Employee.Queries.List;
 using Detailly.Shared.Constants;
 
@@ -10,8 +11,8 @@ public sealed class EmployeesController(ISender sender) : ControllerBase
     // GET /Employees
     [HttpGet]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
-    public async Task<List<ListEmployeesQueryDto>> List(CancellationToken ct)
+    public async Task<PageResult<ListEmployeesQueryDto>> List([FromQuery] ListEmployeesQuery query, CancellationToken ct)
     {
-        return await sender.Send(new ListEmployeesQuery(), ct);
+        return await sender.Send(query, ct);
     }
 }

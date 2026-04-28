@@ -17,50 +17,30 @@
 
   <!-- Form -->
   <form [formGroup]="form" (ngSubmit)="onSave()" class="shift-dialog__body">
-    <!-- Work Mode (first — drives employee list) -->
-    <mat-form-field appearance="outline" class="shift-dialog__field">
-      <mat-label>Work Mode</mat-label>
-      <mat-select formControlName="employeeWorkMode">
-        <mat-option [value]="EmployeeWorkMode.InShop">In Shop</mat-option>
-        <mat-option [value]="EmployeeWorkMode.Mobile">Mobile</mat-option>
-      </mat-select>
-      @if (form.get('employeeWorkMode')?.hasError('required')) {
-        <mat-error>Required</mat-error>
-      }
-    </mat-form-field>
-
-    <!-- Employee dropdown -->
-    <mat-form-field appearance="outline" class="shift-dialog__field">
-      <mat-label>Employee</mat-label>
-      <mat-select formControlName="employeeId" [disabled]="isLoadingEmployees">
-        @for (emp of employees; track $index) {
-          <mat-option [value]="emp.id">
-            {{ emp.fullName }}
-          </mat-option>
-        }
-      </mat-select>
-      <mat-icon matSuffix>badge</mat-icon>
-      @if (isLoadingEmployees) {
-        <mat-hint>Loading employees…</mat-hint>
-      }
-      @if (!isLoadingEmployees && employees.length === 0) {
-        <mat-hint> No employees found for this work mode </mat-hint>
-      }
-      @if (form.get('employeeId')?.hasError('required')) {
-        <mat-error>Required</mat-error>
-      }
-    </mat-form-field>
-
-    <!-- Location -->
+    <!-- 1. Location -->
     <mat-form-field appearance="outline" class="shift-dialog__field">
       <mat-label>Location</mat-label>
       <mat-select formControlName="shopLocationId">
+        <mat-select-trigger>
+          @if (selectedLocation; as loc) {
+            <span class="shift-dialog__loc-trigger">
+              <mat-icon>{{ loc.locationType === 0 ? 'store' : 'location_on' }}</mat-icon>
+              {{ loc.name }}
+              @if (loc.city) {
+                — {{ loc.city }}
+              }
+            </span>
+          }
+        </mat-select-trigger>
         @for (loc of data.locations; track $index) {
           <mat-option [value]="loc.id">
-            {{ loc.name }}
-            @if (loc.city) {
-              <ng-container> — {{ loc.city }}</ng-container>
-            }
+            <span class="shift-dialog__loc-option">
+              <mat-icon>{{ loc.locationType === 0 ? 'store' : 'location_on' }}</mat-icon>
+              {{ loc.name }}
+              @if (loc.city) {
+                — {{ loc.city }}
+              }
+            </span>
           </mat-option>
         }
       </mat-select>
@@ -70,9 +50,9 @@
       }
     </mat-form-field>
 
-    <!-- Date -->
+    <!-- 2. Date -->
     <mat-form-field appearance="outline" class="shift-dialog__field">
-      <mat-label>Date (UTC)</mat-label>
+      <mat-label>Date</mat-label>
       <input matInput [matDatepicker]="shiftDate" formControlName="date" />
       <mat-datepicker-toggle matIconSuffix [for]="shiftDate"></mat-datepicker-toggle>
       <mat-datepicker #shiftDate></mat-datepicker>
@@ -81,13 +61,12 @@
       }
     </mat-form-field>
 
-    <!-- Times row -->
+    <!-- 3. Times row -->
     <div class="shift-dialog__times">
       <mat-form-field appearance="outline" class="shift-dialog__field">
-        <mat-label>Start Time (UTC)</mat-label>
+        <mat-label>Start Time</mat-label>
         <input matInput formControlName="startTime" placeholder="HH:mm" maxlength="5" />
         <mat-icon matSuffix>login</mat-icon>
-        <mat-hint>24h format</mat-hint>
         @if (form.get('startTime')?.hasError('required')) {
           <mat-error>Required</mat-error>
         }
@@ -97,10 +76,9 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="shift-dialog__field">
-        <mat-label>End Time (UTC)</mat-label>
+        <mat-label>End Time</mat-label>
         <input matInput formControlName="endTime" placeholder="HH:mm" maxlength="5" />
         <mat-icon matSuffix>logout</mat-icon>
-        <mat-hint>24h format</mat-hint>
         @if (form.get('endTime')?.hasError('required')) {
           <mat-error>Required</mat-error>
         }
@@ -117,6 +95,40 @@
         End time must be after start time
       </p>
     }
+
+    <!-- 4. Employee dropdown -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Employee</mat-label>
+      <mat-select formControlName="employeeId">
+        @for (emp of employees; track $index) {
+          <mat-option [value]="emp.id">
+            {{ emp.fullName }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>badge</mat-icon>
+      @if (isLoadingEmployees) {
+        <mat-hint>Loading employees…</mat-hint>
+      }
+      @if (!isLoadingEmployees && employees.length === 0) {
+        <mat-hint>No employees available for this date</mat-hint>
+      }
+      @if (form.get('employeeId')?.hasError('required')) {
+        <mat-error>Required</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- 5. Work Mode -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Work Mode</mat-label>
+      <mat-select formControlName="employeeWorkMode">
+        <mat-option [value]="EmployeeWorkMode.InShop">In Shop</mat-option>
+        <mat-option [value]="EmployeeWorkMode.Mobile">Mobile</mat-option>
+      </mat-select>
+      @if (form.get('employeeWorkMode')?.hasError('required')) {
+        <mat-error>Required</mat-error>
+      }
+    </mat-form-field>
 
     <!-- Actions -->
     <div class="shift-dialog__actions">
