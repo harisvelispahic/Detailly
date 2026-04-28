@@ -1,0 +1,143 @@
+<div class="my-shifts">
+  <!-- Header -->
+  <div class="my-shifts__header-card">
+    <div class="my-shifts__header-inner">
+      <div class="my-shifts__title-section">
+        <div class="my-shifts__title-icon">
+          <mat-icon>calendar_today</mat-icon>
+        </div>
+        <div>
+          <h1 class="my-shifts__title">My Shifts</h1>
+          <p class="my-shifts__subtitle">Your upcoming and recent work schedule</p>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="my-shifts__range-field">
+        <mat-label>Range</mat-label>
+        <mat-select [(ngModel)]="days" (selectionChange)="onDaysChange($event.value)">
+          @for (opt of daysOptions; track opt) {
+            <mat-option [value]="opt">±{{ opt }} days</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>date_range</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="5" [showActions]="false"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="my-shifts__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="my-shifts__error-title">Failed to load shifts</p>
+        <p class="my-shifts__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="my-shifts__table-card">
+      <table mat-table [dataSource]="items" class="my-shifts__table">
+
+        <!-- Date -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>event</mat-icon> Date</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <div class="my-shifts__date-cell">
+              <span class="my-shifts__date-val">{{ s.startUtc | date: 'EEE, dd MMM' : 'UTC' }}</span>
+              @if (isToday(s.startUtc)) {
+                <span class="my-shifts__today-badge">TODAY</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Location -->
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>location_on</mat-icon> Location</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <span class="my-shifts__location">{{ s.shopLocationName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Work Mode -->
+        <ng-container matColumnDef="workMode">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>work</mat-icon> Mode</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <span
+              class="my-shifts__mode-badge"
+              [class.my-shifts__mode-badge--shop]="s.employeeWorkMode === EmployeeWorkMode.InShop"
+              [class.my-shifts__mode-badge--mobile]="s.employeeWorkMode === EmployeeWorkMode.Mobile"
+            >
+              <mat-icon>{{ getWorkModeIcon(s.employeeWorkMode) }}</mat-icon>
+              {{ getWorkModeLabel(s.employeeWorkMode) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Start -->
+        <ng-container matColumnDef="start">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>login</mat-icon> Start (UTC)</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <span class="my-shifts__time-val">{{ s.startUtc | date: 'HH:mm' : 'UTC' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- End -->
+        <ng-container matColumnDef="end">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>logout</mat-icon> End (UTC)</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <span class="my-shifts__time-val">{{ s.endUtc | date: 'HH:mm' : 'UTC' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Duration -->
+        <ng-container matColumnDef="duration">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-shifts__th"><mat-icon>timelapse</mat-icon> Duration</div>
+          </th>
+          <td mat-cell *matCellDef="let s">
+            <span class="my-shifts__duration">{{ getDuration(s) }}</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="my-shifts__row"
+          [class.my-shifts__row--today]="isToday(row.startUtc)"
+          [class.my-shifts__row--past]="isPast(row.startUtc)"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="my-shifts__empty">
+              <mat-icon>event_busy</mat-icon>
+              <p>No shifts scheduled in this range</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  }
+</div>

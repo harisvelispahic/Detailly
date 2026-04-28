@@ -6,6 +6,7 @@ import {
   CreateEmployeeShiftCommand,
   ListEmployeeShiftsRequest,
   ListEmployeeShiftsResponse,
+  MyShiftDto,
   UpdateEmployeeShiftCommand,
 } from './employee-shifts-api.models';
 import { buildHttpParams } from '../../core/models/build-http-params';
@@ -30,5 +31,10 @@ export class EmployeeShiftsApiService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  listMine(days: number = 7): Observable<MyShiftDto[]> {
+    const params = buildHttpParams({ days });
+    return this.http.get<MyShiftDto[]>(`${this.baseUrl}/mine`, { params });
   }
 }

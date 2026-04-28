@@ -1,4 +1,3 @@
-// src/app/core/services/auth/current-user.service.ts
 import { Injectable, inject, computed } from '@angular/core';
 import { AuthFacadeService } from './auth-facade.service';
 

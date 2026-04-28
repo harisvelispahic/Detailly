@@ -44,3 +44,12 @@ export interface UpdateEmployeeShiftCommand {
   startUtc?: string | null;
   endUtc?: string | null;
 }
+
+export interface MyShiftDto {
+  id: number;
+  shopLocationId: number;
+  shopLocationName: string;
+  employeeWorkMode: EmployeeWorkMode;
+  startUtc: string;
+  endUtc: string;
+}

@@ -36,6 +36,18 @@
         <span>Dashboard</span>
       </a>
 
+      @if (auth.isEmployee()) {
+        <a
+          class="sidebar__item"
+          routerLink="/staff/my-shifts"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">calendar_today</mat-icon>
+          <span>My Shifts</span>
+        </a>
+      }
+
       <!-- ── MANAGEMENT (manager + admin) ──────────────────────────────── -->
       @if (auth.isAdmin() || auth.isManager()) {
         <p class="sidebar__group-label">Management</p>

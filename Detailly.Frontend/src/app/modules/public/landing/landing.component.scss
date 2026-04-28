@@ -1,8 +1,11 @@
-// src/app/modules/public/landing/landing.component.scss
-
 .landing-page {
   min-height: 100vh;
   background:
     radial-gradient(circle at top right, hsl(var(--primary) / 0.08), transparent 28rem),
-    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(260 20% 8%) 50%, hsl(var(--background)) 100%);
+    linear-gradient(
+      180deg,
+      hsl(var(--background)) 0%,
+      hsl(260 20% 8%) 50%,
+      hsl(var(--background)) 100%
+    );
 }

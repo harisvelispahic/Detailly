@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardLayoutComponent } from '../shared/components/dashboard-layout/dashboard-layout.component';
 import { StaffHomeComponent } from './pages/staff-home/staff-home.component';
 import { ShiftsComponent } from './pages/shifts/shifts.component';
+import { MyShiftsComponent } from './pages/my-shifts/my-shifts.component';
 import { myAuthData, myAuthGuard } from '../../core/guards/my-auth-guard';
 
 const routes: Routes = [
@@ -17,6 +18,12 @@ const routes: Routes = [
         component: ShiftsComponent,
         canActivate: [myAuthGuard],
         data: myAuthData({ requireAuth: true, requireAdminOrManager: true }),
+      },
+      {
+        path: 'my-shifts',
+        component: MyShiftsComponent,
+        canActivate: [myAuthGuard],
+        data: myAuthData({ requireAuth: true, requireEmployee: true }),
       },
     ],
   },

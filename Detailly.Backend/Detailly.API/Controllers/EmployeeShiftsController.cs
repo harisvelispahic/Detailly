@@ -2,7 +2,7 @@
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
-using Detailly.Application.Modules.Vehicle.Vehicles.Queries.ListMine;
+using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListMine;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -56,6 +56,17 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     [HttpGet]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<PageResult<ListEmployeeShiftsForDateQueryDto>> ListForDate([FromQuery] ListEmployeeShiftsForDateQuery query, CancellationToken ct)
+    {
+        return await sender.Send(query, ct);
+    }
+
+    // ---------------------------------------
+    // LIST MY SHIFTS (Employee)
+    // GET /EmployeeShifts/mine?days=7
+    // ---------------------------------------
+    [HttpGet("mine")]
+    [Authorize(Policy = AuthPolicies.EmployeeOnly)]
+    public async Task<List<ListMyShiftsQueryDto>> ListMine([FromQuery] ListMyShiftsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
     }
