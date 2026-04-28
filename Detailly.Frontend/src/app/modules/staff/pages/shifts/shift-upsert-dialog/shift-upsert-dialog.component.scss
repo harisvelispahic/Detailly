@@ -1,0 +1,128 @@
+.shift-dialog {
+  background: hsl(var(--card));
+  color: hsl(var(--card-foreground));
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-width: 440px;
+}
+
+// ── Header ────────────────────────────────────────────────────────
+.shift-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 24px 20px;
+  background: var(--gradient-surface);
+  border-bottom: 1px solid hsl(var(--border));
+  position: relative;
+}
+
+.shift-dialog__header-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  box-shadow: var(--shadow-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    color: hsl(var(--primary-foreground));
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.shift-dialog__title {
+  margin: 0 0 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.shift-dialog__subtitle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.shift-dialog__close-btn {
+  margin-left: auto;
+  color: hsl(var(--muted-foreground));
+
+  &:hover {
+    color: hsl(var(--foreground));
+  }
+}
+
+// ── Body ──────────────────────────────────────────────────────────
+.shift-dialog__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.shift-dialog__field {
+  width: 100%;
+}
+
+.shift-dialog__times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.shift-dialog__time-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  color: hsl(var(--destructive));
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ── Actions ───────────────────────────────────────────────────────
+.shift-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+
+  button {
+    min-width: 120px;
+    height: 42px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+}
+
+.shift-dialog__submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-spinner {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .shift-dialog {
+    min-width: unset;
+  }
+
+  .shift-dialog__times {
+    grid-template-columns: 1fr;
+  }
+}

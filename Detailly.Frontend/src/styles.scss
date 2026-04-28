@@ -680,6 +680,15 @@ img {
   &:active:not(:disabled) {
     filter: brightness(0.96);
   }
+
+  // Clearly grayed-out disabled state so users understand the button is inactive
+  &:disabled {
+    background: hsl(var(--muted)) !important;
+    color: hsl(var(--muted-foreground)) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+  }
 }
 
 .mat-mdc-unelevated-button[color='primary'] {
@@ -695,6 +704,14 @@ img {
 
   &:active:not(:disabled) {
     filter: brightness(0.96);
+  }
+
+  &:disabled {
+    background: hsl(var(--muted)) !important;
+    color: hsl(var(--muted-foreground)) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
   }
 }
 

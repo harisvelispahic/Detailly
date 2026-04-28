@@ -1,0 +1,117 @@
+<div class="shift-dialog">
+
+  <!-- Header -->
+  <div class="shift-dialog__header">
+    <div class="shift-dialog__header-icon">
+      <mat-icon>{{ isEditMode ? 'edit_calendar' : 'add_circle' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="shift-dialog__title">{{ isEditMode ? 'Edit Shift' : 'New Shift' }}</h2>
+      <p class="shift-dialog__subtitle">
+        {{ isEditMode ? 'Update the shift details below' : 'Create a new employee shift' }}
+      </p>
+    </div>
+    <button mat-icon-button class="shift-dialog__close-btn" (click)="onCancel()" matTooltip="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="shift-dialog__body">
+
+    <!-- Work Mode (first — drives employee list) -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Work Mode</mat-label>
+      <mat-select formControlName="employeeWorkMode">
+        <mat-option [value]="EmployeeWorkMode.InShop">In Shop</mat-option>
+        <mat-option [value]="EmployeeWorkMode.Mobile">Mobile</mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('employeeWorkMode')?.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <!-- Employee dropdown -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Employee</mat-label>
+      <mat-select formControlName="employeeId" [disabled]="isLoadingEmployees">
+        <mat-option *ngFor="let emp of employees" [value]="emp.id">
+          {{ emp.fullName }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matSuffix>badge</mat-icon>
+      <mat-hint *ngIf="isLoadingEmployees">Loading employees…</mat-hint>
+      <mat-hint *ngIf="!isLoadingEmployees && employees.length === 0">
+        No employees found for this work mode
+      </mat-hint>
+      <mat-error *ngIf="form.get('employeeId')?.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <!-- Location -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Location</mat-label>
+      <mat-select formControlName="shopLocationId">
+        <mat-option *ngFor="let loc of data.locations" [value]="loc.id">
+          {{ loc.name }}<ng-container *ngIf="loc.city"> — {{ loc.city }}</ng-container>
+        </mat-option>
+      </mat-select>
+      <mat-icon matSuffix>location_on</mat-icon>
+      <mat-error *ngIf="form.get('shopLocationId')?.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <!-- Date -->
+    <mat-form-field appearance="outline" class="shift-dialog__field">
+      <mat-label>Date (UTC)</mat-label>
+      <input matInput [matDatepicker]="shiftDate" formControlName="date" />
+      <mat-datepicker-toggle matIconSuffix [for]="shiftDate"></mat-datepicker-toggle>
+      <mat-datepicker #shiftDate></mat-datepicker>
+      <mat-error *ngIf="form.get('date')?.hasError('required')">Required</mat-error>
+    </mat-form-field>
+
+    <!-- Times row -->
+    <div class="shift-dialog__times">
+
+      <mat-form-field appearance="outline" class="shift-dialog__field">
+        <mat-label>Start Time (UTC)</mat-label>
+        <input matInput formControlName="startTime" placeholder="HH:mm" maxlength="5" />
+        <mat-icon matSuffix>login</mat-icon>
+        <mat-hint>24h format</mat-hint>
+        <mat-error *ngIf="form.get('startTime')?.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="form.get('startTime')?.hasError('pattern')">Use HH:mm (e.g. 09:00)</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="shift-dialog__field">
+        <mat-label>End Time (UTC)</mat-label>
+        <input matInput formControlName="endTime" placeholder="HH:mm" maxlength="5" />
+        <mat-icon matSuffix>logout</mat-icon>
+        <mat-hint>24h format</mat-hint>
+        <mat-error *ngIf="form.get('endTime')?.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="form.get('endTime')?.hasError('pattern')">Use HH:mm (e.g. 17:00)</mat-error>
+      </mat-form-field>
+
+    </div>
+
+    <!-- Cross-field time error -->
+    <p *ngIf="form.hasError('endBeforeStart') && form.dirty" class="shift-dialog__time-error">
+      <mat-icon>warning</mat-icon>
+      End time must be after start time
+    </p>
+
+    <!-- Actions -->
+    <div class="shift-dialog__actions">
+      <button type="button" mat-stroked-button (click)="onCancel()" [disabled]="isSubmitting">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        class="shift-dialog__submit"
+        [disabled]="form.invalid || isSubmitting"
+      >
+        <mat-spinner *ngIf="isSubmitting" diameter="16"></mat-spinner>
+        {{ isEditMode ? 'Save Changes' : 'Create Shift' }}
+      </button>
+    </div>
+
+  </form>
+
+</div>

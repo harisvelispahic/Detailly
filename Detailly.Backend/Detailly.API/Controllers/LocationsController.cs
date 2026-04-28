@@ -2,6 +2,7 @@
 using Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 using Detailly.Application.Modules.Booking.Locations.Commands.Update;
 using Detailly.Application.Modules.Booking.Locations.Queries.GetById;
+using Detailly.Application.Modules.Booking.Locations.Queries.GetOpeningHours;
 using Detailly.Application.Modules.Booking.Locations.Queries.List;
 using Detailly.Shared.Constants;
 
@@ -46,5 +47,13 @@ public class LocationsController(ISender sender) : ControllerBase
     public async Task<PageResult<ListLocationsQueryDto>> List([FromQuery] ListLocationsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
+    }
+
+    // GET /Locations/{id}/hours
+    [HttpGet("{id:int}/hours")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<List<GetLocationOpeningHoursQueryDto>> GetOpeningHours(int id, CancellationToken ct)
+    {
+        return await sender.Send(new GetLocationOpeningHoursQuery { LocationId = id }, ct);
     }
 }
