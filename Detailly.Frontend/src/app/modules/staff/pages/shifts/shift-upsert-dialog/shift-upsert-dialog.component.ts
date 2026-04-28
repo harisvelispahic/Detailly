@@ -86,15 +86,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
       { validators: endAfterStartValidator },
     );
 
-    // Load employees for the initial work mode
-    this.loadEmployees(this.form.value.employeeWorkMode);
-
-    // When work mode changes, reload employees
-    this.form.get('employeeWorkMode')!.valueChanges.subscribe((mode: EmployeeWorkMode) => {
-      this.employees = [];
-      this.form.patchValue({ employeeId: null });
-      this.loadEmployees(mode);
-    });
+    this.loadEmployees();
 
     // When location changes, update default times from opening hours
     this.form.get('shopLocationId')!.valueChanges.subscribe((locationId: number) => {
@@ -108,9 +100,9 @@ export class ShiftUpsertDialogComponent implements OnInit {
     }
   }
 
-  private loadEmployees(workMode: EmployeeWorkMode): void {
+  private loadEmployees(): void {
     this.isLoadingEmployees = true;
-    this.employeesApi.list(workMode).subscribe({
+    this.employeesApi.list().subscribe({
       next: (list) => {
         this.employees = list;
         this.isLoadingEmployees = false;

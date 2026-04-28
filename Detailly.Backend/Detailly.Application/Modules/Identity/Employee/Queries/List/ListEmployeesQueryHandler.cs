@@ -8,22 +8,15 @@ public sealed class ListEmployeesQueryHandler(IAppDbContext context, IAppCurrent
         if (!currentUser.IsAuthenticated || (!currentUser.IsAdmin && !currentUser.IsManager))
             throw new DetaillyForbiddenException("Admin or Manager access required.");
 
-        var q = context.ApplicationUsers
+        return await context.ApplicationUsers
             .AsNoTracking()
-            .Where(u => u.IsEmployee && u.IsEnabled && !u.IsDeleted);
-
-        if (request.EmployeeWorkMode.HasValue)
-            q = q.Where(u => u.EmployeeWorkMode == request.EmployeeWorkMode.Value
-                             || u.EmployeeWorkMode == null);
-
-        return await q
+            .Where(u => u.IsEmployee && u.IsEnabled && !u.IsDeleted)
             .OrderBy(u => u.LastName)
             .ThenBy(u => u.FirstName)
             .Select(u => new ListEmployeesQueryDto
             {
                 Id = u.Id,
                 FullName = u.FirstName + " " + u.LastName,
-                EmployeeWorkMode = u.EmployeeWorkMode,
             })
             .ToListAsync(ct);
     }

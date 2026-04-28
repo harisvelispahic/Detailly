@@ -20,8 +20,6 @@ public sealed class ApplicationUserEntity : BaseEntity
     public bool IsAdmin { get; set; } = false;
     public bool IsEmployee { get; set; } = false;
 
-    public EmployeeWorkMode? EmployeeWorkMode { get; set; } // null if not employee
-
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public required string Username { get; set; }

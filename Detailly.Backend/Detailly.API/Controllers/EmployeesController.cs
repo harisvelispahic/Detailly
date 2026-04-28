@@ -1,5 +1,4 @@
 using Detailly.Application.Modules.Identity.Employee.Queries.List;
-using Detailly.Domain.Common.Enums;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -8,11 +7,11 @@ namespace Detailly.API.Controllers;
 [Route("[controller]")]
 public sealed class EmployeesController(ISender sender) : ControllerBase
 {
-    // GET /Employees?employeeWorkMode=0
+    // GET /Employees
     [HttpGet]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
-    public async Task<List<ListEmployeesQueryDto>> List([FromQuery] EmployeeWorkMode? employeeWorkMode, CancellationToken ct)
+    public async Task<List<ListEmployeesQueryDto>> List(CancellationToken ct)
     {
-        return await sender.Send(new ListEmployeesQuery { EmployeeWorkMode = employeeWorkMode }, ct);
+        return await sender.Send(new ListEmployeesQuery(), ct);
     }
 }

@@ -151,7 +151,6 @@ public static class DynamicDataSeeder
             IsEmployee = true,
             IsFleet = false,
             IsEnabled = true,
-            EmployeeWorkMode = EmployeeWorkMode.InShop,
             CreatedAtUtc = now
         };
         employee.Wallet = new WalletEntity

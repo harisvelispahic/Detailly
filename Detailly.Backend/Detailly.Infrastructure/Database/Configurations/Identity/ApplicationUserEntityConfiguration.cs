@@ -33,7 +33,6 @@ public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguratio
 
         // ✅ Address book relationship is configured from AddressConfiguration (below)
 
-        // Index for employee availability filtering
-        builder.HasIndex(x => new { x.IsEmployee, x.EmployeeWorkMode, x.IsEnabled });
+        builder.HasIndex(x => new { x.IsEmployee, x.IsEnabled });
     }
 }
