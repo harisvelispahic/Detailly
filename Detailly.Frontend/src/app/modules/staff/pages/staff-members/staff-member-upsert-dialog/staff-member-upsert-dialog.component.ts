@@ -15,8 +15,6 @@ import {
   UpdateStaffMemberCommand,
 } from '../../../../../api-services/staff-members/staff-members-api.models';
 import { StaffMembersApiService } from '../../../../../api-services/staff-members/staff-members-api.service';
-import { ToasterService } from '../../../../../core/services/toaster.service';
-
 export interface PhoneCountry {
   name: string;
   iso2: string;
@@ -101,13 +99,13 @@ const PHONE_COUNTRIES: PhoneCountry[] = [
 export class StaffMemberUpsertDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private staffApi = inject(StaffMembersApiService);
-  private toaster = inject(ToasterService);
   private dialogRef = inject(MatDialogRef<StaffMemberUpsertDialogComponent>);
 
   form!: FormGroup;
   isSubmitting = false;
   hidePassword = true;
   hideConfirmPassword = true;
+  serverError: string | null = null;
 
   readonly phoneCountries = PHONE_COUNTRIES;
   filteredCountries: PhoneCountry[] = [...PHONE_COUNTRIES];
@@ -236,6 +234,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
   onSave(): void {
     if (this.form.invalid || this.isSubmitting) return;
     this.isSubmitting = true;
+    this.serverError = null;
 
     const v = this.form.getRawValue();
 
@@ -251,7 +250,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.toaster.error(this.extractError(err) ?? 'Failed to update staff member.');
+          this.serverError = this.extractError(err) ?? 'Failed to update staff member.';
         },
       });
     } else {
@@ -268,7 +267,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.toaster.error(this.extractError(err) ?? 'Failed to create staff member.');
+          this.serverError = this.extractError(err) ?? 'Failed to create staff member.';
         },
       });
     }

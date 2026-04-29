@@ -280,6 +280,14 @@
   background: hsl(var(--sidebar-foreground) / 0.04);
   border: 1px solid hsl(var(--sidebar-border));
   margin-bottom: 2px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: hsl(var(--sidebar-foreground) / 0.08);
+    border-color: hsl(var(--sidebar-primary) / 0.35);
+  }
 }
 
 // Initials avatar
@@ -337,21 +345,21 @@
     }
 
     &--admin {
-      background: hsl(var(--destructive) / 0.2);
-      color: hsl(var(--destructive-foreground));
+      background: hsl(var(--destructive) / 0.12);
+      color: hsl(var(--destructive));
       border: 1px solid hsl(var(--destructive) / 0.3);
     }
 
     &--manager {
-      background: hsl(var(--warning) / 0.2);
-      color: hsl(var(--warning-foreground));
-      border: 1px solid hsl(var(--warning) / 0.3);
+      background: hsl(var(--primary) / 0.12);
+      color: hsl(var(--primary));
+      border: 1px solid hsl(var(--primary) / 0.3);
     }
 
     &--employee {
-      background: hsl(var(--success) / 0.2);
-      color: hsl(var(--success-foreground));
-      border: 1px solid hsl(var(--success) / 0.3);
+      background: hsl(var(--info) / 0.12);
+      color: hsl(var(--info));
+      border: 1px solid hsl(var(--info) / 0.3);
     }
   }
 }

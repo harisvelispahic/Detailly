@@ -141,7 +141,7 @@
     <div class="sidebar__bottom">
 
       <!-- User info card -->
-      <div class="sidebar__user-card">
+      <a class="sidebar__user-card" routerLink="/client/profile" (click)="closeSidebar()">
         <div class="sidebar__avatar">{{ initials() }}</div>
         <div class="sidebar__user-meta">
           <span class="sidebar__user-email">{{ auth.currentUser()?.email }}</span>
@@ -164,7 +164,7 @@
             }
           </div>
         </div>
-      </div>
+      </a>
 
       <div class="sidebar__bottom-divider"></div>
 

@@ -1,25 +1,34 @@
 <div class="upsert-dialog">
-
   <div class="upsert-dialog__header">
     <div class="upsert-dialog__header-icon">
       <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
     </div>
     <div>
-      <h2 class="upsert-dialog__title">{{ isEditMode ? 'Edit Staff Member' : 'Add Staff Member' }}</h2>
+      <h2 class="upsert-dialog__title">
+        {{ isEditMode ? 'Edit Staff Member' : 'Add Staff Member' }}
+      </h2>
       <p class="upsert-dialog__subtitle">
-        {{ isEditMode ? 'Update the details below' : 'Fill in the details to create a new staff member' }}
+        {{
+          isEditMode
+            ? 'Update the details below'
+            : 'Fill in the details to create a new staff member'
+        }}
       </p>
     </div>
   </div>
 
   <mat-dialog-content class="upsert-dialog__content">
     <form [formGroup]="form" (ngSubmit)="onSave()" id="staff-form">
-
       <!-- Name row -->
       <div class="upsert-dialog__row">
         <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field">
           <mat-label>First Name</mat-label>
-          <input matInput formControlName="firstName" placeholder="John" autocomplete="given-name" />
+          <input
+            matInput
+            formControlName="firstName"
+            placeholder="John"
+            autocomplete="given-name"
+          />
           @if (form.get('firstName')?.hasError('required')) {
             <mat-error>First name is required</mat-error>
           }
@@ -41,7 +50,11 @@
       </div>
 
       <!-- Username -->
-      <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+      <mat-form-field
+        appearance="outline"
+        subscriptSizing="fixed"
+        class="upsert-dialog__field-full"
+      >
         <mat-label>Username</mat-label>
         <input matInput formControlName="username" placeholder="johndoe" autocomplete="username" />
         <mat-icon matPrefix>alternate_email</mat-icon>
@@ -57,9 +70,19 @@
       </mat-form-field>
 
       <!-- Email -->
-      <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+      <mat-form-field
+        appearance="outline"
+        subscriptSizing="fixed"
+        class="upsert-dialog__field-full"
+      >
         <mat-label>Email</mat-label>
-        <input matInput formControlName="email" type="email" placeholder="john@example.com" autocomplete="email" />
+        <input
+          matInput
+          formControlName="email"
+          type="email"
+          placeholder="john@example.com"
+          autocomplete="email"
+        />
         <mat-icon matPrefix>mail</mat-icon>
         @if (form.get('email')?.hasError('required')) {
           <mat-error>Email is required</mat-error>
@@ -71,7 +94,11 @@
 
       <!-- Password (create mode only) -->
       @if (!isEditMode) {
-        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__field-full">
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="fixed"
+          class="upsert-dialog__field-full"
+        >
           <mat-label>Password</mat-label>
           <input
             matInput
@@ -110,7 +137,12 @@
             autocomplete="new-password"
           />
           <mat-icon matPrefix>lock_reset</mat-icon>
-          <button mat-icon-button matSuffix type="button" (click)="hideConfirmPassword = !hideConfirmPassword">
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hideConfirmPassword = !hideConfirmPassword"
+          >
             <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
           </button>
           @if (form.get('confirmPassword')?.hasError('required')) {
@@ -127,7 +159,11 @@
 
       <!-- Phone -->
       <div class="upsert-dialog__phone-group">
-        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__phone-country">
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="fixed"
+          class="upsert-dialog__phone-country"
+        >
           <span matPrefix class="fi fi-{{ selectedCountry.iso2 }} upsert-dialog__flag"></span>
           <input
             matInput
@@ -151,7 +187,11 @@
           </mat-autocomplete>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" subscriptSizing="fixed" class="upsert-dialog__phone-number">
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="fixed"
+          class="upsert-dialog__phone-number"
+        >
           <mat-label>Phone (optional)</mat-label>
           <input
             matInput
@@ -182,9 +222,15 @@
           <p class="upsert-dialog__role-hint">Only admins can assign the Manager role.</p>
         }
       </div>
-
     </form>
   </mat-dialog-content>
+
+  @if (serverError) {
+    <div class="upsert-dialog__server-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError }}</span>
+    </div>
+  }
 
   <mat-dialog-actions class="upsert-dialog__actions">
     <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isSubmitting">
@@ -206,12 +252,15 @@
         {{ isEditMode ? 'Save Changes' : 'Create Member' }}
       }
       @if (isSubmitting) {
-        <mat-progress-spinner mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="18"
+          strokeWidth="3"
+        ></mat-progress-spinner>
       }
       @if (isSubmitting) {
         <span>{{ isEditMode ? 'Saving…' : 'Creating…' }}</span>
       }
     </button>
   </mat-dialog-actions>
-
 </div>

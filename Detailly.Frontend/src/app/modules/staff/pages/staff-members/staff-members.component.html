@@ -1,5 +1,4 @@
 <div class="staff-members">
-
   <!-- Header card -->
   <div class="staff-members__header-card">
     <div class="staff-members__header-inner">
@@ -26,7 +25,10 @@
 
     <!-- Filters -->
     <div class="staff-members__filters">
-      <mat-form-field appearance="outline" class="staff-members__filter-field staff-members__filter-field--search">
+      <mat-form-field
+        appearance="outline"
+        class="staff-members__filter-field staff-members__filter-field--search"
+      >
         <mat-label>Search</mat-label>
         <input matInput [formControl]="searchCtrl" placeholder="Name, username, email…" />
         <mat-icon matPrefix>search</mat-icon>
@@ -67,7 +69,6 @@
   @if (!isLoading && !errorMessage) {
     <div class="staff-members__table-card">
       <table mat-table [dataSource]="items" class="staff-members__table">
-
         <!-- Name -->
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>
@@ -186,5 +187,4 @@
       </div>
     </div>
   }
-
 </div>
