@@ -20,18 +20,29 @@ export interface LocationUpsertDialogData {
   location: ListLocationsQueryDto | null;
 }
 
+// Display order: Monday first — dayOfWeek stays as System.DayOfWeek (0=Sun…6=Sat)
 const DAYS = [
-  { label: 'Sunday',    short: 'Sun' },
-  { label: 'Monday',    short: 'Mon' },
-  { label: 'Tuesday',   short: 'Tue' },
-  { label: 'Wednesday', short: 'Wed' },
-  { label: 'Thursday',  short: 'Thu' },
-  { label: 'Friday',    short: 'Fri' },
-  { label: 'Saturday',  short: 'Sat' },
+  { label: 'Monday',    dayOfWeek: 1 },
+  { label: 'Tuesday',   dayOfWeek: 2 },
+  { label: 'Wednesday', dayOfWeek: 3 },
+  { label: 'Thursday',  dayOfWeek: 4 },
+  { label: 'Friday',    dayOfWeek: 5 },
+  { label: 'Saturday',  dayOfWeek: 6 },
+  { label: 'Sunday',    dayOfWeek: 0 },
 ];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = [0, 15, 30, 45];
+
+interface DayHours {
+  isClosed: boolean;
+  openHour: number | null;
+  openMinute: number | null;
+  closeHour: number | null;
+  closeMinute: number | null;
+}
+
+const DEFAULT_HOURS: DayHours = { isClosed: false, openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0 };
 
 @Component({
   selector: 'app-location-upsert-dialog',
@@ -49,14 +60,12 @@ export class LocationUpsertDialogComponent implements OnInit {
   readonly hours = HOURS;
   readonly minutes = MINUTES;
 
-  // Opening hours state: one entry per day (index = DayOfWeek)
-  openingHours: Array<{
-    isClosed: boolean;
-    openHour: number | null;
-    openMinute: number | null;
-    closeHour: number | null;
-    closeMinute: number | null;
-  }> = DAYS.map(() => ({ isClosed: false, openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0 }));
+  // openingHours[dayOfWeek] — indexed 0=Sun … 6=Sat
+  openingHours: DayHours[] = Array.from({ length: 7 }, () => ({ ...DEFAULT_HOURS }));
+
+  // Snapshots for change detection (edit mode only)
+  private initialFormSnapshot: string = '';
+  private initialHoursSnapshot: string = '';
 
   // Country autocomplete
   countrySearchCtrl = new FormControl<CountryOption | string>('');
@@ -72,6 +81,15 @@ export class LocationUpsertDialogComponent implements OnInit {
     return !!this.data.location;
   }
 
+  get hasChanges(): boolean {
+    if (!this.isEdit) return true;
+    if (!this.initialFormSnapshot) return false;
+    return (
+      JSON.stringify(this.form.getRawValue()) !== this.initialFormSnapshot ||
+      JSON.stringify(this.openingHours) !== this.initialHoursSnapshot
+    );
+  }
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<LocationUpsertDialogComponent>,
@@ -84,7 +102,6 @@ export class LocationUpsertDialogComponent implements OnInit {
       name:        ['', [Validators.required, Validators.maxLength(150)]],
       description: [''],
       totalBays:   [1, [Validators.required, Validators.min(1)]],
-      // Address fields
       street:     ['', Validators.required],
       city:       ['', Validators.required],
       postalCode: ['', Validators.required],
@@ -145,13 +162,17 @@ export class LocationUpsertDialogComponent implements OnInit {
       this.countrySearchCtrl.setValue(match ?? a.country ?? '', { emitEvent: false });
     }
 
-    // Patch opening hours
-    this.openingHours = DAYS.map((_, i) => {
-      const h = hours.find(h => h.dayOfWeek === i);
+    // Build openingHours in display order (Monday first)
+    this.openingHours = DAYS.map(day => {
+      const h = hours.find(h => h.dayOfWeek === day.dayOfWeek);
       return h
         ? { isClosed: h.isClosed, openHour: h.openHour, openMinute: h.openMinute, closeHour: h.closeHour, closeMinute: h.closeMinute }
-        : { isClosed: false, openHour: 8, openMinute: 0, closeHour: 17, closeMinute: 0 };
+        : { ...DEFAULT_HOURS };
     });
+
+    // Capture snapshots for change detection
+    this.initialFormSnapshot = JSON.stringify(this.form.getRawValue());
+    this.initialHoursSnapshot = JSON.stringify(this.openingHours);
   }
 
   onCountryFocus(): void {
@@ -181,14 +202,17 @@ export class LocationUpsertDialogComponent implements OnInit {
   }
 
   private buildOpeningHoursPayload(): LocationOpeningHoursInputDto[] {
-    return this.openingHours.map((h, i) => ({
-      dayOfWeek:   i,
-      isClosed:    h.isClosed,
-      openHour:    h.isClosed ? null : (h.openHour ?? null),
-      openMinute:  h.isClosed ? null : (h.openMinute ?? null),
-      closeHour:   h.isClosed ? null : (h.closeHour ?? null),
-      closeMinute: h.isClosed ? null : (h.closeMinute ?? null),
-    }));
+    return DAYS.map((day, i) => {
+      const h = this.openingHours[i];
+      return {
+        dayOfWeek:   day.dayOfWeek,
+        isClosed:    h.isClosed,
+        openHour:    h.isClosed ? null : (h.openHour ?? null),
+        openMinute:  h.isClosed ? null : (h.openMinute ?? null),
+        closeHour:   h.isClosed ? null : (h.closeHour ?? null),
+        closeMinute: h.isClosed ? null : (h.closeMinute ?? null),
+      };
+    });
   }
 
   submit(): void {

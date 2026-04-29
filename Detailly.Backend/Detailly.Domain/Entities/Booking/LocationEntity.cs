@@ -10,6 +10,8 @@ public class LocationEntity : BaseEntity
 
     public required int TotalBays { get; set; }
 
+    public bool IsTemporarilyClosed { get; set; } = false;
+
     // Foreign keys
     public required int AddressId { get; set; }
     public AddressEntity Address { get; set; } = null!;

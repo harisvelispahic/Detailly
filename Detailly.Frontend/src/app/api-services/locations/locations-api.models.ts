@@ -33,6 +33,7 @@ export interface ListLocationsQueryDto {
   region: string | null;
   country: string | null;
   isOpenToday: boolean;
+  isTemporarilyClosed: boolean;
 }
 
 export class ListLocationsRequest extends BasePagedQuery {

@@ -30,7 +30,7 @@ export class LocationsComponent
   readonly auth = inject(AuthFacadeService);
   private destroy$ = new Subject<void>();
 
-  displayedColumns = ['name', 'address', 'bays', 'open', 'actions'];
+  displayedColumns = ['name', 'address', 'bays', 'status', 'actions'];
   searchCtrl = new FormControl('');
 
   constructor() {
@@ -114,6 +114,29 @@ export class LocationsComponent
       width: '640px',
       maxWidth: '95vw',
       data: { locationId: loc.id, locationName: loc.name } as LocationDetailDialogData,
+    });
+  }
+
+  toggleLocationStatus(loc: ListLocationsQueryDto, event: MouseEvent): void {
+    event.stopPropagation();
+    const action = loc.isTemporarilyClosed ? 'reopen' : 'temporarily close';
+    const message = loc.isTemporarilyClosed
+      ? `Are you sure you want to reopen "${loc.name}"?`
+      : `Are you sure you want to temporarily close "${loc.name}"? Customers won't be able to book at this location.`;
+
+    this.dialogHelper.confirm(
+      loc.isTemporarilyClosed ? 'Reopen Location' : 'Close Location',
+      message,
+      loc.isTemporarilyClosed ? 'store' : 'construction',
+    ).subscribe((result) => {
+      if (result?.button !== DialogButton.YES) return;
+      this.locationsApi.toggleStatus(loc.id).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.toaster.success(loc.isTemporarilyClosed ? 'Location reopened.' : 'Location closed.');
+          this.loadPagedData();
+        },
+        error: () => this.toaster.error(`Failed to ${action} location.`),
+      });
     });
   }
 

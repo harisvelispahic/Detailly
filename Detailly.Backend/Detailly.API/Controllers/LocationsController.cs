@@ -1,5 +1,6 @@
 using Detailly.Application.Modules.Booking.Locations.Commands.Create;
 using Detailly.Application.Modules.Booking.Locations.Commands.Delete;
+using Detailly.Application.Modules.Booking.Locations.Commands.ToggleStatus;
 using Detailly.Application.Modules.Booking.Locations.Commands.Update;
 using Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 using Detailly.Application.Modules.Booking.Locations.Queries.GetOpeningHours;
@@ -26,6 +27,13 @@ public class LocationsController(ISender sender) : ControllerBase
     {
         command.Id = id;
         await sender.Send(command, ct);
+    }
+
+    [HttpPatch("{id:int}/toggle-status")]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
+    public async Task ToggleStatus(int id, CancellationToken ct)
+    {
+        await sender.Send(new ToggleLocationStatusCommand { Id = id }, ct);
     }
 
     [HttpDelete("{id:int}")]

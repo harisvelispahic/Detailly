@@ -11,4 +11,5 @@ public sealed class ListLocationsQueryDto
     public string? Region { get; set; }
     public string? Country { get; set; }
     public bool IsOpenToday { get; set; }
+    public bool IsTemporarilyClosed { get; set; }
 }

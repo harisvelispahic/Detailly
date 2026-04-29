@@ -19,7 +19,8 @@
   }
 
   @if (!isFetchingDetails) {
-    <form [formGroup]="form" (ngSubmit)="submit()" class="lud__form">
+    <mat-dialog-content class="lud__content">
+    <form [formGroup]="form" (ngSubmit)="submit()" id="lud-form" class="lud__form">
 
       <!-- ── Location info ──────────────────────────────────────────── -->
       <p class="lud__section-label">Location Info</p>
@@ -119,60 +120,80 @@
       <!-- ── Opening Hours ──────────────────────────────────────────── -->
       <p class="lud__section-label">Opening Hours (UTC)</p>
 
-      <div class="lud__hours-grid">
-        @for (day of days; track day.label; let i = $index) {
-          <div class="lud__hours-row" [class.lud__hours-row--closed]="openingHours[i].isClosed">
+      <div class="lud__hours-table">
+        <!-- Header row -->
+        <div class="lud__hours-head">
+          <div class="lud__hours-cell lud__hours-cell--day">Day</div>
+          <div class="lud__hours-cell lud__hours-cell--time-group">Opening</div>
+          <div class="lud__hours-cell lud__hours-cell--time-group">Closing</div>
+          <div class="lud__hours-cell lud__hours-cell--closed">Closed</div>
+        </div>
 
-            <div class="lud__hours-day">
+        @for (day of days; track day.dayOfWeek; let i = $index) {
+          <div class="lud__hours-row" [class.lud__hours-row--closed]="openingHours[i].isClosed">
+            <div class="lud__hours-cell lud__hours-cell--day">{{ day.label }}</div>
+
+            <!-- Opening time -->
+            <div class="lud__hours-cell lud__hours-cell--time-group">
+              <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
+                <mat-select
+                  [(ngModel)]="openingHours[i].openHour"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="openingHours[i].isClosed"
+                >
+                  @for (h of hours; track h) {
+                    <mat-option [value]="h">{{ formatHour(h) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <span class="lud__time-sep">:</span>
+              <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
+                <mat-select
+                  [(ngModel)]="openingHours[i].openMinute"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="openingHours[i].isClosed"
+                >
+                  @for (m of minutes; track m) {
+                    <mat-option [value]="m">{{ formatMinute(m) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- Closing time -->
+            <div class="lud__hours-cell lud__hours-cell--time-group">
+              <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
+                <mat-select
+                  [(ngModel)]="openingHours[i].closeHour"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="openingHours[i].isClosed"
+                >
+                  @for (h of hours; track h) {
+                    <mat-option [value]="h">{{ formatHour(h) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <span class="lud__time-sep">:</span>
+              <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
+                <mat-select
+                  [(ngModel)]="openingHours[i].closeMinute"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="openingHours[i].isClosed"
+                >
+                  @for (m of minutes; track m) {
+                    <mat-option [value]="m">{{ formatMinute(m) }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <!-- Closed checkbox -->
+            <div class="lud__hours-cell lud__hours-cell--closed">
               <mat-checkbox
                 [(ngModel)]="openingHours[i].isClosed"
                 [ngModelOptions]="{ standalone: true }"
-                class="lud__hours-closed-check"
               ></mat-checkbox>
-              <span class="lud__hours-day-label">{{ day.label }}</span>
             </div>
-
-            @if (!openingHours[i].isClosed) {
-              <div class="lud__hours-times">
-                <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
-                  <mat-label>Open</mat-label>
-                  <mat-select [(ngModel)]="openingHours[i].openHour" [ngModelOptions]="{ standalone: true }">
-                    @for (h of hours; track h) {
-                      <mat-option [value]="h">{{ formatHour(h) }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <span class="lud__time-sep">:</span>
-                <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__min-field">
-                  <mat-select [(ngModel)]="openingHours[i].openMinute" [ngModelOptions]="{ standalone: true }">
-                    @for (m of minutes; track m) {
-                      <mat-option [value]="m">{{ formatMinute(m) }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-
-                <span class="lud__time-dash">–</span>
-
-                <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__time-field">
-                  <mat-label>Close</mat-label>
-                  <mat-select [(ngModel)]="openingHours[i].closeHour" [ngModelOptions]="{ standalone: true }">
-                    @for (h of hours; track h) {
-                      <mat-option [value]="h">{{ formatHour(h) }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <span class="lud__time-sep">:</span>
-                <mat-form-field appearance="outline" subscriptSizing="fixed" class="lud__min-field">
-                  <mat-select [(ngModel)]="openingHours[i].closeMinute" [ngModelOptions]="{ standalone: true }">
-                    @for (m of minutes; track m) {
-                      <mat-option [value]="m">{{ formatMinute(m) }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            } @else {
-              <span class="lud__hours-closed-label">Closed</span>
-            }
           </div>
         }
       </div>
@@ -181,21 +202,24 @@
         <div class="lud__error">{{ serverError }}</div>
       }
 
-      <div class="lud__actions">
-        <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
-        <button
-          type="submit"
-          mat-raised-button
-          color="primary"
-          [disabled]="form.invalid || isLoading"
-        >
-          @if (isLoading) {
-            <mat-spinner diameter="18"></mat-spinner>
-          }
-          <span>{{ isEdit ? 'Save Changes' : 'Create Location' }}</span>
-        </button>
-      </div>
     </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="lud__actions">
+      <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+      <button
+        type="submit"
+        form="lud-form"
+        mat-raised-button
+        color="primary"
+        [disabled]="form.invalid || isLoading || (isEdit && !hasChanges)"
+      >
+        @if (isLoading) {
+          <mat-spinner diameter="18"></mat-spinner>
+        }
+        <span>{{ isEdit ? 'Save Changes' : 'Create Location' }}</span>
+      </button>
+    </mat-dialog-actions>
   }
 
 </div>

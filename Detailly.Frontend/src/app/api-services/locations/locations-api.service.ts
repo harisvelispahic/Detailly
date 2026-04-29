@@ -34,6 +34,10 @@ export class LocationsApiService {
     return this.http.put<void>(`${this.baseUrl}/${id}`, command);
   }
 
+  toggleStatus(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/toggle-status`, {});
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }

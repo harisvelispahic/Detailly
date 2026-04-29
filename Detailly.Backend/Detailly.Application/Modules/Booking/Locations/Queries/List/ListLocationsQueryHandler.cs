@@ -28,7 +28,8 @@ public sealed class ListLocationsQueryHandler(IAppDbContext context)
                 Region    = l.Address.Region,
                 Country   = l.Address.Country,
                 IsOpenToday = l.LocationOpeningHours
-                    .Any(h => !h.IsDeleted && h.DayOfWeek == todayDow && !h.IsClosed)
+                    .Any(h => !h.IsDeleted && h.DayOfWeek == todayDow && !h.IsClosed),
+                IsTemporarilyClosed = l.IsTemporarilyClosed
             });
 
         return await PageResult<ListLocationsQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);

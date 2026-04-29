@@ -1,7 +1,6 @@
 .lud {
   display: flex;
   flex-direction: column;
-  max-height: 85vh;
 }
 
 // ── Header ──────────────────────────────────────────────────────────
@@ -45,14 +44,16 @@
   font-size: 0.9rem;
 }
 
+// ── Content (mat-dialog-content override) ────────────────────────────
+.lud__content {
+  padding: 20px 24px !important;
+}
+
 // ── Form ─────────────────────────────────────────────────────────────
 .lud__form {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 20px 24px;
-  overflow-y: auto;
-  flex: 1;
 }
 
 .lud__section-label {
@@ -77,59 +78,64 @@
   gap: 12px;
 }
 
-// ── Opening hours grid ───────────────────────────────────────────────
-.lud__hours-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+// ── Opening hours table ───────────────────────────────────────────────
+.lud__hours-table {
   background: hsl(var(--surface-1));
   border: 1px solid hsl(var(--border));
   border-radius: 12px;
-  padding: 8px 12px;
+  overflow: hidden;
+}
+
+.lud__hours-head {
+  display: grid;
+  grid-template-columns: 110px 1fr 1fr 72px;
+  background: hsl(var(--surface-2, var(--surface-1)));
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 6px 12px;
 }
 
 .lud__hours-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 1fr 72px;
+  align-items: center;
+  padding: 6px 12px;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  transition: opacity 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+
+  &--closed { opacity: 0.5; }
+}
+
+.lud__hours-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 4px;
-  border-radius: 8px;
-  transition: background 0.15s ease;
+
+  &--day {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(var(--foreground));
+  }
+
+  &--time-group {
+    gap: 4px;
+  }
 
   &--closed {
-    opacity: 0.55;
+    justify-content: center;
   }
 }
 
-.lud__hours-day {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 130px;
-  flex-shrink: 0;
-}
-
-.lud__hours-day-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: hsl(var(--foreground));
-  min-width: 90px;
-}
-
-.lud__hours-times {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
+.lud__hours-head .lud__hours-cell {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--muted-foreground));
 }
 
 .lud__time-field {
-  width: 72px;
-  flex-shrink: 0;
-}
-
-.lud__min-field {
-  width: 60px;
+  width: 86px;
   flex-shrink: 0;
 }
 
@@ -138,18 +144,7 @@
   font-size: 1rem;
   font-weight: 600;
   padding: 0 2px;
-}
-
-.lud__time-dash {
-  color: hsl(var(--muted-foreground));
-  font-size: 1rem;
-  padding: 0 6px;
-}
-
-.lud__hours-closed-label {
-  font-size: 0.8rem;
-  font-style: italic;
-  color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
 }
 
 // ── Country flag ──────────────────────────────────────────────────────
@@ -173,9 +168,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding-top: 8px;
+  padding: 8px 24px 16px !important;
   border-top: 1px solid hsl(var(--border));
-  flex-shrink: 0;
 
   button[disabled] {
     opacity: 0.5;
@@ -189,7 +183,10 @@
 
   .lud__half { width: 100%; }
 
-  .lud__hours-day { min-width: 100px; }
+  .lud__hours-head,
+  .lud__hours-row {
+    grid-template-columns: 90px 1fr 1fr 60px;
+  }
 
-  .lud__hours-day-label { min-width: 70px; }
+  .lud__time-field { width: 72px; }
 }

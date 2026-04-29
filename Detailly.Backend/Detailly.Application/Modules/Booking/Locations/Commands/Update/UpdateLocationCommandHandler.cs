@@ -1,4 +1,5 @@
 using Detailly.Application.Abstractions.Booking;
+using Detailly.Application.Modules.Booking.Locations.Commands.Create;
 using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Locations.Commands.Update;
@@ -45,13 +46,14 @@ public sealed class UpdateLocationCommandHandler(
             var a = request.Address;
             bool addressChanged = false;
 
-            if (!string.IsNullOrWhiteSpace(a.Street))       { location.Address.Street     = a.Street.Trim();     addressChanged = true; }
-            if (!string.IsNullOrWhiteSpace(a.City))         { location.Address.City       = a.City.Trim();       addressChanged = true; }
-            if (!string.IsNullOrWhiteSpace(a.PostalCode))   { location.Address.PostalCode = a.PostalCode.Trim(); addressChanged = true; }
-            if (a.Region is not null)                       { location.Address.Region     = a.Region.Trim();     }
-            if (!string.IsNullOrWhiteSpace(a.Country))      { location.Address.Country    = a.Country.Trim();    addressChanged = true; }
+            // Only flag as changed when the trimmed incoming value differs from what is stored,
+            // so ORS (road-distance geocoding) is not called on a no-op update.
+            if (!string.IsNullOrWhiteSpace(a.Street)    && a.Street.Trim()     != location.Address.Street)     { location.Address.Street     = a.Street.Trim();     addressChanged = true; }
+            if (!string.IsNullOrWhiteSpace(a.City)      && a.City.Trim()       != location.Address.City)       { location.Address.City       = a.City.Trim();       addressChanged = true; }
+            if (!string.IsNullOrWhiteSpace(a.PostalCode)&& a.PostalCode.Trim() != location.Address.PostalCode) { location.Address.PostalCode = a.PostalCode.Trim(); addressChanged = true; }
+            if (a.Region is not null                    && a.Region.Trim()     != location.Address.Region)     { location.Address.Region     = a.Region.Trim(); }
+            if (!string.IsNullOrWhiteSpace(a.Country)   && a.Country.Trim()    != location.Address.Country)    { location.Address.Country    = a.Country.Trim();    addressChanged = true; }
 
-            // Re-geocode when any address field changed
             if (addressChanged)
             {
                 var coords = await roadDistanceService.GetCoordinatesAsync(
@@ -63,32 +65,58 @@ public sealed class UpdateLocationCommandHandler(
 
                 location.Address.Latitude  = coords?.Latitude;
                 location.Address.Longitude = coords?.Longitude;
+                location.Address.ModifiedAtUtc = now;
             }
-
-            location.Address.ModifiedAtUtc = now;
         }
 
         // Replace opening hours when provided
         if (request.OpeningHours?.Count > 0)
         {
-            var existing = await context.LocationOpeningHours
-                .Where(h => h.ShopLocationId == location.Id && !h.IsDeleted)
+            // Must use IgnoreQueryFilters: the unique index on (ShopLocationId, DayOfWeek)
+            // applies to soft-deleted rows too, so delete+insert would violate it.
+            // Instead we update rows in-place and restore any that were soft-deleted.
+            var allExisting = await context.LocationOpeningHours
+                .IgnoreQueryFilters()
+                .Where(h => h.ShopLocationId == location.Id)
                 .ToListAsync(ct);
 
-            foreach (var e in existing)
-                e.IsDeleted = true;
-
-            foreach (var h in request.OpeningHours)
+            if (OpeningHoursHaveChanged(request.OpeningHours, allExisting))
             {
-                context.LocationOpeningHours.Add(new LocationOpeningHoursEntity
+                foreach (var h in request.OpeningHours)
                 {
-                    ShopLocationId = location.Id,
-                    DayOfWeek      = h.DayOfWeek,
-                    IsClosed       = h.IsClosed,
-                    OpenTimeUtc    = h.IsClosed ? null : (h.OpenHour is not null ? new TimeSpan(h.OpenHour.Value, h.OpenMinute ?? 0, 0) : null),
-                    CloseTimeUtc   = h.IsClosed ? null : (h.CloseHour is not null ? new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0) : null),
-                    CreatedAtUtc   = now
-                });
+                    var openTime  = h.IsClosed || h.OpenHour  is null ? (TimeSpan?)null : new TimeSpan(h.OpenHour.Value,  h.OpenMinute  ?? 0, 0);
+                    var closeTime = h.IsClosed || h.CloseHour is null ? (TimeSpan?)null : new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0);
+
+                    var row = allExisting.FirstOrDefault(e => e.DayOfWeek == h.DayOfWeek);
+                    if (row is not null)
+                    {
+                        row.IsDeleted     = false;
+                        row.IsClosed      = h.IsClosed;
+                        row.OpenTimeUtc   = openTime;
+                        row.CloseTimeUtc  = closeTime;
+                        row.ModifiedAtUtc = now;
+                    }
+                    else
+                    {
+                        context.LocationOpeningHours.Add(new LocationOpeningHoursEntity
+                        {
+                            ShopLocationId = location.Id,
+                            DayOfWeek      = h.DayOfWeek,
+                            IsClosed       = h.IsClosed,
+                            OpenTimeUtc    = openTime,
+                            CloseTimeUtc   = closeTime,
+                            CreatedAtUtc   = now,
+                        });
+                    }
+                }
+
+                // Soft-delete any days that were not included in the incoming set
+                var incomingDays = request.OpeningHours.Select(h => h.DayOfWeek).ToHashSet();
+                foreach (var row in allExisting.Where(e => !e.IsDeleted && !incomingDays.Contains(e.DayOfWeek)))
+                {
+                    row.IsDeleted     = true;
+                    row.ModifiedAtUtc = now;
+                }
             }
         }
 
@@ -96,5 +124,23 @@ public sealed class UpdateLocationCommandHandler(
 
         await context.SaveChangesAsync(ct);
         return Unit.Value;
+    }
+
+    private static bool OpeningHoursHaveChanged(List<LocationOpeningHoursInputDto> incoming, List<LocationOpeningHoursEntity> existing)
+    {
+        foreach (var h in incoming)
+        {
+            var openTime  = h.IsClosed || h.OpenHour  is null ? (TimeSpan?)null : new TimeSpan(h.OpenHour.Value,  h.OpenMinute  ?? 0, 0);
+            var closeTime = h.IsClosed || h.CloseHour is null ? (TimeSpan?)null : new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0);
+
+            var row = existing.FirstOrDefault(e => e.DayOfWeek == h.DayOfWeek);
+            if (row is null || row.IsDeleted)    return true;
+            if (row.IsClosed    != h.IsClosed)   return true;
+            if (row.OpenTimeUtc  != openTime)    return true;
+            if (row.CloseTimeUtc != closeTime)   return true;
+        }
+
+        var incomingDays = incoming.Select(h => h.DayOfWeek).ToHashSet();
+        return existing.Any(e => !e.IsDeleted && !incomingDays.Contains(e.DayOfWeek));
     }
 }
