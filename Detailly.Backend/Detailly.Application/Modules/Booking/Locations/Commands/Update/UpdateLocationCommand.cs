@@ -1,4 +1,4 @@
-﻿using Detailly.Domain.Common.Enums;
+using Detailly.Application.Modules.Booking.Locations.Commands.Create;
 
 namespace Detailly.Application.Modules.Booking.Locations.Commands.Update;
 
@@ -9,10 +9,18 @@ public sealed class UpdateLocationCommand : IRequest<Unit>
 
     public string? Name { get; set; }
     public string? Description { get; set; }
+    public int? TotalBays { get; set; }
 
-    public LocationType? LocationType { get; set; }
-    public int? TotalBays { get; set; } // only meaningful for Shop
+    public UpdateLocationAddressDto? Address { get; set; }
 
-    // Optional: allow changing address by id
-    public int? AddressId { get; set; }
+    public List<LocationOpeningHoursInputDto>? OpeningHours { get; set; }
+}
+
+public sealed class UpdateLocationAddressDto
+{
+    public string? Street { get; set; }
+    public string? City { get; set; }
+    public string? PostalCode { get; set; }
+    public string? Region { get; set; }
+    public string? Country { get; set; }
 }

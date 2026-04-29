@@ -8,6 +8,9 @@ import { ShiftUpsertDialogComponent } from './pages/shifts/shift-upsert-dialog/s
 import { MyShiftsComponent } from './pages/my-shifts/my-shifts.component';
 import { StaffMembersComponent } from './pages/staff-members/staff-members.component';
 import { StaffMemberUpsertDialogComponent } from './pages/staff-members/staff-member-upsert-dialog/staff-member-upsert-dialog.component';
+import { LocationsComponent } from './pages/locations/locations.component';
+import { LocationUpsertDialogComponent } from './pages/locations/location-upsert-dialog/location-upsert-dialog.component';
+import { LocationDetailDialogComponent } from './pages/locations/location-detail-dialog/location-detail-dialog.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +20,9 @@ import { StaffMemberUpsertDialogComponent } from './pages/staff-members/staff-me
     MyShiftsComponent,
     StaffMembersComponent,
     StaffMemberUpsertDialogComponent,
+    LocationsComponent,
+    LocationUpsertDialogComponent,
+    LocationDetailDialogComponent,
   ],
   imports: [SharedModule, StaffRoutingModule],
 })

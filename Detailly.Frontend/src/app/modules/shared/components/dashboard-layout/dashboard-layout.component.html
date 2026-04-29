@@ -72,6 +72,16 @@
           <span>Employee Shifts</span>
         </a>
 
+        <a
+          class="sidebar__item"
+          routerLink="/staff/locations"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">store</mat-icon>
+          <span>Locations</span>
+        </a>
+
         <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">
           <mat-icon class="sidebar__item-icon">analytics</mat-icon>
           <span>Reports</span>

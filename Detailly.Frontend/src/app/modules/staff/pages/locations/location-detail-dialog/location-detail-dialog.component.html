@@ -1,0 +1,110 @@
+<div class="ldd">
+
+  <!-- Header -->
+  <div class="ldd__header">
+    <div class="ldd__title-row">
+      <mat-icon class="ldd__icon">store</mat-icon>
+      <h2 class="ldd__title">{{ data.locationName }}</h2>
+    </div>
+    <button mat-icon-button (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="ldd__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Loading details…</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && error) {
+    <div class="ldd__error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!isLoading && !error && detail) {
+    <div class="ldd__content">
+
+      <!-- Info section -->
+      <div class="ldd__section">
+        <p class="ldd__section-label">Location Info</p>
+        <div class="ldd__info-grid">
+          <div class="ldd__info-item">
+            <span class="ldd__info-key">Name</span>
+            <span class="ldd__info-val">{{ detail.name }}</span>
+          </div>
+          @if (detail.description) {
+            <div class="ldd__info-item ldd__info-item--full">
+              <span class="ldd__info-key">Description</span>
+              <span class="ldd__info-val">{{ detail.description }}</span>
+            </div>
+          }
+          <div class="ldd__info-item">
+            <span class="ldd__info-key">Bays</span>
+            <span class="ldd__info-val">
+              <mat-icon class="ldd__inline-icon">directions_car</mat-icon>
+              {{ detail.totalBays }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address section -->
+      <div class="ldd__section">
+        <p class="ldd__section-label">Address</p>
+        <div class="ldd__address-card">
+          <mat-icon class="ldd__address-icon">place</mat-icon>
+          <div class="ldd__address-text">
+            @if (detail.address.street) {
+              <div class="ldd__address-line">{{ detail.address.street }}</div>
+            }
+            <div class="ldd__address-line">
+              {{ detail.address.city }}@if (detail.address.postalCode) {, {{ detail.address.postalCode }}}
+            </div>
+            @if (detail.address.region) {
+              <div class="ldd__address-line ldd__address-muted">{{ detail.address.region }}</div>
+            }
+            <div class="ldd__address-line">{{ detail.address.country }}</div>
+            @if (detail.address.latitude && detail.address.longitude) {
+              <div class="ldd__address-coords">
+                {{ detail.address.latitude }}, {{ detail.address.longitude }}
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Opening hours section -->
+      <div class="ldd__section">
+        <p class="ldd__section-label">Opening Hours (UTC)</p>
+        <div class="ldd__hours-list">
+          @for (h of hours; track h.dayOfWeek) {
+            <div class="ldd__hours-row" [class.ldd__hours-row--closed]="h.isClosed">
+              <span class="ldd__day-name">{{ dayNames[h.dayOfWeek] }}</span>
+              @if (h.isClosed) {
+                <span class="ldd__hours-closed">Closed</span>
+              } @else {
+                <span class="ldd__hours-time">
+                  {{ formatTime(h.openHour, h.openMinute) }} – {{ formatTime(h.closeHour, h.closeMinute) }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- Footer -->
+  <div class="ldd__footer">
+    <button mat-stroked-button (click)="close()">Close</button>
+  </div>
+
+</div>

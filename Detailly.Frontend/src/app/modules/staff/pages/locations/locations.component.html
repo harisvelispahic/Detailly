@@ -1,0 +1,166 @@
+<div class="locations">
+
+  <!-- Header card -->
+  <div class="locations__header-card">
+    <div class="locations__header-inner">
+      <div class="locations__title-section">
+        <div class="locations__title-icon">
+          <mat-icon>store</mat-icon>
+        </div>
+        <div>
+          <h1 class="locations__title">Locations</h1>
+          <p class="locations__subtitle">Manage shop locations and opening hours</p>
+        </div>
+      </div>
+
+      @if (auth.isAdmin()) {
+        <button
+          mat-raised-button
+          color="primary"
+          class="locations__new-btn"
+          (click)="openCreateDialog()"
+        >
+          <mat-icon>add_business</mat-icon>
+          Add Location
+        </button>
+      }
+    </div>
+
+    <!-- Search -->
+    <div class="locations__filters">
+      <mat-form-field appearance="outline" class="locations__filter-field">
+        <mat-label>Search</mat-label>
+        <input matInput [formControl]="searchCtrl" placeholder="Location name…" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="4" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="locations__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="locations__error-title">Failed to load locations</p>
+        <p class="locations__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadPagedData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="locations__table-card">
+      <table mat-table [dataSource]="items" class="locations__table">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="locations__th"><mat-icon>store</mat-icon> Name</div>
+          </th>
+          <td mat-cell *matCellDef="let loc">
+            <span class="locations__name">{{ loc.name }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Address -->
+        <ng-container matColumnDef="address">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="locations__th"><mat-icon>place</mat-icon> Address</div>
+          </th>
+          <td mat-cell *matCellDef="let loc">
+            <span class="locations__address">{{ formatAddress(loc) }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Bays -->
+        <ng-container matColumnDef="bays">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="locations__th"><mat-icon>directions_car</mat-icon> Bays</div>
+          </th>
+          <td mat-cell *matCellDef="let loc">
+            <span class="locations__bays">{{ loc.totalBays }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Open today -->
+        <ng-container matColumnDef="open">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="locations__th"><mat-icon>schedule</mat-icon> Open Today</div>
+          </th>
+          <td mat-cell *matCellDef="let loc">
+            @if (loc.isOpenToday) {
+              <span class="locations__open-badge locations__open-badge--open">
+                <mat-icon>check_circle</mat-icon> Open
+              </span>
+            } @else {
+              <span class="locations__open-badge locations__open-badge--closed">
+                <mat-icon>cancel</mat-icon> Closed
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let loc">
+            <div class="locations__actions">
+              @if (auth.isAdmin()) {
+                <button
+                  mat-icon-button
+                  class="locations__action-btn locations__action-btn--edit"
+                  (click)="openEditDialog(loc, $event)"
+                  matTooltip="Edit"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  class="locations__action-btn locations__action-btn--delete"
+                  (click)="deleteLocation(loc, $event)"
+                  matTooltip="Delete"
+                >
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              } @else {
+                <span class="locations__read-only" matTooltip="Read only">
+                  <mat-icon>visibility</mat-icon>
+                </span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="locations__row"
+          (click)="openDetailDialog(row)"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="locations__empty">
+              <mat-icon>store_mall_directory</mat-icon>
+              <p>No locations found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="locations__paginator">
+        <app-paginator-bar [vm]="this"></app-paginator-bar>
+      </div>
+    </div>
+  }
+
+</div>

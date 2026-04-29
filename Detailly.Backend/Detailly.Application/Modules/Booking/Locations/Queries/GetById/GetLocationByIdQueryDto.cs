@@ -1,5 +1,3 @@
-﻿using Detailly.Domain.Common.Enums;
-
 namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 
 public sealed class GetLocationByIdQueryDto
@@ -7,7 +5,6 @@ public sealed class GetLocationByIdQueryDto
     public required int Id { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public required LocationType LocationType { get; set; }
     public required int TotalBays { get; set; }
 
     public required int AddressId { get; set; }

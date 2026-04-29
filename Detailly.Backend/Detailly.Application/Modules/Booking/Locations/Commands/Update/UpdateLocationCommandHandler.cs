@@ -1,8 +1,12 @@
-﻿using Detailly.Domain.Common.Enums;
+using Detailly.Application.Abstractions.Booking;
+using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Locations.Commands.Update;
 
-public sealed class UpdateLocationCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class UpdateLocationCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser,
+    IRoadDistanceService roadDistanceService)
     : IRequestHandler<UpdateLocationCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateLocationCommand request, CancellationToken ct)
@@ -16,6 +20,7 @@ public sealed class UpdateLocationCommandHandler(IAppDbContext context, IAppCurr
             throw new DetaillyBusinessRuleException("FORBIDDEN", "Only admin/manager can manage locations.");
 
         var location = await context.Locations
+            .Include(l => l.Address)
             .FirstOrDefaultAsync(l => l.Id == request.Id && !l.IsDeleted, ct);
 
         if (location is null)
@@ -27,39 +32,64 @@ public sealed class UpdateLocationCommandHandler(IAppDbContext context, IAppCurr
         if (request.Description is not null)
             location.Description = request.Description.Trim();
 
-        if (request.AddressId is not null)
+        if (request.TotalBays is not null)
         {
-            var exists = await context.Addresses
-                .AnyAsync(a => a.Id == request.AddressId.Value && !a.IsDeleted, ct);
-
-            if (!exists)
-                throw new DetaillyNotFoundException("Address not found.");
-
-            location.AddressId = request.AddressId.Value;
+            if (request.TotalBays.Value <= 0)
+                throw new DetaillyBusinessRuleException("LOCATION_BAYS_REQUIRED", "TotalBays must be > 0.");
+            location.TotalBays = request.TotalBays.Value;
         }
 
-        if (request.LocationType is not null)
-            location.LocationType = request.LocationType.Value;
-
-        // Bays rules
-        if (location.LocationType == LocationType.Shop)
+        // Update address fields when provided
+        if (request.Address is not null)
         {
-            if (request.TotalBays is not null)
-            {
-                if (request.TotalBays.Value <= 0)
-                    throw new DetaillyBusinessRuleException("LOCATION_BAYS_REQUIRED", "Shop locations must have TotalBays > 0.");
+            var a = request.Address;
+            bool addressChanged = false;
 
-                location.TotalBays = request.TotalBays.Value;
-            }
-            else if (location.TotalBays <= 0)
+            if (!string.IsNullOrWhiteSpace(a.Street))       { location.Address.Street     = a.Street.Trim();     addressChanged = true; }
+            if (!string.IsNullOrWhiteSpace(a.City))         { location.Address.City       = a.City.Trim();       addressChanged = true; }
+            if (!string.IsNullOrWhiteSpace(a.PostalCode))   { location.Address.PostalCode = a.PostalCode.Trim(); addressChanged = true; }
+            if (a.Region is not null)                       { location.Address.Region     = a.Region.Trim();     }
+            if (!string.IsNullOrWhiteSpace(a.Country))      { location.Address.Country    = a.Country.Trim();    addressChanged = true; }
+
+            // Re-geocode when any address field changed
+            if (addressChanged)
             {
-                throw new DetaillyBusinessRuleException("LOCATION_BAYS_REQUIRED", "Shop locations must have TotalBays > 0.");
+                var coords = await roadDistanceService.GetCoordinatesAsync(
+                    location.Address.Street ?? string.Empty,
+                    location.Address.City ?? string.Empty,
+                    location.Address.PostalCode,
+                    location.Address.Country ?? string.Empty,
+                    ct);
+
+                location.Address.Latitude  = coords?.Latitude;
+                location.Address.Longitude = coords?.Longitude;
             }
+
+            location.Address.ModifiedAtUtc = now;
         }
-        else
+
+        // Replace opening hours when provided
+        if (request.OpeningHours?.Count > 0)
         {
-            // address-type -> force 0
-            location.TotalBays = 0;
+            var existing = await context.LocationOpeningHours
+                .Where(h => h.ShopLocationId == location.Id && !h.IsDeleted)
+                .ToListAsync(ct);
+
+            foreach (var e in existing)
+                e.IsDeleted = true;
+
+            foreach (var h in request.OpeningHours)
+            {
+                context.LocationOpeningHours.Add(new LocationOpeningHoursEntity
+                {
+                    ShopLocationId = location.Id,
+                    DayOfWeek      = h.DayOfWeek,
+                    IsClosed       = h.IsClosed,
+                    OpenTimeUtc    = h.IsClosed ? null : (h.OpenHour is not null ? new TimeSpan(h.OpenHour.Value, h.OpenMinute ?? 0, 0) : null),
+                    CloseTimeUtc   = h.IsClosed ? null : (h.CloseHour is not null ? new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0) : null),
+                    CreatedAtUtc   = now
+                });
+            }
         }
 
         location.ModifiedAtUtc = now;

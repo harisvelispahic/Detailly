@@ -24,7 +24,7 @@
         <mat-select-trigger>
           @if (selectedLocation; as loc) {
             <span class="shift-dialog__loc-trigger">
-              <mat-icon>{{ loc.locationType === 0 ? 'store' : 'location_on' }}</mat-icon>
+              <mat-icon>store</mat-icon>
               {{ loc.name }}
               @if (loc.city) {
                 — {{ loc.city }}
@@ -35,7 +35,7 @@
         @for (loc of data.locations; track $index) {
           <mat-option [value]="loc.id">
             <span class="shift-dialog__loc-option">
-              <mat-icon>{{ loc.locationType === 0 ? 'store' : 'location_on' }}</mat-icon>
+              <mat-icon>store</mat-icon>
               {{ loc.name }}
               @if (loc.city) {
                 — {{ loc.city }}

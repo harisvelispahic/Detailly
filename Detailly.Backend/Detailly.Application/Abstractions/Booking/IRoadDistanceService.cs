@@ -2,6 +2,8 @@ namespace Detailly.Application.Abstractions.Booking;
 
 public record RoadTravelInfo(decimal DistanceKm, int TravelTimeMinutes);
 
+public record GeoCoordinates(decimal Latitude, decimal Longitude);
+
 public interface IRoadDistanceService
 {
     /// <summary>
@@ -20,5 +22,13 @@ public interface IRoadDistanceService
     Task<RoadTravelInfo?> GetRoadTravelAsync(
         decimal fromLat, decimal fromLng,
         decimal toLat, decimal toLng,
+        CancellationToken ct);
+
+    /// <summary>
+    /// Geocodes a postal address to latitude/longitude using ORS Pelias geocoder.
+    /// Returns null when the API call fails or no result is found.
+    /// </summary>
+    Task<GeoCoordinates?> GetCoordinatesAsync(
+        string street, string city, string? postalCode, string country,
         CancellationToken ct);
 }

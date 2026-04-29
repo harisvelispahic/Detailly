@@ -6,8 +6,8 @@ public sealed class GetLocationOpeningHoursQueryHandler(IAppDbContext context, I
     public async Task<List<GetLocationOpeningHoursQueryDto>> Handle(
         GetLocationOpeningHoursQuery request, CancellationToken ct)
     {
-        if (!currentUser.IsAuthenticated || (!currentUser.IsAdmin && !currentUser.IsManager))
-            throw new DetaillyForbiddenException("Admin or Manager access required.");
+        if (!currentUser.IsAuthenticated)
+            throw new DetaillyForbiddenException("Authentication required.");
 
         // Materialize first to avoid EF-Core translation issues with TimeSpan formatting
         var rows = await context.LocationOpeningHours

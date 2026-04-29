@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Modules.Booking.Locations.Commands.Create;
+using Detailly.Application.Modules.Booking.Locations.Commands.Create;
 using Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 using Detailly.Application.Modules.Booking.Locations.Commands.Update;
 using Detailly.Application.Modules.Booking.Locations.Queries.GetById;
@@ -13,7 +13,7 @@ namespace Detailly.API.Controllers;
 public class LocationsController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
     public async Task<ActionResult<int>> Create(CreateLocationCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -21,7 +21,7 @@ public class LocationsController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
     public async Task Update(int id, UpdateLocationCommand command, CancellationToken ct)
     {
         command.Id = id;
@@ -29,21 +29,21 @@ public class LocationsController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteLocationCommand { Id = id }, ct);
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task<GetLocationByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         return await sender.Send(new GetLocationByIdQuery { Id = id }, ct);
     }
 
     [HttpGet]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task<PageResult<ListLocationsQueryDto>> List([FromQuery] ListLocationsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
@@ -51,7 +51,7 @@ public class LocationsController(ISender sender) : ControllerBase
 
     // GET /Locations/{id}/hours
     [HttpGet("{id:int}/hours")]
-    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    [Authorize(Policy = AuthPolicies.Staff)]
     public async Task<List<GetLocationOpeningHoursQueryDto>> GetOpeningHours(int id, CancellationToken ct)
     {
         return await sender.Send(new GetLocationOpeningHoursQuery { LocationId = id }, ct);

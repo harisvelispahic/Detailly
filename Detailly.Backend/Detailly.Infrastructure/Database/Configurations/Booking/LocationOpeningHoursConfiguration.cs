@@ -13,7 +13,7 @@ public sealed class LocationOpeningHoursConfiguration : IEntityTypeConfiguration
         builder.Property(x => x.IsClosed).IsRequired();
 
         builder.HasOne(x => x.ShopLocation)
-            .WithMany()
+            .WithMany(l => l.LocationOpeningHours)
             .HasForeignKey(x => x.ShopLocationId)
             .OnDelete(DeleteBehavior.Restrict);
 

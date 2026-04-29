@@ -1,0 +1,195 @@
+.lud {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+// ── Header ──────────────────────────────────────────────────────────
+.lud__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid hsl(var(--border));
+  flex-shrink: 0;
+}
+
+.lud__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lud__icon {
+  color: hsl(var(--primary));
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
+.lud__title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+// ── Loading state ────────────────────────────────────────────────────
+.lud__loading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 24px;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.9rem;
+}
+
+// ── Form ─────────────────────────────────────────────────────────────
+.lud__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.lud__section-label {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--primary));
+
+  &:first-child { margin-top: 0; }
+}
+
+.lud__full { width: 100%; }
+
+.lud__half { width: 50%; }
+
+.lud__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+// ── Opening hours grid ───────────────────────────────────────────────
+.lud__hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: hsl(var(--surface-1));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.lud__hours-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+
+  &--closed {
+    opacity: 0.55;
+  }
+}
+
+.lud__hours-day {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.lud__hours-day-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  min-width: 90px;
+}
+
+.lud__hours-times {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.lud__time-field {
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.lud__min-field {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.lud__time-sep {
+  color: hsl(var(--muted-foreground));
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0 2px;
+}
+
+.lud__time-dash {
+  color: hsl(var(--muted-foreground));
+  font-size: 1rem;
+  padding: 0 6px;
+}
+
+.lud__hours-closed-label {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+}
+
+// ── Country flag ──────────────────────────────────────────────────────
+.lud__country-flag {
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+// ── Error ────────────────────────────────────────────────────────────
+.lud__error {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: hsl(var(--destructive) / 0.12);
+  border: 1px solid hsl(var(--destructive) / 0.3);
+  color: hsl(var(--destructive));
+  font-size: 0.875rem;
+}
+
+// ── Actions ──────────────────────────────────────────────────────────
+.lud__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid hsl(var(--border));
+  flex-shrink: 0;
+
+  button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .lud__row { grid-template-columns: 1fr; }
+
+  .lud__half { width: 100%; }
+
+  .lud__hours-day { min-width: 100px; }
+
+  .lud__hours-day-label { min-width: 70px; }
+}

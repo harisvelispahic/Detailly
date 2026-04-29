@@ -1,4 +1,4 @@
-﻿namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
+namespace Detailly.Application.Modules.Booking.Locations.Queries.GetById;
 
 public sealed class GetLocationByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetLocationByIdQuery, GetLocationByIdQueryDto>
@@ -10,22 +10,21 @@ public sealed class GetLocationByIdQueryHandler(IAppDbContext context)
             .Where(l => l.Id == request.Id && !l.IsDeleted)
             .Select(l => new GetLocationByIdQueryDto
             {
-                Id = l.Id,
-                Name = l.Name,
+                Id          = l.Id,
+                Name        = l.Name,
                 Description = l.Description,
-                LocationType = l.LocationType,
-                TotalBays = l.TotalBays,
-                AddressId = l.AddressId,
+                TotalBays   = l.TotalBays,
+                AddressId   = l.AddressId,
                 Address = new GetLocationByIdQueryDto.AddressDto
                 {
-                    Id = l.Address.Id,
-                    Street = l.Address.Street,
-                    City = l.Address.City,
+                    Id         = l.Address.Id,
+                    Street     = l.Address.Street,
+                    City       = l.Address.City,
                     PostalCode = l.Address.PostalCode,
-                    Region = l.Address.Region,
-                    Country = l.Address.Country,
-                    Latitude = l.Address.Latitude,
-                    Longitude = l.Address.Longitude
+                    Region     = l.Address.Region,
+                    Country    = l.Address.Country,
+                    Latitude   = l.Address.Latitude,
+                    Longitude  = l.Address.Longitude
                 }
             })
             .FirstOrDefaultAsync(ct);
