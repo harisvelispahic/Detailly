@@ -52,6 +52,23 @@ public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAp
                 throw new DetaillyBusinessRuleException("SHIFT_NOT_EMPLOYEE", "Selected user is not an employee.");
         }
 
+        // Validate shift times are within the location's opening hours for that day
+        var dayOfWeek = (int)newStart.DayOfWeek;
+        var openingHours = await context.LocationOpeningHours
+            .FirstOrDefaultAsync(h => h.ShopLocationId == newShopLocationId && h.DayOfWeek == dayOfWeek && !h.IsDeleted, ct);
+
+        if (openingHours != null)
+        {
+            if (openingHours.IsClosed)
+                throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
+
+            if (openingHours.OpenTimeUtc.HasValue && newStart.TimeOfDay < openingHours.OpenTimeUtc.Value)
+                throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", "Shift cannot start before the location opens.");
+
+            if (openingHours.CloseTimeUtc.HasValue && newEnd.TimeOfDay > openingHours.CloseTimeUtc.Value)
+                throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", "Shift cannot end after the location closes.");
+        }
+
         // If any of the properties that affect overlap are changed, check overlaps.
         var needOverlapCheck = request.EmployeeId != null
                                || request.EmployeeWorkMode != null

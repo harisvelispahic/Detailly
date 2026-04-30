@@ -5,6 +5,7 @@ import {
   Validators,
   AbstractControl,
   ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
@@ -104,7 +105,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
         employeeId: [shift?.employeeId ?? null, Validators.required],
         employeeWorkMode: [shift?.employeeWorkMode ?? EmployeeWorkMode.InShop, Validators.required],
       },
-      { validators: endAfterStartValidator },
+      { validators: [endAfterStartValidator, this.buildOpeningHoursValidator()] },
     );
 
     // Location change → reload opening hours and apply defaults to times
@@ -163,8 +164,55 @@ export class ShiftUpsertDialogComponent implements OnInit {
       next: (hours) => {
         this.openingHoursCache = hours;
         if (!this.isEditMode) this.applyTodayHours();
+        this.form.updateValueAndValidity();
       },
     });
+  }
+
+  private buildOpeningHoursValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      if (!this.openingHoursCache.length) return null;
+
+      const date: Date | null = group.get('date')?.value ?? null;
+      const startTime: string = group.get('startTime')?.value ?? '';
+      const endTime: string = group.get('endTime')?.value ?? '';
+
+      if (!date || !startTime || !endTime) return null;
+      if (!TIME_PATTERN.test(startTime) || !TIME_PATTERN.test(endTime)) return null;
+
+      const dayOfWeek = date.getDay();
+      const hours = this.openingHoursCache.find((h) => h.dayOfWeek === dayOfWeek);
+
+      if (!hours) return null;
+      if (hours.isClosed) return { locationClosed: true };
+
+      if (
+        hours.openHour == null ||
+        hours.openMinute == null ||
+        hours.closeHour == null ||
+        hours.closeMinute == null
+      )
+        return null;
+
+      const [startH, startM] = startTime.split(':').map(Number);
+      const [endH, endM] = endTime.split(':').map(Number);
+
+      const shiftStartMins = startH * 60 + startM;
+      const shiftEndMins = endH * 60 + endM;
+      const openMins = hours.openHour * 60 + hours.openMinute;
+      const closeMins = hours.closeHour * 60 + hours.closeMinute;
+
+      if (shiftStartMins < openMins)
+        return {
+          shiftBeforeOpen: { openTime: this.formatHhmm(hours.openHour, hours.openMinute) },
+        };
+      if (shiftEndMins > closeMins)
+        return {
+          shiftAfterClose: { closeTime: this.formatHhmm(hours.closeHour, hours.closeMinute) },
+        };
+
+      return null;
+    };
   }
 
   private applyTodayHours(): void {

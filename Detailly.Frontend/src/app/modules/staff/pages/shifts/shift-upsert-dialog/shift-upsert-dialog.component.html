@@ -88,11 +88,29 @@
       </mat-form-field>
     </div>
 
-    <!-- Cross-field time error -->
+    <!-- Cross-field time errors -->
     @if (form.hasError('endBeforeStart') && form.dirty) {
       <p class="shift-dialog__time-error">
         <mat-icon>warning</mat-icon>
         End time must be after start time
+      </p>
+    }
+    @if (form.hasError('locationClosed') && form.dirty) {
+      <p class="shift-dialog__time-error">
+        <mat-icon>event_busy</mat-icon>
+        The location is closed on this day
+      </p>
+    }
+    @if (form.hasError('shiftBeforeOpen') && form.dirty) {
+      <p class="shift-dialog__time-error">
+        <mat-icon>schedule</mat-icon>
+        Shift cannot start before the location opens at {{ form.getError('shiftBeforeOpen').openTime }}
+      </p>
+    }
+    @if (form.hasError('shiftAfterClose') && form.dirty) {
+      <p class="shift-dialog__time-error">
+        <mat-icon>schedule</mat-icon>
+        Shift cannot end after the location closes at {{ form.getError('shiftAfterClose').closeTime }}
       </p>
     }
 

@@ -1,63 +1,47 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import {
+  ToastNotificationComponent,
+  ToastNotificationData,
+  ToastType,
+} from '../../modules/shared/components/toast-notification/toast-notification.component';
 
-/**
- * Global toaster service for displaying notifications.
- * Uses Material Snackbar for consistent UI.
- */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ToasterService {
   private snackBar = inject(MatSnackBar);
 
-  private defaultConfig: MatSnackBarConfig = {
-    duration: 3000,
+  private readonly defaultDuration = 4000;
+
+  private readonly baseConfig: MatSnackBarConfig = {
     horizontalPosition: 'end',
-    verticalPosition: 'top'
+    verticalPosition: 'top',
+    panelClass: ['detaily-snack'],
   };
 
-  /**
-   * Show success message (green)
-   */
+  private open(message: string, type: ToastType, duration?: number): void {
+    const data: ToastNotificationData = { message, type };
+    this.snackBar.openFromComponent(ToastNotificationComponent, {
+      ...this.baseConfig,
+      duration: duration ?? this.defaultDuration,
+      data,
+    });
+  }
+
   success(message: string, duration?: number): void {
-    this.snackBar.open(message, 'Close', {
-      ...this.defaultConfig,
-      duration: duration ?? this.defaultConfig.duration,
-      panelClass: ['snackbar-success']
-    });
+    this.open(message, 'success', duration);
   }
 
-  /**
-   * Show error message (red)
-   */
   error(message: string, duration?: number): void {
-    this.snackBar.open(message, 'Close', {
-      ...this.defaultConfig,
-      duration: duration ?? this.defaultConfig.duration,
-      panelClass: ['snackbar-error']
-    });
+    this.open(message, 'error', duration);
   }
 
-  /**
-   * Show warning message (orange)
-   */
   warning(message: string, duration?: number): void {
-    this.snackBar.open(message, 'Close', {
-      ...this.defaultConfig,
-      duration: duration ?? this.defaultConfig.duration,
-      panelClass: ['snackbar-warning']
-    });
+    this.open(message, 'warning', duration);
   }
 
-  /**
-   * Show info message (blue)
-   */
   info(message: string, duration?: number): void {
-    this.snackBar.open(message, 'Close', {
-      ...this.defaultConfig,
-      duration: duration ?? this.defaultConfig.duration,
-      panelClass: ['snackbar-info']
-    });
+    this.open(message, 'info', duration);
   }
 }

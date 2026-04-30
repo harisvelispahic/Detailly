@@ -7,6 +7,8 @@ namespace Detailly.Application.Modules.Payment.Wallet.Commands.TopUpByCard;
 public class CreateWalletTopUpCardIntentCommandHandler
     : IRequestHandler<CreateWalletTopUpCardIntentCommand, CreateWalletTopUpCardIntentResult>
 {
+    private static readonly decimal[] AllowedPresets = [100m, 200m, 500m, 1000m];
+
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;
 
@@ -21,7 +23,11 @@ public class CreateWalletTopUpCardIntentCommandHandler
         CancellationToken ct)
     {
         if (request.Amount <= 0)
-            throw new DetaillyBusinessRuleException("TOPUP_AMOUNT_INVALID","Amount must be greater than zero.");
+            throw new DetaillyBusinessRuleException("TOPUP_AMOUNT_INVALID", "Amount must be greater than zero.");
+
+        if (!AllowedPresets.Contains(request.Amount) && request.Amount <= 1000)
+            throw new DetaillyBusinessRuleException("TOPUP_AMOUNT_INVALID",
+                "Top-up amount must be one of the standard values (100, 200, 500, or 1,000 BAM), or exceed 1,000 BAM for a custom amount.");
 
         var wallet = await _context.Wallet
             .FirstOrDefaultAsync(x => x.ApplicationUserId == request.UserId, ct)

@@ -11,10 +11,13 @@ import { environment } from '../../../../environments/environment';
   standalone: false,
 })
 export class WalletTopUpComponent implements OnInit {
-  amount: number | null = null;
-  description: string = '';
-  readonly amountPresets = [10, 25, 50, 100];
+  readonly amountPresets = [100, 200, 500, 1000];
+  readonly customMin = 1001;
 
+  selectedPreset: number | null = null;
+  customAmount: number | null = null;
+
+  description: string = '';
   isLoading = false;
   isReady = false;
   paymentSucceeded = false;
@@ -24,6 +27,10 @@ export class WalletTopUpComponent implements OnInit {
 
   private stripe: Stripe | null = null;
   private card!: StripeCardElement;
+
+  get effectiveAmount(): number | null {
+    return this.selectedPreset ?? (this.customAmount && this.customAmount > 0 ? this.customAmount : null);
+  }
 
   constructor(
     private payments: PaymentsService,
@@ -60,8 +67,15 @@ export class WalletTopUpComponent implements OnInit {
     this.isReady = true;
   }
 
-  setAmount(value: number) {
-    this.amount = value;
+  selectPreset(value: number): void {
+    this.selectedPreset = value;
+    this.customAmount = null;
+    this.cardError = undefined;
+  }
+
+  onCustomAmountChange(): void {
+    this.selectedPreset = null;
+    this.cardError = undefined;
   }
 
   goToProfile() {
@@ -74,8 +88,15 @@ export class WalletTopUpComponent implements OnInit {
 
     if (!this.stripe || !this.isReady) return;
 
-    if (!this.amount || this.amount <= 0) {
-      this.cardError = 'Please enter a valid amount.';
+    const amount = this.effectiveAmount;
+
+    if (!amount || amount <= 0) {
+      this.cardError = 'Please select a top-up amount or enter a custom amount above 1,000 BAM.';
+      return;
+    }
+
+    if (this.selectedPreset === null && amount <= 1000) {
+      this.cardError = 'Custom top-up amounts must exceed 1,000 BAM. Use the preset buttons for standard amounts.';
       return;
     }
 
@@ -83,7 +104,7 @@ export class WalletTopUpComponent implements OnInit {
 
     this.payments
       .createWalletTopUpCardIntent({
-        amount: this.amount,
+        amount,
         description: this.description || null,
       })
       .subscribe({

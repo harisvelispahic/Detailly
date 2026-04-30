@@ -575,55 +575,28 @@ img {
 // TOASTER / SNACKBAR STYLES
 // ===========================
 
-.snackbar-success {
-  background-color: hsl(var(--success)) !important;
-  color: hsl(var(--success-foreground)) !important;
-
-  .mat-mdc-snack-bar-label {
-    color: hsl(var(--success-foreground)) !important;
+// Strip the Material container of its own chrome — the custom component handles all styling.
+.detaily-snack {
+  &.mat-mdc-snack-bar-container {
+    // Let the custom component control its own size
+    max-width: none !important;
+    min-width: 0 !important;
+    padding: 0 !important;
   }
 
-  .mat-mdc-button {
-    color: hsl(var(--success-foreground)) !important;
-  }
-}
-
-.snackbar-error {
-  background-color: hsl(var(--destructive)) !important;
-  color: hsl(var(--destructive-foreground)) !important;
-
-  .mat-mdc-snack-bar-label {
-    color: hsl(var(--destructive-foreground)) !important;
+  .mdc-snackbar__surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    border-radius: 0 !important;
   }
 
-  .mat-mdc-button {
-    color: hsl(var(--destructive-foreground)) !important;
-  }
-}
-
-.snackbar-warning {
-  background-color: hsl(var(--warning)) !important;
-  color: hsl(var(--warning-foreground)) !important;
-
-  .mat-mdc-snack-bar-label {
-    color: hsl(var(--warning-foreground)) !important;
-  }
-
-  .mat-mdc-button {
-    color: hsl(var(--warning-foreground)) !important;
-  }
-}
-
-.snackbar-info {
-  background-color: hsl(var(--info)) !important;
-  color: hsl(var(--info-foreground)) !important;
-
-  .mat-mdc-snack-bar-label {
-    color: hsl(var(--info-foreground)) !important;
-  }
-
-  .mat-mdc-button {
-    color: hsl(var(--info-foreground)) !important;
+  // Remove inner padding added by the content wrapper
+  .mat-mdc-snack-bar-container-content,
+  .mat-mdc-snackbar-handset-content {
+    padding: 0 !important;
   }
 }
 

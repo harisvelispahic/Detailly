@@ -33,6 +33,7 @@ import { TabsContentComponent } from './components/ui/tabs/tabs-content.componen
 import { ContainerComponent } from './components/ui/container/container.component';
 import { TextareaComponent } from './components/ui/textarea/textarea.component';
 import { DetailyDatePipe } from './pipes/detaily-date.pipe';
+import { ToastNotificationComponent } from './components/toast-notification/toast-notification.component';
 
 const DETAILY_DATE_FORMATS: MatDateFormats = {
   parse: { dateInput: { year: 'numeric', month: '2-digit', day: '2-digit' } },
@@ -74,6 +75,7 @@ const UI_COMPONENTS = [
     SiteFooterComponent,
     DashboardLayoutComponent,
     DetailyDatePipe,
+    ToastNotificationComponent,
     ...UI_COMPONENTS,
   ],
   imports: [

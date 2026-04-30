@@ -118,6 +118,12 @@
   font-size: 0.8125rem;
   font-weight: 500;
   color: hsl(var(--foreground));
+
+  &__note {
+    font-weight: 400;
+    color: hsl(var(--muted-foreground));
+    margin-left: 0.25rem;
+  }
 }
 
 .field-input {
@@ -157,6 +163,10 @@
     font-family: 'Space Grotesk', sans-serif;
     padding-left: 3.25rem;
   }
+
+  &.field-input--active {
+    border-color: hsl(var(--ring) / 0.6);
+  }
 }
 
 .field-input-wrap {
@@ -173,6 +183,23 @@
     color: hsl(var(--muted-foreground));
     pointer-events: none;
     letter-spacing: 0.01em;
+  }
+}
+
+.field-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+
+  svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    margin-top: 1px;
   }
 }
 
