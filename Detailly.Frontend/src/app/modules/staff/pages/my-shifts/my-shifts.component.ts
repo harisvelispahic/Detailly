@@ -50,16 +50,16 @@ export class MyShiftsComponent extends BaseListComponent<MyShiftDto> implements 
     const d = new Date(startUtc);
     const now = new Date();
     return (
-      d.getUTCFullYear() === now.getUTCFullYear() &&
-      d.getUTCMonth() === now.getUTCMonth() &&
-      d.getUTCDate() === now.getUTCDate()
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
     );
   }
 
   isPast(startUtc: string): boolean {
     const d = new Date(startUtc);
     const now = new Date();
-    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     return d < todayStart;
   }
 

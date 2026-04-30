@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDateFormats } from '@angular/material/core';
 import { RouterModule } from '@angular/router';
 import { PaginatorBarComponent } from './components/paginator-bar/paginator-bar.component';
 import { materialModules } from './material-modules';
@@ -31,6 +32,17 @@ import { TabsTriggerComponent } from './components/ui/tabs/tabs-trigger.componen
 import { TabsContentComponent } from './components/ui/tabs/tabs-content.component';
 import { ContainerComponent } from './components/ui/container/container.component';
 import { TextareaComponent } from './components/ui/textarea/textarea.component';
+import { DetailyDatePipe } from './pipes/detaily-date.pipe';
+
+const DETAILY_DATE_FORMATS: MatDateFormats = {
+  parse: { dateInput: { year: 'numeric', month: '2-digit', day: '2-digit' } },
+  display: {
+    dateInput: { year: 'numeric', month: '2-digit', day: '2-digit' },
+    monthYearLabel: { year: 'numeric', month: 'short' },
+    dateA11yLabel: { year: 'numeric', month: 'long', day: 'numeric' },
+    monthYearA11yLabel: { year: 'numeric', month: 'long' },
+  },
+};
 
 const UI_COMPONENTS = [
   ButtonComponent,
@@ -61,6 +73,7 @@ const UI_COMPONENTS = [
     SiteNavbarComponent,
     SiteFooterComponent,
     DashboardLayoutComponent,
+    DetailyDatePipe,
     ...UI_COMPONENTS,
   ],
   imports: [
@@ -71,7 +84,11 @@ const UI_COMPONENTS = [
     TranslatePipe,
     ...materialModules,
   ],
-  providers: [DialogHelperService],
+  providers: [
+    DialogHelperService,
+    { provide: MAT_DATE_FORMATS, useValue: DETAILY_DATE_FORMATS },
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
+  ],
   exports: [
     PaginatorBarComponent,
     CommonModule,
@@ -86,6 +103,7 @@ const UI_COMPONENTS = [
     DashboardLayoutComponent,
     ...materialModules,
     ...UI_COMPONENTS,
+    DetailyDatePipe,
   ],
 })
 export class SharedModule {}

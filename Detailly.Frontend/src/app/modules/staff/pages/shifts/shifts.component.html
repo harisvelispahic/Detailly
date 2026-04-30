@@ -27,7 +27,7 @@
     <div class="shifts__filters">
       <!-- Date picker -->
       <mat-form-field appearance="outline" class="shifts__filter-field">
-        <mat-label>Date (UTC)</mat-label>
+        <mat-label>Date</mat-label>
         <input
           matInput
           [matDatepicker]="datePicker"
@@ -136,12 +136,12 @@
             <!-- Start -->
             <ng-container matColumnDef="start">
               <th mat-header-cell *matHeaderCellDef>
-                <div class="shifts__th"><mat-icon>login</mat-icon> Start (UTC)</div>
+                <div class="shifts__th"><mat-icon>login</mat-icon> Start</div>
               </th>
               <td mat-cell *matCellDef="let s">
                 <div class="shifts__time">
-                  <span class="shifts__time-date">{{ s.startUtc | date: 'dd MMM yyyy' }}</span>
-                  <span class="shifts__time-val">{{ s.startUtc | date: 'HH:mm' : 'UTC' }}</span>
+                  <span class="shifts__time-date">{{ s.startUtc | detailyDate: 'long' }}</span>
+                  <span class="shifts__time-val">{{ s.startUtc | date: 'HH:mm' }}</span>
                 </div>
               </td>
             </ng-container>
@@ -149,12 +149,12 @@
             <!-- End -->
             <ng-container matColumnDef="end">
               <th mat-header-cell *matHeaderCellDef>
-                <div class="shifts__th"><mat-icon>logout</mat-icon> End (UTC)</div>
+                <div class="shifts__th"><mat-icon>logout</mat-icon> End</div>
               </th>
               <td mat-cell *matCellDef="let s">
                 <div class="shifts__time">
-                  <span class="shifts__time-date">{{ s.endUtc | date: 'dd MMM yyyy' }}</span>
-                  <span class="shifts__time-val">{{ s.endUtc | date: 'HH:mm' : 'UTC' }}</span>
+                  <span class="shifts__time-date">{{ s.endUtc | detailyDate: 'long' }}</span>
+                  <span class="shifts__time-val">{{ s.endUtc | date: 'HH:mm' }}</span>
                 </div>
               </td>
             </ng-container>

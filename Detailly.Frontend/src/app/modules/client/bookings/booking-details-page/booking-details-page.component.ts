@@ -241,23 +241,6 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
     return new Date(dateStr.endsWith('Z') ? dateStr : `${dateStr}Z`);
   }
 
-  formatDate(dateStr: string): string {
-    return this.parseUtc(dateStr).toLocaleDateString('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  }
-
-  formatTime(dateStr: string): string {
-    return this.parseUtc(dateStr).toLocaleString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
-
   formatDuration(minutes: number): string {
     if (minutes < 60) return `${minutes} min`;
     const h = Math.floor(minutes / 60);

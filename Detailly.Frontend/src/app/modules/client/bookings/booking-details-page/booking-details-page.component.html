@@ -37,7 +37,7 @@
           </div>
           <p class="booking-details__subtitle">
             <mat-icon class="booking-details__date-icon">calendar_today</mat-icon>
-            {{ formatDate(booking.startUtc) }}
+            {{ booking.startUtc | detailyDate: 'long' }}
           </p>
         </div>
 
@@ -52,12 +52,12 @@
 
             <div class="info-row">
               <span class="info-row__label">Date</span>
-              <span class="info-row__value">{{ formatDate(booking.startUtc) }}</span>
+              <span class="info-row__value">{{ booking.startUtc | detailyDate: 'long' }}</span>
             </div>
             <div class="info-row">
               <span class="info-row__label">Time</span>
               <span class="info-row__value"
-                >{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span
+                >{{ booking.startUtc | date: 'HH:mm' }} – {{ booking.endUtc | date: 'HH:mm' }}</span
               >
             </div>
             <div class="info-row">
@@ -83,13 +83,13 @@
             @if (booking.departureUtc) {
               <div class="info-row">
                 <span class="info-row__label">Team Departs</span>
-                <span class="info-row__value">{{ formatTime(booking.departureUtc) }}</span>
+                <span class="info-row__value">{{ booking.departureUtc | date: 'HH:mm' }}</span>
               </div>
             }
             @if (booking.returnUtc) {
               <div class="info-row">
                 <span class="info-row__label">Team Returns</span>
-                <span class="info-row__value">{{ formatTime(booking.returnUtc) }}</span>
+                <span class="info-row__value">{{ booking.returnUtc | date: 'HH:mm' }}</span>
               </div>
             }
             <div class="info-row">

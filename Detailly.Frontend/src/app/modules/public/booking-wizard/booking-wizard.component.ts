@@ -590,28 +590,6 @@ export class BookingWizardComponent implements OnInit {
     });
   }
 
-  formatSlotTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
-
-  formatSelectedDate(): string {
-    if (!this.selectedDate) return '';
-    return this.selectedDate.toLocaleDateString('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  }
-
-  formatSelectedSlotTime(): string {
-    return this.selectedSlot ? this.formatSlotTime(this.selectedSlot.startUtc) : '';
-  }
-
   formatAddress(addr: ListMyAddressesQueryDto): string {
     return `${addr.street}, ${addr.city}`;
   }

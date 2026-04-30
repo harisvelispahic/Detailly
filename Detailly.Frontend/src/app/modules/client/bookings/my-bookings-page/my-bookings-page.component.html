@@ -133,7 +133,7 @@
               <div class="appointment-card__meta">
                 <span class="appointment-card__meta-item">
                   <mat-icon>schedule</mat-icon>
-                  {{ formatTime(booking.startUtc) }}
+                  {{ booking.startUtc | date: 'HH:mm' }}
                 </span>
               </div>
             </div>

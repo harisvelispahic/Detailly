@@ -42,14 +42,14 @@
               <mat-icon>calendar_today</mat-icon>
               Date
             </span>
-            <span class="summary-card__value">{{ formatDate(booking.startUtc) }}</span>
+            <span class="summary-card__value">{{ booking.startUtc | detailyDate: 'long' }}</span>
           </div>
           <div class="summary-card__row">
             <span class="summary-card__label">
               <mat-icon>schedule</mat-icon>
               Time
             </span>
-            <span class="summary-card__value">{{ formatTime(booking.startUtc) }} – {{ formatTime(booking.endUtc) }}</span>
+            <span class="summary-card__value">{{ booking.startUtc | date: 'HH:mm' }} – {{ booking.endUtc | date: 'HH:mm' }}</span>
           </div>
           <div class="summary-card__divider"></div>
           <div class="summary-card__total-row">

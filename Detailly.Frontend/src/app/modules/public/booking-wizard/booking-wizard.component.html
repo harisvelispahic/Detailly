@@ -421,7 +421,7 @@
             <mat-icon>schedule</mat-icon>
             <span>Select Time</span>
             <span *ngIf="selectedDate" class="timeslots-header__date">
-              &mdash; {{ formatSelectedDate() }}
+              &mdash; {{ selectedDate | detailyDate: 'long' }}
             </span>
           </div>
 
@@ -480,7 +480,7 @@
               [class.timeslot-btn--selected]="isSlotSelected(slot)"
               (click)="selectSlot(slot)"
             >
-              {{ formatSlotTime(slot.startUtc) }}
+              {{ slot.startUtc | date: 'HH:mm' }}
             </button>
           </div>
         </div>
@@ -553,7 +553,7 @@
           <div class="summary-row__content">
             <span class="summary-row__label">Date & Time</span>
             <span class="summary-row__value">
-              {{ formatSelectedDate() }} at {{ formatSelectedSlotTime() }}
+              {{ selectedDate | detailyDate: 'long' }} at {{ selectedSlot?.startUtc | date: 'HH:mm' }}
             </span>
           </div>
         </div>

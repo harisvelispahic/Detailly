@@ -206,20 +206,4 @@ export class BookingPaymentPageComponent implements OnInit, OnDestroy {
     return this.isLoadingBooking || this.isLoadingWallet;
   }
 
-  formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-GB', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  }
-
-  formatTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
 }

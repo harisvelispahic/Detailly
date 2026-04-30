@@ -46,14 +46,14 @@
           <mat-icon>schedule</mat-icon>
           <div>
             <span class="label">{{ 'ORDERS.DETAILS.ORDERED_AT' | translate }}</span>
-            <span class="value">{{ order.orderedAtUtc | date:'dd.MM.yyyy HH:mm' }}</span>
+            <span class="value">{{ order.orderedAtUtc | detailyDate: 'short' }} {{ order.orderedAtUtc | date: 'HH:mm' }}</span>
           </div>
         </div>
         <div class="date-item" *ngIf="order.paidAtUtc">
           <mat-icon>payment</mat-icon>
           <div>
             <span class="label">{{ 'ORDERS.DETAILS.PAID_AT' | translate }}</span>
-            <span class="value">{{ order.paidAtUtc | date:'dd.MM.yyyy HH:mm' }}</span>
+            <span class="value">{{ order.paidAtUtc | detailyDate: 'short' }} {{ order.paidAtUtc | date: 'HH:mm' }}</span>
           </div>
         </div>
       </div>

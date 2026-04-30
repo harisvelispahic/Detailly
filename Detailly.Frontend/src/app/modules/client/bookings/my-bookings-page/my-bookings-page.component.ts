@@ -167,11 +167,4 @@ export class MyBookingsPageComponent
     return new Date(dateStr).getDate().toString();
   }
 
-  formatTime(dateStr: string): string {
-    return new Date(dateStr).toLocaleString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
 }
