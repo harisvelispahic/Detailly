@@ -1,3 +1,5 @@
+using Detailly.Application.Common;
+using Detailly.Application.Modules.Identity.Employee.Queries.ListAvailableEmployeesForShift;
 using Detailly.Application.Modules.Identity.Staff.Commands.Create;
 using Detailly.Application.Modules.Identity.Staff.Commands.Update;
 using Detailly.Application.Modules.Identity.Staff.Commands.Delete;
@@ -44,6 +46,13 @@ public sealed class StaffController(ISender sender) : ControllerBase
     [HttpGet]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<PageResult<ListStaffMembersQueryDto>> List([FromQuery] ListStaffMembersQuery query, CancellationToken ct)
+    {
+        return await sender.Send(query, ct);
+    }
+
+    [HttpGet("employees")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<PageResult<ListAvailableEmployeesForShiftQueryDto>> ListEmployees([FromQuery] ListAvailableEmployeesForShiftQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
     }

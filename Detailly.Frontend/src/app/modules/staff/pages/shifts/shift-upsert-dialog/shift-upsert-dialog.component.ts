@@ -1,5 +1,11 @@
 import { Component, inject, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {
   CreateEmployeeShiftCommand,
@@ -8,10 +14,16 @@ import {
   UpdateEmployeeShiftCommand,
 } from '../../../../../api-services/employee-shifts/employee-shifts-api.models';
 import { EmployeeShiftsApiService } from '../../../../../api-services/employee-shifts/employee-shifts-api.service';
-import { LocationDto, LocationOpeningHoursDto } from '../../../../../api-services/locations/locations-api.models';
+import {
+  LocationDto,
+  LocationOpeningHoursDto,
+} from '../../../../../api-services/locations/locations-api.models';
 import { LocationsApiService } from '../../../../../api-services/locations/locations-api.service';
-import { EmployeeDto, ListEmployeesRequest } from '../../../../../api-services/employees/employees-api.models';
-import { EmployeesApiService } from '../../../../../api-services/employees/employees-api.service';
+import {
+  EmployeeDto,
+  ListAvailableEmployeesForShiftRequest,
+} from '../../../../../api-services/staff-members/staff-members-api.models';
+import { StaffMembersApiService } from '../../../../../api-services/staff-members/staff-members-api.service';
 import { ToasterService } from '../../../../../core/services/toaster.service';
 
 export interface ShiftUpsertDialogData {
@@ -42,7 +54,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private shiftsApi = inject(EmployeeShiftsApiService);
   private locationsApi = inject(LocationsApiService);
-  private employeesApi = inject(EmployeesApiService);
+  private staffMembersApi = inject(StaffMembersApiService);
   private toaster = inject(ToasterService);
   private dialogRef = inject(MatDialogRef<ShiftUpsertDialogComponent>);
 
@@ -76,7 +88,10 @@ export class ShiftUpsertDialogComponent implements OnInit {
     // Field order: location → date → times → employee → work mode
     this.form = this.fb.group(
       {
-        shopLocationId: [shift?.shopLocationId ?? this.data.locationId ?? null, Validators.required],
+        shopLocationId: [
+          shift?.shopLocationId ?? this.data.locationId ?? null,
+          Validators.required,
+        ],
         date: [initialDate, Validators.required],
         startTime: [
           shift ? this.utcIsoToLocalTime(shift.startUtc) : '09:00',
@@ -118,7 +133,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
   }
 
   private loadEmployees(): void {
-    const request = new ListEmployeesRequest();
+    const request = new ListAvailableEmployeesForShiftRequest();
     const date: Date | null = this.form.get('date')?.value ?? null;
     if (date) {
       request.dateUtc = this.formatLocalDate(date) + 'T00:00:00.000Z';
@@ -129,7 +144,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
 
     this.isLoadingEmployees = true;
     this.form.get('employeeId')?.disable();
-    this.employeesApi.list(request).subscribe({
+    this.staffMembersApi.listAvailableForShift(request).subscribe({
       next: (res) => {
         this.employees = res.items;
         this.isLoadingEmployees = false;
@@ -185,10 +200,20 @@ export class ShiftUpsertDialogComponent implements OnInit {
     const [endH, endM] = (endTime as string).split(':').map(Number);
 
     const startLocal = new Date(
-      localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), startH, startM, 0,
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      localDate.getDate(),
+      startH,
+      startM,
+      0,
     );
     const endLocal = new Date(
-      localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), endH, endM, 0,
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      localDate.getDate(),
+      endH,
+      endM,
+      0,
     );
 
     const startUtc = startLocal.toISOString();

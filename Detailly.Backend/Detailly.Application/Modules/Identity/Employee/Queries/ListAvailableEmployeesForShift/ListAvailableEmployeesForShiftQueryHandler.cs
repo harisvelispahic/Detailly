@@ -1,9 +1,9 @@
-namespace Detailly.Application.Modules.Identity.Employee.Queries.List;
+namespace Detailly.Application.Modules.Identity.Employee.Queries.ListAvailableEmployeesForShift;
 
-public sealed class ListEmployeesQueryHandler(IAppDbContext context, IAppCurrentUser currentUser)
-    : IRequestHandler<ListEmployeesQuery, PageResult<ListEmployeesQueryDto>>
+public sealed class ListAvailableEmployeesForShiftQueryHandler(IAppDbContext context, IAppCurrentUser currentUser)
+    : IRequestHandler<ListAvailableEmployeesForShiftQuery, PageResult<ListAvailableEmployeesForShiftQueryDto>>
 {
-    public async Task<PageResult<ListEmployeesQueryDto>> Handle(ListEmployeesQuery request, CancellationToken ct)
+    public async Task<PageResult<ListAvailableEmployeesForShiftQueryDto>> Handle(ListAvailableEmployeesForShiftQuery request, CancellationToken ct)
     {
         if (!currentUser.IsAuthenticated || (!currentUser.IsAdmin && !currentUser.IsManager))
             throw new DetaillyForbiddenException("Admin or Manager access required.");
@@ -30,12 +30,12 @@ public sealed class ListEmployeesQueryHandler(IAppDbContext context, IAppCurrent
         var projected = query
             .OrderBy(u => u.LastName)
             .ThenBy(u => u.FirstName)
-            .Select(u => new ListEmployeesQueryDto
+            .Select(u => new ListAvailableEmployeesForShiftQueryDto
             {
                 Id = u.Id,
                 FullName = u.FirstName + " " + u.LastName,
             });
 
-        return await PageResult<ListEmployeesQueryDto>.FromQueryableAsync(projected, request.Paging, ct);
+        return await PageResult<ListAvailableEmployeesForShiftQueryDto>.FromQueryableAsync(projected, request.Paging, ct);
     }
 }

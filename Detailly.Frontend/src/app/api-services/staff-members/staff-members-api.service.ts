@@ -5,7 +5,10 @@ import { environment } from '../../../environments/environment';
 import { buildHttpParams } from '../../core/models/build-http-params';
 import {
   CreateStaffMemberCommand,
+  EmployeeDto,
   GetStaffMemberByIdQueryDto,
+  ListAvailableEmployeesForShiftRequest,
+  ListAvailableEmployeesForShiftResponse,
   ListStaffMembersRequest,
   ListStaffMembersResponse,
   UpdateStaffMemberCommand,
@@ -19,6 +22,15 @@ export class StaffMembersApiService {
   list(request?: ListStaffMembersRequest): Observable<ListStaffMembersResponse> {
     const params = buildHttpParams((request ?? new ListStaffMembersRequest()) as any);
     return this.http.get<ListStaffMembersResponse>(this.baseUrl, { params });
+  }
+
+  listAvailableForShift(
+    request?: ListAvailableEmployeesForShiftRequest,
+  ): Observable<ListAvailableEmployeesForShiftResponse> {
+    const params = buildHttpParams((request ?? new ListAvailableEmployeesForShiftRequest()) as any);
+    return this.http.get<ListAvailableEmployeesForShiftResponse>(`${this.baseUrl}/employees`, {
+      params,
+    });
   }
 
   getById(id: number): Observable<GetStaffMemberByIdQueryDto> {
