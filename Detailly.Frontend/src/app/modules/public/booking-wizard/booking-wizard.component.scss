@@ -519,6 +519,132 @@
   margin-top: 0.25rem;
 }
 
+// ── Step 3: Location picker ─────────────────────────────────────────────────
+
+.location-selector {
+  background: hsl(var(--surface-1));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.location-selector__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 1rem;
+
+  mat-icon {
+    font-size: 19px;
+    width: 19px;
+    height: 19px;
+    color: hsl(var(--primary));
+  }
+}
+
+.location-selector__empty {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.88rem;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+.location-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.location-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: hsl(var(--card));
+  border: 2px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover:not(.location-card--closed) {
+    border-color: hsl(var(--primary) / 0.4);
+  }
+}
+
+.location-card--selected {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
+}
+
+.location-card--closed {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.location-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: hsl(var(--primary) / 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--primary));
+  flex: 0 0 auto;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.location-card__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.location-card__name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: hsl(var(--foreground));
+}
+
+.location-card__address {
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  color: hsl(var(--muted-foreground));
+}
+
+.location-card__closed-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: hsl(var(--destructive));
+  letter-spacing: 0.03em;
+}
+
+.location-card__check {
+  color: hsl(var(--muted-foreground));
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+
+  .location-card--selected & {
+    color: hsl(var(--primary));
+  }
+}
+
 // ── Step 3: Service Mode Toggle ─────────────────────────────────────────────
 
 .service-mode-toggle {

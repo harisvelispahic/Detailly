@@ -8,6 +8,7 @@ import { BookingsService } from '../../../api-services/bookings/bookings-api.ser
 import { VehiclesApiService } from '../../../api-services/vehicles/vehicles-api.service';
 import { VehicleCategoriesApiService } from '../../../api-services/vehicle-categories/vehicle-categories-api.service';
 import { AddressesApiService } from '../../../api-services/addresses/addresses-api.service';
+import { LocationsApiService } from '../../../api-services/locations/locations-api.service';
 import { DialogHelperService } from '../../shared/services/dialog-helper.service';
 import { DialogButton, DialogType } from '../../shared/models/dialog-config.model';
 
@@ -18,6 +19,7 @@ import {
 import { ListMyVehiclesQueryDto } from '../../../api-services/vehicles/vehicles-api.model';
 import { VehicleCategoryDto } from '../../../api-services/vehicle-categories/vehicle-categories-api.model';
 import { ListMyAddressesQueryDto } from '../../../api-services/addresses/addresses-api.model';
+import { ListLocationsQueryDto } from '../../../api-services/locations/locations-api.models';
 import {
   ServiceMode,
   CreateBookingHoldCommand,
@@ -42,6 +44,7 @@ export class BookingWizardComponent implements OnInit {
   private readonly vehiclesService = inject(VehiclesApiService);
   private readonly vehicleCategoriesService = inject(VehicleCategoriesApiService);
   private readonly addressesService = inject(AddressesApiService);
+  private readonly locationsService = inject(LocationsApiService);
   private readonly dialogHelper = inject(DialogHelperService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -76,7 +79,9 @@ export class BookingWizardComponent implements OnInit {
   addVehicleError?: string;
 
   // Step 3
-  readonly shopLocationId = 1;
+  locations: ListLocationsQueryDto[] = [];
+  selectedLocationId?: number;
+  isLoadingLocations = false;
   selectedServiceMode: ServiceMode = ServiceMode.InShop;
   selectedAddressId?: number;
   addresses: ListMyAddressesQueryDto[] = [];
@@ -178,6 +183,7 @@ export class BookingWizardComponent implements OnInit {
     if (this.currentStep === 2) {
       if (this.selectedVehicleIds.size === 0) return;
       this.currentStep = 3;
+      this.loadLocationsIfNeeded();
       // Pre-load addresses so they're ready if user picks Mobile
       if (this.selectedServiceMode === ServiceMode.Mobile) {
         this.loadAddressesIfNeeded();
@@ -269,6 +275,37 @@ export class BookingWizardComponent implements OnInit {
         this.addVehicleError = err?.error?.message ?? 'Failed to add vehicle.';
       },
     });
+  }
+
+  // ── Step 3: Location ─────────────────────────────────────────────────────
+
+  loadLocationsIfNeeded(): void {
+    if (this.locations.length === 0 && !this.isLoadingLocations) {
+      this.loadLocations();
+    }
+  }
+
+  loadLocations(): void {
+    this.isLoadingLocations = true;
+    this.locationsService.list().subscribe({
+      next: (result) => {
+        this.locations = result.items;
+        this.isLoadingLocations = false;
+      },
+      error: () => {
+        this.isLoadingLocations = false;
+      },
+    });
+  }
+
+  selectLocation(id: number): void {
+    if (this.selectedLocationId === id) return;
+    this.selectedLocationId = id;
+    this.selectedSlot = undefined;
+    this.availableSlots = [];
+    if (this.selectedDate) {
+      this.loadAvailability();
+    }
   }
 
   // ── Step 3: Service Mode ──────────────────────────────────────────────────
@@ -374,7 +411,7 @@ export class BookingWizardComponent implements OnInit {
   }
 
   loadAvailability(): void {
-    if (!this.selectedDate || !this.selectedPackage) return;
+    if (!this.selectedDate || !this.selectedPackage || !this.selectedLocationId) return;
     // For mobile, wait until an address is chosen — travel time gates which slots are possible
     if (this.selectedServiceMode === ServiceMode.Mobile && !this.selectedAddressId) return;
 
@@ -393,7 +430,7 @@ export class BookingWizardComponent implements OnInit {
         servicePackageId: this.selectedPackage.id,
         addonItemIds: Array.from(this.selectedAddonIds),
         serviceMode: this.selectedServiceMode,
-        shopLocationId: this.shopLocationId,
+        shopLocationId: this.selectedLocationId,
         serviceAddressId: this.selectedAddressId,
       })
       .subscribe({
@@ -425,7 +462,7 @@ export class BookingWizardComponent implements OnInit {
       servicePackageId: this.selectedPackage.id,
       addonItemIds: Array.from(this.selectedAddonIds),
       serviceMode: this.selectedServiceMode,
-      shopLocationId: this.shopLocationId,
+      shopLocationId: this.selectedLocationId!,
       serviceAddressId: this.selectedAddressId,
       startUtc: this.selectedSlot.startUtc,
       vehicleIds: Array.from(this.selectedVehicleIds),
@@ -591,6 +628,10 @@ export class BookingWizardComponent implements OnInit {
     return this.addresses.find((a) => a.id === this.selectedAddressId);
   }
 
+  get selectedLocation(): ListLocationsQueryDto | undefined {
+    return this.locations.find((l) => l.id === this.selectedLocationId);
+  }
+
   get canProceedStep1(): boolean {
     return !!this.selectedPackage;
   }
@@ -600,6 +641,7 @@ export class BookingWizardComponent implements OnInit {
   }
 
   get canProceedStep3(): boolean {
+    if (!this.selectedLocationId) return false;
     if (!this.selectedSlot) return false;
     if (this.selectedServiceMode === ServiceMode.Mobile && !this.selectedAddressId) return false;
     return true;

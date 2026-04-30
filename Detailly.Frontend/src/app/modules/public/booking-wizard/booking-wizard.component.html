@@ -243,6 +243,52 @@
         <p class="step-header__subtitle">Choose your preferred appointment slot</p>
       </div>
 
+      <!-- Location picker -->
+      <div class="location-selector">
+        <h4 class="location-selector__title">
+          <mat-icon>store</mat-icon>
+          Select Location
+        </h4>
+
+        <div *ngIf="isLoadingLocations" class="loading-state loading-state--small">
+          <mat-spinner diameter="28"></mat-spinner>
+        </div>
+
+        <ng-container *ngIf="!isLoadingLocations">
+          <p *ngIf="locations.length === 0" class="location-selector__empty">
+            No locations available at the moment.
+          </p>
+
+          <div *ngIf="locations.length > 0" class="location-cards">
+            <div
+              *ngFor="let loc of locations"
+              class="location-card"
+              [class.location-card--selected]="selectedLocationId === loc.id"
+              [class.location-card--closed]="loc.isTemporarilyClosed"
+              (click)="!loc.isTemporarilyClosed && selectLocation(loc.id)"
+            >
+              <div class="location-card__icon">
+                <mat-icon>store</mat-icon>
+              </div>
+              <div class="location-card__info">
+                <span class="location-card__name">{{ loc.name }}</span>
+                <span class="location-card__address">
+                  {{ loc.street }}{{ loc.city ? ', ' + loc.city : '' }}
+                </span>
+                <span *ngIf="loc.isTemporarilyClosed" class="location-card__closed-badge">
+                  Temporarily Closed
+                </span>
+              </div>
+              <mat-icon class="location-card__check">
+                {{
+                  selectedLocationId === loc.id ? 'radio_button_checked' : 'radio_button_unchecked'
+                }}
+              </mat-icon>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
       <!-- Service mode selector (hidden for fleet — always Mobile) -->
       <div *ngIf="!isFleet()" class="service-mode-toggle">
         <button
@@ -385,7 +431,15 @@
           </div>
 
           <div
-            *ngIf="selectedDate && isMobile && !selectedAddressId && !isLoadingSlots"
+            *ngIf="selectedDate && !selectedLocationId && !isLoadingSlots"
+            class="timeslots-empty"
+          >
+            <mat-icon>store</mat-icon>
+            <p>Select a location above to see available slots</p>
+          </div>
+
+          <div
+            *ngIf="selectedDate && selectedLocationId && isMobile && !selectedAddressId && !isLoadingSlots"
             class="timeslots-empty"
           >
             <mat-icon>location_on</mat-icon>
@@ -399,6 +453,7 @@
           <div
             *ngIf="
               selectedDate &&
+              selectedLocationId &&
               (!isMobile || selectedAddressId) &&
               !isLoadingSlots &&
               availableSlots.length === 0
@@ -412,6 +467,7 @@
           <div
             *ngIf="
               selectedDate &&
+              selectedLocationId &&
               (!isMobile || selectedAddressId) &&
               !isLoadingSlots &&
               availableSlots.length > 0
@@ -504,7 +560,7 @@
 
         <div class="summary-divider"></div>
 
-        <!-- Service mode + address row -->
+        <!-- Service mode + location + address row -->
         <div class="summary-row">
           <div class="summary-row__icon">
             <mat-icon>{{ isMobile ? 'home_pin' : 'store' }}</mat-icon>
@@ -512,8 +568,12 @@
           <div class="summary-row__content">
             <span class="summary-row__label">Service Type</span>
             <span class="summary-row__value">{{ isMobile ? 'On-Site (Mobile)' : 'In-Shop' }}</span>
+            <span *ngIf="selectedLocation" class="summary-row__address">
+              {{ selectedLocation.name
+              }}{{ selectedLocation.city ? ' — ' + selectedLocation.city : '' }}
+            </span>
             <span *ngIf="isMobile && selectedAddress" class="summary-row__address">
-              {{ selectedAddress.street }}, {{ selectedAddress.city }}
+              Service address: {{ selectedAddress.street }}, {{ selectedAddress.city }}
             </span>
           </div>
         </div>
