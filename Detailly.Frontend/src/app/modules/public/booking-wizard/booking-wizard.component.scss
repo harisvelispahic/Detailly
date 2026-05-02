@@ -245,6 +245,56 @@
   }
 }
 
+.package-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 0.5rem;
+
+  &--none {
+    opacity: 0.6;
+  }
+
+  &-star {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: hsl(var(--warning));
+  }
+
+  &-val {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+
+  &-count {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+.package-card__footer {
+  padding: 0 1.25rem 1rem;
+
+  .package-card__reviews-link {
+    font-size: 0.75rem;
+    padding: 0 0.75rem;
+    height: 28px;
+    line-height: 26px;
+    min-width: unset;
+
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      margin-right: 3px;
+    }
+  }
+}
+
 .package-card__selected-badge {
   position: absolute;
   top: 0.75rem;

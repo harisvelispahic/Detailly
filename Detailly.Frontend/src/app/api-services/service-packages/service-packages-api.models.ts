@@ -6,6 +6,8 @@ export interface ListServicePackagesQueryDto {
   description?: string | null;
   price: number;
   estimatedDurationHours: number;
+  averageRating?: number | null;
+  reviewCount: number;
   items: ServicePackageItemDto[];
 }
 

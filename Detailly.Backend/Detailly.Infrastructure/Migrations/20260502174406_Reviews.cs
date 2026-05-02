@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Reviews : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -220,8 +220,8 @@ namespace Detailly.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LocationType = table.Column<int>(type: "int", nullable: false),
                     TotalBays = table.Column<int>(type: "int", nullable: false),
+                    IsTemporarilyClosed = table.Column<bool>(type: "bit", nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -276,7 +276,6 @@ namespace Detailly.Infrastructure.Migrations
                     IsFleet = table.Column<bool>(type: "bit", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IsEmployee = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    EmployeeWorkMode = table.Column<int>(type: "int", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -302,6 +301,7 @@ namespace Detailly.Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     MobileSurchargeFee = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    FleetDiscountPercent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     StartUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RequiredEmployees = table.Column<int>(type: "int", nullable: false),
@@ -678,21 +678,36 @@ namespace Detailly.Infrastructure.Migrations
                 name: "Reviews",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     BookingId = table.Column<int>(type: "int", nullable: false),
+                    ServicePackageId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
                     Rating = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ValueForMoney = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reviews", x => x.BookingId);
+                    table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_ApplicationUsers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "ApplicationUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Reviews_ServicePackages_ServicePackageId",
+                        column: x => x.ServicePackageId,
+                        principalTable: "ServicePackages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -851,7 +866,6 @@ namespace Detailly.Infrastructure.Migrations
                     ApplicationUserId = table.Column<int>(type: "int", nullable: true),
                     ServicePackageItemId = table.Column<int>(type: "int", nullable: true),
                     ProductEntityId = table.Column<int>(type: "int", nullable: true),
-                    ReviewEntityBookingId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -876,15 +890,10 @@ namespace Detailly.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Images_Reviews_ReviewEntityBookingId",
-                        column: x => x.ReviewEntityBookingId,
-                        principalTable: "Reviews",
-                        principalColumn: "BookingId");
-                    table.ForeignKey(
                         name: "FK_Images_Reviews_ReviewId",
                         column: x => x.ReviewId,
                         principalTable: "Reviews",
-                        principalColumn: "BookingId");
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Images_ServicePackageItems_ServicePackageItemId",
                         column: x => x.ServicePackageItemId,
@@ -914,9 +923,9 @@ namespace Detailly.Infrastructure.Migrations
                 column: "ImageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUsers_IsEmployee_EmployeeWorkMode_IsEnabled",
+                name: "IX_ApplicationUsers_IsEmployee_IsEnabled",
                 table: "ApplicationUsers",
-                columns: new[] { "IsEmployee", "EmployeeWorkMode", "IsEnabled" });
+                columns: new[] { "IsEmployee", "IsEnabled" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingEmployeeAssignments_BookingId_EmployeeId",
@@ -1024,11 +1033,6 @@ namespace Detailly.Infrastructure.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_ReviewEntityBookingId",
-                table: "Images",
-                column: "ReviewEntityBookingId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Images_ReviewId",
                 table: "Images",
                 column: "ReviewId");
@@ -1053,11 +1057,6 @@ namespace Detailly.Infrastructure.Migrations
                 name: "IX_Locations_AddressId",
                 table: "Locations",
                 column: "AddressId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Locations_LocationType",
-                table: "Locations",
-                column: "LocationType");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Locations_Name",
@@ -1134,6 +1133,22 @@ namespace Detailly.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reviews_BookingId",
+                table: "Reviews",
+                column: "BookingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_CustomerId_ServicePackageId",
+                table: "Reviews",
+                columns: new[] { "CustomerId", "ServicePackageId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ServicePackageId",
+                table: "Reviews",
+                column: "ServicePackageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SavedProducts_ApplicationUserId_ProductId",
                 table: "SavedProducts",
                 columns: new[] { "ApplicationUserId", "ProductId" },
@@ -1206,6 +1221,10 @@ namespace Detailly.Infrastructure.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Images_ApplicationUsers_ApplicationUserId",
                 table: "Images");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Reviews_ApplicationUsers_CustomerId",
+                table: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "BookingEmployeeAssignments");

@@ -13,6 +13,7 @@ import { FinalCtaComponent } from './landing/final-cta/final-cta.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
 import { PublicPlaceholderPageComponent } from './placeholder-page/public-placeholder-page.component';
 import { BookingWizardComponent } from './booking-wizard/booking-wizard.component';
+import { ReviewsPageComponent } from './reviews-page/reviews-page.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { BookingWizardComponent } from './booking-wizard/booking-wizard.componen
     PublicLayoutComponent,
     PublicPlaceholderPageComponent,
     BookingWizardComponent,
+    ReviewsPageComponent,
   ],
   imports: [SharedModule, PublicRoutingModule],
 })

@@ -36,6 +36,8 @@ export interface ListMyBookingsQueryDto {
   endUtc: string;
   totalPrice: number;
   servicePackageName: string;
+  servicePackageId: number;
+  canRate: boolean;
 }
 
 export interface GetBookingByIdQueryDto {

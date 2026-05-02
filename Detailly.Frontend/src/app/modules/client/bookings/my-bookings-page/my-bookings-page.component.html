@@ -138,11 +138,21 @@
               </div>
             </div>
 
-            <!-- Price -->
+            <!-- Price / actions -->
             <div class="appointment-card__right">
               <span class="appointment-card__price"
                 >BAM {{ booking.totalPrice | number: '1.0-0' }}</span
               >
+              @if (booking.canRate) {
+                <button
+                  mat-stroked-button
+                  class="appointment-card__rate-btn"
+                  (click)="openRateDialog(booking, $event)"
+                >
+                  <mat-icon>star</mat-icon>
+                  Rate
+                </button>
+              }
               <mat-icon class="appointment-card__chevron">chevron_right</mat-icon>
             </div>
           </div>

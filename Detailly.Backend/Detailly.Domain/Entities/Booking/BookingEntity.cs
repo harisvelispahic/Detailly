@@ -56,9 +56,6 @@ public class BookingEntity : BaseEntity
     public ServicePackageEntity ServicePackage { get; set; } = null!;
 
 
-    // REVIEW
-    public ReviewEntity? Review { get; set; }
-
 
 
     public IReadOnlyCollection<BookingVehicleAssignmentEntity> BookingVehicleAssignments { get; private set; } = new List<BookingVehicleAssignmentEntity>();

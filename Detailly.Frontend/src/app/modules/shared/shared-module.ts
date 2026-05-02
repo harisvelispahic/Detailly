@@ -34,6 +34,7 @@ import { ContainerComponent } from './components/ui/container/container.componen
 import { TextareaComponent } from './components/ui/textarea/textarea.component';
 import { DetailyDatePipe } from './pipes/detaily-date.pipe';
 import { ToastNotificationComponent } from './components/toast-notification/toast-notification.component';
+import { RateBookingDialogComponent } from './components/rate-booking-dialog/rate-booking-dialog.component';
 
 const DETAILY_DATE_FORMATS: MatDateFormats = {
   parse: { dateInput: { year: 'numeric', month: '2-digit', day: '2-digit' } },
@@ -76,6 +77,7 @@ const UI_COMPONENTS = [
     DashboardLayoutComponent,
     DetailyDatePipe,
     ToastNotificationComponent,
+    RateBookingDialogComponent,
     ...UI_COMPONENTS,
   ],
   imports: [

@@ -1,34 +1,35 @@
-﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
+namespace Detailly.Application.Modules.Booking.Reviews.Queries.List;
+
 public class ListReviewsQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListReviewsQuery, PageResult<ListReviewsQueryDto>>
 {
     public async Task<PageResult<ListReviewsQueryDto>> Handle(ListReviewsQuery request, CancellationToken ct)
     {
-        var q = ctx.Reviews.AsNoTracking();
+        var q = ctx.Reviews.AsNoTracking().Where(r => !r.IsDeleted);
 
-        if (!string.IsNullOrWhiteSpace(request.Search))
+        if (request.ServicePackageId.HasValue)
+            q = q.Where(r => r.ServicePackageId == request.ServicePackageId.Value);
+
+        var ordered = request.Sort == "oldest"
+            ? q.OrderBy(r => r.CreatedAtUtc)
+            : q.OrderByDescending(r => r.CreatedAtUtc);
+
+        var projected = ordered.Select(r => new ListReviewsQueryDto
         {
-            q = q.Where(x => x.Description.Contains(request.Search));
-        }
+            Id = r.Id,
+            ServicePackageId = r.ServicePackageId,
+            ServicePackageName = r.ServicePackage.Name,
+            CustomerFullName = r.Customer.FirstName + " " + r.Customer.LastName,
+            CustomerInitials = r.Customer.FirstName.Substring(0, 1) + r.Customer.LastName.Substring(0, 1),
+            Rating = r.Rating,
+            Description = r.Description,
+            AddonNames = ctx.BookingItems
+                .Where(bi => bi.BookingId == r.BookingId && bi.IsAddon && !bi.IsDeleted)
+                .Select(bi => bi.ServicePackageItem.Name)
+                .ToList(),
+            CreatedAtUtc = r.CreatedAtUtc,
+        });
 
-        var projectedQuery = q.OrderBy(x => x.CreatedAtUtc)
-            .Select(x => new ListReviewsQueryDto
-            {
-                BookingId = x.BookingId,
-                Rating = x.Rating,
-                Description = x.Description,
-                ValueForMoney = x.ValueForMoney,
-                Images = x.Images.Select(img => new ListReviewsQueryDtoImage
-                {
-                    Id = img.Id,
-                    ImageUrl = img.ImageUrl,
-                    AltText = img.AltText,
-                    IsThumbnail = img.IsThumbnail,
-                    DisplayOrder = img.DisplayOrder
-                }).ToList()
-            });
-
-        return await PageResult<ListReviewsQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);
-
+        return await PageResult<ListReviewsQueryDto>.FromQueryableAsync(projected, request.Paging, ct);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
+namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 
 public class ListServicePackagesQueryHandler(IAppDbContext ctx)
     : IRequestHandler<ListServicePackagesQuery, PageResult<ListServicePackagesQueryDto>>
@@ -26,9 +26,13 @@ public class ListServicePackagesQueryHandler(IAppDbContext ctx)
                 Name = sp.Name,
                 Description = sp.Description,
                 Price = sp.Price,
-                //EstimatedDurationHours = sp.EstimatedDurationHours,
                 EstimatedDurationHours = 1,
-
+                AverageRating = ctx.Reviews
+                    .Where(r => r.ServicePackageId == sp.Id && !r.IsDeleted)
+                    .Select(r => (decimal?)r.Rating)
+                    .Average(),
+                ReviewCount = ctx.Reviews
+                    .Count(r => r.ServicePackageId == sp.Id && !r.IsDeleted),
                 Items = ctx.ServicePackageItemAssignments
                     .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted && !a.ServicePackageItem.IsDeleted)
                     .Select(a => new ListServicePackagesQueryDtoItem

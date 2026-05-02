@@ -1,6 +1,7 @@
-﻿namespace Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
+namespace Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
+
 public class DeleteReviewCommand : IRequest<Unit>
 {
     [JsonIgnore]
-    public int BookingId { get; set; }
+    public int Id { get; set; }
 }

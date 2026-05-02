@@ -1,6 +1,7 @@
-﻿namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
+namespace Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
+
 public class GetReviewByIdQuery : IRequest<GetReviewByIdQueryDto>
 {
     [JsonIgnore]
-    public int BookingId { get; set; }
+    public int Id { get; set; }
 }

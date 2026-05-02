@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 import { BaseListPagedComponent } from '../../../../core/components/base-classes/base-list-paged-component';
 import {
   BookingStatus,
@@ -10,6 +11,11 @@ import {
   ListMyBookingsRequest,
 } from '../../../../api-services/bookings/bookings-api.models';
 import { BookingsService } from '../../../../api-services/bookings/bookings-api.service';
+import {
+  RateBookingDialogComponent,
+  RateBookingDialogData,
+  RateBookingDialogResult,
+} from '../../../shared/components/rate-booking-dialog/rate-booking-dialog.component';
 
 @Component({
   selector: 'app-my-bookings-page',
@@ -23,6 +29,7 @@ export class MyBookingsPageComponent
 {
   private bookingsService = inject(BookingsService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   private destroy$ = new Subject<void>();
 
   searchControl = new FormControl('');
@@ -106,6 +113,23 @@ export class MyBookingsPageComponent
 
   openDetails(id: number): void {
     this.router.navigate(['/client/bookings', id]);
+  }
+
+  openRateDialog(booking: ListMyBookingsQueryDto, event: Event): void {
+    event.stopPropagation();
+    const data: RateBookingDialogData = {
+      bookingId: booking.id,
+      servicePackageId: booking.servicePackageId,
+      servicePackageName: booking.servicePackageName,
+    };
+    this.dialog
+      .open(RateBookingDialogComponent, { data, width: '480px', disableClose: false })
+      .afterClosed()
+      .subscribe((result: RateBookingDialogResult | undefined) => {
+        if (result?.submitted) {
+          this.loadPagedData();
+        }
+      });
   }
 
   getStatusLabel(status: BookingStatus): string {

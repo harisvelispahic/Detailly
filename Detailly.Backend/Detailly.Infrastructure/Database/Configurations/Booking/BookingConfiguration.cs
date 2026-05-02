@@ -9,11 +9,6 @@ public sealed class BookingConfiguration : IEntityTypeConfiguration<BookingEntit
         builder.ToTable("Bookings");
         builder.HasKey(x => x.Id);
 
-        builder.HasOne(b => b.Review)
-            .WithOne(r => r.Booking)
-            .HasForeignKey<ReviewEntity>(r => r.BookingId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasMany(b => b.PaymentTransactions)
             .WithOne(p => p.Booking)
             .HasForeignKey(p => p.BookingId)

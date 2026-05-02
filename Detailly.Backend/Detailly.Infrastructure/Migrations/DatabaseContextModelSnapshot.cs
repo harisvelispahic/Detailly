@@ -352,11 +352,20 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -370,10 +379,17 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ValueForMoney")
+                    b.Property<int>("ServicePackageId")
                         .HasColumnType("int");
 
-                    b.HasKey("BookingId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("ServicePackageId");
+
+                    b.HasIndex("CustomerId", "ServicePackageId")
+                        .IsUnique();
 
                     b.ToTable("Reviews", (string)null);
                 });
@@ -1243,9 +1259,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReviewEntityBookingId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ReviewId")
                         .HasColumnType("int");
 
@@ -1259,8 +1272,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasIndex("ProductEntityId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ReviewEntityBookingId");
 
                     b.HasIndex("ReviewId");
 
@@ -1530,12 +1541,28 @@ namespace Detailly.Infrastructure.Migrations
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Booking.BookingEntity", "Booking")
-                        .WithOne("Review")
-                        .HasForeignKey("Detailly.Domain.Entities.Booking.ReviewEntity", "BookingId")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageEntity", "ServicePackage")
+                        .WithMany()
+                        .HasForeignKey("ServicePackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Booking");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("ServicePackage");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageItemAssignmentEntity", b =>
@@ -1757,10 +1784,6 @@ namespace Detailly.Infrastructure.Migrations
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ReviewEntityBookingId");
-
                     b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", "Review")
                         .WithMany()
                         .HasForeignKey("ReviewId");
@@ -1821,18 +1844,11 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("EmployeeAssignments");
 
                     b.Navigation("PaymentTransactions");
-
-                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.LocationEntity", b =>
                 {
                     b.Navigation("LocationOpeningHours");
-                });
-
-            modelBuilder.Entity("Detailly.Domain.Entities.Booking.ReviewEntity", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageEntity", b =>

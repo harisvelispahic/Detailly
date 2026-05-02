@@ -508,6 +508,27 @@
   color: hsl(var(--primary));
 }
 
+.appointment-card__rate-btn {
+  font-size: 0.75rem;
+  padding: 0 0.625rem;
+  height: 28px;
+  line-height: 26px;
+  min-width: unset;
+  color: hsl(var(--warning));
+  border-color: hsl(var(--warning) / 0.4);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    margin-right: 3px;
+  }
+
+  &:hover {
+    background: hsl(var(--warning) / 0.08);
+  }
+}
+
 .appointment-card__chevron {
   color: hsl(var(--muted-foreground));
   font-size: 1.1rem;

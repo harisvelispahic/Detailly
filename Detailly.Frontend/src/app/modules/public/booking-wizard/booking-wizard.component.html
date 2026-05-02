@@ -57,12 +57,34 @@
                 <mat-icon>schedule</mat-icon>
                 {{ pkg.estimatedDurationHours }}h
               </p>
+              <!-- Rating row -->
+              <div class="package-card__rating" *ngIf="pkg.reviewCount > 0">
+                <mat-icon class="package-card__rating-star">star</mat-icon>
+                <span class="package-card__rating-val">{{ pkg.averageRating | number: '1.1-1' }}</span>
+                <span class="package-card__rating-count">({{ pkg.reviewCount }})</span>
+              </div>
+              <div class="package-card__rating package-card__rating--none" *ngIf="!pkg.reviewCount">
+                <mat-icon class="package-card__rating-star">star_border</mat-icon>
+                <span class="package-card__rating-count">No reviews yet</span>
+              </div>
               <ul class="package-card__items">
                 <li *ngFor="let item of pkg.items | slice: 0 : 4">
                   <mat-icon>check</mat-icon>
                   {{ item.name }}
                 </li>
               </ul>
+            </div>
+            <!-- Reviews link -->
+            <div class="package-card__footer" (click)="$event.stopPropagation()">
+              <a
+                [routerLink]="['/reviews']"
+                [queryParams]="{ servicePackageId: pkg.id }"
+                class="package-card__reviews-link"
+                mat-stroked-button
+              >
+                <mat-icon>rate_review</mat-icon>
+                Reviews
+              </a>
             </div>
             @if (selectedPackage?.id === pkg.id) {
               <div class="package-card__selected-badge">

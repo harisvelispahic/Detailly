@@ -1,0 +1,153 @@
+<section class="reviews-page">
+  <app-container size="lg">
+    <!-- ── Header ───────────────────────────────────────────── -->
+    <div class="reviews-page__header">
+      <div>
+        <h1 class="reviews-page__title">Customer <span class="gradient-text">Reviews</span></h1>
+        <p class="reviews-page__subtitle">See what our customers are saying about their experience</p>
+      </div>
+    </div>
+
+    <!-- ── Summary cards ─────────────────────────────────────── -->
+    <div class="reviews-summary">
+      <!-- Average rating card -->
+      <div class="reviews-summary__avg-card">
+        <div class="avg-rating">
+          <span class="avg-rating__number">{{ formatRating(overallAverageRating) }}</span>
+          <div class="avg-rating__stars">
+            <mat-icon
+              *ngFor="let s of getStarArray(Math.round(overallAverageRating))"
+              class="avg-rating__star"
+              [class.avg-rating__star--filled]="s === 'full'"
+            >{{ s === 'full' ? 'star' : 'star_border' }}</mat-icon>
+          </div>
+          <p class="avg-rating__count">Based on {{ totalReviewCount }} reviews</p>
+        </div>
+        <a
+          routerLink="/client/bookings"
+          mat-stroked-button
+          class="avg-rating__my-btn"
+          *ngIf="currentUserService.isAuthenticated()"
+        >
+          <mat-icon>star</mat-icon>
+          My Ratings
+        </a>
+      </div>
+
+      <!-- Distribution card -->
+      <div class="reviews-summary__dist-card">
+        <div class="dist-header">
+          <mat-icon>bar_chart</mat-icon>
+          <span>Rating Distribution</span>
+        </div>
+        <div class="dist-bars">
+          <div *ngFor="let row of ratingDistribution" class="dist-bar-row">
+            <span class="dist-bar-row__label">{{ row.stars }}<mat-icon>star</mat-icon></span>
+            <div class="dist-bar-row__track">
+              <div
+                class="dist-bar-row__fill"
+                [style.width.%]="row.percent"
+              ></div>
+            </div>
+            <span class="dist-bar-row__count">{{ row.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Filters ────────────────────────────────────────────── -->
+    <div class="reviews-filters">
+      <mat-form-field appearance="outline" class="reviews-filters__pkg">
+        <mat-label>Service Package</mat-label>
+        <mat-select [(ngModel)]="selectedServicePackageId" (ngModelChange)="onPackageFilterChange()">
+          <mat-option [value]="null">All Packages</mat-option>
+          <mat-option *ngFor="let pkg of packages" [value]="pkg.id">
+            {{ pkg.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="reviews-filters__sort">
+        <mat-label>Sort</mat-label>
+        <mat-select [(ngModel)]="sort" (ngModelChange)="onSortChange()">
+          <mat-option value="newest">Newest First</mat-option>
+          <mat-option value="oldest">Oldest First</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- ── Loading ────────────────────────────────────────────── -->
+    <div *ngIf="isLoadingReviews" class="reviews-page__loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <!-- ── Empty state ────────────────────────────────────────── -->
+    <div *ngIf="!isLoadingReviews && reviews.length === 0" class="reviews-page__empty">
+      <mat-icon>rate_review</mat-icon>
+      <p>No reviews yet{{ selectedServicePackageId ? ' for this package' : '' }}.</p>
+    </div>
+
+    <!-- ── Review list ────────────────────────────────────────── -->
+    <div *ngIf="!isLoadingReviews && reviews.length > 0" class="reviews-list">
+      <h2 class="reviews-list__title">All Reviews ({{ totalItems }})</h2>
+
+      <div *ngFor="let review of reviews" class="review-card">
+        <!-- Avatar -->
+        <div class="review-card__avatar">{{ review.customerInitials }}</div>
+
+        <!-- Content -->
+        <div class="review-card__content">
+          <div class="review-card__top">
+            <span class="review-card__name">{{ review.customerFullName }}</span>
+            <span *ngIf="review.addonNames.length > 0" class="review-card__addons">
+              <span
+                *ngFor="let addon of review.addonNames"
+                class="review-card__addon-badge"
+              >{{ addon }}</span>
+            </span>
+          </div>
+
+          <div class="review-card__meta">
+            <div class="review-card__stars">
+              <mat-icon
+                *ngFor="let s of getStarArray(review.rating)"
+                class="review-card__star"
+                [class.review-card__star--filled]="s === 'full'"
+              >{{ s === 'full' ? 'star' : 'star_border' }}</mat-icon>
+            </div>
+            <span class="review-card__date">{{ review.createdAtUtc | detailyDate: 'long' }}</span>
+          </div>
+
+          <p *ngIf="review.description" class="review-card__description">
+            {{ review.description }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="reviews-pagination">
+        <button
+          mat-icon-button
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)"
+        >
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button
+          *ngFor="let p of pages"
+          mat-icon-button
+          class="reviews-pagination__page"
+          [class.reviews-pagination__page--active]="p === currentPage"
+          (click)="goToPage(p)"
+        >{{ p }}</button>
+        <button
+          mat-icon-button
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+  </app-container>
+</section>

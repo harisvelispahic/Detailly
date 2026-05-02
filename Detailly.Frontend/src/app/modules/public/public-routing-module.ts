@@ -6,6 +6,7 @@ import { LandingComponent } from './landing/landing.component';
 import { PublicPlaceholderPageComponent } from './placeholder-page/public-placeholder-page.component';
 import { PublicLayoutComponent } from './public-layout/public-layout.component';
 import { BookingWizardComponent } from './booking-wizard/booking-wizard.component';
+import { ReviewsPageComponent } from './reviews-page/reviews-page.component';
 
 const routes: Routes = [
   {
@@ -36,23 +37,7 @@ const routes: Routes = [
       },
       {
         path: 'reviews',
-        component: PublicPlaceholderPageComponent,
-        data: {
-          eyebrow: 'Social Proof',
-          title: 'Customer',
-          accent: 'Reviews',
-          description:
-            'This page is reserved for the full testimonials and rating experience. For now it keeps the global navigation complete and consistent.',
-          highlights: [
-            'Rating summary and distribution',
-            'Review cards and sorting',
-            'Future write-a-review flow',
-          ],
-          primaryLabel: 'Book Now',
-          primaryRoute: '/book-now',
-          secondaryLabel: 'Back Home',
-          secondaryRoute: '/',
-        },
+        component: ReviewsPageComponent,
       },
       {
         path: 'privacy-policy',
