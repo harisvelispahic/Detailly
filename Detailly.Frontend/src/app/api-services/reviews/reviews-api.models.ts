@@ -21,7 +21,32 @@ export interface ListReviewsQueryDto {
   description?: string | null;
   addonNames: string[];
   createdAtUtc: string;
+  modifiedAtUtc?: string | null;
+  ratedAtUtc: string;
 }
+
+export class ListMyReviewsRequest extends BasePagedQuery {
+  sort?: 'newest' | 'oldest' = 'newest';
+
+  constructor() {
+    super();
+    this.paging.pageSize = 8;
+  }
+}
+
+export interface ListMyReviewsQueryDto {
+  id: number;
+  servicePackageId: number;
+  servicePackageName: string;
+  rating: number;
+  description?: string | null;
+  addonNames: string[];
+  createdAtUtc: string;
+  modifiedAtUtc?: string | null;
+  ratedAtUtc: string;
+}
+
+export type ListMyReviewsResponse = PageResult<ListMyReviewsQueryDto>;
 
 export interface GetMyReviewForServicePackageDto {
   id: number;

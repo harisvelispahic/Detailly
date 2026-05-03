@@ -6,6 +6,8 @@ import { buildHttpParams } from '../../core/models/build-http-params';
 import {
   CreateReviewCommand,
   GetMyReviewForServicePackageDto,
+  ListMyReviewsRequest,
+  ListMyReviewsResponse,
   ListReviewsRequest,
   ListReviewsResponse,
 } from './reviews-api.models';
@@ -27,6 +29,11 @@ export class ReviewsApiService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  listMy(request: ListMyReviewsRequest): Observable<ListMyReviewsResponse> {
+    const params = buildHttpParams(request as any);
+    return this.http.get<ListMyReviewsResponse>(`${this.baseUrl}/my`, { params });
   }
 
   getMyReviewForServicePackage(servicePackageId: number): Observable<GetMyReviewForServicePackageDto | null> {

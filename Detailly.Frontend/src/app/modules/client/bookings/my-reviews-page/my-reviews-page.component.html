@@ -1,0 +1,75 @@
+<section class="my-reviews-page">
+  <!-- ── Back link ──────────────────────────────────────────── -->
+  <a routerLink="/reviews" class="my-reviews-page__back">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Reviews
+  </a>
+
+  <!-- ── Header ───────────────────────────────────────────── -->
+  <div class="my-reviews-page__header">
+    <div>
+      <h1 class="my-reviews-page__title">My <span class="gradient-text">Reviews</span></h1>
+      <p class="my-reviews-page__subtitle">Service packages you've reviewed</p>
+    </div>
+  </div>
+
+  <!-- ── Sort filter ──────────────────────────────────────── -->
+  <div class="my-reviews-page__filters">
+    <mat-form-field appearance="outline" class="my-reviews-page__sort">
+      <mat-label>Sort</mat-label>
+      <mat-select [(ngModel)]="sort" (ngModelChange)="onSortChange()">
+        <mat-option value="newest">Newest First</mat-option>
+        <mat-option value="oldest">Oldest First</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- ── Loading ──────────────────────────────────────────── -->
+  <div *ngIf="isLoading" class="my-reviews-page__loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- ── Empty state ──────────────────────────────────────── -->
+  <div *ngIf="!isLoading && items.length === 0" class="my-reviews-page__empty">
+    <mat-icon>star_border</mat-icon>
+    <p>You haven't reviewed any bookings yet.</p>
+    <a mat-stroked-button routerLink="/client/bookings">View My Bookings</a>
+  </div>
+
+  <!-- ── Reviews list ─────────────────────────────────────── -->
+  <div *ngIf="!isLoading && items.length > 0" class="my-reviews-list">
+    <h2 class="my-reviews-list__title">{{ totalItems }} Review{{ totalItems !== 1 ? 's' : '' }}</h2>
+
+    <div *ngFor="let review of items" class="my-review-card">
+      <!-- Service package name + addons -->
+      <div class="my-review-card__top">
+        <span class="my-review-card__pkg-name">{{ review.servicePackageName }}</span>
+        <span *ngIf="review.addonNames.length > 0" class="my-review-card__addons">
+          <span
+            *ngFor="let addon of review.addonNames"
+            class="my-review-card__addon-badge"
+          >{{ addon }}</span>
+        </span>
+      </div>
+
+      <!-- Stars + date -->
+      <div class="my-review-card__meta">
+        <div class="my-review-card__stars">
+          <mat-icon
+            *ngFor="let s of getStarArray(review.rating)"
+            class="my-review-card__star"
+            [class.my-review-card__star--filled]="s === 'full'"
+          >{{ s === 'full' ? 'star' : 'star_border' }}</mat-icon>
+        </div>
+        <span class="my-review-card__date">{{ review.ratedAtUtc | detailyDate: 'long' }}</span>
+      </div>
+
+      <!-- Description -->
+      <p *ngIf="review.description" class="my-review-card__description">
+        {{ review.description }}
+      </p>
+    </div>
+
+    <app-paginator-bar [vm]="this"></app-paginator-bar>
+  </div>
+</section>

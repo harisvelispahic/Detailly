@@ -11,6 +11,8 @@ interface SiteNavLink {
   route: string;
   exact?: boolean;
   guestRoute?: string;
+  extraRoutes?: string[];  // additional URL prefixes that also activate this link
+  excludeRoutes?: string[]; // URL prefixes that must NOT activate this link
 }
 
 @Component({
@@ -38,8 +40,14 @@ export class SiteNavbarComponent {
       icon: 'event_note',
       route: '/client/bookings',
       guestRoute: '/auth/login',
+      excludeRoutes: ['/client/bookings/my-reviews'],
     },
-    { label: 'Reviews', icon: 'reviews', route: '/reviews' },
+    {
+      label: 'Reviews',
+      icon: 'reviews',
+      route: '/reviews',
+      extraRoutes: ['/client/bookings/my-reviews'],
+    },
   ];
 
   isMenuOpen = false;
@@ -74,6 +82,14 @@ export class SiteNavbarComponent {
   isLinkActive(link: SiteNavLink): boolean {
     const currentUrl = this.router.url.split('?')[0].split('#')[0];
     const route = this.resolveRoute(link);
+
+    if (link.excludeRoutes?.some((r) => currentUrl === r || currentUrl.startsWith(`${r}/`))) {
+      return false;
+    }
+
+    if (link.extraRoutes?.some((r) => currentUrl === r || currentUrl.startsWith(`${r}/`))) {
+      return true;
+    }
 
     if (link.exact) {
       return currentUrl === route;

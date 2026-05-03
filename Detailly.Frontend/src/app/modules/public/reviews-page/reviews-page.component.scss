@@ -1,6 +1,17 @@
 .reviews-page {
-  padding: 3rem 0;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+  padding-inline: 1rem;
   min-height: 100vh;
+
+  @media (min-width: 1024px) {
+    padding-inline: clamp(2rem, 6vw, 6rem);
+  }
+
+  @media (max-width: 600px) {
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+  }
 
   &__header {
     margin-bottom: 2rem;

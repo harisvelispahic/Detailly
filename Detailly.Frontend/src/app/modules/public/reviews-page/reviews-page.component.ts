@@ -5,6 +5,7 @@ import { ServicePackagesApiService } from '../../../api-services/service-package
 import { ListReviewsQueryDto, ListReviewsRequest } from '../../../api-services/reviews/reviews-api.models';
 import { ListServicePackagesQueryDto } from '../../../api-services/service-packages/service-packages-api.models';
 import { CurrentUserService } from '../../../core/services/auth/current-user.service';
+import { BaseListPagedComponent } from '../../../core/components/base-classes/base-list-paged-component';
 
 @Component({
   selector: 'app-reviews-page',
@@ -12,26 +13,26 @@ import { CurrentUserService } from '../../../core/services/auth/current-user.ser
   templateUrl: './reviews-page.component.html',
   styleUrl: './reviews-page.component.scss',
 })
-export class ReviewsPageComponent implements OnInit {
+export class ReviewsPageComponent
+  extends BaseListPagedComponent<ListReviewsQueryDto, ListReviewsRequest>
+  implements OnInit
+{
   private reviewsService = inject(ReviewsApiService);
   private packagesService = inject(ServicePackagesApiService);
   private route = inject(ActivatedRoute);
   readonly currentUserService = inject(CurrentUserService);
 
-  reviews: ListReviewsQueryDto[] = [];
   packages: ListServicePackagesQueryDto[] = [];
-
-  isLoadingReviews = false;
   isLoadingPackages = false;
-
-  totalItems = 0;
-  currentPage = 1;
-  pageSize = 5;
 
   selectedServicePackageId: number | null = null;
   sort: 'newest' | 'oldest' = 'newest';
 
-  // Computed from loaded reviews/packages
+  constructor() {
+    super();
+    this.request = new ListReviewsRequest();
+  }
+
   get selectedPackage(): ListServicePackagesQueryDto | undefined {
     return this.packages.find((p) => p.id === this.selectedServicePackageId);
   }
@@ -53,25 +54,35 @@ export class ReviewsPageComponent implements OnInit {
   }
 
   get ratingDistribution(): { stars: number; count: number; percent: number }[] {
-    // Build aggregate distribution across all packages
-    // We don't have per-star breakdown from the backend, so we estimate from loaded reviews
-    const dist = [5, 4, 3, 2, 1].map((stars) => {
-      const count = this.reviews.filter((r) => r.rating === stars).length;
+    return [5, 4, 3, 2, 1].map((stars) => {
+      const count = this.items.filter((r) => r.rating === stars).length;
       return { stars, count, percent: this.totalItems > 0 ? (count / this.totalItems) * 100 : 0 };
     });
-    return dist;
   }
 
   ngOnInit(): void {
     this.loadPackages();
-
-    // Support pre-selecting a service package via query param
     this.route.queryParams.subscribe((params) => {
       const spId = params['servicePackageId'];
       if (spId) {
         this.selectedServicePackageId = Number(spId);
       }
-      this.loadReviews();
+      this.request.paging.page = 1;
+      this.loadPagedData();
+    });
+  }
+
+  protected loadPagedData(): void {
+    this.startLoading();
+    this.request.sort = this.sort;
+    this.request.servicePackageId = this.selectedServicePackageId ?? undefined;
+
+    this.reviewsService.list(this.request).subscribe({
+      next: (result) => {
+        this.handlePageResult(result);
+        this.stopLoading();
+      },
+      error: () => this.stopLoading(),
     });
   }
 
@@ -88,49 +99,14 @@ export class ReviewsPageComponent implements OnInit {
     });
   }
 
-  loadReviews(): void {
-    this.isLoadingReviews = true;
-    const req = new ListReviewsRequest();
-    req.paging.page = this.currentPage;
-    req.paging.pageSize = this.pageSize;
-    req.sort = this.sort;
-    if (this.selectedServicePackageId) {
-      req.servicePackageId = this.selectedServicePackageId;
-    }
-
-    this.reviewsService.list(req).subscribe({
-      next: (result) => {
-        this.reviews = result.items;
-        this.totalItems = result.total;
-        this.isLoadingReviews = false;
-      },
-      error: () => {
-        this.isLoadingReviews = false;
-      },
-    });
-  }
-
   onPackageFilterChange(): void {
-    this.currentPage = 1;
-    this.loadReviews();
+    this.request.paging.page = 1;
+    this.loadPagedData();
   }
 
   onSortChange(): void {
-    this.currentPage = 1;
-    this.loadReviews();
-  }
-
-  goToPage(page: number): void {
-    this.currentPage = page;
-    this.loadReviews();
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.totalItems / this.pageSize);
-  }
-
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    this.request.paging.page = 1;
+    this.loadPagedData();
   }
 
   getStarArray(rating: number): ('full' | 'empty')[] {

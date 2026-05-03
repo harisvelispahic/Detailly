@@ -28,6 +28,7 @@ public class ListReviewsQueryHandler(IAppDbContext ctx)
                 .Select(bi => bi.ServicePackageItem.Name)
                 .ToList(),
             CreatedAtUtc = r.CreatedAtUtc,
+            ModifiedAtUtc = r.ModifiedAtUtc,
         });
 
         return await PageResult<ListReviewsQueryDto>.FromQueryableAsync(projected, request.Paging, ct);

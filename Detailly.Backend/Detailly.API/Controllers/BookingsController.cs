@@ -79,10 +79,9 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpPut("complete/{id:int}")]
     [Authorize(Policy = AuthPolicies.Staff)]
-    public async Task Complete(int id, CompleteBookingCommand command, CancellationToken ct)
+    public async Task Complete(int id, CancellationToken ct)
     {
-        command.BookingId = id; // Route ID precedence
-        await sender.Send(command, ct);
+        await sender.Send(new CompleteBookingCommand { BookingId = id }, ct);
         // no return -> 204 No Content
     }
 
@@ -108,9 +107,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpGet("assignable-employees/{id:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
-    public async Task<List<ListAssignableEmployeesForBookingQueryDto>> ListAssignableEmployees(
-        int id,
-        CancellationToken ct)
+    public async Task<List<ListAssignableEmployeesForBookingQueryDto>> ListAssignableEmployees(int id, CancellationToken ct)
     {
         var result = await sender.Send(new ListAssignableEmployeesForBookingQuery(id), ct);
         return result;
@@ -121,10 +118,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // ---------------------------------------
     [HttpPut("assign-employees/{id:int}")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
-    public async Task AssignEmployees(
-        int id,
-        AssignEmployeesToBookingCommand command,
-        CancellationToken ct)
+    public async Task AssignEmployees(int id, AssignEmployeesToBookingCommand command, CancellationToken ct)
     {
         command.BookingId = id; // Route ID precedence
         await sender.Send(command, ct);

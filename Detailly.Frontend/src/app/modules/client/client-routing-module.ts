@@ -11,6 +11,7 @@ import { BookingPayCardPageComponent } from './bookings/booking-pay-card-page/bo
 import { BookingPaymentPageComponent } from './bookings/booking-payment-page/booking-payment-page.component';
 import { ClientLayoutComponent } from './client-layout/client-layout.component';
 import { ProfilePageComponent } from './profile/profile-page/profile-page.component';
+import { MyReviewsPageComponent } from './bookings/my-reviews-page/my-reviews-page.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,12 @@ const routes: Routes = [
       {
         path: 'bookings',
         component: MyBookingsPageComponent,
+        canActivate: [myAuthGuard],
+        data: { requireAuth: true },
+      },
+      {
+        path: 'bookings/my-reviews',
+        component: MyReviewsPageComponent,
         canActivate: [myAuthGuard],
         data: { requireAuth: true },
       },

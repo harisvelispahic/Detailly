@@ -3,6 +3,7 @@ using Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
 using Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
 using Detailly.Application.Modules.Booking.Reviews.Queries.GetMyReview;
 using Detailly.Application.Modules.Booking.Reviews.Queries.List;
+using Detailly.Application.Modules.Booking.Reviews.Queries.ListMy;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -39,6 +40,13 @@ public class ReviewsController(ISender sender) : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     public async Task<PageResult<ListReviewsQueryDto>> List([FromQuery] ListReviewsQuery query, CancellationToken ct)
+    {
+        return await sender.Send(query, ct);
+    }
+
+    [HttpGet("my")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
+    public async Task<PageResult<ListMyReviewsQueryDto>> ListMy([FromQuery] ListMyReviewsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
     }
