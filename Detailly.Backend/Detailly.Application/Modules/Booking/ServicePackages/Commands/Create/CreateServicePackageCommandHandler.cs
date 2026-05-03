@@ -24,6 +24,21 @@ public class CreateServicePackageCommandHandler(IAppDbContext context)
 
         if (distinctIds.Count > 0)
         {
+            var sortedNewIds = distinctIds.OrderBy(x => x).ToList();
+
+            var existingAssignments = await context.ServicePackageItemAssignments
+                .Where(a => !a.IsDeleted && !a.ServicePackage.IsDeleted)
+                .Select(a => new { a.ServicePackageId, a.ServicePackageItemId })
+                .ToListAsync(ct);
+
+            bool isDuplicate = existingAssignments
+                .GroupBy(a => a.ServicePackageId)
+                .Any(g => g.Select(a => a.ServicePackageItemId).OrderBy(x => x).SequenceEqual(sortedNewIds));
+
+            if (isDuplicate)
+                throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_DUPLICATE_ITEMS",
+                    "A service package with the exact same set of items already exists.");
+
             // Load full items so we can compute totals
             var items = await context.ServicePackageItems
                 .Where(x => distinctIds.Contains(x.Id) && !x.IsDeleted /* && x.IsActive */)

@@ -13,7 +13,7 @@ namespace Detailly.API.Controllers;
 public class ServicePackagesController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    [Authorize(Policy = AuthPolicies.Staff)]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task<ActionResult<int>> Create(CreateServicePackageCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -21,7 +21,7 @@ public class ServicePackagesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthPolicies.Staff)]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Update(int id, UpdateServicePackageCommand command, CancellationToken ct)
     {
         command.Id = id; // ID from route takes precedence
@@ -29,7 +29,7 @@ public class ServicePackagesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthPolicies.Staff)]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteServicePackageCommand { Id = id }, ct);

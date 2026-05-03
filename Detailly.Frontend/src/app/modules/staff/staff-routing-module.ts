@@ -7,6 +7,7 @@ import { ShiftsComponent } from './pages/shifts/shifts.component';
 import { MyShiftsComponent } from './pages/my-shifts/my-shifts.component';
 import { StaffMembersComponent } from './pages/staff-members/staff-members.component';
 import { LocationsComponent } from './pages/locations/locations.component';
+import { ServicePackagesComponent } from './pages/service-packages/service-packages.component';
 import { myAuthData, myAuthGuard } from '../../core/guards/my-auth-guard';
 
 const routes: Routes = [
@@ -38,6 +39,12 @@ const routes: Routes = [
         component: LocationsComponent,
         canActivate: [myAuthGuard],
         data: myAuthData({ requireAuth: true }),
+      },
+      {
+        path: 'service-packages',
+        component: ServicePackagesComponent,
+        canActivate: [myAuthGuard],
+        data: myAuthData({ requireAuth: true, requireAdminOrManager: true }),
       },
     ],
   },

@@ -1,0 +1,153 @@
+<div class="service-packages">
+  <!-- Header card -->
+  <div class="service-packages__header-card">
+    <div class="service-packages__header-inner">
+      <div class="service-packages__title-section">
+        <div class="service-packages__title-icon">
+          <mat-icon>spa</mat-icon>
+        </div>
+        <div>
+          <h1 class="service-packages__title">Service Packages</h1>
+          <p class="service-packages__subtitle">Manage detailing service packages</p>
+        </div>
+      </div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="service-packages__new-btn"
+        (click)="openCreateDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        New Package
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="service-packages__filters">
+      <mat-form-field
+        appearance="outline"
+        class="service-packages__filter-field service-packages__filter-field--search"
+      >
+        <mat-label>Search packages</mat-label>
+        <input matInput [formControl]="searchCtrl" placeholder="Name or description…" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="4" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="service-packages__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="service-packages__error-title">Failed to load service packages</p>
+        <p class="service-packages__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadPagedData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="service-packages__table-card">
+      <table mat-table [dataSource]="items" class="service-packages__table">
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="service-packages__th"><mat-icon>spa</mat-icon> Package Name</div>
+          </th>
+          <td mat-cell *matCellDef="let pkg">
+            <div class="service-packages__name-cell">
+              <span class="service-packages__name">{{ pkg.name }}</span>
+              @if (pkg.description) {
+                <span class="service-packages__description">{{ pkg.description }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Price -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="service-packages__th"><mat-icon>payments</mat-icon> Price</div>
+          </th>
+          <td mat-cell *matCellDef="let pkg">
+            <span class="service-packages__price">{{ pkg.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Items -->
+        <ng-container matColumnDef="items">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="service-packages__th"><mat-icon>checklist</mat-icon> Items</div>
+          </th>
+          <td mat-cell *matCellDef="let pkg">
+            @if (!pkg.items?.length) {
+              <span class="service-packages__no-items">No items</span>
+            } @else {
+              <div class="service-packages__item-chips">
+                @for (item of pkg.items.slice(0, 3); track item.id) {
+                  <span class="service-packages__item-chip">{{ item.name }}</span>
+                }
+                @if (pkg.items.length > 3) {
+                  <span class="service-packages__item-chip service-packages__item-chip--more">
+                    +{{ pkg.items.length - 3 }} more
+                  </span>
+                }
+              </div>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let pkg">
+            <div class="service-packages__actions">
+              <button
+                mat-icon-button
+                class="service-packages__action-btn service-packages__action-btn--edit"
+                (click)="openEditDialog(pkg, $event)"
+                matTooltip="Edit"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="service-packages__action-btn service-packages__action-btn--delete"
+                (click)="deletePackage(pkg, $event)"
+                matTooltip="Delete"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="service-packages__row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="service-packages__empty">
+              <mat-icon>spa</mat-icon>
+              <p>No service packages found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="service-packages__paginator">
+        <app-paginator-bar [vm]="this"></app-paginator-bar>
+      </div>
+    </div>
+  }
+</div>

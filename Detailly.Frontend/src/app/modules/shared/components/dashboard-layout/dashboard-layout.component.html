@@ -82,6 +82,16 @@
           <span>Locations</span>
         </a>
 
+        <a
+          class="sidebar__item"
+          routerLink="/staff/service-packages"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">spa</mat-icon>
+          <span>Service Packages</span>
+        </a>
+
         <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">
           <mat-icon class="sidebar__item-icon">analytics</mat-icon>
           <span>Reports</span>
