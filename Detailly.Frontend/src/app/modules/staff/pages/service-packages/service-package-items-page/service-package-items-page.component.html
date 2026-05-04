@@ -1,0 +1,183 @@
+<div class="spi-page">
+
+  <!-- Back + Header card -->
+  <div class="spi-page__header-card">
+    <button mat-button class="spi-page__back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Service Packages
+    </button>
+
+    <div class="spi-page__header-inner">
+      <div class="spi-page__title-section">
+        <div class="spi-page__title-icon">
+          <mat-icon>build_circle</mat-icon>
+        </div>
+        <div>
+          <h1 class="spi-page__title">Service Package Items</h1>
+          <p class="spi-page__subtitle">Manage individual items that can be added to service packages</p>
+        </div>
+      </div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="spi-page__new-btn"
+        (click)="openCreateDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        New Item
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="spi-page__filters">
+      <mat-form-field appearance="outline" class="spi-page__filter-field">
+        <mat-label>Search items</mat-label>
+        <input matInput [formControl]="searchCtrl" placeholder="Name or description…" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="7" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="spi-page__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="spi-page__error-title">Failed to load items</p>
+        <p class="spi-page__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadPagedData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="spi-page__table-card">
+      <table mat-table [dataSource]="items" class="spi-page__table">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>label</mat-icon> Name</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            <div class="spi-page__name-cell">
+              <span class="spi-page__name">{{ item.name }}</span>
+              @if (item.description) {
+                <span class="spi-page__description">{{ item.description }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Type -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>category</mat-icon> Type</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            @if (item.isAddon) {
+              <span class="spi-page__badge spi-page__badge--addon">Addon</span>
+            } @else {
+              <span class="spi-page__badge spi-page__badge--base">Base</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Duration -->
+        <ng-container matColumnDef="duration">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>schedule</mat-icon> Duration</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            <span class="spi-page__meta">{{ item.durationMinutes }} min</span>
+          </td>
+        </ng-container>
+
+        <!-- Employees -->
+        <ng-container matColumnDef="employees">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>person</mat-icon> Employees</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            <span class="spi-page__meta">{{ item.requiredEmployees }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Price -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>payments</mat-icon> Price</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            <span class="spi-page__price">{{ item.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="spi-page__th"><mat-icon>toggle_on</mat-icon> Status</div>
+          </th>
+          <td mat-cell *matCellDef="let item">
+            @if (item.isActive) {
+              <span class="spi-page__badge spi-page__badge--active">Active</span>
+            } @else {
+              <span class="spi-page__badge spi-page__badge--inactive">Inactive</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let item">
+            <div class="spi-page__actions">
+              <button
+                mat-icon-button
+                class="spi-page__action-btn spi-page__action-btn--edit"
+                (click)="openEditDialog(item, $event)"
+                matTooltip="Edit"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="spi-page__action-btn spi-page__action-btn--delete"
+                (click)="deleteItem(item, $event)"
+                matTooltip="Delete"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="spi-page__row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="spi-page__empty">
+              <mat-icon>build_circle</mat-icon>
+              <p>No service package items found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="spi-page__paginator">
+        <app-paginator-bar [vm]="this"></app-paginator-bar>
+      </div>
+    </div>
+  }
+
+</div>

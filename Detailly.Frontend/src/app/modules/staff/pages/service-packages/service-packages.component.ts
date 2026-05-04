@@ -1,4 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
@@ -31,6 +32,7 @@ export class ServicePackagesComponent
   private dialog = inject(MatDialog);
   private toaster = inject(ToasterService);
   private dialogHelper = inject(DialogHelperService);
+  private router = inject(Router);
   private destroy$ = new Subject<void>();
 
   displayedColumns = ['name', 'price', 'items', 'actions'];
@@ -71,6 +73,10 @@ export class ServicePackagesComponent
         },
         error: () => this.stopLoading('Failed to load service packages.'),
       });
+  }
+
+  goToItems(): void {
+    this.router.navigate(['/staff/service-packages/items']);
   }
 
   openCreateDialog(): void {

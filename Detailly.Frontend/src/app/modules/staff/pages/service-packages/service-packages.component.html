@@ -12,15 +12,25 @@
         </div>
       </div>
 
-      <button
-        mat-raised-button
-        color="primary"
-        class="service-packages__new-btn"
-        (click)="openCreateDialog()"
-      >
-        <mat-icon>add</mat-icon>
-        New Package
-      </button>
+      <div class="service-packages__header-actions">
+        <button
+          mat-stroked-button
+          class="service-packages__items-btn"
+          (click)="goToItems()"
+        >
+          <mat-icon>build_circle</mat-icon>
+          Manage Items
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="service-packages__new-btn"
+          (click)="openCreateDialog()"
+        >
+          <mat-icon>add</mat-icon>
+          New Package
+        </button>
+      </div>
     </div>
 
     <!-- Search -->

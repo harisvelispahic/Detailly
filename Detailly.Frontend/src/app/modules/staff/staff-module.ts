@@ -13,6 +13,8 @@ import { LocationUpsertDialogComponent } from './pages/locations/location-upsert
 import { LocationDetailDialogComponent } from './pages/locations/location-detail-dialog/location-detail-dialog.component';
 import { ServicePackagesComponent } from './pages/service-packages/service-packages.component';
 import { ServicePackageUpsertDialogComponent } from './pages/service-packages/service-package-upsert-dialog/service-package-upsert-dialog.component';
+import { ServicePackageItemsPageComponent } from './pages/service-packages/service-package-items-page/service-package-items-page.component';
+import { ServicePackageItemUpsertDialogComponent } from './pages/service-packages/service-package-items-page/service-package-item-upsert-dialog/service-package-item-upsert-dialog.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +29,8 @@ import { ServicePackageUpsertDialogComponent } from './pages/service-packages/se
     LocationDetailDialogComponent,
     ServicePackagesComponent,
     ServicePackageUpsertDialogComponent,
+    ServicePackageItemsPageComponent,
+    ServicePackageItemUpsertDialogComponent,
   ],
   imports: [SharedModule, StaffRoutingModule],
 })

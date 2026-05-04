@@ -8,7 +8,10 @@ public sealed class ListServicePackageItemsQueryHandler(IAppDbContext ctx)
     {
         var q = ctx.ServicePackageItems
             .AsNoTracking()
-            .Where(x => !x.IsDeleted && x.IsActive);
+            .Where(x => !x.IsDeleted);
+
+        if (!request.IncludeInactive)
+            q = q.Where(x => x.IsActive);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {

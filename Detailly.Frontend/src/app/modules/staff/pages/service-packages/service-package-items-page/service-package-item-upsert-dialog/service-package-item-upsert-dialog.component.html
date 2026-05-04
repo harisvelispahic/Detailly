@@ -1,0 +1,163 @@
+<div class="item-dialog">
+  <div class="item-dialog__header">
+    <div class="item-dialog__header-icon">
+      <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="item-dialog__title">
+        {{ isEditMode ? 'Edit Service Item' : 'New Service Item' }}
+      </h2>
+      <p class="item-dialog__subtitle">
+        {{ isEditMode ? 'Update the details below' : 'Fill in the details to create a new item' }}
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="item-dialog__content">
+    <form [formGroup]="form" id="item-form">
+
+      <!-- Name -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="item-dialog__field-full">
+        <mat-label>Item Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g. Exterior Wash" />
+        <mat-icon matPrefix>label</mat-icon>
+        @if (form.get('name')?.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+        @if (form.get('name')?.hasError('maxlength')) {
+          <mat-error>Too long (max 200 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="item-dialog__field-full">
+        <mat-label>Description (optional)</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Brief description of this item…"
+          rows="3"
+        ></textarea>
+        @if (form.get('description')?.hasError('maxlength')) {
+          <mat-error>Too long (max 2000 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Price + Duration row -->
+      <div class="item-dialog__row">
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="item-dialog__field-half">
+          <mat-label>Price (BAM)</mat-label>
+          <input
+            matInput
+            formControlName="price"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          />
+          <mat-icon matPrefix>payments</mat-icon>
+          @if (form.get('price')?.hasError('required')) {
+            <mat-error>Price is required</mat-error>
+          }
+          @if (form.get('price')?.hasError('min')) {
+            <mat-error>Cannot be negative</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" subscriptSizing="fixed" class="item-dialog__field-half">
+          <mat-label>Duration (minutes)</mat-label>
+          <input
+            matInput
+            formControlName="durationMinutes"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="60"
+          />
+          <mat-icon matPrefix>schedule</mat-icon>
+          @if (form.get('durationMinutes')?.hasError('required')) {
+            <mat-error>Duration is required</mat-error>
+          }
+          @if (form.get('durationMinutes')?.hasError('min')) {
+            <mat-error>Must be at least 1 minute</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Required Employees -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="item-dialog__field-full">
+        <mat-label>Required Employees</mat-label>
+        <input
+          matInput
+          formControlName="requiredEmployees"
+          type="number"
+          min="1"
+          step="1"
+          placeholder="1"
+        />
+        <mat-icon matPrefix>person</mat-icon>
+        @if (form.get('requiredEmployees')?.hasError('required')) {
+          <mat-error>Required employees is required</mat-error>
+        }
+        @if (form.get('requiredEmployees')?.hasError('min')) {
+          <mat-error>Must be at least 1</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Toggles -->
+      <div class="item-dialog__toggles">
+        <div class="item-dialog__toggle-row">
+          <mat-checkbox formControlName="isAddon" color="primary">
+            <span class="item-dialog__toggle-label">Add-on item</span>
+          </mat-checkbox>
+          <span class="item-dialog__toggle-hint">Add-ons are optional extras that complement base items</span>
+        </div>
+
+        @if (isEditMode) {
+          <div class="item-dialog__toggle-row">
+            <mat-checkbox formControlName="isActive" color="primary">
+              <span class="item-dialog__toggle-label">Active</span>
+            </mat-checkbox>
+            <span class="item-dialog__toggle-hint">Inactive items won't appear when building service packages</span>
+          </div>
+        }
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  @if (serverError) {
+    <div class="item-dialog__server-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError }}</span>
+    </div>
+  }
+
+  <mat-dialog-actions class="item-dialog__actions">
+    <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isSubmitting">
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      form="item-form"
+      [disabled]="form.invalid || isSubmitting"
+      [class.submit-button--disabled]="form.invalid || isSubmitting"
+      (click)="onSave()"
+    >
+      @if (!isSubmitting) {
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      }
+      @if (!isSubmitting) {
+        {{ isEditMode ? 'Save Changes' : 'Create Item' }}
+      }
+      @if (isSubmitting) {
+        <mat-progress-spinner mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
+      }
+      @if (isSubmitting) {
+        <span>{{ isEditMode ? 'Saving…' : 'Creating…' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</div>
