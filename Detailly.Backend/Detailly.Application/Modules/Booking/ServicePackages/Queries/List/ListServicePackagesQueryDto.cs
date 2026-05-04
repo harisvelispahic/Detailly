@@ -6,7 +6,7 @@ public class ListServicePackagesQueryDto
     public required string Name { get; init; }
     public required string? Description { get; init; }
     public required decimal Price { get; init; }
-    public required int EstimatedDurationHours { get; init; }
+    public required int EstimatedDurationMinutes { get; init; }
     public required decimal? AverageRating { get; init; }
     public required int ReviewCount { get; init; }
 

@@ -34,22 +34,16 @@ public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAp
         if (!employee.IsEmployee)
             throw new DetaillyBusinessRuleException("SHIFT_NOT_EMPLOYEE", "Selected user is not an employee.");
 
-        // Validate shift times are within the location's opening hours for that day
+        // Validate the location is not closed on that day.
+        // Time-of-day bounds are enforced by the frontend (which compares in local time);
+        // comparing UTC TimeOfDay against locally-stored opening hours is unreliable without
+        // an explicit timezone, so only the IsClosed flag is checked here.
         var dayOfWeek = (int)request.StartUtc.DayOfWeek;
         var openingHours = await context.LocationOpeningHours
             .FirstOrDefaultAsync(h => h.ShopLocationId == request.ShopLocationId && h.DayOfWeek == dayOfWeek && !h.IsDeleted, ct);
 
-        if (openingHours != null)
-        {
-            if (openingHours.IsClosed)
-                throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
-
-            if (openingHours.OpenTimeUtc.HasValue && request.StartUtc.TimeOfDay < openingHours.OpenTimeUtc.Value)
-                throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", "Shift cannot start before the location opens.");
-
-            if (openingHours.CloseTimeUtc.HasValue && request.EndUtc.TimeOfDay > openingHours.CloseTimeUtc.Value)
-                throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", "Shift cannot end after the location closes.");
-        }
+        if (openingHours?.IsClosed == true)
+            throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
 
         // Prevent overlaps for the same employee (same mode is enough, but you can block all overlaps regardless of mode)
         var overlaps = await context.EmployeeShifts

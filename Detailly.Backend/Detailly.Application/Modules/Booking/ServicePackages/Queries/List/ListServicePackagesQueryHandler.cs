@@ -26,7 +26,9 @@ public class ListServicePackagesQueryHandler(IAppDbContext ctx)
                 Name = sp.Name,
                 Description = sp.Description,
                 Price = sp.Price,
-                EstimatedDurationHours = 1,
+                EstimatedDurationMinutes = ctx.ServicePackageItemAssignments
+                    .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted && !a.ServicePackageItem.IsDeleted)
+                    .Sum(a => (int?)a.ServicePackageItem.DurationMinutes) ?? sp.BaseDurationMinutes ?? 0,
                 AverageRating = ctx.Reviews
                     .Where(r => r.ServicePackageId == sp.Id && !r.IsDeleted)
                     .Select(r => (decimal?)r.Rating)

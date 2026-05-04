@@ -563,6 +563,15 @@ export class BookingWizardComponent implements OnInit {
     return this.serviceTotal + this.mobileSurchargeFee;
   }
 
+  formatDuration(minutes: number): string {
+    if (!minutes) return '—';
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    if (h === 0) return `${m}min`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}min`;
+  }
+
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   isPastDate(date: Date): boolean {

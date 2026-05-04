@@ -13,7 +13,7 @@ export interface ListServicePackagesQueryDto {
   name: string;
   description?: string | null;
   price: number;
-  estimatedDurationHours: number;
+  estimatedDurationMinutes: number;
   averageRating?: number | null;
   reviewCount: number;
   items: ServicePackageItemDto[];

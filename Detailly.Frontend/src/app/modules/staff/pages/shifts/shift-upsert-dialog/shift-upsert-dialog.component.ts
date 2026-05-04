@@ -242,7 +242,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
     const { employeeId, shopLocationId, employeeWorkMode, date, startTime, endTime } =
       this.form.value;
 
-    // Build local datetimes and let the browser convert to UTC ISO strings
+    // Build local datetimes and convert to UTC ISO via toISOString()
     const localDate = new Date(date);
     const [startH, startM] = (startTime as string).split(':').map(Number);
     const [endH, endM] = (endTime as string).split(':').map(Number);

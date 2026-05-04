@@ -55,7 +55,7 @@
               <h3 class="package-card__name">{{ pkg.name }}</h3>
               <p class="package-card__duration">
                 <mat-icon>schedule</mat-icon>
-                {{ pkg.estimatedDurationHours }}h
+                {{ formatDuration(pkg.estimatedDurationMinutes) }}
               </p>
               <!-- Rating row -->
               <div class="package-card__rating" *ngIf="pkg.reviewCount > 0">
