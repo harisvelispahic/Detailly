@@ -1,14 +1,24 @@
+using Detailly.Application.Common;
+
 namespace Detailly.Application.Modules.Vehicle.VehicleCategories.Queries.List;
 
 public class ListVehicleCategoriesQueryHandler(IAppDbContext context)
-    : IRequestHandler<ListVehicleCategoriesQuery, IList<ListVehicleCategoriesQueryDto>>
+    : IRequestHandler<ListVehicleCategoriesQuery, PageResult<ListVehicleCategoriesQueryDto>>
 {
-    public async Task<IList<ListVehicleCategoriesQueryDto>> Handle(
+    public async Task<PageResult<ListVehicleCategoriesQueryDto>> Handle(
         ListVehicleCategoriesQuery request,
         CancellationToken ct)
     {
-        return await context.VehicleCategories
-            .AsNoTracking()
+        var q = context.VehicleCategories.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var search = request.Search.Trim();
+            q = q.Where(c => c.Name.Contains(search) ||
+                             (c.Description != null && c.Description.Contains(search)));
+        }
+
+        var projected = q
             .OrderBy(c => c.Name)
             .Select(c => new ListVehicleCategoriesQueryDto
             {
@@ -16,7 +26,8 @@ public class ListVehicleCategoriesQueryHandler(IAppDbContext context)
                 Name = c.Name,
                 Description = c.Description,
                 BasePriceMultiplier = c.BasePriceMultiplier
-            })
-            .ToListAsync(ct);
+            });
+
+        return await PageResult<ListVehicleCategoriesQueryDto>.FromQueryableAsync(projected, request.Paging, ct);
     }
 }

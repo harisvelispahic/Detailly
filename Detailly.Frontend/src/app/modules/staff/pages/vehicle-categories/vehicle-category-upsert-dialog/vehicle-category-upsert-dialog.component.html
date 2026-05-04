@@ -1,0 +1,104 @@
+<div class="vc-dialog">
+  <div class="vc-dialog__header">
+    <div class="vc-dialog__header-icon">
+      <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="vc-dialog__title">
+        {{ isEditMode ? 'Edit Vehicle Category' : 'New Vehicle Category' }}
+      </h2>
+      <p class="vc-dialog__subtitle">
+        {{ isEditMode ? 'Update the details below' : 'Fill in the details to create a new category' }}
+      </p>
+    </div>
+  </div>
+
+  <mat-dialog-content class="vc-dialog__content">
+    <form [formGroup]="form" id="vc-form">
+
+      <!-- Name -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="vc-dialog__field-full">
+        <mat-label>Category Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g. SUV" />
+        <mat-icon matPrefix>directions_car</mat-icon>
+        @if (form.get('name')?.hasError('required')) {
+          <mat-error>Name is required</mat-error>
+        }
+        @if (form.get('name')?.hasError('maxlength')) {
+          <mat-error>Too long (max 200 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="vc-dialog__field-full">
+        <mat-label>Description (optional)</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Brief description of this vehicle category…"
+          rows="3"
+        ></textarea>
+        @if (form.get('description')?.hasError('maxlength')) {
+          <mat-error>Too long (max 2000 characters)</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Price Multiplier -->
+      <mat-form-field appearance="outline" subscriptSizing="fixed" class="vc-dialog__field-full">
+        <mat-label>Price Multiplier</mat-label>
+        <input
+          matInput
+          formControlName="basePriceMultiplier"
+          type="number"
+          min="0.0001"
+          step="0.01"
+          placeholder="1.00"
+        />
+        <mat-icon matPrefix>price_change</mat-icon>
+        <mat-hint>Applied on top of the base service price (e.g. 1.5 = 50% more)</mat-hint>
+        @if (form.get('basePriceMultiplier')?.hasError('required')) {
+          <mat-error>Price multiplier is required</mat-error>
+        }
+        @if (form.get('basePriceMultiplier')?.hasError('min')) {
+          <mat-error>Must be greater than 0</mat-error>
+        }
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+
+  @if (serverError) {
+    <div class="vc-dialog__server-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ serverError }}</span>
+    </div>
+  }
+
+  <mat-dialog-actions class="vc-dialog__actions">
+    <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="isSubmitting">
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      form="vc-form"
+      [disabled]="form.invalid || isSubmitting"
+      [class.submit-button--disabled]="form.invalid || isSubmitting"
+      (click)="onSave()"
+    >
+      @if (!isSubmitting) {
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      }
+      @if (!isSubmitting) {
+        {{ isEditMode ? 'Save Changes' : 'Create Category' }}
+      }
+      @if (isSubmitting) {
+        <mat-progress-spinner mode="indeterminate" diameter="18" strokeWidth="3"></mat-progress-spinner>
+      }
+      @if (isSubmitting) {
+        <span>{{ isEditMode ? 'Saving…' : 'Creating…' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

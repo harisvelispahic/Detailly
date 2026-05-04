@@ -1,0 +1,127 @@
+<div class="vc">
+
+  <!-- Header card -->
+  <div class="vc__header-card">
+    <div class="vc__header-inner">
+      <div class="vc__title-section">
+        <div class="vc__title-icon">
+          <mat-icon>directions_car</mat-icon>
+        </div>
+        <div>
+          <h1 class="vc__title">Vehicle Categories</h1>
+          <p class="vc__subtitle">Manage vehicle types and their price multipliers</p>
+        </div>
+      </div>
+
+      <div class="vc__header-actions">
+        <button mat-raised-button color="primary" class="vc__new-btn" (click)="openCreateDialog()">
+          <mat-icon>add</mat-icon>
+          New Category
+        </button>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="vc__filters">
+      <mat-form-field appearance="outline" class="vc__search-field">
+        <mat-label>Search categories</mat-label>
+        <input matInput [formControl]="searchCtrl" placeholder="Name or description…" />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="3" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="vc__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="vc__error-title">Failed to load vehicle categories</p>
+        <p class="vc__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadPagedData()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="vc__table-card">
+      <table mat-table [dataSource]="items" class="vc__table">
+
+        <!-- Name -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="vc__th"><mat-icon>directions_car</mat-icon> Category Name</div>
+          </th>
+          <td mat-cell *matCellDef="let cat">
+            <div class="vc__name-cell">
+              <span class="vc__name">{{ cat.name }}</span>
+              @if (cat.description) {
+                <span class="vc__description">{{ cat.description }}</span>
+              }
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Multiplier -->
+        <ng-container matColumnDef="multiplier">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="vc__th"><mat-icon>price_change</mat-icon> Price Multiplier</div>
+          </th>
+          <td mat-cell *matCellDef="let cat">
+            <span class="vc__multiplier">×{{ cat.basePriceMultiplier | number: '1.2-4' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let cat">
+            <div class="vc__actions">
+              <button
+                mat-icon-button
+                class="vc__action-btn vc__action-btn--edit"
+                (click)="openEditDialog(cat, $event)"
+                matTooltip="Edit"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                class="vc__action-btn vc__action-btn--delete"
+                (click)="deleteCategory(cat, $event)"
+                matTooltip="Delete"
+              >
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="vc__row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="vc__empty">
+              <mat-icon>directions_car</mat-icon>
+              <p>No vehicle categories found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="vc__paginator">
+        <app-paginator-bar [vm]="this"></app-paginator-bar>
+      </div>
+    </div>
+  }
+
+</div>

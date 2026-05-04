@@ -242,7 +242,7 @@ export class BookingWizardComponent implements OnInit {
 
   openAddVehicleForm(): void {
     if (this.vehicleCategories.length === 0) {
-      this.vehicleCategoriesService.list().subscribe({
+      this.vehicleCategoriesService.listAll().subscribe({
         next: (cats) => {
           this.vehicleCategories = cats;
         },

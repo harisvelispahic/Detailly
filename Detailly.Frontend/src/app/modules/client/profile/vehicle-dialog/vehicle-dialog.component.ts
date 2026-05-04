@@ -54,7 +54,7 @@ export class VehicleDialogComponent implements OnInit {
 
   private loadCategories(currentCategoryName?: string): void {
     this.isLoadingCategories = true;
-    this.vehicleCategories.list().subscribe({
+    this.vehicleCategories.listAll().subscribe({
       next: (cats) => {
         this.categories = cats;
         if (currentCategoryName) {

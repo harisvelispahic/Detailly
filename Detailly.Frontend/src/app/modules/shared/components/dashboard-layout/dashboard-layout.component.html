@@ -92,6 +92,16 @@
           <span>Service Packages</span>
         </a>
 
+        <a
+          class="sidebar__item"
+          routerLink="/staff/vehicle-categories"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">directions_car</mat-icon>
+          <span>Vehicle Categories</span>
+        </a>
+
         <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">
           <mat-icon class="sidebar__item-icon">analytics</mat-icon>
           <span>Reports</span>
