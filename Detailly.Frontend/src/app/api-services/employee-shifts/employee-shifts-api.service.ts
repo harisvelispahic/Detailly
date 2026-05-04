@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
   CreateEmployeeShiftCommand,
+  EmployeeWorkMode,
   ListEmployeeShiftsRequest,
   ListEmployeeShiftsResponse,
   MyShiftDto,
@@ -36,5 +37,21 @@ export class EmployeeShiftsApiService {
   listMine(days: number = 7): Observable<MyShiftDto[]> {
     const params = buildHttpParams({ days });
     return this.http.get<MyShiftDto[]>(`${this.baseUrl}/mine`, { params });
+  }
+
+  exportShiftsPdf(
+    startDate: string,
+    endDate: string,
+    shopLocationId: number,
+    employeeWorkMode?: EmployeeWorkMode | null,
+  ): Observable<Blob> {
+    let params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate)
+      .set('shopLocationId', shopLocationId.toString());
+    if (employeeWorkMode != null) {
+      params = params.set('employeeWorkMode', employeeWorkMode.toString());
+    }
+    return this.http.get(`${this.baseUrl}/export-pdf`, { params, responseType: 'blob' });
   }
 }

@@ -12,15 +12,27 @@
         </div>
       </div>
 
-      <button
-        mat-raised-button
-        color="primary"
-        class="shifts__new-btn"
-        (click)="openCreateDialog()"
-      >
-        <mat-icon>add</mat-icon>
-        New Shift
-      </button>
+      <div class="shifts__header-actions">
+        <button
+          mat-stroked-button
+          class="shifts__export-btn"
+          [disabled]="!selectedLocationId"
+          matTooltip="Export shifts as PDF"
+          (click)="openExportDialog()"
+        >
+          <mat-icon>download</mat-icon>
+          Export PDF
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          class="shifts__new-btn"
+          (click)="openCreateDialog()"
+        >
+          <mat-icon>add</mat-icon>
+          New Shift
+        </button>
+      </div>
     </div>
 
     <!-- Filters -->

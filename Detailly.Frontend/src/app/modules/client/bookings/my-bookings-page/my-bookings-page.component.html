@@ -9,8 +9,8 @@
       <button
         mat-stroked-button
         class="appointments-page__export-btn"
-        disabled
-        matTooltip="Coming soon"
+        (click)="openExportDialog()"
+        matTooltip="Export appointments as PDF"
       >
         <mat-icon>download</mat-icon>
         Export Report

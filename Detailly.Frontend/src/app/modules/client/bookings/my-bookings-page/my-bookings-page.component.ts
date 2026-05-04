@@ -16,6 +16,7 @@ import {
   RateBookingDialogData,
   RateBookingDialogResult,
 } from '../../../shared/components/rate-booking-dialog/rate-booking-dialog.component';
+import { BookingsExportDialogComponent } from './bookings-export-dialog/bookings-export-dialog.component';
 
 @Component({
   selector: 'app-my-bookings-page',
@@ -113,6 +114,10 @@ export class MyBookingsPageComponent
 
   openDetails(id: number): void {
     this.router.navigate(['/client/bookings', id]);
+  }
+
+  openExportDialog(): void {
+    this.dialog.open(BookingsExportDialogComponent, { width: '480px', disableClose: false });
   }
 
   openRateDialog(booking: ListMyBookingsQueryDto, event: Event): void {

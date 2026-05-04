@@ -19,6 +19,7 @@ import { VehicleCategoriesComponent } from './pages/vehicle-categories/vehicle-c
 import { VehicleCategoryUpsertDialogComponent } from './pages/vehicle-categories/vehicle-category-upsert-dialog/vehicle-category-upsert-dialog.component';
 import { AssignBookingsComponent } from './pages/assign-bookings/assign-bookings.component';
 import { MyAssignedBookingsComponent } from './pages/my-assigned-bookings/my-assigned-bookings.component';
+import { ShiftsExportDialogComponent } from './pages/shifts/shifts-export-dialog/shifts-export-dialog.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { MyAssignedBookingsComponent } from './pages/my-assigned-bookings/my-ass
     VehicleCategoryUpsertDialogComponent,
     AssignBookingsComponent,
     MyAssignedBookingsComponent,
+    ShiftsExportDialogComponent,
   ],
   imports: [SharedModule, StaffRoutingModule],
 })

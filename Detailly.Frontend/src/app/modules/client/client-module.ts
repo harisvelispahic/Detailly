@@ -17,6 +17,7 @@ import { VehicleDialogComponent } from './profile/vehicle-dialog/vehicle-dialog.
 import { AddressDialogComponent } from './profile/address-dialog/address-dialog.component';
 import { EditProfileDialogComponent } from './profile/edit-profile-dialog/edit-profile-dialog.component';
 import { MyReviewsPageComponent } from './bookings/my-reviews-page/my-reviews-page.component';
+import { BookingsExportDialogComponent } from './bookings/my-bookings-page/bookings-export-dialog/bookings-export-dialog.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { MyReviewsPageComponent } from './bookings/my-reviews-page/my-reviews-pa
     AddressDialogComponent,
     EditProfileDialogComponent,
     MyReviewsPageComponent,
+    BookingsExportDialogComponent,
   ],
   imports: [SharedModule, ClientRoutingModule, FormsModule],
   exports: [FormsModule],

@@ -15,6 +15,7 @@ import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
 import { ShiftUpsertDialogComponent, ShiftUpsertDialogData } from './shift-upsert-dialog/shift-upsert-dialog.component';
+import { ShiftsExportDialogComponent, ShiftsExportDialogData } from './shifts-export-dialog/shifts-export-dialog.component';
 
 @Component({
   selector: 'app-shifts',
@@ -111,6 +112,17 @@ export class ShiftsComponent
     this.workModeFilter = mode;
     this.request.paging.page = 1;
     this.loadPagedData();
+  }
+
+  openExportDialog(): void {
+    if (!this.selectedLocationId) return;
+    const locationName = this.locations.find(l => l.id === this.selectedLocationId)?.name ?? '';
+    const data: ShiftsExportDialogData = {
+      shopLocationId: this.selectedLocationId,
+      locationName,
+      workModeFilter: this.workModeFilter,
+    };
+    this.dialog.open(ShiftsExportDialogComponent, { width: '520px', maxWidth: '95vw', data });
   }
 
   openCreateDialog(): void {

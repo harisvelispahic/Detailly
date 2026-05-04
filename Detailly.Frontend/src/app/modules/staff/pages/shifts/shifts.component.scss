@@ -65,6 +65,28 @@
   color: hsl(var(--muted-foreground));
 }
 
+.shifts__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shifts__export-btn {
+  height: 44px;
+  border-radius: 10px;
+  font-weight: 600;
+  gap: 6px;
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+
+  mat-icon { font-size: 20px; }
+
+  &:not([disabled]):hover {
+    border-color: hsl(var(--primary));
+    color: hsl(var(--primary));
+  }
+}
+
 .shifts__new-btn {
   height: 44px;
   border-radius: 10px;

@@ -1,8 +1,11 @@
 ﻿using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
+using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ExportShifts;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListMine;
+using Detailly.API.Services.Pdf;
+using Detailly.Domain.Common.Enums;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -69,5 +72,34 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
     public async Task<List<ListMyShiftsQueryDto>> ListMine([FromQuery] ListMyShiftsQuery query, CancellationToken ct)
     {
         return await sender.Send(query, ct);
+    }
+
+    // ---------------------------------------
+    // EXPORT SHIFTS AS PDF (Manager/Admin)
+    // GET /EmployeeShifts/export-pdf?startDate=2026-01-01&endDate=2026-01-31&shopLocationId=1
+    // ---------------------------------------
+    [HttpGet("export-pdf")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<IActionResult> ExportShiftsPdf(
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate,
+        [FromQuery] int shopLocationId,
+        [FromQuery] EmployeeWorkMode? employeeWorkMode,
+        CancellationToken ct)
+    {
+        var query = new ExportShiftsQuery
+        {
+            StartDateUtc = startDate,
+            EndDateUtc = endDate,
+            ShopLocationId = shopLocationId,
+            EmployeeWorkMode = employeeWorkMode,
+        };
+        var shifts = await sender.Send(query, ct);
+        var locationName = shifts.FirstOrDefault()?.LocationName ?? string.Empty;
+
+        var pdfBytes = ShiftsPdfGenerator.Generate(shifts, startDate, endDate, locationName);
+        var fileName = $"shifts-{startDate:yyyy-MM-dd}-to-{endDate:yyyy-MM-dd}.pdf";
+
+        return File(pdfBytes, "application/pdf", fileName);
     }
 }

@@ -84,4 +84,11 @@ export class BookingsService {
   assignEmployees(bookingId: number, command: AssignEmployeesCommand): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/assign-employees/${bookingId}`, command);
   }
+
+  exportMyBookingsPdf(startDate: string, endDate: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    return this.http.get(`${this.baseUrl}/my/export-pdf`, { params, responseType: 'blob' });
+  }
 }

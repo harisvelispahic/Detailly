@@ -1,0 +1,57 @@
+.export-dialog {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    color: hsl(var(--foreground));
+  }
+
+  &__title-icon {
+    color: hsl(var(--primary));
+  }
+
+  &__content {
+    padding-top: 8px !important;
+  }
+
+  &__desc {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.875rem;
+    margin-bottom: 20px;
+  }
+
+  &__fields {
+    display: flex;
+    gap: 16px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  &__field {
+    flex: 1;
+  }
+
+  &__error {
+    color: hsl(var(--destructive));
+    font-size: 0.8rem;
+    margin-top: 4px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  &__spinner {
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+}

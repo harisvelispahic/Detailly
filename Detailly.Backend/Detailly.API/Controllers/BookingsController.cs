@@ -2,6 +2,7 @@
 using Detailly.Application.Modules.Booking.Bookings.Commands.Cancel;
 using Detailly.Application.Modules.Booking.Bookings.Commands.Complete;
 using Detailly.Application.Modules.Booking.Bookings.Commands.CreateHold;
+using Detailly.Application.Modules.Booking.Bookings.Queries.ExportMyBookings;
 using Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 using Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListAssignableEmployees;
@@ -9,6 +10,7 @@ using Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListMyAssigned;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListUnassigned;
+using Detailly.API.Services.Pdf;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -61,6 +63,30 @@ public class BookingsController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(query, ct);
         return result;
+    }
+
+    // ---------------------------------------
+    // EXPORT MY BOOKINGS AS PDF
+    // GET /Bookings/my/export-pdf?startDate=2026-01-01&endDate=2026-12-31
+    // ---------------------------------------
+    [HttpGet("my/export-pdf")]
+    [Authorize(Policy = AuthPolicies.AnyClient)]
+    public async Task<IActionResult> ExportMyBookingsPdf(
+        [FromQuery] DateTime startDate,
+        [FromQuery] DateTime endDate,
+        CancellationToken ct)
+    {
+        var query = new ExportMyBookingsQuery { StartDateUtc = startDate, EndDateUtc = endDate };
+        var bookings = await sender.Send(query, ct);
+
+        var customerName = User.FindFirst("name")?.Value
+            ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+            ?? string.Empty;
+
+        var pdfBytes = BookingsPdfGenerator.Generate(bookings, startDate, endDate, customerName);
+        var fileName = $"my-appointments-{startDate:yyyy-MM-dd}-to-{endDate:yyyy-MM-dd}.pdf";
+
+        return File(pdfBytes, "application/pdf", fileName);
     }
 
     // ---------------------------------------
