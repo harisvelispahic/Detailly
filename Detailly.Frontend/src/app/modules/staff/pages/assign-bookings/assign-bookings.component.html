@@ -1,0 +1,228 @@
+<div class="assign-bookings">
+
+  <!-- Header -->
+  <div class="assign-bookings__header-card">
+    <div class="assign-bookings__title-section">
+      <div class="assign-bookings__title-icon">
+        <mat-icon>assignment_ind</mat-icon>
+      </div>
+      <div>
+        <h1 class="assign-bookings__title">Assign Bookings</h1>
+        <p class="assign-bookings__subtitle">Select a confirmed booking and assign employees to it</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="assign-bookings__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="assign-bookings__error-title">Failed to load bookings</p>
+        <p class="assign-bookings__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadBookings()">
+          <mat-icon>refresh</mat-icon> Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="assign-bookings__layout">
+
+    <!-- ── LEFT: Unassigned bookings list ────────────────────────── -->
+    <div class="assign-bookings__list-panel">
+      <div class="assign-bookings__panel-header">
+        <mat-icon>pending_actions</mat-icon>
+        <span>Unassigned Bookings</span>
+        @if (!isLoading) {
+          <span class="assign-bookings__count-badge">{{ totalBookings }}</span>
+        }
+      </div>
+
+      <!-- Skeleton -->
+      @if (isLoading) {
+        @for (_ of [1,2,3,4,5]; track $index) {
+          <div class="assign-bookings__skeleton-card"></div>
+        }
+      }
+
+      <!-- Empty state -->
+      @if (!isLoading && !errorMessage && bookings.length === 0) {
+        <div class="assign-bookings__empty">
+          <mat-icon>check_circle_outline</mat-icon>
+          <p>All bookings are assigned</p>
+        </div>
+      }
+
+      <!-- Booking cards -->
+      @for (b of bookings; track b.id) {
+        <div
+          class="assign-bookings__booking-card"
+          [class.assign-bookings__booking-card--selected]="selectedBooking?.id === b.id"
+          (click)="selectBooking(b)"
+        >
+          <div class="assign-bookings__booking-top">
+            <div class="assign-bookings__booking-pkg">{{ b.servicePackageName }}</div>
+            <span
+              class="assign-bookings__mode-badge"
+              [class.assign-bookings__mode-badge--shop]="b.serviceMode === ServiceMode.InShop"
+              [class.assign-bookings__mode-badge--mobile]="b.serviceMode === ServiceMode.Mobile"
+            >
+              <mat-icon>{{ getServiceModeIcon(b.serviceMode) }}</mat-icon>
+              {{ getServiceModeLabel(b.serviceMode) }}
+            </span>
+          </div>
+
+          <div class="assign-bookings__booking-meta">
+            <span class="assign-bookings__meta-item">
+              <mat-icon>person</mat-icon>
+              {{ b.customerName }}
+            </span>
+            <span class="assign-bookings__meta-item">
+              <mat-icon>schedule</mat-icon>
+              {{ b.startUtc | detailyDate: 'long' }} · {{ b.startUtc | date: 'HH:mm' }}–{{ b.endUtc | date: 'HH:mm' }}
+            </span>
+            <span class="assign-bookings__meta-item">
+              <mat-icon>timelapse</mat-icon>
+              {{ getDuration(b) }}
+            </span>
+            <span class="assign-bookings__meta-item">
+              <mat-icon>group</mat-icon>
+              Needs {{ b.requiredEmployees }} employee{{ b.requiredEmployees !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          @if (b.notes) {
+            <p class="assign-bookings__booking-notes">{{ b.notes }}</p>
+          }
+        </div>
+      }
+
+      <!-- Pagination -->
+      @if (totalPages > 1) {
+        <div class="assign-bookings__pagination">
+          <button mat-icon-button [disabled]="page <= 1" (click)="onPageChange(page - 1)">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="assign-bookings__page-label">{{ page }} / {{ totalPages }}</span>
+          <button mat-icon-button [disabled]="page >= totalPages" (click)="onPageChange(page + 1)">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- ── RIGHT: Assign panel ────────────────────────────────────── -->
+    <div class="assign-bookings__assign-panel" [class.assign-bookings__assign-panel--visible]="selectedBooking !== null">
+
+      @if (!selectedBooking) {
+        <div class="assign-bookings__assign-placeholder">
+          <mat-icon>touch_app</mat-icon>
+          <p>Select a booking to assign employees</p>
+        </div>
+      }
+
+      @if (selectedBooking) {
+        <!-- Booking summary -->
+        <div class="assign-bookings__panel-header">
+          <mat-icon>event_note</mat-icon>
+          <span>Booking #{{ selectedBooking.id }}</span>
+        </div>
+
+        <div class="assign-bookings__summary-card">
+          <p class="assign-bookings__summary-pkg">{{ selectedBooking.servicePackageName }}</p>
+          <div class="assign-bookings__summary-row">
+            <mat-icon>person</mat-icon><span>{{ selectedBooking.customerName }}</span>
+          </div>
+          <div class="assign-bookings__summary-row">
+            <mat-icon>schedule</mat-icon>
+            <span>
+              {{ selectedBooking.startUtc | detailyDate: 'long' }}
+              · {{ selectedBooking.startUtc | date: 'HH:mm' }}–{{ selectedBooking.endUtc | date: 'HH:mm' }}
+            </span>
+          </div>
+          <div class="assign-bookings__summary-row">
+            <mat-icon>group</mat-icon>
+            <span>Requires {{ selectedBooking.requiredEmployees }} employee{{ selectedBooking.requiredEmployees !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+
+        <!-- Employees header -->
+        <div class="assign-bookings__employees-header">
+          <span>Assignable Employees</span>
+          <span class="assign-bookings__selection-label">{{ selectedEmployeeIds.size }} / {{ selectedBooking.requiredEmployees }} selected</span>
+        </div>
+
+        <!-- Loading employees -->
+        @if (isLoadingEmployees) {
+          @for (_ of [1,2,3]; track $index) {
+            <div class="assign-bookings__skeleton-employee"></div>
+          }
+        }
+
+        <!-- Employees error -->
+        @if (!isLoadingEmployees && employeesError) {
+          <p class="assign-bookings__employees-error">{{ employeesError }}</p>
+        }
+
+        <!-- No employees -->
+        @if (!isLoadingEmployees && !employeesError && employees.length === 0) {
+          <div class="assign-bookings__empty">
+            <mat-icon>person_off</mat-icon>
+            <p>No employees available for this time slot</p>
+          </div>
+        }
+
+        <!-- Employee list -->
+        @for (emp of employees; track emp.employeeId) {
+          <div
+            class="assign-bookings__employee-row"
+            [class.assign-bookings__employee-row--selected]="isEmployeeSelected(emp.employeeId)"
+            [class.assign-bookings__employee-row--disabled]="
+              !isEmployeeSelected(emp.employeeId) && selectedEmployeeIds.size >= selectedBooking!.requiredEmployees
+            "
+            (click)="toggleEmployee(emp.employeeId)"
+          >
+            <div class="assign-bookings__employee-check">
+              <mat-icon>{{ isEmployeeSelected(emp.employeeId) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+            </div>
+            <div class="assign-bookings__employee-info">
+              <span class="assign-bookings__employee-name">{{ emp.fullName }}</span>
+              @if (emp.hasOverlappingAssignment) {
+                <span class="assign-bookings__overlap-badge">
+                  <mat-icon>warning_amber</mat-icon>
+                  Overlap
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Submit -->
+        <div class="assign-bookings__submit-area">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!canSubmit"
+            (click)="submitAssignment()"
+          >
+            @if (isSubmitting) {
+              <ng-container>
+                <mat-icon class="spin">refresh</mat-icon>
+                Assigning…
+              </ng-container>
+            } @else {
+              <ng-container>
+                <mat-icon>assignment_turned_in</mat-icon>
+                Assign {{ selectedEmployeeIds.size }} Employee{{ selectedEmployeeIds.size !== 1 ? 's' : '' }}
+              </ng-container>
+            }
+          </button>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+</div>

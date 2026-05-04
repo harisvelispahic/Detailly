@@ -46,6 +46,16 @@
           <mat-icon class="sidebar__item-icon">calendar_today</mat-icon>
           <span>My Shifts</span>
         </a>
+
+        <a
+          class="sidebar__item"
+          routerLink="/staff/my-bookings"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">book_online</mat-icon>
+          <span>My Bookings</span>
+        </a>
       }
 
       <!-- ── MANAGEMENT (manager + admin) ──────────────────────────────── -->
@@ -100,6 +110,16 @@
         >
           <mat-icon class="sidebar__item-icon">directions_car</mat-icon>
           <span>Vehicle Categories</span>
+        </a>
+
+        <a
+          class="sidebar__item"
+          routerLink="/staff/assign-bookings"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">assignment_ind</mat-icon>
+          <span>Assign Bookings</span>
         </a>
 
         <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">

@@ -10,6 +10,8 @@ import { LocationsComponent } from './pages/locations/locations.component';
 import { ServicePackagesComponent } from './pages/service-packages/service-packages.component';
 import { ServicePackageItemsPageComponent } from './pages/service-packages/service-package-items-page/service-package-items-page.component';
 import { VehicleCategoriesComponent } from './pages/vehicle-categories/vehicle-categories.component';
+import { AssignBookingsComponent } from './pages/assign-bookings/assign-bookings.component';
+import { MyAssignedBookingsComponent } from './pages/my-assigned-bookings/my-assigned-bookings.component';
 import { myAuthData, myAuthGuard } from '../../core/guards/my-auth-guard';
 
 const routes: Routes = [
@@ -59,6 +61,18 @@ const routes: Routes = [
         component: VehicleCategoriesComponent,
         canActivate: [myAuthGuard],
         data: myAuthData({ requireAuth: true, requireAdminOrManager: true }),
+      },
+      {
+        path: 'assign-bookings',
+        component: AssignBookingsComponent,
+        canActivate: [myAuthGuard],
+        data: myAuthData({ requireAuth: true, requireAdminOrManager: true }),
+      },
+      {
+        path: 'my-bookings',
+        component: MyAssignedBookingsComponent,
+        canActivate: [myAuthGuard],
+        data: myAuthData({ requireAuth: true, requireEmployee: true }),
       },
     ],
   },

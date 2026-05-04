@@ -107,3 +107,41 @@ export interface GetAvailabilityRequest {
   shopLocationId: number;
   serviceAddressId?: number;
 }
+
+// ---- Staff: Unassigned confirmed bookings (admin/manager) ----
+export interface ListUnassignedBookingsQueryDto {
+  id: number;
+  startUtc: string;
+  endUtc: string;
+  requiredEmployees: number;
+  serviceMode: ServiceMode;
+  customerName: string;
+  servicePackageName: string;
+  totalPrice: number;
+  notes?: string | null;
+}
+
+// ---- Employee: My assigned bookings ----
+export interface ListMyAssignedBookingsQueryDto {
+  id: number;
+  status: BookingStatus;
+  serviceMode: ServiceMode;
+  startUtc: string;
+  endUtc: string;
+  totalPrice: number;
+  servicePackageName: string;
+  customerName: string;
+  shopLocationName: string;
+  notes?: string | null;
+}
+
+// ---- Assignable employees ----
+export interface AssignableEmployeeDto {
+  employeeId: number;
+  fullName: string;
+  hasOverlappingAssignment: boolean;
+}
+
+export interface AssignEmployeesCommand {
+  employeeIds: number[];
+}

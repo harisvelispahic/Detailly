@@ -213,6 +213,28 @@ public sealed class CreateBookingHoldCommandHandler(
         if (location is null)
             throw new DetaillyNotFoundException("Location not found.");
 
+        // --- Vehicle conflict check (standard customers only) ---
+        // Prevents a customer from booking the same vehicle in an overlapping slot.
+        if (!appCurrentUser.IsEmployee && !appCurrentUser.IsManager && !appCurrentUser.IsAdmin && vehicleIds.Count > 0)
+        {
+            var hasVehicleConflict = await context.BookingVehicleAssignments
+                .AnyAsync(bva =>
+                    !bva.IsDeleted &&
+                    vehicleIds.Contains(bva.VehicleId) &&
+                    !bva.Booking.IsDeleted &&
+                    (bva.Booking.Status == BookingStatus.Confirmed ||
+                     (bva.Booking.Status == BookingStatus.PendingPayment &&
+                      bva.Booking.ReservationExpiresAtUtc != null &&
+                      bva.Booking.ReservationExpiresAtUtc > now)) &&
+                    bva.Booking.StartUtc < endUtc &&
+                    bva.Booking.EndUtc > request.StartUtc,
+                    ct);
+
+            if (hasVehicleConflict)
+                throw new DetaillyBusinessRuleException("BOOKING_VEHICLE_CONFLICT",
+                    "One or more of your vehicles already have a booking in the selected time slot. Please choose the next available slot.");
+        }
+
         // --- Capacity check ---
         // For mobile: shifts must cover the full away period [departureUtc, returnUtc].
         // For InShop: travelTimeMinutes = 0, so departureUtc = StartUtc and returnUtc = endUtc.

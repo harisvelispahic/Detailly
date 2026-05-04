@@ -17,6 +17,8 @@ import { ServicePackageItemsPageComponent } from './pages/service-packages/servi
 import { ServicePackageItemUpsertDialogComponent } from './pages/service-packages/service-package-items-page/service-package-item-upsert-dialog/service-package-item-upsert-dialog.component';
 import { VehicleCategoriesComponent } from './pages/vehicle-categories/vehicle-categories.component';
 import { VehicleCategoryUpsertDialogComponent } from './pages/vehicle-categories/vehicle-category-upsert-dialog/vehicle-category-upsert-dialog.component';
+import { AssignBookingsComponent } from './pages/assign-bookings/assign-bookings.component';
+import { MyAssignedBookingsComponent } from './pages/my-assigned-bookings/my-assigned-bookings.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,8 @@ import { VehicleCategoryUpsertDialogComponent } from './pages/vehicle-categories
     ServicePackageItemUpsertDialogComponent,
     VehicleCategoriesComponent,
     VehicleCategoryUpsertDialogComponent,
+    AssignBookingsComponent,
+    MyAssignedBookingsComponent,
   ],
   imports: [SharedModule, StaffRoutingModule],
 })

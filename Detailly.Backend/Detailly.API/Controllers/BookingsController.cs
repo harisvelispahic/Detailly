@@ -7,6 +7,8 @@ using Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListAssignableEmployees;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 using Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
+using Detailly.Application.Modules.Booking.Bookings.Queries.ListMyAssigned;
+using Detailly.Application.Modules.Booking.Bookings.Queries.ListUnassigned;
 using Detailly.Shared.Constants;
 
 namespace Detailly.API.Controllers;
@@ -123,5 +125,29 @@ public class BookingsController(ISender sender) : ControllerBase
         command.BookingId = id; // Route ID precedence
         await sender.Send(command, ct);
         // no return -> 204 No Content
+    }
+
+    // ---------------------------------------
+    // MANAGER: LIST UNASSIGNED CONFIRMED BOOKINGS
+    // ---------------------------------------
+    [HttpGet("staff/unassigned")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<PageResult<ListUnassignedBookingsQueryDto>> ListUnassigned(
+        [FromQuery] ListUnassignedBookingsQuery query,
+        CancellationToken ct)
+    {
+        return await sender.Send(query, ct);
+    }
+
+    // ---------------------------------------
+    // EMPLOYEE: LIST MY ASSIGNED BOOKINGS
+    // ---------------------------------------
+    [HttpGet("employee/my")]
+    [Authorize(Policy = AuthPolicies.Staff)]
+    public async Task<PageResult<ListMyAssignedBookingsQueryDto>> ListMyAssigned(
+        [FromQuery] ListMyAssignedBookingsQuery query,
+        CancellationToken ct)
+    {
+        return await sender.Send(query, ct);
     }
 }

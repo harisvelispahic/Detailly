@@ -32,6 +32,11 @@ public sealed class CompleteBookingCommandHandler(IAppDbContext context, IAppCur
                 "BOOKING_NOT_COMPLETABLE",
                 "Only confirmed bookings can be marked as completed.");
 
+        if (now < booking.EndUtc)
+            throw new DetaillyBusinessRuleException(
+                "BOOKING_NOT_ENDED",
+                "A booking cannot be completed before its scheduled end time.");
+
         // 🔒 Assignment rule:
         // - Admin/Manager can complete anything
         // - Employee can complete ONLY if assigned to that booking

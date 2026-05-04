@@ -3,17 +3,22 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  AssignableEmployeeDto,
+  AssignEmployeesCommand,
   AvailabilitySlotDto,
   CancelBookingCommand,
   CreateBookingHoldCommand,
   GetAvailabilityRequest,
   GetAvailabilityResponse,
   GetBookingByIdQueryDto,
+  ListMyAssignedBookingsQueryDto,
   ListMyBookingsQueryDto,
   ListMyBookingsRequest,
+  ListUnassignedBookingsQueryDto,
 } from './bookings-api.models';
 import { PageResult } from '../../core/models/paging/page-result';
 import { buildHttpParams } from '../../core/models/build-http-params';
+import { BasePagedQuery } from '../../core/models/paging/base-paged-query';
 
 @Injectable({ providedIn: 'root' })
 export class BookingsService {
@@ -56,5 +61,27 @@ export class BookingsService {
     }
 
     return this.http.get<GetAvailabilityResponse>(`${this.baseUrl}/availability`, { params });
+  }
+
+  completeBooking(id: number): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/complete/${id}`, {});
+  }
+
+  listUnassigned(query?: BasePagedQuery): Observable<PageResult<ListUnassignedBookingsQueryDto>> {
+    const params = query ? buildHttpParams(query as any) : undefined;
+    return this.http.get<PageResult<ListUnassignedBookingsQueryDto>>(`${this.baseUrl}/staff/unassigned`, { params });
+  }
+
+  listMyAssigned(query?: BasePagedQuery): Observable<PageResult<ListMyAssignedBookingsQueryDto>> {
+    const params = query ? buildHttpParams(query as any) : undefined;
+    return this.http.get<PageResult<ListMyAssignedBookingsQueryDto>>(`${this.baseUrl}/employee/my`, { params });
+  }
+
+  listAssignableEmployees(bookingId: number): Observable<AssignableEmployeeDto[]> {
+    return this.http.get<AssignableEmployeeDto[]>(`${this.baseUrl}/assignable-employees/${bookingId}`);
+  }
+
+  assignEmployees(bookingId: number, command: AssignEmployeesCommand): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/assign-employees/${bookingId}`, command);
   }
 }

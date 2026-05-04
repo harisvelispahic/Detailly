@@ -1,0 +1,162 @@
+<div class="my-bookings">
+  <!-- Header -->
+  <div class="my-bookings__header-card">
+    <div class="my-bookings__title-section">
+      <div class="my-bookings__title-icon">
+        <mat-icon>book_online</mat-icon>
+      </div>
+      <div>
+        <h1 class="my-bookings__title">My Bookings</h1>
+        <p class="my-bookings__subtitle">Bookings you have been assigned to</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skeleton -->
+  @if (isLoading && !errorMessage) {
+    <app-table-skeleton [rows]="8" [columns]="6" [showActions]="true"></app-table-skeleton>
+  }
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+    <div class="my-bookings__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <p class="my-bookings__error-title">Failed to load bookings</p>
+        <p class="my-bookings__error-msg">{{ errorMessage }}</p>
+        <button mat-stroked-button (click)="loadData()"><mat-icon>refresh</mat-icon> Retry</button>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!isLoading && !errorMessage) {
+    <div class="my-bookings__table-card">
+      <table mat-table [dataSource]="items" class="my-bookings__table">
+        <!-- Date -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>event</mat-icon> Date</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <span class="my-bookings__date">{{ b.startUtc | detailyDate: 'long' }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Time -->
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>schedule</mat-icon> Time</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <span class="my-bookings__time"
+              >{{ b.startUtc | date: 'HH:mm' }} – {{ b.endUtc | date: 'HH:mm' }}</span
+            >
+          </td>
+        </ng-container>
+
+        <!-- Customer -->
+        <ng-container matColumnDef="customer">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>person</mat-icon> Customer</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <span class="my-bookings__customer">{{ b.customerName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Package -->
+        <ng-container matColumnDef="package">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>spa</mat-icon> Package</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <div class="my-bookings__package-cell">
+              <span class="my-bookings__package">{{ b.servicePackageName }}</span>
+              <span class="my-bookings__mode">{{ getServiceModeLabel(b.serviceMode) }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Location -->
+        <ng-container matColumnDef="location">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>store</mat-icon> Location</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <span class="my-bookings__location">{{ b.shopLocationName }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="my-bookings__th"><mat-icon>info</mat-icon> Status</div>
+          </th>
+          <td mat-cell *matCellDef="let b">
+            <span class="my-bookings__status-badge" [ngClass]="getStatusClass(b.status)">
+              {{ getStatusLabel(b.status) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let b">
+            @if (b.status === BookingStatus.Confirmed) {
+              <button
+                mat-raised-button
+                class="my-bookings__complete-btn"
+                [disabled]="!isCompletable(b) || completingId === b.id"
+                (click)="completeBooking(b)"
+                [title]="
+                  isCompletable(b) ? 'Mark as completed' : 'Available after booking end time'
+                "
+              >
+                <ng-container>
+                  @if (completingId === b.id) {
+                    <mat-icon class="spin">refresh</mat-icon>
+                  } @else {
+                    <mat-icon>check_circle</mat-icon>
+                  }
+                  Complete
+                </ng-container>
+              </button>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          class="my-bookings__row"
+          [class.my-bookings__row--completed]="row.status === BookingStatus.Completed"
+        ></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <div class="my-bookings__empty">
+              <mat-icon>event_busy</mat-icon>
+              <p>No assigned bookings found</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="my-bookings__pagination">
+        <button mat-icon-button [disabled]="page <= 1" (click)="onPageChange(page - 1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <span class="my-bookings__page-label">{{ page }} / {{ totalPages }}</span>
+        <button mat-icon-button [disabled]="page >= totalPages" (click)="onPageChange(page + 1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    }
+  }
+</div>
