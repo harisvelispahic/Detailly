@@ -11,6 +11,8 @@ import { AddressesApiService } from '../../../api-services/addresses/addresses-a
 import { LocationsApiService } from '../../../api-services/locations/locations-api.service';
 import { DialogHelperService } from '../../shared/services/dialog-helper.service';
 import { DialogButton, DialogType } from '../../shared/models/dialog-config.model';
+import { ReactionsApiService } from '../../../api-services/reactions/reactions-api.service';
+import { ReactionType } from '../../../api-services/reactions/reactions-api.models';
 
 import {
   ListServicePackagesQueryDto,
@@ -46,14 +48,16 @@ export class BookingWizardComponent implements OnInit {
   private readonly addressesService = inject(AddressesApiService);
   private readonly locationsService = inject(LocationsApiService);
   private readonly dialogHelper = inject(DialogHelperService);
+  private readonly reactionsService = inject(ReactionsApiService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
   readonly isAuthenticated = computed(() => this.currentUserService.isAuthenticated());
   readonly isFleet = computed(() => this.currentUserService.isFleet());
 
-  // Expose enum to template
+  // Expose enums to template
   readonly ServiceMode = ServiceMode;
+  readonly ReactionType = ReactionType;
 
   currentStep = 1;
   readonly stepLabels = ['Service', 'Vehicle', 'Date & Time', 'Confirm'];
@@ -67,6 +71,7 @@ export class BookingWizardComponent implements OnInit {
   selectedAddonIds = new Set<number>();
   isLoadingPackages = false;
   isLoadingAddons = false;
+  myReactions = new Map<number, ReactionType>();
 
   // Step 2
   vehicles: ListMyVehiclesQueryDto[] = [];
@@ -104,6 +109,9 @@ export class BookingWizardComponent implements OnInit {
   ngOnInit(): void {
     this.buildCalendar();
     this.loadPackages();
+    if (this.isAuthenticated()) {
+      this.loadMyReactions();
+    }
     // Fleet customers are always mobile
     if (this.isFleet()) {
       this.selectedServiceMode = ServiceMode.Mobile;
@@ -137,6 +145,38 @@ export class BookingWizardComponent implements OnInit {
         this.isLoadingPackages = false;
       },
     });
+  }
+
+  loadMyReactions(): void {
+    this.reactionsService.getMy().subscribe({
+      next: (reactions) => {
+        this.myReactions.clear();
+        reactions.forEach((r) => this.myReactions.set(r.servicePackageId, r.reactionType));
+      },
+    });
+  }
+
+  react(pkg: ListServicePackagesQueryDto, type: ReactionType, event: Event): void {
+    event.stopPropagation();
+    if (!this.isAuthenticated()) {
+      this.router.navigate(['/auth/login'], { queryParams: { returnUrl: '/book-now' } });
+      return;
+    }
+    this.reactionsService.upsert(pkg.id, type).subscribe({
+      next: (summary) => {
+        pkg.likeCount = summary.likeCount;
+        pkg.dislikeCount = summary.dislikeCount;
+        if (summary.myReaction != null) {
+          this.myReactions.set(pkg.id, summary.myReaction);
+        } else {
+          this.myReactions.delete(pkg.id);
+        }
+      },
+    });
+  }
+
+  getMyReaction(packageId: number): ReactionType | undefined {
+    return this.myReactions.get(packageId);
   }
 
   selectPackage(pkg: ListServicePackagesQueryDto): void {

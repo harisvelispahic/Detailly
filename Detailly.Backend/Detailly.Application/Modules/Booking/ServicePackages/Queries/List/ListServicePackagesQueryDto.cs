@@ -9,6 +9,8 @@ public class ListServicePackagesQueryDto
     public required int EstimatedDurationMinutes { get; init; }
     public required decimal? AverageRating { get; init; }
     public required int ReviewCount { get; init; }
+    public required int LikeCount { get; init; }
+    public required int DislikeCount { get; init; }
 
     public required List<ListServicePackagesQueryDtoItem> Items { get; init; }
 }

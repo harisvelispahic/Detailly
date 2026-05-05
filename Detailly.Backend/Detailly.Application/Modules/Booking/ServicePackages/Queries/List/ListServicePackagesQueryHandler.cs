@@ -1,3 +1,5 @@
+using Detailly.Domain.Common.Enums;
+
 namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 
 public class ListServicePackagesQueryHandler(IAppDbContext ctx)
@@ -35,6 +37,10 @@ public class ListServicePackagesQueryHandler(IAppDbContext ctx)
                     .Average(),
                 ReviewCount = ctx.Reviews
                     .Count(r => r.ServicePackageId == sp.Id && !r.IsDeleted),
+                LikeCount = ctx.Reactions
+                    .Count(r => r.ServicePackageId == sp.Id && r.ReactionType == ReactionType.Like),
+                DislikeCount = ctx.Reactions
+                    .Count(r => r.ServicePackageId == sp.Id && r.ReactionType == ReactionType.Dislike),
                 Items = ctx.ServicePackageItemAssignments
                     .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted && !a.ServicePackageItem.IsDeleted)
                     .Select(a => new ListServicePackagesQueryDtoItem

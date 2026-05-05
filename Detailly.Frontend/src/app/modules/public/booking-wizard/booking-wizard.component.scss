@@ -278,6 +278,10 @@
 
 .package-card__footer {
   padding: 0 1.25rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 
   .package-card__reviews-link {
     font-size: 0.75rem;
@@ -292,6 +296,53 @@
       height: 14px;
       margin-right: 3px;
     }
+  }
+}
+
+.package-card__reactions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 100px;
+  border: 1px solid hsl(var(--border));
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  line-height: 1;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: hsl(var(--muted));
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--border));
+  }
+
+  &--like.reaction-btn--active {
+    background: hsl(var(--success) / 0.12);
+    border-color: hsl(var(--success) / 0.4);
+    color: hsl(var(--success));
+  }
+
+  &--dislike.reaction-btn--active {
+    background: hsl(var(--destructive) / 0.12);
+    border-color: hsl(var(--destructive) / 0.4);
+    color: hsl(var(--destructive));
   }
 }
 

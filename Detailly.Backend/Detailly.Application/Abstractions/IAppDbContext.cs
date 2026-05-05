@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Entities.Booking;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Sales;
 using Detailly.Domain.Entities.Shared;
@@ -41,6 +42,7 @@ public interface IAppDbContext
     // Booking
     DbSet<BookingEntity> Bookings { get; }
     DbSet<ReviewEntity> Reviews { get; }
+    DbSet<ReactionEntity> Reactions { get; }
     DbSet<ServicePackageEntity> ServicePackages { get; }
     DbSet<ServicePackageItemEntity> ServicePackageItems { get; }
     DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; }

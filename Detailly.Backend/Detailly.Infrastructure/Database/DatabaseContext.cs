@@ -36,6 +36,7 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Booking
     public DbSet<BookingEntity> Bookings => Set<BookingEntity>();
     public DbSet<ReviewEntity> Reviews => Set<ReviewEntity>();
+    public DbSet<ReactionEntity> Reactions => Set<ReactionEntity>();
     public DbSet<ServicePackageEntity> ServicePackages => Set<ServicePackageEntity>();
     public DbSet<ServicePackageItemEntity> ServicePackageItems => Set<ServicePackageItemEntity>();
     public DbSet<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments => Set<ServicePackageItemAssignmentEntity>();

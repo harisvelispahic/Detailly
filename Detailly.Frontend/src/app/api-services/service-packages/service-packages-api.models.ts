@@ -16,6 +16,8 @@ export interface ListServicePackagesQueryDto {
   estimatedDurationMinutes: number;
   averageRating?: number | null;
   reviewCount: number;
+  likeCount: number;
+  dislikeCount: number;
   items: ServicePackageItemDto[];
 }
 

@@ -74,7 +74,7 @@
                 </li>
               </ul>
             </div>
-            <!-- Reviews link -->
+            <!-- Reviews link + reactions -->
             <div class="package-card__footer" (click)="$event.stopPropagation()">
               <a
                 [routerLink]="['/reviews']"
@@ -85,6 +85,27 @@
                 <mat-icon>rate_review</mat-icon>
                 Reviews
               </a>
+
+              <div class="package-card__reactions">
+                <button
+                  class="reaction-btn reaction-btn--like"
+                  [class.reaction-btn--active]="getMyReaction(pkg.id) === ReactionType.Like"
+                  [title]="isAuthenticated() ? 'Like this package' : 'Sign in to react'"
+                  (click)="react(pkg, ReactionType.Like, $event)"
+                >
+                  <mat-icon>thumb_up</mat-icon>
+                  <span>{{ pkg.likeCount }}</span>
+                </button>
+                <button
+                  class="reaction-btn reaction-btn--dislike"
+                  [class.reaction-btn--active]="getMyReaction(pkg.id) === ReactionType.Dislike"
+                  [title]="isAuthenticated() ? 'Dislike this package' : 'Sign in to react'"
+                  (click)="react(pkg, ReactionType.Dislike, $event)"
+                >
+                  <mat-icon>thumb_down</mat-icon>
+                  <span>{{ pkg.dislikeCount }}</span>
+                </button>
+              </div>
             </div>
             @if (selectedPackage?.id === pkg.id) {
               <div class="package-card__selected-badge">
