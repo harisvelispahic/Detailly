@@ -7,54 +7,84 @@
         <span class="gradient-text">Services</span>
       </h2>
       <p class="section-subtitle">
-        From quick washes to complete transformations, we've got you covered.
+        Choose the package that fits your vehicle's needs. All prices include labor and premium products.
       </p>
     </div>
 
     <!-- Services Grid -->
     <div class="services-grid">
-      @for (service of services; track $index) {
-        <div class="service-card" [style.animation-delay]="$index * 100 + 'ms'">
-          <!-- Service Image -->
-          <div class="service-image">
-            <img [src]="service.image" [alt]="service.name" />
-            @if (service.popular) {
-              <div class="popular-badge">
-                <mat-icon>star</mat-icon>
-                <span>Popular</span>
-              </div>
+      @for (service of services; track service.id) {
+        <div class="service-card" [class.featured]="isFeatured($index)">
+
+          @if (isFeatured($index)) {
+            <div class="featured-badge">Most Popular</div>
+          }
+
+          <!-- Card Header -->
+          <div class="card-header">
+            <h3 class="service-name">{{ service.name }}</h3>
+            @if (service.description) {
+              <p class="service-description">{{ service.description }}</p>
             }
           </div>
 
-          <!-- Service Content -->
-          <div class="service-content">
-            <div class="service-header">
-              <h3 class="service-name">{{ service.name }}</h3>
-              <span class="service-price">${{ service.price }}</span>
-            </div>
-
-            <p class="service-description">{{ service.description }}</p>
-
-            <div class="service-duration">
-              <mat-icon>schedule</mat-icon>
-              <span>{{ service.duration }}</span>
-            </div>
+          <!-- Price -->
+          <div class="price-block">
+            <span class="price-amount">${{ service.price }}</span>
+            <span class="price-unit">/service</span>
           </div>
+
+          <!-- Duration + Rating -->
+          <div class="meta-row">
+            <mat-icon>schedule</mat-icon>
+            <span>{{ formatDuration(service.estimatedDurationMinutes) }}</span>
+            @if (service.averageRating && service.reviewCount > 0) {
+              <span class="meta-dot">·</span>
+              <mat-icon class="star-icon">star</mat-icon>
+              <span>{{ service.averageRating | number: '1.1-1' }} ({{ service.reviewCount }})</span>
+            }
+          </div>
+
+          <div class="items-divider"></div>
+
+          <!-- Items List -->
+          <ul class="items-list">
+            <!-- Base items -->
+            @for (item of service.items; track item.id) {
+              <li class="item-row item-row--base">
+                <mat-icon class="item-icon item-icon--check">check_circle</mat-icon>
+                <span>{{ item.name }}</span>
+              </li>
+            }
+
+            <!-- Addon items -->
+            @if (service.availableAddons.length > 0) {
+              <li class="addon-section-header">
+                <span>Optional add-ons</span>
+              </li>
+              @for (addon of service.availableAddons.slice(0, 3); track addon.id) {
+                <li class="item-row item-row--addon">
+                  <mat-icon class="item-icon item-icon--add">add_circle_outline</mat-icon>
+                  <span class="addon-name">{{ addon.name }}</span>
+                  <span class="addon-price">+${{ addon.price }}</span>
+                </li>
+              }
+            }
+          </ul>
+
+          <!-- CTA Button -->
+          <button
+            mat-raised-button
+            [color]="isFeatured($index) ? 'primary' : undefined"
+            class="book-btn"
+            [class.book-btn--featured]="isFeatured($index)"
+            (click)="bookNow(service.id)"
+          >
+            Book Now
+          </button>
+
         </div>
       }
-    </div>
-
-    <!-- View All Button -->
-    <div class="actions-container">
-      <button
-        mat-raised-button
-        color="primary"
-        class="view-all-btn btn-trailing-icon"
-        (click)="viewAllServices()"
-      >
-        <span class="btn-trailing-icon__text">View All Services</span>
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
     </div>
   </div>
 </section>

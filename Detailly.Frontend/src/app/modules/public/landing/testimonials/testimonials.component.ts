@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Review } from '../../../../data/landing-detailing.model';
+import { ListReviewsQueryDto } from '../../../../api-services/reviews/reviews-api.models';
 
 @Component({
   selector: 'app-testimonials',
@@ -8,11 +8,11 @@ import { Review } from '../../../../data/landing-detailing.model';
   standalone: false,
 })
 export class TestimonialsComponent {
-  @Input() reviews: Review[] = [];
+  @Input() reviews: ListReviewsQueryDto[] = [];
 
   currentReviewIndex = 0;
 
-  get currentReview(): Review {
+  get currentReview(): ListReviewsQueryDto | undefined {
     return this.reviews[this.currentReviewIndex];
   }
 

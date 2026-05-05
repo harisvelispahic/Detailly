@@ -1,6 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { PricingTier } from '../../../../data/landing-detailing.model';
+
+export interface PricingTier {
+  name: string;
+  price: number;
+  description: string;
+  features: string[];
+  popular: boolean;
+}
 
 @Component({
   selector: 'app-pricing',

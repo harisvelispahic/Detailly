@@ -38,9 +38,13 @@
       <div class="site-footer__column">
         <h3>Our Services</h3>
 
-        @for (service of services; track $index) {
-          <a routerLink="/book-now" [queryParams]="{ service: service }" class="site-footer__link">
-            {{ service }}
+        @for (service of footerServices; track service.id) {
+          <a
+            routerLink="/book-now"
+            [queryParams]="{ packageId: service.id }"
+            class="site-footer__link"
+          >
+            {{ service.name }}
           </a>
         }
       </div>
@@ -50,17 +54,17 @@
 
         <div class="site-footer__contact-item">
           <mat-icon>location_on</mat-icon>
-          <span>123 Detail Street, Auto City, AC 12345</span>
+          <span>Alije Izetbegovića bb, ZDK, Kakanj 72240</span>
         </div>
 
         <div class="site-footer__contact-item">
           <mat-icon>call</mat-icon>
-          <span>(555) 123-4567</span>
+          <span>+387 60 555 33 33</span>
         </div>
 
         <div class="site-footer__contact-item">
           <mat-icon>mail</mat-icon>
-          <span>hello@detailly.com</span>
+          <span>detailly.rs1@gmail.com</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { LandingStats } from '../../../../data/landing-detailing.model';
+
+export interface LandingStats {
+  carsDetailed: string;
+  averageRating: string;
+  yearsExperience: string;
+}
 
 @Component({
   selector: 'app-hero',

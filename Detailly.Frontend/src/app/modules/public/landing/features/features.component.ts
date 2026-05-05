@@ -1,5 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { Feature } from '../../../../data/landing-detailing.model';
+
+export interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+}
 
 @Component({
   selector: 'app-features',

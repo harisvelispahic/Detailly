@@ -24,20 +24,24 @@
           </div>
 
           <!-- Review Text -->
-          <p class="review-text">"{{ currentReview.comment }}"</p>
+          <p class="review-text">{{ currentReview.description }}</p>
 
           <!-- Reviewer Info -->
           <div class="reviewer-info">
-            <img
-              [src]="currentReview.userAvatar"
-              [alt]="currentReview.userName"
-              class="reviewer-avatar"
-            />
+            <div class="reviewer-avatar" [attr.aria-label]="currentReview.customerFullName">
+              {{ currentReview.customerInitials }}
+            </div>
             <div class="reviewer-details">
-              <div class="reviewer-name">{{ currentReview.userName }}</div>
-              <div class="reviewer-service">{{ currentReview.serviceName }}</div>
+              <div class="reviewer-name">{{ currentReview.customerFullName }}</div>
+              <div class="reviewer-service">{{ currentReview.servicePackageName }}</div>
             </div>
           </div>
+        </div>
+      }
+
+      @if (!currentReview && reviews.length === 0) {
+        <div class="review-card review-card--empty">
+          <p class="empty-message">No reviews yet. Be the first to share your experience!</p>
         </div>
       }
 

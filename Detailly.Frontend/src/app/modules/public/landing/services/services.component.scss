@@ -5,7 +5,7 @@
     transparent 0%,
     hsl(var(--card) / 0.5) 50%,
     transparent 100%
-  ); // bg-gradient-to-b from-transparent via-card/50 to-transparent
+  );
 }
 
 .container {
@@ -16,11 +16,7 @@
 
 .section-header {
   text-align: center;
-  margin-bottom: 48px; // mb-12
-
-  @media (min-width: 768px) {
-    margin-bottom: 48px;
-  }
+  margin-bottom: 48px;
 }
 
 .section-title {
@@ -41,10 +37,8 @@
 .section-subtitle {
   font-size: 16px;
   color: hsl(var(--muted-foreground));
-  margin: 0;
-  max-width: 42rem; // max-w-2xl
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  max-width: 42rem;
   line-height: 1.6;
 }
 
@@ -52,157 +46,206 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
-  margin-bottom: 40px;
 
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr); // md:grid-cols-2
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr); // lg:grid-cols-4
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
   }
 }
 
 .service-card {
+  position: relative;
+  padding: 28px 24px;
   background: var(--gradient-card);
+  border: 1px solid hsl(var(--border) / 0.5);
   border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid hsl(var(--border));
   transition: all 0.3s ease;
-  cursor: pointer;
-  height: 100%;
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-card);
 
   &:hover {
     transform: translateY(-4px);
-    border-color: hsl(var(--primary) / 0.28);
-    box-shadow: var(--shadow-elevated), var(--glow-primary);
+    box-shadow: var(--shadow-elevated);
+  }
 
-    .service-image img {
-      transform: scale(1.06);
+  &.featured {
+    border-color: hsl(var(--primary));
+    border-width: 2px;
+    box-shadow: var(--glow-primary);
+
+    &:hover {
+      box-shadow: var(--shadow-elevated), var(--glow-primary);
     }
   }
 }
 
-.service-image {
-  position: relative;
-  height: 11rem;
-  overflow: hidden;
-  background: hsl(var(--secondary));
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-    /* TODO: Add service image here */
-  }
-}
-
-.popular-badge {
+.featured-badge {
   position: absolute;
-  top: 12px; // top-3
-  right: 12px; // right-3
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
   background: hsl(var(--accent));
   color: hsl(var(--accent-foreground));
   border-radius: 9999px;
   font-size: 12px;
   font-weight: 600;
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-  }
+  white-space: nowrap;
 }
 
-.service-content {
-  padding: 20px; // p-5
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.service-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+.card-header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .service-name {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: hsl(var(--foreground));
-  margin: 0;
-  flex: 1;
-}
-
-.service-price {
-  font-size: 18px;
-  font-weight: 700;
-  color: hsl(var(--primary));
-  white-space: nowrap;
+  margin: 0 0 8px 0;
 }
 
 .service-description {
   font-size: 14px;
   color: hsl(var(--muted-foreground));
+  margin: 0;
   line-height: 1.5;
-  margin: 0 0 12px 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex: 1;
 }
 
-.service-duration {
+.price-block {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.price-amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  line-height: 1;
+}
+
+.price-unit {
+  font-size: 14px;
+  color: hsl(var(--muted-foreground));
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.meta-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font-size: 13px;
   color: hsl(var(--muted-foreground));
+  margin-bottom: 20px;
 
   mat-icon {
     font-size: 14px;
     width: 14px;
     height: 14px;
   }
+
+  .star-icon {
+    color: hsl(var(--warning));
+    font-variation-settings: 'FILL' 1;
+  }
+
+  .meta-dot {
+    margin: 0 2px;
+  }
 }
 
-.actions-container {
+.items-divider {
+  height: 1px;
+  background: hsl(var(--border));
+  margin-bottom: 20px;
+}
+
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  flex: 1;
   display: flex;
-  justify-content: center;
-  margin-top: 40px;
-  padding: 0 20px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.view-all-btn {
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: hsl(var(--foreground));
+  line-height: 1.4;
+
+  &--addon {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+.item-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+
+  &--check {
+    color: hsl(var(--primary));
+    font-variation-settings: 'FILL' 1;
+  }
+
+  &--add {
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+.addon-section-header {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--muted-foreground) / 0.7);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed hsl(var(--border));
+}
+
+.addon-name {
+  flex: 1;
+}
+
+.addon-price {
+  font-size: 12px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.book-btn {
+  width: 100%;
   min-height: 3rem;
-  padding: 0 32px;
   font-size: 0.95rem;
   font-weight: 600;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-hero);
   transition: all 0.3s ease;
+  margin-top: auto;
 
-  &:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 20px 40px -10px hsl(var(--primary) / 0.4);
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
 
-  mat-icon {
-    margin-left: 8px;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+  &--featured {
+    box-shadow: var(--shadow-hero);
+
+    &:hover {
+      box-shadow: 0 20px 40px -10px hsl(var(--primary) / 0.4);
+    }
   }
 }
