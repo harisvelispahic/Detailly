@@ -177,12 +177,14 @@ export class BookingWizardComponent implements OnInit {
         return;
       }
       this.currentStep = 2;
+      window.scrollTo(0, 0);
       this.loadVehiclesIfNeeded();
       return;
     }
     if (this.currentStep === 2) {
       if (this.selectedVehicleIds.size === 0) return;
       this.currentStep = 3;
+      window.scrollTo(0, 0);
       this.loadLocationsIfNeeded();
       // Pre-load addresses so they're ready if user picks Mobile
       if (this.selectedServiceMode === ServiceMode.Mobile) {
@@ -193,12 +195,14 @@ export class BookingWizardComponent implements OnInit {
     if (this.currentStep === 3) {
       if (!this.canProceedStep3) return;
       this.currentStep = 4;
+      window.scrollTo(0, 0);
     }
   }
 
   prevStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;
+      window.scrollTo(0, 0);
     }
   }
 
