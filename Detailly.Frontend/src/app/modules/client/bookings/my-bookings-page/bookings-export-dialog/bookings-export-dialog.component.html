@@ -53,8 +53,10 @@
         <mat-spinner diameter="18" class="export-dialog__spinner"></mat-spinner>
         Generating…
       } @else {
-        <mat-icon>download</mat-icon>
-        Generate PDF
+        <ng-container>
+          <mat-icon>download</mat-icon>
+          Generate PDF
+        </ng-container>
       }
     </button>
   </mat-dialog-actions>

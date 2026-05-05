@@ -9,6 +9,7 @@
       <button
         mat-stroked-button
         class="appointments-page__export-btn"
+        [disabled]="isLoading || totalItems === 0"
         (click)="openExportDialog()"
         matTooltip="Export appointments as PDF"
       >

@@ -1,18 +1,21 @@
 ﻿using Detailly.Application.Abstractions;
 using Detailly.Application.Abstractions.Booking;
 using Detailly.Application.Abstractions.Payments;
+using Detailly.Application.Abstractions.PDF;
 using Detailly.Infrastructure.Background;
 using Detailly.Infrastructure.Booking;
 using Detailly.Infrastructure.Common;
 using Detailly.Infrastructure.Database;
 using Detailly.Infrastructure.ExternalAuth;
 using Detailly.Infrastructure.Payments.Stripe;
+using Detailly.Infrastructure.PDF;
 using Detailly.Shared.Constants;
 using Detailly.Shared.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using QuestPDF.Infrastructure;
 using System.Net.Http;
 
 namespace Detailly.Infrastructure;
@@ -24,6 +27,12 @@ public static class DependencyInjection
         IConfiguration configuration,
         IHostEnvironment env)
     {
+        QuestPDF.Settings.License = LicenseType.Community;
+
+        // PDF generators
+        services.AddScoped<IBookingsPdfGenerator, BookingsPdfGeneratorImpl>();
+        services.AddScoped<IShiftsPdfGenerator, ShiftsPdfGeneratorImpl>();
+
         // Typed ConnectionStrings + validation
         services.AddOptions<ConnectionStringsOptions>()
             .Bind(configuration.GetSection(ConnectionStringsOptions.SectionName))

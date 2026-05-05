@@ -1,10 +1,9 @@
 ﻿using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
+using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.ExportShiftsPdf;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
-using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ExportShifts;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListForDate;
 using Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListMine;
-using Detailly.API.Services.Pdf;
 using Detailly.Domain.Common.Enums;
 using Detailly.Shared.Constants;
 
@@ -87,19 +86,14 @@ public sealed class EmployeeShiftsController(ISender sender) : ControllerBase
         [FromQuery] EmployeeWorkMode? employeeWorkMode,
         CancellationToken ct)
     {
-        var query = new ExportShiftsQuery
+        var pdfBytes = await sender.Send(new ExportShiftsPdfCommand
         {
             StartDateUtc = startDate,
             EndDateUtc = endDate,
             ShopLocationId = shopLocationId,
             EmployeeWorkMode = employeeWorkMode,
-        };
-        var shifts = await sender.Send(query, ct);
-        var locationName = shifts.FirstOrDefault()?.LocationName ?? string.Empty;
+        }, ct);
 
-        var pdfBytes = ShiftsPdfGenerator.Generate(shifts, startDate, endDate, locationName);
-        var fileName = $"shifts-{startDate:yyyy-MM-dd}-to-{endDate:yyyy-MM-dd}.pdf";
-
-        return File(pdfBytes, "application/pdf", fileName);
+        return File(pdfBytes, "application/pdf", $"shifts-{startDate:yyyy-MM-dd}-to-{endDate:yyyy-MM-dd}.pdf");
     }
 }

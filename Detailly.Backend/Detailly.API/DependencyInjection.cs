@@ -5,7 +5,6 @@ using Detailly.Shared.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using QuestPDF.Infrastructure;
 using System.Text;
 
 namespace Detailly.API;
@@ -17,8 +16,6 @@ public static class DependencyInjection
         IConfiguration configuration,
         IHostEnvironment env)
     {
-        QuestPDF.Settings.License = LicenseType.Community;
-
         // Controllers + uniform BadRequest
         services
             .AddControllers()

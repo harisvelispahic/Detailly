@@ -39,9 +39,18 @@ public sealed class RequestResponseLoggingMiddleware(
         {
             stopwatch.Stop();
 
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            var responseText = await new StreamReader(context.Response.Body).ReadToEndAsync();
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            var contentType = context.Response.ContentType ?? string.Empty;
+            var isBinary = contentType.StartsWith("application/pdf", StringComparison.OrdinalIgnoreCase)
+                        || contentType.StartsWith("application/octet-stream", StringComparison.OrdinalIgnoreCase)
+                        || contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase);
+
+            string responseText = string.Empty;
+            if (!isBinary)
+            {
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+                responseText = await new StreamReader(context.Response.Body).ReadToEndAsync();
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+            }
 
             var logMessage = new StringBuilder()
                 .AppendLine("HTTP Request/Response Log:")
@@ -53,7 +62,9 @@ public sealed class RequestResponseLoggingMiddleware(
             if (!string.IsNullOrWhiteSpace(requestBody))
                 logMessage.AppendLine($"  Request Body: {requestBody}");
 
-            if (!string.IsNullOrWhiteSpace(responseText))
+            if (isBinary)
+                logMessage.AppendLine($"  Response Body: [binary {contentType}, {responseBody.Length} bytes]");
+            else if (!string.IsNullOrWhiteSpace(responseText))
                 logMessage.AppendLine($"  Response Body: {responseText}");
 
             var elapsed = stopwatch.ElapsedMilliseconds;

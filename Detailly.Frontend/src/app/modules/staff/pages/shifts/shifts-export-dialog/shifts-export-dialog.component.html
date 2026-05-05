@@ -7,7 +7,8 @@
   <mat-dialog-content class="export-dialog__content">
     <p class="export-dialog__desc">
       Generate a PDF report of employee shifts for
-      <strong>{{ locationName }}</strong>.
+      <strong>{{ locationName }}</strong
+      >.
     </p>
 
     <div class="export-dialog__fields">
@@ -63,8 +64,10 @@
         <mat-spinner diameter="18" class="export-dialog__spinner"></mat-spinner>
         Generating…
       } @else {
-        <mat-icon>download</mat-icon>
-        Generate PDF
+        <ng-container>
+          <mat-icon>download</mat-icon>
+          Generate PDF
+        </ng-container>
       }
     </button>
   </mat-dialog-actions>
