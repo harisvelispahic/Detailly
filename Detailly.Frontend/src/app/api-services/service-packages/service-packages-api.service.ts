@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, filter, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { buildHttpParams } from '../../core/models/build-http-params';
 import {
@@ -9,8 +9,15 @@ import {
   GetServicePackageByIdQueryDto,
   ListServicePackagesRequest,
   ListServicePackagesResponse,
+  ServicePackageImageDto,
   UpdateServicePackageCommand,
 } from './service-packages-api.models';
+
+export interface ImageUploadProgress {
+  progress: number;        // 0–100
+  done: boolean;
+  result?: ServicePackageImageDto;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ServicePackagesApiService {
@@ -45,5 +52,42 @@ export class ServicePackagesApiService {
         'paging.pageSize': '100',
       },
     });
+  }
+
+  // ── Images ──────────────────────────────────────────────────────────────
+
+  uploadImage(packageId: number, file: File): Observable<ImageUploadProgress> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const req = new HttpRequest('POST', `${this.baseUrl}/${packageId}/images`, formData, {
+      reportProgress: true,
+    });
+
+    return this.http.request<ServicePackageImageDto>(req).pipe(
+      filter(
+        (e): e is HttpEvent<ServicePackageImageDto> =>
+          e.type === HttpEventType.UploadProgress || e.type === HttpEventType.Response,
+      ),
+      map((e) => {
+        if (e.type === HttpEventType.UploadProgress) {
+          const total = e.total ?? e.loaded;
+          return { progress: Math.round((100 * e.loaded) / total), done: false };
+        }
+        return { progress: 100, done: true, result: (e as any).body as ServicePackageImageDto };
+      }),
+    );
+  }
+
+  deleteImage(packageId: number, imageId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${packageId}/images/${imageId}`);
+  }
+
+  setThumbnail(packageId: number, imageId: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${packageId}/images/${imageId}/thumbnail`, {});
+  }
+
+  getDownloadUrl(packageId: number, imageId: number): string {
+    return `${this.baseUrl}/${packageId}/images/${imageId}/download`;
   }
 }

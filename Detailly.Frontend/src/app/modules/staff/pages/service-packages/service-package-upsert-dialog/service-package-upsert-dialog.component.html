@@ -13,129 +13,150 @@
     </div>
   </div>
 
-  <mat-dialog-content class="pkg-dialog__content">
-    <form [formGroup]="form" id="pkg-form">
+  <mat-tab-group class="pkg-dialog__tabs" animationDuration="150ms">
 
-      <!-- Name -->
-      <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
-        <mat-label>Package Name</mat-label>
-        <input matInput formControlName="name" placeholder="e.g. Full Detail" />
-        <mat-icon matPrefix>spa</mat-icon>
-        @if (form.get('name')?.hasError('required')) {
-          <mat-error>Name is required</mat-error>
-        }
-        @if (form.get('name')?.hasError('maxlength')) {
-          <mat-error>Too long (max 200 characters)</mat-error>
-        }
-      </mat-form-field>
+    <!-- ── Tab 1: Details ─────────────────────────────────────────── -->
+    <mat-tab label="Details">
+      <mat-dialog-content class="pkg-dialog__content">
+        <form [formGroup]="form" id="pkg-form">
 
-      <!-- Description -->
-      <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
-        <mat-label>Description (optional)</mat-label>
-        <textarea
-          matInput
-          formControlName="description"
-          placeholder="Brief description of the package…"
-          rows="3"
-        ></textarea>
-        @if (form.get('description')?.hasError('maxlength')) {
-          <mat-error>Too long (max 2000 characters)</mat-error>
-        }
-      </mat-form-field>
-
-      <!-- Price -->
-      <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
-        <mat-label>Base Price (BAM)</mat-label>
-        <input
-          matInput
-          formControlName="price"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-        />
-        <mat-icon matPrefix>payments</mat-icon>
-        @if (form.get('price')?.hasError('required')) {
-          <mat-error>Price is required</mat-error>
-        }
-        @if (form.get('price')?.hasError('min')) {
-          <mat-error>Price cannot be negative</mat-error>
-        }
-      </mat-form-field>
-
-      <!-- Items picker -->
-      <div class="pkg-dialog__items-section">
-        <div class="pkg-dialog__items-header">
-          <div class="pkg-dialog__items-label">
-            <mat-icon>checklist</mat-icon>
-            <span>Package Items</span>
-          </div>
-          @if (selectedCount > 0) {
-            <span class="pkg-dialog__items-count">{{ selectedCount }} selected</span>
-          }
-        </div>
-
-        <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full pkg-dialog__item-search">
-          <mat-label>Search items</mat-label>
-          <input matInput [formControl]="itemSearchCtrl" placeholder="Filter by name…" />
-          <mat-icon matPrefix>search</mat-icon>
-        </mat-form-field>
-
-        <div class="pkg-dialog__items-list">
-          @if (isLoadingItems) {
-            <div class="pkg-dialog__items-loading">
-              <mat-progress-spinner mode="indeterminate" diameter="28" strokeWidth="3"></mat-progress-spinner>
-              <span>Loading items…</span>
-            </div>
-          } @else if (!filteredItems.length) {
-            <div class="pkg-dialog__items-empty">
-              <mat-icon>search_off</mat-icon>
-              <span>No items found</span>
-            </div>
-          } @else {
-            @for (item of filteredItems; track item.id) {
-              <div
-                class="pkg-dialog__item"
-                [class.pkg-dialog__item--selected]="isItemSelected(item.id)"
-                (click)="toggleItem(item.id)"
-              >
-                <mat-checkbox
-                  [checked]="isItemSelected(item.id)"
-                  (click)="$event.stopPropagation()"
-                  (change)="toggleItem(item.id)"
-                  color="primary"
-                ></mat-checkbox>
-
-                <div class="pkg-dialog__item-info">
-                  <div class="pkg-dialog__item-name-row">
-                    <span class="pkg-dialog__item-name">{{ item.name }}</span>
-                    @if (item.isAddon) {
-                      <span class="pkg-dialog__item-badge pkg-dialog__item-badge--addon">Addon</span>
-                    } @else {
-                      <span class="pkg-dialog__item-badge pkg-dialog__item-badge--base">Base</span>
-                    }
-                  </div>
-                  @if (item.description) {
-                    <span class="pkg-dialog__item-desc">{{ item.description }}</span>
-                  }
-                  <div class="pkg-dialog__item-meta">
-                    <span class="pkg-dialog__item-meta-pill">
-                      <mat-icon>schedule</mat-icon>{{ item.durationMinutes }} min
-                    </span>
-                    <span class="pkg-dialog__item-meta-pill">
-                      <mat-icon>person</mat-icon>{{ item.requiredEmployees }} employee{{ item.requiredEmployees !== 1 ? 's' : '' }}
-                    </span>
-                    <span class="pkg-dialog__item-price">{{ item.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</span>
-                  </div>
-                </div>
-              </div>
+          <!-- Name -->
+          <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
+            <mat-label>Package Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Full Detail" />
+            <mat-icon matPrefix>spa</mat-icon>
+            @if (form.get('name')?.hasError('required')) {
+              <mat-error>Name is required</mat-error>
             }
-          }
-        </div>
-      </div>
+            @if (form.get('name')?.hasError('maxlength')) {
+              <mat-error>Too long (max 200 characters)</mat-error>
+            }
+          </mat-form-field>
 
-    </form>
-  </mat-dialog-content>
+          <!-- Description -->
+          <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
+            <mat-label>Description (optional)</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              placeholder="Brief description of the package…"
+              rows="3"
+            ></textarea>
+            @if (form.get('description')?.hasError('maxlength')) {
+              <mat-error>Too long (max 2000 characters)</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Price -->
+          <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full">
+            <mat-label>Base Price (BAM)</mat-label>
+            <input
+              matInput
+              formControlName="price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+            <mat-icon matPrefix>payments</mat-icon>
+            @if (form.get('price')?.hasError('required')) {
+              <mat-error>Price is required</mat-error>
+            }
+            @if (form.get('price')?.hasError('min')) {
+              <mat-error>Price cannot be negative</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Items picker -->
+          <div class="pkg-dialog__items-section">
+            <div class="pkg-dialog__items-header">
+              <div class="pkg-dialog__items-label">
+                <mat-icon>checklist</mat-icon>
+                <span>Package Items</span>
+              </div>
+              @if (selectedCount > 0) {
+                <span class="pkg-dialog__items-count">{{ selectedCount }} selected</span>
+              }
+            </div>
+
+            <mat-form-field appearance="outline" subscriptSizing="fixed" class="pkg-dialog__field-full pkg-dialog__item-search">
+              <mat-label>Search items</mat-label>
+              <input matInput [formControl]="itemSearchCtrl" placeholder="Filter by name…" />
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+
+            <div class="pkg-dialog__items-list">
+              @if (isLoadingItems) {
+                <div class="pkg-dialog__items-loading">
+                  <mat-progress-spinner mode="indeterminate" diameter="28" strokeWidth="3"></mat-progress-spinner>
+                  <span>Loading items…</span>
+                </div>
+              } @else if (!filteredItems.length) {
+                <div class="pkg-dialog__items-empty">
+                  <mat-icon>search_off</mat-icon>
+                  <span>No items found</span>
+                </div>
+              } @else {
+                @for (item of filteredItems; track item.id) {
+                  <div
+                    class="pkg-dialog__item"
+                    [class.pkg-dialog__item--selected]="isItemSelected(item.id)"
+                    (click)="toggleItem(item.id)"
+                  >
+                    <mat-checkbox
+                      [checked]="isItemSelected(item.id)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleItem(item.id)"
+                      color="primary"
+                    ></mat-checkbox>
+
+                    <div class="pkg-dialog__item-info">
+                      <div class="pkg-dialog__item-name-row">
+                        <span class="pkg-dialog__item-name">{{ item.name }}</span>
+                        @if (item.isAddon) {
+                          <span class="pkg-dialog__item-badge pkg-dialog__item-badge--addon">Addon</span>
+                        } @else {
+                          <span class="pkg-dialog__item-badge pkg-dialog__item-badge--base">Base</span>
+                        }
+                      </div>
+                      @if (item.description) {
+                        <span class="pkg-dialog__item-desc">{{ item.description }}</span>
+                      }
+                      <div class="pkg-dialog__item-meta">
+                        <span class="pkg-dialog__item-meta-pill">
+                          <mat-icon>schedule</mat-icon>{{ item.durationMinutes }} min
+                        </span>
+                        <span class="pkg-dialog__item-meta-pill">
+                          <mat-icon>person</mat-icon>{{ item.requiredEmployees }} employee{{ item.requiredEmployees !== 1 ? 's' : '' }}
+                        </span>
+                        <span class="pkg-dialog__item-price">{{ item.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+        </form>
+      </mat-dialog-content>
+    </mat-tab>
+
+    <!-- ── Tab 2: Images ──────────────────────────────────────────── -->
+    <mat-tab label="Images">
+      <mat-dialog-content class="pkg-dialog__content">
+        @if (!isEditMode) {
+          <div class="pkg-dialog__images-notice">
+            <mat-icon>info_outline</mat-icon>
+            <span>Save the package first to manage its images.</span>
+          </div>
+        } @else {
+          <app-service-package-images [packageId]="data.servicePackage!.id"></app-service-package-images>
+        }
+      </mat-dialog-content>
+    </mat-tab>
+
+  </mat-tab-group>
 
   @if (serverError) {
     <div class="pkg-dialog__server-error">

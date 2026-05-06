@@ -1,4 +1,6 @@
-﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
+﻿using Detailly.Application.Modules.Booking.ServicePackages.Shared;
+
+namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 
 public class GetServicePackageByIdQueryHandler(IAppDbContext context)
     : IRequestHandler<GetServicePackageByIdQuery, GetServicePackageByIdQueryDto>
@@ -9,6 +11,12 @@ public class GetServicePackageByIdQueryHandler(IAppDbContext context)
             .Where(sp => sp.Id == request.Id)
             .FirstOrDefaultAsync(ct);
 
+        if (package == null)
+            throw new DetaillyNotFoundException($"Service package with Id {request.Id} not found.");
+
+        if (package.IsDeleted)
+            throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_DELETED", "Service package does not exist.");
+
         var result = await context.ServicePackages
             .Where(sp => sp.Id == request.Id)
             .Select(sp => new GetServicePackageByIdQueryDto
@@ -17,7 +25,6 @@ public class GetServicePackageByIdQueryHandler(IAppDbContext context)
                 Name = sp.Name,
                 Description = sp.Description,
                 Price = sp.Price,
-                //EstimatedDurationHours = sp.EstimatedDurationHours,
                 EstimatedDurationHours = 1,
 
                 Items = context.ServicePackageItemAssignments
@@ -29,16 +36,16 @@ public class GetServicePackageByIdQueryHandler(IAppDbContext context)
                         Price = a.ServicePackageItem.Price,
                         Description = a.ServicePackageItem.Description
                     })
+                    .ToList(),
+
+                Images = context.Images
+                    .Where(i => i.ServicePackageId == sp.Id)
+                    .OrderBy(i => i.DisplayOrder)
+                    .Select(i => new ServicePackageImageDto(i.Id, i.ImageUrl, i.PublicId, i.IsThumbnail, i.DisplayOrder))
                     .ToList()
             })
-            .FirstOrDefaultAsync(ct);
+            .FirstAsync(ct);
 
-        if (package == null)
-            throw new DetaillyNotFoundException($"Service package with Id {request.Id} not found.");
-
-        if (package.IsDeleted)
-            throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_DELETED", "Service package does not exist.");
-
-        return result!;
+        return result;
     }
 }

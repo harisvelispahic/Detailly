@@ -11,6 +11,7 @@ public class ListServicePackagesQueryDto
     public required int ReviewCount { get; init; }
     public required int LikeCount { get; init; }
     public required int DislikeCount { get; init; }
+    public string? ThumbnailUrl { get; init; }
 
     public required List<ListServicePackagesQueryDtoItem> Items { get; init; }
 }

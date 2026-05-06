@@ -1,0 +1,112 @@
+<div class="sp-images">
+
+  <!-- Drop zone -->
+  <div
+    class="sp-images__dropzone"
+    [class.sp-images__dropzone--active]="isDragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+  >
+    <mat-icon class="sp-images__drop-icon">cloud_upload</mat-icon>
+    <p class="sp-images__drop-primary">Drag &amp; drop images here</p>
+    <p class="sp-images__drop-secondary">or click to browse &mdash; JPEG, PNG, WebP, GIF &bull; max 10 MB each</p>
+    <p class="sp-images__drop-secondary sp-images__drop-note">
+      Images are compressed to max 1200px before upload
+    </p>
+    <input
+      #fileInput
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif"
+      multiple
+      hidden
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- Active uploads (progress bars) -->
+  @if (uploads.length) {
+    <div class="sp-images__uploads">
+      @for (item of uploads; track item.preview) {
+        <div class="sp-images__upload-row" [class.sp-images__upload-row--error]="item.status === 'error'">
+          <img class="sp-images__upload-thumb" [src]="item.preview" alt="" />
+          <div class="sp-images__upload-info">
+            <span class="sp-images__upload-name">{{ item.file.name }}</span>
+            @if (item.status === 'uploading') {
+              <mat-progress-bar mode="determinate" [value]="item.progress" class="sp-images__progress-bar"></mat-progress-bar>
+              <span class="sp-images__upload-pct">{{ item.progress }}%</span>
+            }
+            @if (item.status === 'done') {
+              <span class="sp-images__upload-done">
+                <mat-icon>check_circle</mat-icon> Uploaded
+              </span>
+            }
+            @if (item.status === 'error') {
+              <span class="sp-images__upload-error">
+                <mat-icon>error_outline</mat-icon> {{ item.error }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Existing image grid -->
+  @if (isLoading) {
+    <div class="sp-images__loading">
+      <mat-progress-spinner mode="indeterminate" diameter="32" strokeWidth="3"></mat-progress-spinner>
+    </div>
+  } @else if (!images.length && !uploads.length) {
+    <div class="sp-images__empty">
+      <mat-icon>image</mat-icon>
+      <span>No images yet. Upload one above.</span>
+    </div>
+  } @else if (images.length) {
+    <div class="sp-images__grid">
+      @for (img of images; track img.id) {
+        <div class="sp-images__card" [class.sp-images__card--thumbnail]="img.isThumbnail">
+          <img class="sp-images__img" [src]="img.imageUrl" [alt]="'Image ' + img.id" />
+
+          @if (img.isThumbnail) {
+            <div class="sp-images__badge">
+              <mat-icon>star</mat-icon> Thumbnail
+            </div>
+          }
+
+          <div class="sp-images__card-actions">
+            @if (!img.isThumbnail) {
+              <button
+                mat-icon-button
+                class="sp-images__action-btn sp-images__action-btn--star"
+                title="Set as thumbnail"
+                (click)="setThumbnail(img)"
+              >
+                <mat-icon>star_border</mat-icon>
+              </button>
+            }
+            <a
+              mat-icon-button
+              class="sp-images__action-btn sp-images__action-btn--download"
+              [href]="downloadUrl(img)"
+              download
+              title="Download"
+            >
+              <mat-icon>download</mat-icon>
+            </a>
+            <button
+              mat-icon-button
+              class="sp-images__action-btn sp-images__action-btn--delete"
+              title="Delete image"
+              (click)="deleteImage(img)"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

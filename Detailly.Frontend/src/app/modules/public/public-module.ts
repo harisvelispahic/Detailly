@@ -14,6 +14,7 @@ import { PublicLayoutComponent } from './public-layout/public-layout.component';
 import { PublicPlaceholderPageComponent } from './placeholder-page/public-placeholder-page.component';
 import { BookingWizardComponent } from './booking-wizard/booking-wizard.component';
 import { ReviewsPageComponent } from './reviews-page/reviews-page.component';
+import { ServicePackageDetailsDialogComponent } from './booking-wizard/service-package-details-dialog/service-package-details-dialog.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { ReviewsPageComponent } from './reviews-page/reviews-page.component';
     PublicPlaceholderPageComponent,
     BookingWizardComponent,
     ReviewsPageComponent,
+    ServicePackageDetailsDialogComponent,
   ],
   imports: [SharedModule, PublicRoutingModule],
 })

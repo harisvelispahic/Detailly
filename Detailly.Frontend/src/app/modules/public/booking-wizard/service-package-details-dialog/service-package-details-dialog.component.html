@@ -1,0 +1,99 @@
+<div class="spd">
+
+  <!-- Header -->
+  <div class="spd__header">
+    <h2 class="spd__title">{{ package?.name ?? 'Package Details' }}</h2>
+    <button mat-icon-button class="spd__close" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="spd__content">
+
+    @if (isLoading) {
+      <div class="spd__loading">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      </div>
+    } @else if (package) {
+
+      <!-- Gallery -->
+      @if (galleryImages.length) {
+        <div class="spd__gallery">
+          @for (img of galleryImages; track img.id) {
+            <div
+              class="spd__gallery-thumb"
+              [class.spd__gallery-thumb--active]="lightboxImage?.id === img.id"
+              (click)="openLightbox(img)"
+            >
+              <img [src]="img.imageUrl" [alt]="'Package image ' + img.id" />
+              @if (img.isThumbnail) {
+                <div class="spd__gallery-star"><mat-icon>star</mat-icon></div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Info -->
+      <div class="spd__info">
+        <div class="spd__price">{{ package.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</div>
+
+        @if (package.description) {
+          <p class="spd__description">{{ package.description }}</p>
+        }
+
+        <!-- Items -->
+        @if (package.items.length) {
+          <div class="spd__section">
+            <h3 class="spd__section-title">
+              <mat-icon>checklist</mat-icon> Included Services
+            </h3>
+            <ul class="spd__items">
+              @for (item of package.items; track item.id) {
+                <li class="spd__item">
+                  <mat-icon class="spd__item-check">check_circle</mat-icon>
+                  <div class="spd__item-info">
+                    <span class="spd__item-name">{{ item.name }}</span>
+                    @if (item.description) {
+                      <span class="spd__item-desc">{{ item.description }}</span>
+                    }
+                  </div>
+                  <span class="spd__item-price">{{ item.price | currency: 'BAM ' : 'symbol' : '1.2-2' }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+    }
+  </mat-dialog-content>
+
+  <!-- Lightbox overlay -->
+  @if (lightboxImage) {
+    <div class="spd__lightbox" (click)="closeLightbox()">
+      <button mat-icon-button class="spd__lb-nav spd__lb-nav--prev" (click)="$event.stopPropagation(); lightboxPrev()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <div class="spd__lb-img-wrap" (click)="$event.stopPropagation()">
+        <img class="spd__lb-img" [src]="lightboxImage.imageUrl" alt="Full image" />
+        <a
+          class="spd__lb-download"
+          mat-icon-button
+          [href]="downloadUrl(lightboxImage)"
+          download
+          (click)="$event.stopPropagation()"
+          title="Download image"
+        >
+          <mat-icon>download</mat-icon>
+        </a>
+      </div>
+
+      <button mat-icon-button class="spd__lb-nav spd__lb-nav--next" (click)="$event.stopPropagation(); lightboxNext()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
+
+</div>

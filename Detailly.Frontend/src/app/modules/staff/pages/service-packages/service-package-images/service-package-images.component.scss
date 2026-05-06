@@ -1,0 +1,225 @@
+.sp-images {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// ── Drop zone ───────────────────────────────────────────────────────────────
+.sp-images__dropzone {
+  border: 2px dashed hsl(var(--border));
+  border-radius: 12px;
+  padding: 36px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  background: hsl(var(--background));
+
+  &:hover,
+  &--active {
+    border-color: hsl(var(--primary));
+    background: hsl(var(--primary) / 0.04);
+  }
+}
+
+.sp-images__drop-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: hsl(var(--primary));
+  margin-bottom: 4px;
+}
+
+.sp-images__drop-primary {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.sp-images__drop-secondary {
+  margin: 0;
+  font-size: 0.78rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.sp-images__drop-note {
+  font-style: italic;
+}
+
+// ── Active uploads ──────────────────────────────────────────────────────────
+.sp-images__uploads {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sp-images__upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  background: hsl(var(--card));
+
+  &--error {
+    border-color: hsl(var(--destructive) / 0.4);
+    background: hsl(var(--destructive) / 0.05);
+  }
+}
+
+.sp-images__upload-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.sp-images__upload-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sp-images__upload-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-images__progress-bar {
+  border-radius: 4px;
+  height: 6px;
+}
+
+.sp-images__upload-pct {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.sp-images__upload-done {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: hsl(var(--success, 142 71% 45%));
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+.sp-images__upload-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: hsl(var(--destructive));
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+}
+
+// ── Loading / empty ─────────────────────────────────────────────────────────
+.sp-images__loading,
+.sp-images__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+
+  mat-icon { font-size: 22px; width: 22px; height: 22px; }
+}
+
+// ── Image grid ──────────────────────────────────────────────────────────────
+.sp-images__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.sp-images__card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid hsl(var(--border));
+  aspect-ratio: 1;
+  background: hsl(var(--muted));
+  transition: border-color 0.15s ease;
+
+  &--thumbnail {
+    border-color: hsl(var(--primary));
+  }
+
+  &:hover .sp-images__card-actions {
+    opacity: 1;
+  }
+}
+
+.sp-images__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sp-images__badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  mat-icon { font-size: 12px; width: 12px; height: 12px; }
+}
+
+.sp-images__card-actions {
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--background) / 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sp-images__action-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+
+  &--star {
+    color: hsl(var(--warning, 38 92% 50%));
+  }
+
+  &--download {
+    color: hsl(var(--info, 199 89% 48%));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &--delete {
+    color: hsl(var(--destructive));
+  }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}

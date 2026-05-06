@@ -8,6 +8,14 @@ export interface ServicePackageItemDto {
   description?: string | null;
 }
 
+export interface ServicePackageImageDto {
+  id: number;
+  imageUrl: string;
+  publicId?: string | null;
+  isThumbnail: boolean;
+  displayOrder: number;
+}
+
 export interface ListServicePackagesQueryDto {
   id: number;
   name: string;
@@ -18,6 +26,7 @@ export interface ListServicePackagesQueryDto {
   reviewCount: number;
   likeCount: number;
   dislikeCount: number;
+  thumbnailUrl?: string | null;
   items: ServicePackageItemDto[];
 }
 
@@ -28,6 +37,7 @@ export interface GetServicePackageByIdQueryDto {
   price: number;
   estimatedDurationHours: number;
   items: ServicePackageItemDto[];
+  images?: ServicePackageImageDto[] | null;
 }
 
 export interface CreateServicePackageCommand {

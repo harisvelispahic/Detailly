@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 import { CurrentUserService } from '../../../core/services/auth/current-user.service';
 import { ServicePackagesApiService } from '../../../api-services/service-packages/service-packages-api.service';
@@ -13,6 +14,10 @@ import { DialogHelperService } from '../../shared/services/dialog-helper.service
 import { DialogButton, DialogType } from '../../shared/models/dialog-config.model';
 import { ReactionsApiService } from '../../../api-services/reactions/reactions-api.service';
 import { ReactionType } from '../../../api-services/reactions/reactions-api.models';
+import {
+  ServicePackageDetailsDialogComponent,
+  ServicePackageDetailsDialogData,
+} from './service-package-details-dialog/service-package-details-dialog.component';
 
 import {
   ListServicePackagesQueryDto,
@@ -49,6 +54,7 @@ export class BookingWizardComponent implements OnInit {
   private readonly locationsService = inject(LocationsApiService);
   private readonly dialogHelper = inject(DialogHelperService);
   private readonly reactionsService = inject(ReactionsApiService);
+  private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
@@ -172,6 +178,14 @@ export class BookingWizardComponent implements OnInit {
           this.myReactions.delete(pkg.id);
         }
       },
+    });
+  }
+
+  openPackageDetails(pkg: ListServicePackagesQueryDto): void {
+    this.dialog.open(ServicePackageDetailsDialogComponent, {
+      width: '640px',
+      maxWidth: '95vw',
+      data: { packageId: pkg.id } as ServicePackageDetailsDialogData,
     });
   }
 

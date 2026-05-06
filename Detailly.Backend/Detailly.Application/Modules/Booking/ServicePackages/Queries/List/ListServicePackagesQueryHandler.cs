@@ -41,6 +41,10 @@ public class ListServicePackagesQueryHandler(IAppDbContext ctx)
                     .Count(r => r.ServicePackageId == sp.Id && r.ReactionType == ReactionType.Like),
                 DislikeCount = ctx.Reactions
                     .Count(r => r.ServicePackageId == sp.Id && r.ReactionType == ReactionType.Dislike),
+                ThumbnailUrl = ctx.Images
+                    .Where(i => i.ServicePackageId == sp.Id && i.IsThumbnail)
+                    .Select(i => (string?)i.ImageUrl)
+                    .FirstOrDefault(),
                 Items = ctx.ServicePackageItemAssignments
                     .Where(a => a.ServicePackageId == sp.Id && !a.IsDeleted && !a.ServicePackageItem.IsDeleted)
                     .Select(a => new ListServicePackagesQueryDtoItem

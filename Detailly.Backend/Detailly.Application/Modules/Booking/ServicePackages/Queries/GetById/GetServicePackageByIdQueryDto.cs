@@ -1,4 +1,6 @@
-﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
+﻿using Detailly.Application.Modules.Booking.ServicePackages.Shared;
+
+namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 
 public class GetServicePackageByIdQueryDto
 {
@@ -9,6 +11,7 @@ public class GetServicePackageByIdQueryDto
     public required int EstimatedDurationHours { get; init; }
 
     public required List<GetServicePackageByIdQueryDtoItem> Items { get; init; }
+    public required List<ServicePackageImageDto> Images { get; init; }
 }
 
 public class GetServicePackageByIdQueryDtoItem

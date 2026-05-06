@@ -13,6 +13,7 @@ import { LocationUpsertDialogComponent } from './pages/locations/location-upsert
 import { LocationDetailDialogComponent } from './pages/locations/location-detail-dialog/location-detail-dialog.component';
 import { ServicePackagesComponent } from './pages/service-packages/service-packages.component';
 import { ServicePackageUpsertDialogComponent } from './pages/service-packages/service-package-upsert-dialog/service-package-upsert-dialog.component';
+import { ServicePackageImagesComponent } from './pages/service-packages/service-package-images/service-package-images.component';
 import { ServicePackageItemsPageComponent } from './pages/service-packages/service-package-items-page/service-package-items-page.component';
 import { ServicePackageItemUpsertDialogComponent } from './pages/service-packages/service-package-items-page/service-package-item-upsert-dialog/service-package-item-upsert-dialog.component';
 import { VehicleCategoriesComponent } from './pages/vehicle-categories/vehicle-categories.component';
@@ -34,6 +35,7 @@ import { ShiftsExportDialogComponent } from './pages/shifts/shifts-export-dialog
     LocationDetailDialogComponent,
     ServicePackagesComponent,
     ServicePackageUpsertDialogComponent,
+    ServicePackageImagesComponent,
     ServicePackageItemsPageComponent,
     ServicePackageItemUpsertDialogComponent,
     VehicleCategoriesComponent,

@@ -76,6 +76,14 @@
             </div>
             <!-- Reviews link + reactions -->
             <div class="package-card__footer" (click)="$event.stopPropagation()">
+              <button
+                mat-icon-button
+                class="package-card__details-btn"
+                title="View package details"
+                (click)="openPackageDetails(pkg)"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
               <a
                 [routerLink]="['/reviews']"
                 [queryParams]="{ servicePackageId: pkg.id }"

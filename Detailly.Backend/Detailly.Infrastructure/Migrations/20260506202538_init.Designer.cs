@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260505170029_2026050519000_Reactions")]
-    partial class _2026050519000_Reactions
+    [Migration("20260506202538_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -688,9 +688,6 @@ namespace Detailly.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsAdmin")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -744,8 +741,6 @@ namespace Detailly.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("IsEmployee", "IsEnabled");
 
@@ -1270,9 +1265,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("AltText")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ApplicationUserId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
@@ -1292,29 +1284,20 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ProductEntityId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReviewId")
-                        .HasColumnType("int");
+                    b.Property<string>("PublicId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ServicePackageItemId")
+                    b.Property<int?>("ServicePackageId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("ProductEntityId");
-
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("ReviewId");
-
-                    b.HasIndex("ServicePackageItemId");
+                    b.HasIndex("ServicePackageId");
 
                     b.ToTable("Images", (string)null);
                 });
@@ -1664,15 +1647,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Identity.ApplicationUserEntity", b =>
-                {
-                    b.HasOne("Detailly.Domain.Entities.Shared.ImageEntity", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId");
-
-                    b.Navigation("Image");
-                });
-
             modelBuilder.Entity("Detailly.Domain.Entities.Identity.RefreshTokenEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
@@ -1829,34 +1803,19 @@ namespace Detailly.Infrastructure.Migrations
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.ImageEntity", b =>
                 {
-                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ProductEntityId");
-
                     b.HasOne("Detailly.Domain.Entities.Catalog.ProductEntity", "Product")
-                        .WithMany()
+                        .WithMany("Images")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Detailly.Domain.Entities.Booking.ReviewEntity", "Review")
-                        .WithMany()
-                        .HasForeignKey("ReviewId");
-
-                    b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", "ServicePackageItem")
+                    b.HasOne("Detailly.Domain.Entities.Booking.ServicePackageEntity", "ServicePackage")
                         .WithMany("Images")
-                        .HasForeignKey("ServicePackageItemId");
-
-                    b.Navigation("ApplicationUser");
+                        .HasForeignKey("ServicePackageId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Product");
 
-                    b.Navigation("Review");
-
-                    b.Navigation("ServicePackageItem");
+                    b.Navigation("ServicePackage");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Shared.NotificationEntity", b =>
@@ -1913,14 +1872,14 @@ namespace Detailly.Infrastructure.Migrations
                 {
                     b.Navigation("Bookings");
 
+                    b.Navigation("Images");
+
                     b.Navigation("ServicePackageItemAssignments");
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Booking.ServicePackageItemEntity", b =>
                 {
                     b.Navigation("BookingItems");
-
-                    b.Navigation("Images");
 
                     b.Navigation("ServicePackageItemAssignments");
                 });
