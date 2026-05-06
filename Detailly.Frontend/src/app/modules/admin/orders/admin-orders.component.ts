@@ -1,16 +1,19 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {MatDialog} from '@angular/material/dialog';
-import {Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, takeUntil} from 'rxjs/operators';
-import {FormControl} from '@angular/forms';
-import {BaseListPagedComponent} from '../../../core/components/base-classes/base-list-paged-component';
-import {ListOrdersQueryDto, ListOrdersRequest, OrderStatusType} from '../../../api-services/orders/orders-api.models';
-import {OrdersApiService} from '../../../api-services/orders/orders-api.service';
-import {ToasterService} from '../../../core/services/toaster.service';
-import {OrderStatusHelper} from '../../../api-services/orders/order-status.helper';
-import {ChangeStatusDialogComponent} from './change-status-dialog/change-status-dialog.component';
-import {OrderDetailsDialogComponent} from './admin-orders-details-dialog/order-details-dialog.component';
-
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+import { BaseListPagedComponent } from '../../../core/components/base-classes/base-list-paged-component';
+import {
+  ListOrdersQueryDto,
+  ListOrdersRequest,
+  OrderStatusType,
+} from '../../../api-services/orders/orders-api.models';
+import { OrdersApiService } from '../../../api-services/orders/orders-api.service';
+import { ToasterService } from '../../../core/services/toaster.service';
+import { OrderStatusHelper } from '../../../api-services/orders/order-status.helper';
+import { ChangeStatusDialogComponent } from './change-status-dialog/change-status-dialog.component';
+import { OrderDetailsDialogComponent } from './admin-orders-details-dialog/order-details-dialog.component';
 
 @Component({
   selector: 'app-admin-orders',
@@ -34,7 +37,7 @@ export class AdminOrdersComponent
     'orderedAt',
     'totalAmount',
     'status',
-    'actions'
+    'actions',
   ];
 
   // Search control with debounce
@@ -71,7 +74,7 @@ export class AdminOrdersComponent
       .pipe(
         debounceTime(400), // Wait 400ms after user stops typing
         distinctUntilChanged(), // Only if value actually changed
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe((searchTerm) => {
         // Only search if 3+ characters or empty (to clear)
@@ -123,7 +126,6 @@ export class AdminOrdersComponent
   // === Actions ===
 
   onViewDetails(order: ListOrdersQueryDto, event?: MouseEvent): void {
-    // spriječi da klik sa dugmeta ode na <tr> i ponovo otvori dialog
     event?.stopPropagation();
 
     const dialogRef = this.dialog.open(OrderDetailsDialogComponent, {
@@ -131,9 +133,9 @@ export class AdminOrdersComponent
       maxWidth: '95vw',
       maxHeight: '90vh',
       data: {
-        orderId: order.id
+        orderId: order.id,
       },
-      panelClass: 'order-details-dialog'
+      panelClass: 'order-details-dialog',
     });
 
     dialogRef.afterClosed().subscribe((changed: boolean) => {
@@ -153,9 +155,9 @@ export class AdminOrdersComponent
       width: '500px',
       maxWidth: '90vw',
       data: {
-        order: order
+        order: order,
       },
-      panelClass: 'change-status-dialog'
+      panelClass: 'change-status-dialog',
     });
 
     dialogRef.afterClosed().subscribe((newStatus: OrderStatusType | undefined) => {
@@ -181,7 +183,7 @@ export class AdminOrdersComponent
         this.toaster.error(errorMessage || 'Failed to update order status');
 
         console.error('Change status error:', err);
-      }
+      },
     });
   }
 
@@ -201,8 +203,7 @@ export class AdminOrdersComponent
 
   canChangeStatus(order: ListOrdersQueryDto): boolean {
     // Can change if not in final state
-    return order.status !== OrderStatusType.Completed &&
-      order.status !== OrderStatusType.Cancelled;
+    return order.status !== OrderStatusType.Completed && order.status !== OrderStatusType.Cancelled;
   }
 
   // === Display Helpers ===

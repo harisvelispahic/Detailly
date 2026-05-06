@@ -1,6 +1,4 @@
-﻿using Detailly.Domain.Entities.Shared;
-
-namespace Detailly.Application.Modules.Identity.User.Commands.Update;
+﻿namespace Detailly.Application.Modules.Identity.User.Commands.Update;
 
 public sealed class UpdateUserCommandHandler(
     IAppDbContext context,
@@ -20,7 +18,6 @@ public sealed class UpdateUserCommandHandler(
             throw new DetaillyForbiddenException("You are not allowed to update this user.");
 
         var user = await context.ApplicationUsers
-            .Include(x => x.Image)
             .Include(x => x.ExternalLogins)
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
@@ -66,22 +63,6 @@ public sealed class UpdateUserCommandHandler(
 
         if (request.CompanyName != null)
             user.CompanyName = request.CompanyName.Trim();
-
-        // IMAGE (unchanged)
-        if (request.Image?.ImageUrl != null)
-        {
-            if (user.Image == null)
-            {
-                user.Image = new ImageEntity
-                {
-                    ImageUrl = request.Image.ImageUrl.Trim()
-                };
-            }
-            else
-            {
-                user.Image.ImageUrl = request.Image.ImageUrl.Trim();
-            }
-        }
 
         user.ModifiedAtUtc = DateTime.UtcNow;
 

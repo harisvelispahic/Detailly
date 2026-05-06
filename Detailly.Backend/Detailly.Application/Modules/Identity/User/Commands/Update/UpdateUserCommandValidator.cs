@@ -48,11 +48,5 @@ public sealed class UpdateUserCommandValidator : AbstractValidator<UpdateUserCom
             .WithMessage("Company name cannot exceed 200 characters.")
             .When(x => x.CompanyName != null);
 
-        RuleFor(x => x.Image!.ImageUrl)
-            .NotEmpty()
-            .WithMessage("Image URL cannot be empty.")
-            .MaximumLength(500)
-            .WithMessage("Image URL cannot exceed 500 characters.")
-            .When(x => x.Image != null && x.Image.ImageUrl != null);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Detailly.Domain.Common;
+using Detailly.Domain.Entities.Shared;
 
 namespace Detailly.Domain.Entities.Booking;
 
@@ -14,5 +15,5 @@ public class ServicePackageEntity : BaseEntity
     // Foreign keys
     public IReadOnlyCollection<ServicePackageItemAssignmentEntity> ServicePackageItemAssignments { get; private set; } = new List<ServicePackageItemAssignmentEntity>();
     public IReadOnlyCollection<BookingEntity> Bookings { get; private set; } = new List<BookingEntity>();
-    
+    public IReadOnlyCollection<ImageEntity> Images { get; private set; } = new List<ImageEntity>();
 }

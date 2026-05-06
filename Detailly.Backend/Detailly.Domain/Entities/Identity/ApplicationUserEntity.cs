@@ -34,7 +34,6 @@ public sealed class ApplicationUserEntity : BaseEntity
     // Foreign keys
     public WalletEntity? Wallet { get; set; }
     public CartEntity? Cart { get; set; }
-    public ImageEntity? Image { get; set; }
     public IReadOnlyCollection<AddressEntity> Addresses { get; private set; } = new List<AddressEntity>();
     public IReadOnlyCollection<SavedProductEntity> SavedProducts { get; private set; } = new List<SavedProductEntity>();
 

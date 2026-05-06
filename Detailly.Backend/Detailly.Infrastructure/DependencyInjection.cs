@@ -4,6 +4,7 @@ using Detailly.Application.Abstractions.Payments;
 using Detailly.Application.Abstractions.PDF;
 using Detailly.Infrastructure.Background;
 using Detailly.Infrastructure.Booking;
+using Detailly.Infrastructure.Cloudinary;
 using Detailly.Infrastructure.Common;
 using Detailly.Infrastructure.Database;
 using Detailly.Infrastructure.ExternalAuth;
@@ -28,6 +29,13 @@ public static class DependencyInjection
         IHostEnvironment env)
     {
         QuestPDF.Settings.License = LicenseType.Community;
+
+        // Cloudinary
+        services.AddOptions<CloudinaryOptions>()
+            .Bind(configuration.GetSection(CloudinaryOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
 
         // PDF generators
         services.AddScoped<IBookingsPdfGenerator, BookingsPdfGeneratorImpl>();

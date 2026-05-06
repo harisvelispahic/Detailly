@@ -13,6 +13,9 @@ public sealed class ImageConfiguration : IEntityTypeConfiguration<ImageEntity>
         builder.Property(x => x.ImageUrl)
             .IsRequired();
 
+        builder.Property(x => x.PublicId)
+            .IsRequired(false);
+
         builder.Property(x => x.AltText)
             .IsRequired(false);
 
@@ -22,21 +25,7 @@ public sealed class ImageConfiguration : IEntityTypeConfiguration<ImageEntity>
         builder.Property(x => x.DisplayOrder)
             .IsRequired();
 
-        // Optional relationships (all nullable FKs)
-        builder.HasOne(x => x.Product)
-            .WithMany()
-            .HasForeignKey(x => x.ProductId);
-
-        builder.HasOne(x => x.Review)
-            .WithMany()
-            .HasForeignKey(x => x.ReviewId);
-
-        builder.HasOne(x => x.ApplicationUser)
-            .WithMany()
-            .HasForeignKey(x => x.ApplicationUserId);
-
-        builder.HasOne(x => x.ServicePackageItem)
-            .WithMany(i => i.Images)
-            .HasForeignKey(x => x.ServicePackageItemId);
+        // Product relationship is owned by ProductConfiguration (HasMany side).
+        // ServicePackage relationship is owned by ServicePackageConfiguration (HasMany side).
     }
 }

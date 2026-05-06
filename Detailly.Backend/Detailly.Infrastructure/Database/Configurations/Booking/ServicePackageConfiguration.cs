@@ -25,7 +25,9 @@ public sealed class ServicePackageConfiguration : IEntityTypeConfiguration<Servi
         builder.Property(x => x.BaseRequiredEmployees)
             .IsRequired(false);
 
-        // Relationships:
-        // Left to conventions intentionally (we don't have the other side FK/navs here with certainty).
+        builder.HasMany(x => x.Images)
+            .WithOne(x => x.ServicePackage)
+            .HasForeignKey(x => x.ServicePackageId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

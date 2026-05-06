@@ -9,11 +9,4 @@ public class UpdateUserCommand : IRequest<Unit>
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? CompanyName { get; set; }
-    public UpdateUserCommandImage? Image { get; set; }
-
-}
-
-public class UpdateUserCommandImage
-{
-    public string? ImageUrl { get; set; }
 }

@@ -31,11 +31,6 @@ public sealed class ServicePackageItemConfiguration : IEntityTypeConfiguration<S
         builder.Property(x => x.IsActive)
             .IsRequired();
 
-        // Images relationship is safe to define because ImageEntity has ServicePackageItemId FK
-        builder.HasMany(x => x.Images)
-            .WithOne(i => i.ServicePackageItem)
-            .HasForeignKey(i => i.ServicePackageItemId);
-
         // Other relationships left to conventions (assignments, booking items) due to missing FK certainty.
     }
 }
