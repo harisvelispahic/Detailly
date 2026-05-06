@@ -11,6 +11,7 @@ public class ImageEntity : BaseEntity
     public string? AltText { get; set; }
     public bool IsThumbnail { get; set; }
     public int DisplayOrder { get; set; }
+    public string? FileHash { get; set; }
 
     // Relationships
     public int? ProductId { get; set; }

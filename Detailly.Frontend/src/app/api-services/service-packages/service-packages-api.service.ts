@@ -72,7 +72,8 @@ export class ServicePackagesApiService {
       map((e) => {
         if (e.type === HttpEventType.UploadProgress) {
           const total = e.total ?? e.loaded;
-          return { progress: Math.round((100 * e.loaded) / total), done: false };
+          // Cap at 80 — the remaining 20% represents server-side Cloudinary processing
+          return { progress: Math.round((80 * e.loaded) / total), done: false };
         }
         return { progress: 100, done: true, result: (e as any).body as ServicePackageImageDto };
       }),

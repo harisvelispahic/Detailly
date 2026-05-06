@@ -7,7 +7,7 @@ interface UploadItem {
   file: File;
   preview: string;
   progress: number;
-  status: 'uploading' | 'done' | 'error';
+  status: 'uploading' | 'processing' | 'done' | 'error';
   error?: string;
 }
 
@@ -118,6 +118,9 @@ export class ServicePackageImagesComponent implements OnInit {
     this.api.uploadImage(this.packageId, compressed).subscribe({
       next: (evt: ImageUploadProgress) => {
         item.progress = evt.progress;
+        if (!evt.done && evt.progress >= 80) {
+          item.status = 'processing';
+        }
         if (evt.done && evt.result) {
           item.status = 'done';
           this.images.push(evt.result);

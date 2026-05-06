@@ -37,6 +37,10 @@
               <mat-progress-bar mode="determinate" [value]="item.progress" class="sp-images__progress-bar"></mat-progress-bar>
               <span class="sp-images__upload-pct">{{ item.progress }}%</span>
             }
+            @if (item.status === 'processing') {
+              <mat-progress-bar mode="indeterminate" class="sp-images__progress-bar"></mat-progress-bar>
+              <span class="sp-images__upload-pct">Processing...</span>
+            }
             @if (item.status === 'done') {
               <span class="sp-images__upload-done">
                 <mat-icon>check_circle</mat-icon> Uploaded
