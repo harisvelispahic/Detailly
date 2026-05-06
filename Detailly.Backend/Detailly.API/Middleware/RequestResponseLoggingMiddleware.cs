@@ -21,10 +21,16 @@ public sealed class RequestResponseLoggingMiddleware(
         string? requestBody = null;
         if (request.Method is "POST" or "PUT")
         {
-            request.EnableBuffering();
-            using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
-            requestBody = await reader.ReadToEndAsync();
-            request.Body.Position = 0;
+            var isMultipart = (request.ContentType ?? string.Empty)
+                .StartsWith("multipart/", StringComparison.OrdinalIgnoreCase);
+
+            if (!isMultipart)
+            {
+                request.EnableBuffering();
+                using var reader = new StreamReader(request.Body, Encoding.UTF8, leaveOpen: true);
+                requestBody = await reader.ReadToEndAsync();
+                request.Body.Position = 0;
+            }
         }
 
         var originalBodyStream = context.Response.Body;

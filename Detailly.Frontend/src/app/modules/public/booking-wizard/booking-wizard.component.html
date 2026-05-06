@@ -45,6 +45,17 @@
             [class.package-card--selected]="selectedPackage?.id === pkg.id"
             (click)="selectPackage(pkg)"
           >
+            <div class="package-card__image">
+              <img
+                *ngIf="pkg.thumbnailUrl"
+                [src]="pkg.thumbnailUrl"
+                [alt]="pkg.name"
+                class="package-card__thumbnail"
+              />
+              <div *ngIf="!pkg.thumbnailUrl" class="package-card__thumbnail-placeholder">
+                <mat-icon>auto_fix_high</mat-icon>
+              </div>
+            </div>
             <div class="package-card__header">
               <div class="package-card__icon">
                 <mat-icon>auto_fix_high</mat-icon>

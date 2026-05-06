@@ -80,22 +80,40 @@ export class ServicePackageImagesComponent implements OnInit {
     if (oversized.length) {
       this.toaster.error(`${oversized.length} file(s) exceed the 10 MB limit and were skipped.`);
     }
+
     const valid = imageFiles.filter((f) => f.size <= this.MAX_BYTES);
-    valid.forEach((f) => this.compressAndUpload(f));
+
+    const duplicates = valid.filter((f) =>
+      this.uploads.some((u) => u.file.name === f.name && u.file.size === f.size),
+    );
+    if (duplicates.length) {
+      this.toaster.error(
+        duplicates.length === 1
+          ? `"${duplicates[0].name}" is already being uploaded.`
+          : `${duplicates.length} file(s) are already being uploaded.`,
+      );
+    }
+
+    const unique = valid.filter(
+      (f) => !this.uploads.some((u) => u.file.name === f.name && u.file.size === f.size),
+    );
+    unique.forEach((f) => this.compressAndUpload(f));
   }
 
   private async compressAndUpload(file: File): Promise<void> {
     const preview = await this.toDataUrl(file);
-    const item: UploadItem = { file, preview, progress: 0, status: 'uploading' };
-    this.uploads.push(item);
 
     let compressed: File;
     try {
       const blob = await this.compressImage(file);
       compressed = new File([blob], file.name, { type: blob.type });
     } catch {
-      compressed = file;
+      this.toaster.error(`"${file.name}" appears to be corrupted or invalid and cannot be uploaded.`);
+      return;
     }
+
+    const item: UploadItem = { file, preview, progress: 0, status: 'uploading' };
+    this.uploads.push(item);
 
     this.api.uploadImage(this.packageId, compressed).subscribe({
       next: (evt: ImageUploadProgress) => {
