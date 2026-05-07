@@ -168,6 +168,34 @@
   svg { flex-shrink: 0; }
 }
 
+// ---- Change password link ----
+
+.epd__change-password-row {
+  display: flex;
+  align-items: center;
+  padding-top: 0.25rem;
+  border-top: 1px solid hsl(var(--border));
+  margin-top: 0.25rem;
+}
+
+.epd__change-password-btn {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: hsl(var(--foreground));
+  }
+}
+
 // ---- Actions ----
 
 .epd__actions {

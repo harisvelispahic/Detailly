@@ -119,6 +119,15 @@
       </mat-form-field>
     }
 
+    @if (!isOAuth) {
+      <div class="epd__change-password-row">
+        <button type="button" mat-button class="epd__change-password-btn" (click)="goToChangePassword()">
+          <mat-icon>lock_reset</mat-icon>
+          Change Password
+        </button>
+      </div>
+    }
+
     @if (error) {
       <div class="epd__error">{{ error }}</div>
     }

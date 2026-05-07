@@ -19,6 +19,9 @@ public sealed class ChangePasswordCommandHandler(
         if (user == null)
             throw new DetaillyNotFoundException("User not found.");
 
+        if (user.PasswordHash == ApplicationUserEntity.ExternalOnlyPasswordHash)
+            throw new DetaillyForbiddenException("Password changes are not available for accounts linked to an external provider.");
+
         // Verify old password
         var verifyResult = passwordHasher.VerifyHashedPassword(
             user,
@@ -27,7 +30,7 @@ public sealed class ChangePasswordCommandHandler(
         );
 
         if (verifyResult == PasswordVerificationResult.Failed)
-            throw new ValidationException("Current password is incorrect.");
+            throw new DetaillyBusinessRuleException("CURRENT_PASSWORD_INCORRECT", "Current password is incorrect.");
 
         // Hash and set new password
         user.PasswordHash = passwordHasher.HashPassword(user, request.NewPassword);

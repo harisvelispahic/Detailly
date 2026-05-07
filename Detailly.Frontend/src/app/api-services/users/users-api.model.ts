@@ -32,3 +32,8 @@ export interface UpdateUserCommand {
   phone?: string | null;
   companyName?: string | null;
 }
+
+export interface ChangePasswordCommand {
+  currentPassword: string;
+  newPassword: string;
+}

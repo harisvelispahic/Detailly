@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { UsersApiService } from '../../../../api-services/users/users-api.service';
 import { GetUserByIdQueryDto } from '../../../../api-services/users/users-api.model';
 
@@ -95,6 +96,7 @@ export class EditProfileDialogComponent implements OnInit {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditProfileDialogComponent>,
     private users: UsersApiService,
+    private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: EditProfileDialogData,
   ) {}
 
@@ -202,5 +204,10 @@ export class EditProfileDialogComponent implements OnInit {
 
   cancel(): void {
     this.dialogRef.close(false);
+  }
+
+  goToChangePassword(): void {
+    this.dialogRef.close(false);
+    this.router.navigate(['/client/profile/change-password']);
   }
 }

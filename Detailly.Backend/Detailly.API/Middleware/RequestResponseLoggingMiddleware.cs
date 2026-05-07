@@ -12,6 +12,7 @@ public sealed class RequestResponseLoggingMiddleware(
     ILogger<RequestResponseLoggingMiddleware> logger)
 {
     private const int SlowRequestThresholdMs = 400;
+    private static readonly SemaphoreSlim _slowLogLock = new(1, 1);
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -77,9 +78,17 @@ public sealed class RequestResponseLoggingMiddleware(
             if (elapsed > SlowRequestThresholdMs)
             {
                 logger.LogWarning("[SLOW REQUEST] {Path} took {Elapsed} ms", request.Path, elapsed);
-                await File.AppendAllTextAsync(
-                    "Logs/slow-requests.log",
-                    $"{DateTime.UtcNow:u} | {request.Path} | {elapsed} ms{Environment.NewLine}");
+                await _slowLogLock.WaitAsync();
+                try
+                {
+                    await File.AppendAllTextAsync(
+                        "Logs/slow-requests.log",
+                        $"{DateTime.UtcNow:u} | {request.Path} | {elapsed} ms{Environment.NewLine}");
+                }
+                finally
+                {
+                    _slowLogLock.Release();
+                }
             }
 
             logger.LogInformation("{Log}", logMessage.ToString());
