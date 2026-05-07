@@ -1,6 +1,8 @@
-﻿namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
+﻿using Detailly.Application.Abstractions;
 
-public class DeleteServicePackageCommandHandler(IAppDbContext context)
+namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
+
+public class DeleteServicePackageCommandHandler(IAppDbContext context, ICloudinaryService cloudinaryService)
     : IRequestHandler<DeleteServicePackageCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteServicePackageCommand request, CancellationToken ct)
@@ -18,8 +20,20 @@ public class DeleteServicePackageCommandHandler(IAppDbContext context)
             .AnyAsync(b => b.ServicePackageId == request.Id && !b.IsDeleted, ct);
 
         if (inUse)
-            throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_IN_USE","Cannot delete service package because it is used in bookings.");
+            throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_IN_USE", "Cannot delete service package because it is used in bookings.");
 
+        // Delete all associated images from Cloudinary, then hard-delete from DB
+        var images = await context.Images
+            .Where(i => i.ServicePackageId == request.Id)
+            .ToListAsync(ct);
+
+        foreach (var image in images.Where(i => !string.IsNullOrEmpty(i.PublicId)))
+        {
+            try { await cloudinaryService.DeleteAsync(image.PublicId!, ct); }
+            catch { /* continue even if Cloudinary deletion fails for one asset */ }
+        }
+
+        context.Images.RemoveRange(images);
 
         // Soft delete package
         package.IsDeleted = true;
