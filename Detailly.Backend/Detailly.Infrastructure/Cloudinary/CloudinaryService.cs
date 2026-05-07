@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Detailly.Application.Abstractions;
@@ -9,11 +11,12 @@ namespace Detailly.Infrastructure.Cloudinary;
 public sealed class CloudinaryService : ICloudinaryService
 {
     private readonly CloudinaryDotNet.Cloudinary _cloudinary;
+    private readonly CloudinaryOptions _options;
 
     public CloudinaryService(IOptions<CloudinaryOptions> options)
     {
-        var o = options.Value;
-        _cloudinary = new CloudinaryDotNet.Cloudinary(new Account(o.CloudName, o.ApiKey, o.ApiSecret));
+        _options = options.Value;
+        _cloudinary = new CloudinaryDotNet.Cloudinary(new Account(_options.CloudName, _options.ApiKey, _options.ApiSecret));
         _cloudinary.Api.Secure = true;
     }
 
@@ -42,5 +45,15 @@ public sealed class CloudinaryService : ICloudinaryService
 
         if (result.Error != null)
             throw new InvalidOperationException($"Cloudinary deletion failed: {result.Error.Message}");
+    }
+
+    public CloudinaryDirectUploadParams GenerateDirectUploadParams(string folder)
+    {
+        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        // Cloudinary signature: alphabetically sorted params string + API secret, SHA-1
+        var toSign = $"folder={folder}&timestamp={timestamp}{_options.ApiSecret}";
+        var hashBytes = SHA1.HashData(Encoding.UTF8.GetBytes(toSign));
+        var signature = Convert.ToHexString(hashBytes).ToLowerInvariant();
+        return new CloudinaryDirectUploadParams(_options.CloudName, _options.ApiKey, timestamp, signature, folder);
     }
 }

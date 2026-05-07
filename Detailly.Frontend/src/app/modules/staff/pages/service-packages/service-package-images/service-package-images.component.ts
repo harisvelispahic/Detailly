@@ -118,7 +118,7 @@ export class ServicePackageImagesComponent implements OnInit {
     this.api.uploadImage(this.packageId, compressed).subscribe({
       next: (evt: ImageUploadProgress) => {
         item.progress = evt.progress;
-        if (!evt.done && evt.progress >= 80) {
+        if (!evt.done && evt.progress >= 90) {
           item.status = 'processing';
         }
         if (evt.done && evt.result) {

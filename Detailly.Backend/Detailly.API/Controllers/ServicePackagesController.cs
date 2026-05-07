@@ -1,5 +1,6 @@
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Create;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
+using Detailly.Application.Modules.Booking.ServicePackages.Commands.Image.Confirm;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Image.Delete;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Image.SetThumbnail;
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Image.Upload;
@@ -7,6 +8,7 @@ using Detailly.Application.Modules.Booking.ServicePackages.Commands.Update;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetAvailableAddons;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetImage;
+using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetUploadParams;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 using Detailly.Application.Modules.Booking.ServicePackages.Shared;
 using Detailly.Shared.Constants;
@@ -62,6 +64,22 @@ public class ServicePackagesController(ISender sender, IHttpClientFactory httpCl
     }
 
     // ── Images ───────────────────────────────────────────────────────────────
+
+    [HttpGet("{id:int}/images/upload-params")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<ActionResult<GetServicePackageUploadParamsQueryDto>> GetUploadParams(int id, CancellationToken ct)
+    {
+        return Ok(await sender.Send(new GetServicePackageUploadParamsQuery { ServicePackageId = id }, ct));
+    }
+
+    [HttpPost("{id:int}/images/confirm")]
+    [Authorize(Policy = AuthPolicies.AdminOrManager)]
+    public async Task<ActionResult<ServicePackageImageDto>> ConfirmImage(
+        int id, ConfirmServicePackageImageCommand command, CancellationToken ct)
+    {
+        command.ServicePackageId = id;
+        return Ok(await sender.Send(command, ct));
+    }
 
     [HttpPost("{id:int}/images")]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]

@@ -51,11 +51,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 /**
- * Check if URL is an auth endpoint that should not be intercepted.
+ * Check if URL is an auth endpoint or an external service that should not be intercepted.
  */
 function isAuthEndpoint(url: string): boolean {
   const u = url.toLowerCase();
-  return u.includes('/auth');
+  return u.includes('/auth') || u.includes('api.cloudinary.com');
 }
 
 /**
