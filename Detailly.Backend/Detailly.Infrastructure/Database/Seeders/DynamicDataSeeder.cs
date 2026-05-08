@@ -23,6 +23,10 @@ public static class DynamicDataSeeder
         await SeedLocationsAsync(context);
         await SeedServicePackagesAsync(context);
         await SeedVehiclesAsync(context);
+        await SeedEmployeeShiftsAsync(context);
+        await SeedBookingsAsync(context);
+        await SeedReviewsAsync(context);
+        await SeedReactionsAsync(context);
     }
 
     // ─────────────────────────── PRODUCT CATEGORIES ───────────────────────────
@@ -159,6 +163,13 @@ public static class DynamicDataSeeder
             Make("employee@detailly.local",           "Employee123!", "Workshop",  "Technician",    "employee",     "+38761111002", isEmployee: true,                                         balance: 150m),
             Make("amir.hodzic@detailly.local",        "Employee123!", "Amir",      "Hodzic",        "ahodzic",      "+38761222002", isEmployee: true,                                         balance: 120m),
             Make("tarik.kevric@detailly.local",       "Employee123!", "Tarik",     "Kevric",        "tkevric",      "+38761222003", isEmployee: true,                                         balance: 100m),
+            Make("emir.muric@detailly.local",          "Employee123!", "Emir",      "Murić",         "emuric",       "+38761222004", isEmployee: true,                                         balance: 110m),
+            Make("jasmin.tahirovic@detailly.local",    "Employee123!", "Jasmin",    "Tahirović",     "jtahirovic",   "+38761222005", isEmployee: true,                                         balance: 90m),
+            Make("amra.basic@detailly.local",          "Employee123!", "Amra",      "Bašić",         "abasic",       "+38761222006", isEmployee: true,                                         balance: 95m),
+            Make("nedzad.kukic@detailly.local",        "Employee123!", "Nedžad",    "Kukić",         "nkukic",       "+38761222007", isEmployee: true,                                         balance: 105m),
+            Make("maja.petrovic@detailly.local",       "Employee123!", "Maja",      "Petrović",      "mpetrovic",    "+38761222008", isEmployee: true,                                         balance: 85m),
+            Make("senad.kadic@detailly.local",         "Employee123!", "Senad",     "Kadić",         "skadic",       "+38761222009", isEmployee: true,                                         balance: 115m),
+            Make("lamija.hadzic@detailly.local",       "Employee123!", "Lamija",    "Hadžić",        "lhadzic",      "+38761222010", isEmployee: true,                                         balance: 88m),
 
             // ── Fleet clients ────────────────────────────────────────────
             Make("fleet@detailly.local",              "Fleet123!",    "Fleet",     "Client",        "fleetclient",  "+38761111003", isFleet: true,    company: "Bosna Logistics",              balance: 2500m, pct: 20),
@@ -540,5 +551,271 @@ public static class DynamicDataSeeder
 
         await context.SaveChangesAsync();
         Console.WriteLine("✅ Seed: vehicles.");
+    }
+
+    // ─────────────────────────── EMPLOYEE SHIFTS ───────────────────────────
+
+    private static async Task SeedEmployeeShiftsAsync(DatabaseContext context)
+    {
+        if (await context.EmployeeShifts.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        var users = await context.ApplicationUsers
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Username, x => x.Id);
+
+        var locations = await context.Locations
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        int sarajevo = locations["Detailly Sarajevo"];
+        int mostar   = locations["Detailly Mostar"];
+
+        EmployeeShiftEntity Shift(string username, int locationId, EmployeeWorkMode mode, DateTime start) =>
+            new EmployeeShiftEntity
+            {
+                EmployeeId     = users[username],
+                ShopLocationId = locationId,
+                EmployeeWorkMode = mode,
+                StartUtc       = start,
+                EndUtc         = start.AddHours(10),
+                CreatedAtUtc   = now
+            };
+
+        // Past week  Mon-Fri 2026-05-04 → 2026-05-08  (covers completed bookings on 05, 06, 07)
+        var pastDays = new[] { 4, 5, 6, 7, 8 }
+            .Select(d => new DateTime(2026, 5, d, 6, 0, 0, DateTimeKind.Utc)).ToArray();
+
+        // Future week  Mon-Fri 2026-05-11 → 2026-05-15  (covers confirmed bookings on 12, 14)
+        var futureDays = new[] { 11, 12, 13, 14, 15 }
+            .Select(d => new DateTime(2026, 5, d, 6, 0, 0, DateTimeKind.Utc)).ToArray();
+
+        var shifts = new List<EmployeeShiftEntity>();
+
+        // ahodzic + tkevric — Sarajevo InShop, both weeks (they work the completed bookings)
+        foreach (var day in pastDays.Concat(futureDays))
+        {
+            shifts.Add(Shift("ahodzic", sarajevo, EmployeeWorkMode.InShop, day));
+            shifts.Add(Shift("tkevric", sarajevo, EmployeeWorkMode.InShop, day));
+        }
+
+        // employee, emuric, jtahirovic — Sarajevo InShop, future week (cover confirmed bookings)
+        foreach (var day in futureDays)
+        {
+            shifts.Add(Shift("employee",   sarajevo, EmployeeWorkMode.InShop, day));
+            shifts.Add(Shift("emuric",     sarajevo, EmployeeWorkMode.InShop, day));
+            shifts.Add(Shift("jtahirovic", sarajevo, EmployeeWorkMode.InShop, day));
+            shifts.Add(Shift("lhadzic",    sarajevo, EmployeeWorkMode.InShop, day));
+        }
+
+        // abasic + nkukic — Mostar InShop, both weeks
+        foreach (var day in pastDays.Concat(futureDays))
+        {
+            shifts.Add(Shift("abasic", mostar, EmployeeWorkMode.InShop, day));
+            shifts.Add(Shift("nkukic", mostar, EmployeeWorkMode.InShop, day));
+        }
+
+        // mpetrovic + skadic — Sarajevo Mobile, both weeks
+        foreach (var day in pastDays.Concat(futureDays))
+        {
+            shifts.Add(Shift("mpetrovic", sarajevo, EmployeeWorkMode.Mobile, day));
+            shifts.Add(Shift("skadic",    sarajevo, EmployeeWorkMode.Mobile, day));
+        }
+
+        context.EmployeeShifts.AddRange(shifts);
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: employee shifts.");
+    }
+
+    // ─────────────────────────── BOOKINGS + PAYMENTS ───────────────────────────
+
+    private static async Task SeedBookingsAsync(DatabaseContext context)
+    {
+        if (await context.Bookings.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        var users = await context.ApplicationUsers
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Username, x => x.Id);
+
+        var vehicles = await context.Vehicles
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.LicencePlate, x => x.Id);
+
+        var packages = await context.ServicePackages
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        var packageItems = await context.ServicePackageItems
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x);
+
+        int sarajevo = (await context.Locations
+            .AsNoTracking()
+            .FirstAsync(l => l.Name == "Detailly Sarajevo")).Id;
+
+        // ── 1. Booking entities ──────────────────────────────────────────────
+        // b1: client  Quick Exterior Wash + Wheel Deep addon    70 BAM  completed
+        var b1 = new BookingEntity { CustomerId = users["client"],     ShopLocationId = sarajevo, ServicePackageId = packages["Quick Exterior Wash"], TotalPrice = 70.00m,  StartUtc = new DateTime(2026, 5, 5,  7,  0, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 5,  8, 55, 0, DateTimeKind.Utc),  RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Completed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+        // b2: lkovacevic  Interior Detail                      105 BAM  completed
+        var b2 = new BookingEntity { CustomerId = users["lkovacevic"], ShopLocationId = sarajevo, ServicePackageId = packages["Interior Detail"],     TotalPrice = 105.00m, StartUtc = new DateTime(2026, 5, 5,  9, 30, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 5,  12,  0, 0, DateTimeKind.Utc), RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Completed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+        // b3: mbegovic  Quick Exterior Wash                     40 BAM  completed
+        var b3 = new BookingEntity { CustomerId = users["mbegovic"],   ShopLocationId = sarajevo, ServicePackageId = packages["Quick Exterior Wash"], TotalPrice = 40.00m,  StartUtc = new DateTime(2026, 5, 6,  7,  0, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 6,  8, 10, 0, DateTimeKind.Utc),  RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Completed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+        // b4: haris123  Full Detail + Carnauba addon           270 BAM  completed
+        var b4 = new BookingEntity { CustomerId = users["haris123"],   ShopLocationId = sarajevo, ServicePackageId = packages["Full Detail"],         TotalPrice = 270.00m, StartUtc = new DateTime(2026, 5, 7,  7,  0, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 7, 13, 45, 0, DateTimeKind.Utc),  RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Completed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+        // b5: danis123  Exterior Detail                        120 BAM  confirmed (future)
+        var b5 = new BookingEntity { CustomerId = users["danis123"],   ShopLocationId = sarajevo, ServicePackageId = packages["Exterior Detail"],     TotalPrice = 120.00m, StartUtc = new DateTime(2026, 5, 12, 7,  0, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 12, 10,  5, 0, DateTimeKind.Utc), RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Confirmed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+        // b6: client    Interior Detail                        105 BAM  confirmed (future)
+        var b6 = new BookingEntity { CustomerId = users["client"],     ShopLocationId = sarajevo, ServicePackageId = packages["Interior Detail"],     TotalPrice = 105.00m, StartUtc = new DateTime(2026, 5, 14, 7,  0, 0, DateTimeKind.Utc), EndUtc = new DateTime(2026, 5, 14,  9, 30, 0, DateTimeKind.Utc), RequiredEmployees = 1, RequiredBays = 1, Status = BookingStatus.Confirmed, ServiceMode = ServiceMode.InShop, CreatedAtUtc = now };
+
+        context.Bookings.AddRange(b1, b2, b3, b4, b5, b6);
+        await context.SaveChangesAsync();
+
+        // ── 2. Vehicle + employee assignments, add-on items ──────────────────
+        context.BookingVehicleAssignments.AddRange(
+            new BookingVehicleAssignmentEntity { BookingId = b1.Id, VehicleId = vehicles["A12-345"], CreatedAtUtc = now },
+            new BookingVehicleAssignmentEntity { BookingId = b2.Id, VehicleId = vehicles["E11-222"], CreatedAtUtc = now },
+            new BookingVehicleAssignmentEntity { BookingId = b3.Id, VehicleId = vehicles["K34-567"], CreatedAtUtc = now },
+            new BookingVehicleAssignmentEntity { BookingId = b4.Id, VehicleId = vehicles["T55-123"], CreatedAtUtc = now },
+            new BookingVehicleAssignmentEntity { BookingId = b5.Id, VehicleId = vehicles["T66-456"], CreatedAtUtc = now },
+            new BookingVehicleAssignmentEntity { BookingId = b6.Id, VehicleId = vehicles["A12-345"], CreatedAtUtc = now }
+        );
+
+        context.BookingEmployeeAssignments.AddRange(
+            new BookingEmployeeAssignmentEntity { BookingId = b1.Id, EmployeeId = users["ahodzic"],  AssignedAtUtc = now, CreatedAtUtc = now },
+            new BookingEmployeeAssignmentEntity { BookingId = b2.Id, EmployeeId = users["tkevric"],  AssignedAtUtc = now, CreatedAtUtc = now },
+            new BookingEmployeeAssignmentEntity { BookingId = b3.Id, EmployeeId = users["ahodzic"],  AssignedAtUtc = now, CreatedAtUtc = now },
+            new BookingEmployeeAssignmentEntity { BookingId = b4.Id, EmployeeId = users["tkevric"],  AssignedAtUtc = now, CreatedAtUtc = now },
+            new BookingEmployeeAssignmentEntity { BookingId = b5.Id, EmployeeId = users["employee"], AssignedAtUtc = now, CreatedAtUtc = now },
+            new BookingEmployeeAssignmentEntity { BookingId = b6.Id, EmployeeId = users["employee"], AssignedAtUtc = now, CreatedAtUtc = now }
+        );
+
+        var wheelDeep = packageItems["Wheel Deep Cleaning and Protection"];
+        var carnauba  = packageItems["Carnauba Wax Finish"];
+
+        context.BookingItems.AddRange(
+            new BookingItemEntity { BookingId = b1.Id, ServicePackageItemId = wheelDeep.Id, PriceSnapshot = wheelDeep.Price, DurationMinutesSnapshot = wheelDeep.DurationMinutes, RequiredEmployeesSnapshot = wheelDeep.RequiredEmployees, IsAddon = true, CreatedAtUtc = now },
+            new BookingItemEntity { BookingId = b4.Id, ServicePackageItemId = carnauba.Id,  PriceSnapshot = carnauba.Price,  DurationMinutesSnapshot = carnauba.DurationMinutes,  RequiredEmployeesSnapshot = carnauba.RequiredEmployees,  IsAddon = true, CreatedAtUtc = now }
+        );
+
+        await context.SaveChangesAsync();
+
+        // ── 3. Payment transactions ──────────────────────────────────────────
+        var walletsByUserId = await context.Wallet
+            .AsNoTracking()
+            .ToDictionaryAsync(w => w.ApplicationUserId, w => w.Id);
+
+        context.PaymentTransactions.AddRange(
+            new PaymentTransactionEntity { Amount = b1.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 5,  6, 50, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["client"]],     BookingId = b1.Id, CreatedAtUtc = now },
+            new PaymentTransactionEntity { Amount = b2.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 5,  9, 20, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["lkovacevic"]], BookingId = b2.Id, CreatedAtUtc = now },
+            new PaymentTransactionEntity { Amount = b3.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 6,  6, 50, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["mbegovic"]],   BookingId = b3.Id, CreatedAtUtc = now },
+            new PaymentTransactionEntity { Amount = b4.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 7,  6, 50, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["haris123"]],   BookingId = b4.Id, CreatedAtUtc = now },
+            new PaymentTransactionEntity { Amount = b5.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 9, 14,  0, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["danis123"]],   BookingId = b5.Id, CreatedAtUtc = now },
+            new PaymentTransactionEntity { Amount = b6.TotalPrice, TransactionType = TransactionType.Payment, Status = PaymentTransactionStatus.Paid, TransactionDate = new DateTime(2026, 5, 10, 10,  0, 0, DateTimeKind.Utc), Provider = "Wallet", Description = "Booking payment via wallet.", WalletId = walletsByUserId[users["client"]],     BookingId = b6.Id, CreatedAtUtc = now }
+        );
+        await context.SaveChangesAsync();
+
+        // ── 4. Deduct wallet balances ────────────────────────────────────────
+        // client: b1 (70) + b6 (105) = 175 deducted from 320 → 145 remaining
+        var deductions = new Dictionary<int, decimal>
+        {
+            { users["client"],     175.00m },
+            { users["lkovacevic"], 105.00m },
+            { users["mbegovic"],    40.00m },
+            { users["haris123"],   270.00m },
+            { users["danis123"],   120.00m }
+        };
+
+        var wallets = await context.Wallet
+            .Where(w => deductions.Keys.Contains(w.ApplicationUserId))
+            .ToListAsync();
+
+        foreach (var w in wallets)
+            w.Balance -= deductions[w.ApplicationUserId];
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: bookings + payments.");
+    }
+
+    // ─────────────────────────── REVIEWS ───────────────────────────
+
+    private static async Task SeedReviewsAsync(DatabaseContext context)
+    {
+        if (await context.Reviews.AnyAsync())
+            return;
+
+        var users = await context.ApplicationUsers
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Username, x => x.Id);
+
+        var packages = await context.ServicePackages
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        var completed = await context.Bookings
+            .AsNoTracking()
+            .Where(b => b.Status == BookingStatus.Completed)
+            .ToListAsync();
+
+        BookingEntity? Find(int customerId, int packageId) =>
+            completed.FirstOrDefault(b => b.CustomerId == customerId && b.ServicePackageId == packageId);
+
+        var b1 = Find(users["client"],     packages["Quick Exterior Wash"]);
+        var b2 = Find(users["lkovacevic"], packages["Interior Detail"]);
+        var b3 = Find(users["mbegovic"],   packages["Quick Exterior Wash"]);
+        var b4 = Find(users["haris123"],   packages["Full Detail"]);
+
+        if (b1 is null || b2 is null || b3 is null || b4 is null)
+            return;
+
+        // Reviews must be created within 7 days of booking.EndUtc (all are within window)
+        context.Reviews.AddRange(
+            new ReviewEntity { BookingId = b1.Id, ServicePackageId = packages["Quick Exterior Wash"], CustomerId = users["client"],     Rating = 5, Description = "Excellent service — car looked spotless after. Quick and professional.",               IsDeleted = false, CreatedAtUtc = new DateTime(2026, 5, 6,  9,  0, 0, DateTimeKind.Utc) },
+            new ReviewEntity { BookingId = b2.Id, ServicePackageId = packages["Interior Detail"],     CustomerId = users["lkovacevic"], Rating = 4, Description = "Very thorough interior clean. The leather feels great. Will definitely return.",       IsDeleted = false, CreatedAtUtc = new DateTime(2026, 5, 7, 10,  0, 0, DateTimeKind.Utc) },
+            new ReviewEntity { BookingId = b3.Id, ServicePackageId = packages["Quick Exterior Wash"], CustomerId = users["mbegovic"],   Rating = 4, Description = "Quick and well done. Good value for money.",                                           IsDeleted = false, CreatedAtUtc = new DateTime(2026, 5, 7,  9, 30, 0, DateTimeKind.Utc) },
+            new ReviewEntity { BookingId = b4.Id, ServicePackageId = packages["Full Detail"],         CustomerId = users["haris123"],   Rating = 5, Description = "Outstanding result. The paint correction made a night-and-day difference. Coming back for ceramic.", IsDeleted = false, CreatedAtUtc = new DateTime(2026, 5, 8,  8,  0, 0, DateTimeKind.Utc) }
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: reviews.");
+    }
+
+    // ─────────────────────────── REACTIONS ───────────────────────────
+
+    private static async Task SeedReactionsAsync(DatabaseContext context)
+    {
+        if (await context.Reactions.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        var users = await context.ApplicationUsers
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Username, x => x.Id);
+
+        var packages = await context.ServicePackages
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        // Unique constraint: (CustomerId, ServicePackageId) — one reaction per user per package
+        context.Reactions.AddRange(
+            new ReactionEntity { CustomerId = users["danis123"],   ServicePackageId = packages["Quick Exterior Wash"],                       ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["mbegovic"],   ServicePackageId = packages["Quick Exterior Wash"],                       ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["client"],     ServicePackageId = packages["Exterior Detail"],                           ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["client"],     ServicePackageId = packages["Full Detail"],                               ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["lkovacevic"], ServicePackageId = packages["Full Detail"],                               ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["lkovacevic"], ServicePackageId = packages["Interior Detail"],                           ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["haris123"],   ServicePackageId = packages["Elite Ceramic Coating (3 yr)"],              ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["najanovic"],  ServicePackageId = packages["Paint Correction & Ceramic Coating (1 yr)"], ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["danis123"],   ServicePackageId = packages["Interior Detail"],                           ReactionType = ReactionType.Like,    CreatedAtUtc = now },
+            new ReactionEntity { CustomerId = users["mbegovic"],   ServicePackageId = packages["Full Detail"],                               ReactionType = ReactionType.Dislike, CreatedAtUtc = now }
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: reactions.");
     }
 }
