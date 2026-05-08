@@ -38,8 +38,8 @@ public static class DependencyInjection
         services.AddScoped<ICloudinaryService, CloudinaryService>();
 
         // PDF generators
-        services.AddScoped<IBookingsPdfGenerator, BookingsPdfGeneratorImpl>();
-        services.AddScoped<IShiftsPdfGenerator, ShiftsPdfGeneratorImpl>();
+        services.AddScoped<IBookingsPdfGenerator, BookingsPdfGenerator>();
+        services.AddScoped<IShiftsPdfGenerator, ShiftsPdfGenerator>();
 
         // Typed ConnectionStrings + validation
         services.AddOptions<ConnectionStringsOptions>()

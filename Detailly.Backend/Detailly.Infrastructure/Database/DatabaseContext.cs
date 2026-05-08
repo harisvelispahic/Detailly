@@ -65,7 +65,6 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     // Shared
     public DbSet<AddressEntity> Addresses => Set<AddressEntity>();
     public DbSet<ImageEntity> Images => Set<ImageEntity>();
-    public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
 
 
 
