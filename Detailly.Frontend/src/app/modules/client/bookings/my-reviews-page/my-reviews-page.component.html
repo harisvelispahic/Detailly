@@ -25,51 +25,66 @@
   </div>
 
   <!-- ── Loading ──────────────────────────────────────────── -->
-  <div *ngIf="isLoading" class="my-reviews-page__loading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (isLoading) {
+    <div class="my-reviews-page__loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
   <!-- ── Empty state ──────────────────────────────────────── -->
-  <div *ngIf="!isLoading && items.length === 0" class="my-reviews-page__empty">
-    <mat-icon>star_border</mat-icon>
-    <p>You haven't reviewed any bookings yet.</p>
-    <a mat-stroked-button routerLink="/client/bookings">View My Bookings</a>
-  </div>
+  @if (!isLoading && items.length === 0) {
+    <div class="my-reviews-page__empty">
+      <mat-icon>star_border</mat-icon>
+      <p>You haven't reviewed any bookings yet.</p>
+      <a mat-stroked-button routerLink="/client/bookings">View My Bookings</a>
+    </div>
+  }
 
   <!-- ── Reviews list ─────────────────────────────────────── -->
-  <div *ngIf="!isLoading && items.length > 0" class="my-reviews-list">
-    <h2 class="my-reviews-list__title">{{ totalItems }} Review{{ totalItems !== 1 ? 's' : '' }}</h2>
+  @if (!isLoading && items.length > 0) {
+    <div class="my-reviews-list">
+      <h2 class="my-reviews-list__title">
+        {{ totalItems }} Review{{ totalItems !== 1 ? 's' : '' }}
+      </h2>
 
-    <div *ngFor="let review of items" class="my-review-card">
-      <!-- Service package name + addons -->
-      <div class="my-review-card__top">
-        <span class="my-review-card__pkg-name">{{ review.servicePackageName }}</span>
-        <span *ngIf="review.addonNames.length > 0" class="my-review-card__addons">
-          <span
-            *ngFor="let addon of review.addonNames"
-            class="my-review-card__addon-badge"
-          >{{ addon }}</span>
-        </span>
-      </div>
+      @for (review of items; track $index) {
+        <div class="my-review-card">
+          <!-- Service package name + addons -->
+          <div class="my-review-card__top">
+            <span class="my-review-card__pkg-name">{{ review.servicePackageName }}</span>
+            @if (review.addonNames.length > 0) {
+              <span class="my-review-card__addons">
+                @for (addon of review.addonNames; track $index) {
+                  <span class="my-review-card__addon-badge">{{ addon }}</span>
+                }
+              </span>
+            }
+          </div>
 
-      <!-- Stars + date -->
-      <div class="my-review-card__meta">
-        <div class="my-review-card__stars">
-          <mat-icon
-            *ngFor="let s of getStarArray(review.rating)"
-            class="my-review-card__star"
-            [class.my-review-card__star--filled]="s === 'full'"
-          >{{ s === 'full' ? 'star' : 'star_border' }}</mat-icon>
+          <!-- Stars + date -->
+          <div class="my-review-card__meta">
+            <div class="my-review-card__stars">
+              @for (s of getStarArray(review.rating); track $index) {
+                <mat-icon
+                  class="my-review-card__star"
+                  [class.my-review-card__star--filled]="s === 'full'"
+                  >{{ s === 'full' ? 'star' : 'star_border' }}</mat-icon
+                >
+              }
+            </div>
+            <span class="my-review-card__date">{{ review.ratedAtUtc | detailyDate: 'long' }}</span>
+          </div>
+
+          <!-- Description -->
+          @if (review.description) {
+            <p class="my-review-card__description">
+              {{ review.description }}
+            </p>
+          }
         </div>
-        <span class="my-review-card__date">{{ review.ratedAtUtc | detailyDate: 'long' }}</span>
-      </div>
+      }
 
-      <!-- Description -->
-      <p *ngIf="review.description" class="my-review-card__description">
-        {{ review.description }}
-      </p>
+      <app-paginator-bar [vm]="this"></app-paginator-bar>
     </div>
-
-    <app-paginator-bar [vm]="this"></app-paginator-bar>
-  </div>
+  }
 </section>

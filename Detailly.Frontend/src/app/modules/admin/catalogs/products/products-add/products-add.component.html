@@ -8,16 +8,20 @@
   <div class="form-card mat-elevation-z2">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <!-- Error Message -->
-      <div *ngIf="errorMessage" class="error-banner">
-        <mat-icon>error</mat-icon>
-        <span>{{ errorMessage }}</span>
-      </div>
+      @if (errorMessage) {
+        <div class="error-banner">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+      }
 
       <!-- Loading Indicator -->
-      <div *ngIf="isLoading" class="loading-overlay">
-        <mat-spinner diameter="50"></mat-spinner>
-        <p>{{ 'PRODUCTS.ADD.SAVING' | translate }}</p>
-      </div>
+      @if (isLoading) {
+        <div class="loading-overlay">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>{{ 'PRODUCTS.ADD.SAVING' | translate }}</p>
+        </div>
+      }
 
       <!-- Product Name -->
       <mat-form-field appearance="outline" class="full-width">
@@ -28,9 +32,11 @@
           [placeholder]="'PRODUCTS.FORM.NAME_PLACEHOLDER' | translate"
         />
         <mat-icon matSuffix>inventory_2</mat-icon>
-        <mat-error *ngIf="hasError('name')">
-          {{ getErrorMessage('name') }}
-        </mat-error>
+        @if (hasError('name')) {
+          <mat-error>
+            {{ getErrorMessage('name') }}
+          </mat-error>
+        }
       </mat-form-field>
 
       <!-- Description -->
@@ -43,9 +49,11 @@
           rows="4"
         ></textarea>
         <mat-icon matSuffix>description</mat-icon>
-        <mat-error *ngIf="hasError('description')">
-          {{ getErrorMessage('description') }}
-        </mat-error>
+        @if (hasError('description')) {
+          <mat-error>
+            {{ getErrorMessage('description') }}
+          </mat-error>
+        }
       </mat-form-field>
 
       <!-- Price and Category Row -->

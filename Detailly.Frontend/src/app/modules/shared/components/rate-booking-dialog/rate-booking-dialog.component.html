@@ -6,71 +6,83 @@
     <p class="rate-dialog__subtitle">{{ data.servicePackageName }}</p>
   </div>
 
-  <div *ngIf="isLoading" class="rate-dialog__loading">
-    <mat-spinner diameter="36"></mat-spinner>
-  </div>
-
-  <form *ngIf="!isLoading" [formGroup]="form" (ngSubmit)="submit()" class="rate-dialog__body">
-    <!-- Star picker -->
-    <div class="rate-dialog__stars-label">Your Rating</div>
-    <div class="rate-dialog__stars">
-      <button
-        *ngFor="let star of [1, 2, 3, 4, 5]"
-        type="button"
-        class="rate-dialog__star"
-        [class.rate-dialog__star--active]="star <= activeRating"
-        (mouseenter)="hoverRating = star"
-        (mouseleave)="hoverRating = 0"
-        (click)="setRating(star)"
-        [attr.aria-label]="'Rate ' + star + ' stars'"
-      >
-        <mat-icon>{{ star <= activeRating ? 'star' : 'star_border' }}</mat-icon>
-      </button>
-      <span class="rate-dialog__star-label" *ngIf="activeRating > 0">
-        {{ starLabels[activeRating] }}
-      </span>
+  @if (isLoading) {
+    <div class="rate-dialog__loading">
+      <mat-spinner diameter="36"></mat-spinner>
     </div>
-    <div
-      class="rate-dialog__star-error"
-      *ngIf="form.get('rating')?.touched && form.get('rating')?.value < 1"
-    >
-      Please select a rating.
-    </div>
+  }
 
-    <!-- Description -->
-    <mat-form-field appearance="outline" class="rate-dialog__field">
-      <mat-label>Your Review (optional)</mat-label>
-      <textarea
-        matInput
-        formControlName="description"
-        rows="4"
-        placeholder="Tell us about your experience..."
-        maxlength="1000"
-      ></textarea>
-      <mat-hint align="end">{{ descriptionLength }}/1000</mat-hint>
-      <mat-error *ngIf="form.get('description')?.hasError('maxlength')">
-        Max 1000 characters.
-      </mat-error>
-    </mat-form-field>
+  @if (!isLoading) {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="rate-dialog__body">
+      <!-- Star picker -->
+      <div class="rate-dialog__stars-label">Your Rating</div>
+      <div class="rate-dialog__stars">
+        @for (star of [1, 2, 3, 4, 5]; track star) {
+          <button
+            type="button"
+            class="rate-dialog__star"
+            [class.rate-dialog__star--active]="star <= activeRating"
+            (mouseenter)="hoverRating = star"
+            (mouseleave)="hoverRating = 0"
+            (click)="setRating(star)"
+            [attr.aria-label]="'Rate ' + star + ' stars'"
+          >
+            <mat-icon>{{ star <= activeRating ? 'star' : 'star_border' }}</mat-icon>
+          </button>
+        }
+        @if (activeRating > 0) {
+          <span class="rate-dialog__star-label">
+            {{ starLabels[activeRating] }}
+          </span>
+        }
+      </div>
+      @if (form.get('rating')?.touched && form.get('rating')?.value < 1) {
+        <div class="rate-dialog__star-error">
+          Please select a rating.
+        </div>
+      }
 
-    <div class="rate-dialog__error" *ngIf="errorMessage">
-      <mat-icon>error_outline</mat-icon>
-      {{ errorMessage }}
-    </div>
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="rate-dialog__field">
+        <mat-label>Your Review (optional)</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="4"
+          placeholder="Tell us about your experience..."
+          maxlength="1000"
+        ></textarea>
+        <mat-hint align="end">{{ descriptionLength }}/1000</mat-hint>
+        @if (form.get('description')?.hasError('maxlength')) {
+          <mat-error>
+            Max 1000 characters.
+          </mat-error>
+        }
+      </mat-form-field>
 
-    <div class="rate-dialog__actions">
-      <button type="button" mat-stroked-button (click)="cancel()" [disabled]="isSubmitting">
-        Cancel
-      </button>
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        [disabled]="isSubmitting || form.get('rating')!.value < 1"
-      >
-        <mat-spinner *ngIf="isSubmitting" diameter="18" class="btn-spinner"></mat-spinner>
-        {{ isEditMode ? 'Update Review' : 'Submit Review' }}
-      </button>
-    </div>
-  </form>
+      @if (errorMessage) {
+        <div class="rate-dialog__error">
+          <mat-icon>error_outline</mat-icon>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <div class="rate-dialog__actions">
+        <button type="button" mat-stroked-button (click)="cancel()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button
+          type="submit"
+          mat-raised-button
+          color="primary"
+          [disabled]="isSubmitting || form.get('rating')!.value < 1"
+        >
+          @if (isSubmitting) {
+            <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+          }
+          {{ isEditMode ? 'Update Review' : 'Submit Review' }}
+        </button>
+      </div>
+    </form>
+  }
 </div>

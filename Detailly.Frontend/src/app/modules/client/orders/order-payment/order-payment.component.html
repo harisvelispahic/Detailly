@@ -1,11 +1,15 @@
 <div class="box">
   <h2 class="title is-4">Pay Order</h2>
 
-  <div *ngIf="isLoading">Loading...</div>
+  @if (isLoading) {
+    <div>Loading...</div>
+  }
 
-  <div *ngIf="cardError" class="notification is-danger">
-    {{ cardError }}
-  </div>
+  @if (cardError) {
+    <div class="notification is-danger">
+      {{ cardError }}
+    </div>
+  }
 
   <div id="card-element" class="mb-3"></div>
 

@@ -39,32 +39,38 @@
     <div class="new-status-section">
       <span class="section-label">{{ 'ORDERS.CHANGE_STATUS.NEW_STATUS' | translate }}</span>
 
-      <div *ngIf="availableStatuses.length === 0" class="no-transitions">
-        <mat-icon>block</mat-icon>
-        <p>{{ 'ORDERS.CHANGE_STATUS.NO_TRANSITIONS' | translate }}</p>
-      </div>
+      @if (availableStatuses.length === 0) {
+        <div class="no-transitions">
+          <mat-icon>block</mat-icon>
+          <p>{{ 'ORDERS.CHANGE_STATUS.NO_TRANSITIONS' | translate }}</p>
+        </div>
+      }
 
-      <mat-radio-group
-        [(ngModel)]="selectedStatus"
-        class="status-radio-group"
-        *ngIf="availableStatuses.length > 0">
-        <mat-radio-button
-          *ngFor="let status of availableStatuses"
-          [value]="status"
-          class="status-radio-option">
-          <div class="status-badge" [ngClass]="getStatusClass(status)">
-            <mat-icon>{{ getStatusIcon(status) }}</mat-icon>
-            <span>{{ getStatusLabel(status) | translate }}</span>
-          </div>
-        </mat-radio-button>
-      </mat-radio-group>
+      @if (availableStatuses.length > 0) {
+        <mat-radio-group
+          [(ngModel)]="selectedStatus"
+          class="status-radio-group">
+          @for (status of availableStatuses; track status) {
+            <mat-radio-button
+              [value]="status"
+              class="status-radio-option">
+              <div class="status-badge" [ngClass]="getStatusClass(status)">
+                <mat-icon>{{ getStatusIcon(status) }}</mat-icon>
+                <span>{{ getStatusLabel(status) | translate }}</span>
+              </div>
+            </mat-radio-button>
+          }
+        </mat-radio-group>
+      }
     </div>
 
     <!-- Warning Message -->
-    <div class="warning-message" *ngIf="selectedStatus === OrderStatusType.Cancelled">
-      <mat-icon>warning</mat-icon>
-      <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
-    </div>
+    @if (selectedStatus === OrderStatusType.Cancelled) {
+      <div class="warning-message">
+        <mat-icon>warning</mat-icon>
+        <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
+      </div>
+    }
   </div>
 
   <!-- Actions -->

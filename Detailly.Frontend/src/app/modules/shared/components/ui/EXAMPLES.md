@@ -21,9 +21,7 @@ Important rule:
 ### Outline action
 
 ```html
-<app-button variant="outline" (clicked)="openDetails()">
-  View Details
-</app-button>
+<app-button variant="outline" (clicked)="openDetails()"> View Details </app-button>
 ```
 
 ### Icon-only button
@@ -37,9 +35,7 @@ Important rule:
 ### Status action
 
 ```html
-<app-button variant="success" size="sm" (clicked)="markComplete()">
-  Mark Complete
-</app-button>
+<app-button variant="success" size="sm" (clicked)="markComplete()"> Mark Complete </app-button>
 ```
 
 ## Badges
@@ -47,10 +43,10 @@ Important rule:
 ### Order status
 
 ```html
-<app-badge *ngIf="status === 'pending'" variant="pending">Pending</app-badge>
-<app-badge *ngIf="status === 'confirmed'" variant="confirmed">Confirmed</app-badge>
-<app-badge *ngIf="status === 'completed'" variant="completed">Completed</app-badge>
-<app-badge *ngIf="status === 'cancelled'" variant="cancelled">Cancelled</app-badge>
+@if (status === 'pending') { <app-badge variant="pending">Pending</app-badge> }
+@if (status === 'confirmed') { <app-badge variant="confirmed">Confirmed</app-badge> }
+@if (status === 'completed') { <app-badge variant="completed">Completed</app-badge> }
+@if (status === 'cancelled') { <app-badge variant="cancelled">Cancelled</app-badge> }
 ```
 
 ### Role badge

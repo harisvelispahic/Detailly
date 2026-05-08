@@ -1,26 +1,28 @@
 <h2 mat-dialog-title>{{ title }}</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="form" *ngIf="!isLoading && form">
-    <!-- Category Name -->
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>{{ 'PRODUCT_CATEGORIES.FORM.NAME' | translate }}</mat-label>
-      <input
-        matInput
-        formControlName="name"
-        [placeholder]="'PRODUCT_CATEGORIES.FORM.NAME_PLACEHOLDER' | translate"
-        maxlength="100"
-        autocomplete="off"
-      />
-      <mat-icon matSuffix>label</mat-icon>
-      @if (form.get('name')?.invalid) {
-        <mat-error>
-          {{ getErrorMessage('name') }}
-        </mat-error>
-      }
-      <mat-hint align="end">{{ form.get('name')?.value?.length || 0 }}/100</mat-hint>
-    </mat-form-field>
-  </form>
+  @if (!isLoading && form) {
+    <form [formGroup]="form">
+      <!-- Category Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ 'PRODUCT_CATEGORIES.FORM.NAME' | translate }}</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          [placeholder]="'PRODUCT_CATEGORIES.FORM.NAME_PLACEHOLDER' | translate"
+          maxlength="100"
+          autocomplete="off"
+        />
+        <mat-icon matSuffix>label</mat-icon>
+        @if (form.get('name')?.invalid) {
+          <mat-error>
+            {{ getErrorMessage('name') }}
+          </mat-error>
+        }
+        <mat-hint align="end">{{ form.get('name')?.value?.length || 0 }}/100</mat-hint>
+      </mat-form-field>
+    </form>
+  }
 
   <!-- Loading State -->
   @if (isLoading && !form) {
