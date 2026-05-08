@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
   selector: 'app-root',
   templateUrl: './app.component.html',
   standalone: false,
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
   protected readonly title = signal('rs1-frontend-2025-26');
@@ -14,11 +14,13 @@ export class AppComponent implements OnInit {
   constructor(private translate: TranslateService) {
     console.log('AppComponent constructor - initializing TranslateService');
 
-    // Inicijalizacija translate servisa
+    // ================== TO BE REMOVED ==================
+    // Translate service initialization
     this.translate.addLangs(['en', 'bs']);
     this.translate.setDefaultLang('bs');
 
-    // Učitaj jezik iz localStorage ili koristi default
+    // ================== TO BE REMOVED ==================
+    // Load language from localStorage or use default
     const savedLang = localStorage.getItem('language') || 'bs';
     this.currentLang = savedLang;
 
@@ -30,7 +32,7 @@ export class AppComponent implements OnInit {
       error: (error) => {
         console.error('Error loading translations:', error);
         console.error('Check if files exist at: /i18n/' + savedLang + '.json');
-      }
+      },
     });
   }
 
@@ -57,7 +59,7 @@ export class AppComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error switching language:', error);
-      }
+      },
     });
   }
 }

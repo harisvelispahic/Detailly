@@ -1,15 +1,13 @@
 <div class="dashboard" [class.sidebar-open]="isSidebarOpen()">
-
   <!-- Mobile backdrop — tap to close -->
   <div class="dashboard__backdrop" (click)="closeSidebar()"></div>
 
   <!-- ── SIDEBAR ──────────────────────────────────────────────────────────── -->
   <aside class="dashboard__sidebar">
-
     <!-- Brand strip -->
     <div class="sidebar__brand">
       <img
-        src="/assets/images/detailly-logo-transparent.png"
+        src="/assets/images/detailly-logo-transparent.svg"
         alt="Detailly"
         class="sidebar__logo"
       />
@@ -21,7 +19,6 @@
 
     <!-- Navigation — scrollable -->
     <nav class="sidebar__nav">
-
       <!-- ── WORKSPACE (all staff) ──────────────────────────────────────── -->
       <p class="sidebar__group-label">Workspace</p>
 
@@ -121,12 +118,6 @@
           <mat-icon class="sidebar__item-icon">assignment_ind</mat-icon>
           <span>Assign Bookings</span>
         </a>
-
-        <span class="sidebar__item sidebar__item--disabled" aria-disabled="true">
-          <mat-icon class="sidebar__item-icon">analytics</mat-icon>
-          <span>Reports</span>
-          <span class="sidebar__badge sidebar__badge--soon">Soon</span>
-        </span>
       }
 
       <!-- ── ADMIN — LEGACY (admin only) ───────────────────────────────── -->
@@ -184,12 +175,10 @@
           <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
         </a>
       }
-
     </nav>
 
     <!-- ── SIDEBAR BOTTOM ─────────────────────────────────────────────── -->
     <div class="sidebar__bottom">
-
       <!-- User info card -->
       <a class="sidebar__user-card" routerLink="/client/profile" (click)="closeSidebar()">
         <div class="sidebar__avatar">{{ initials() }}</div>
@@ -227,14 +216,11 @@
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>
       </a>
-
     </div>
-
   </aside>
 
   <!-- ── CONTENT WRAPPER ─────────────────────────────────────────────────── -->
   <div class="dashboard__main">
-
     <!-- Mobile top bar (hidden on desktop) -->
     <header class="dashboard__mobile-bar">
       <button
@@ -246,7 +232,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       <img
-        src="/assets/images/detailly-logo-transparent.png"
+        src="/assets/images/detailly-logo-transparent.svg"
         alt="Detailly"
         class="dashboard__mobile-logo"
       />
@@ -256,7 +242,5 @@
     <main class="dashboard__content">
       <router-outlet></router-outlet>
     </main>
-
   </div>
-
 </div>

@@ -20,7 +20,7 @@ const routes: Routes = [
       { path: 'product-categories', component: ProductCategoriesComponent },
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'settings', component: AdminSettingsComponent },
-      { path: '', redirectTo: 'products', pathMatch: 'full' },
+      { path: '', redirectTo: '/staff', pathMatch: 'full' },
     ],
   },
 ];

@@ -24,7 +24,7 @@ export class CurrentUserService {
     const user = this.snapshot;
     if (!user) return '/login';
 
-    if (user.isAdmin) return '/admin';
+    if (user.isAdmin) return '/staff';
 
     // staff
     if (user.isManager || user.isEmployee) return '/staff';

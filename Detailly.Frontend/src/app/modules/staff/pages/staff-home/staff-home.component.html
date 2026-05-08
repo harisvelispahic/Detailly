@@ -6,7 +6,7 @@
       <p class="staff-home__greeting">Welcome back</p>
       <h1 class="staff-home__title">{{ roleLabel() }} Dashboard</h1>
       <p class="staff-home__subtitle">
-        Here's your workspace. Use the sidebar to navigate to your tools.
+        Here's your workspace. Select a card below to navigate to your tools.
       </p>
     </div>
 
@@ -18,24 +18,82 @@
   <!-- Quick-action cards -->
   <div class="staff-home__grid">
 
-    <!-- All roles: home -->
-    <div class="staff-home__card staff-home__card--primary">
-      <mat-icon>home</mat-icon>
-      <div>
-        <h3>Dashboard</h3>
-        <p>You're here — your overview and hub.</p>
-      </div>
-    </div>
-
-    <!-- Management+ -->
-    @if (auth.isAdmin() || auth.isManager()) {
-      <div class="staff-home__card staff-home__card--info">
-        <mat-icon>analytics</mat-icon>
+    <!-- Employee: personal tools -->
+    @if (auth.isEmployee()) {
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/my-shifts">
+        <mat-icon>calendar_today</mat-icon>
         <div>
-          <h3>Reports <span class="tag tag--soon">Coming soon</span></h3>
-          <p>Performance metrics and summaries.</p>
+          <h3>My Shifts</h3>
+          <p>View your upcoming and past shifts.</p>
         </div>
-      </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/my-bookings">
+        <mat-icon>book_online</mat-icon>
+        <div>
+          <h3>My Bookings</h3>
+          <p>Manage your assigned bookings.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+    }
+
+    <!-- Management (manager + admin) -->
+    @if (auth.isAdmin() || auth.isManager()) {
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/staff-members">
+        <mat-icon>group</mat-icon>
+        <div>
+          <h3>Staff Members</h3>
+          <p>Manage your team and their roles.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/shifts">
+        <mat-icon>schedule</mat-icon>
+        <div>
+          <h3>Employee Shifts</h3>
+          <p>Schedule and track employee shifts.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/locations">
+        <mat-icon>store</mat-icon>
+        <div>
+          <h3>Locations</h3>
+          <p>Configure your service locations.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/service-packages">
+        <mat-icon>spa</mat-icon>
+        <div>
+          <h3>Service Packages</h3>
+          <p>Define and manage service offerings.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/vehicle-categories">
+        <mat-icon>directions_car</mat-icon>
+        <div>
+          <h3>Vehicle Categories</h3>
+          <p>Set up vehicle size categories.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
+
+      <a class="staff-home__card staff-home__card--accent" routerLink="/staff/assign-bookings">
+        <mat-icon>assignment_ind</mat-icon>
+        <div>
+          <h3>Assign Bookings</h3>
+          <p>Assign bookings to staff members.</p>
+        </div>
+        <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+      </a>
     }
 
     <!-- Admin — legacy features pending reimplementation -->
