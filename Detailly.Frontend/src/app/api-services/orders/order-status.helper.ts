@@ -17,17 +17,17 @@ export class OrderStatusHelper {
   static getLabel(status: OrderStatusType): string {
     switch (status) {
       case OrderStatusType.Draft:
-        return 'ORDERS.STATUS.DRAFT';
+        return 'Draft';
       case OrderStatusType.Confirmed:
-        return 'ORDERS.STATUS.CONFIRMED';
+        return 'Confirmed';
       case OrderStatusType.Paid:
-        return 'ORDERS.STATUS.PAID';
+        return 'Paid';
       case OrderStatusType.Completed:
-        return 'ORDERS.STATUS.COMPLETED';
+        return 'Completed';
       case OrderStatusType.Cancelled:
-        return 'ORDERS.STATUS.CANCELLED';
+        return 'Cancelled';
       default:
-        return 'ORDERS.STATUS.UNKNOWN';
+        return 'Unknown';
     }
   }
 

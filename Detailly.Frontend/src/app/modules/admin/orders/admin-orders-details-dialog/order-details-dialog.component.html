@@ -4,7 +4,7 @@
     <div class="header-left">
       <mat-icon class="header-icon">receipt_long</mat-icon>
       <h2 mat-dialog-title>
-        {{ 'ORDERS.DETAILS.TITLE' | translate }}
+        Order Details
         @if (order) {
           <span class="order-ref">{{ order.referenceNumber }}</span>
         }
@@ -19,7 +19,7 @@
   @if (isLoading) {
     <div class="loading-container">
       <mat-spinner diameter="48" color="primary"></mat-spinner>
-      <p>{{ 'ORDERS.DETAILS.LOADING' | translate }}</p>
+      <p>Loading order details...</p>
     </div>
   }
 
@@ -31,7 +31,7 @@
         <p>{{ errorMessage }}</p>
         <button mat-stroked-button color="primary" (click)="retry()">
           <mat-icon>refresh</mat-icon>
-          {{ 'ORDERS.RETRY' | translate }}
+          Retry
         </button>
       </div>
     </div>
@@ -45,14 +45,14 @@
       <div class="status-section">
         <div class="status-badge-large" [ngClass]="getStatusClass(order.status)">
           <mat-icon>{{ getStatusIcon(order.status) }}</mat-icon>
-          <span>{{ getStatusLabel(order.status) | translate }}</span>
+          <span>{{ getStatusLabel(order.status) }}</span>
         </div>
 
         <div class="dates-info">
           <div class="date-item">
             <mat-icon>schedule</mat-icon>
             <div>
-              <span class="label">{{ 'ORDERS.DETAILS.ORDERED_AT' | translate }}</span>
+              <span class="label">Ordered At</span>
               <span class="value">{{ order.orderedAtUtc | detailyDate: 'short' }} {{ order.orderedAtUtc | date: 'HH:mm' }}</span>
             </div>
           </div>
@@ -60,7 +60,7 @@
             <div class="date-item">
               <mat-icon>payment</mat-icon>
               <div>
-                <span class="label">{{ 'ORDERS.DETAILS.PAID_AT' | translate }}</span>
+                <span class="label">Paid At</span>
                 <span class="value">{{ order.paidAtUtc | detailyDate: 'short' }} {{ order.paidAtUtc | date: 'HH:mm' }}</span>
               </div>
             </div>
@@ -72,16 +72,16 @@
       <mat-card class="info-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>person</mat-icon>
-          <mat-card-title>{{ 'ORDERS.DETAILS.CUSTOMER_INFO' | translate }}</mat-card-title>
+          <mat-card-title>Customer Information</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">{{ 'ORDERS.DETAILS.CUSTOMER_NAME' | translate }}</span>
+              <span class="info-label">Name</span>
               <span class="info-value">{{ getCustomerName() }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">{{ 'ORDERS.DETAILS.ADDRESS' | translate }}</span>
+              <span class="info-label">Address</span>
               <span class="info-value">{{ getCustomerAddress() }}</span>
             </div>
           </div>
@@ -92,17 +92,17 @@
       <mat-card class="info-card items-card">
         <mat-card-header>
           <mat-icon mat-card-avatar>shopping_basket</mat-icon>
-          <mat-card-title>{{ 'ORDERS.DETAILS.ORDER_ITEMS' | translate }}</mat-card-title>
+          <mat-card-title>Order Items</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <table class="items-table">
             <thead>
             <tr>
-              <th>{{ 'ORDERS.DETAILS.PRODUCT' | translate }}</th>
-              <th class="text-right">{{ 'ORDERS.DETAILS.QUANTITY' | translate }}</th>
-              <th class="text-right">{{ 'ORDERS.DETAILS.UNIT_PRICE' | translate }}</th>
-              <th class="text-right">{{ 'ORDERS.DETAILS.DISCOUNT' | translate }}</th>
-              <th class="text-right">{{ 'ORDERS.DETAILS.TOTAL' | translate }}</th>
+              <th>Product</th>
+              <th class="text-right">Quantity</th>
+              <th class="text-right">Unit Price</th>
+              <th class="text-right">Discount</th>
+              <th class="text-right">Total</th>
             </tr>
             </thead>
             <tbody>
@@ -132,7 +132,7 @@
             </tbody>
             <tfoot>
             <tr class="total-row">
-              <td colspan="4" class="text-right"><strong>{{ 'ORDERS.DETAILS.ORDER_TOTAL' | translate }}</strong></td>
+              <td colspan="4" class="text-right"><strong>Order Total</strong></td>
               <td class="text-right total-amount"><strong>{{ order.totalAmount | currency:'BAM':'symbol':'1.2-2' }}</strong></td>
             </tr>
             </tfoot>
@@ -145,7 +145,7 @@
         <mat-card class="info-card">
           <mat-card-header>
             <mat-icon mat-card-avatar>notes</mat-icon>
-            <mat-card-title>{{ 'ORDERS.DETAILS.NOTE' | translate }}</mat-card-title>
+            <mat-card-title>Order Note</mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <p class="note-text">{{ order.note }}</p>
@@ -159,7 +159,7 @@
   @if (!isLoading && !errorMessage) {
     <div mat-dialog-actions class="dialog-actions">
       <button mat-button (click)="onClose()">
-        {{ 'COMMON.CLOSE' | translate }}
+        Close
       </button>
     </div>
   }

@@ -14,7 +14,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
-  
+
   mat-icon {
     font-size: 16px;
     width: 16px;
@@ -29,7 +29,7 @@
   background: hsl(var(--neutral) / 0.12);
   color: hsl(var(--neutral));
   border: 1px solid hsl(var(--neutral) / 0.28);
-  
+
   mat-icon {
     color: hsl(var(--neutral));
   }
@@ -40,7 +40,7 @@
   background: hsl(var(--info) / 0.12);
   color: hsl(var(--info));
   border: 1px solid hsl(var(--info) / 0.3);
-  
+
   mat-icon {
     color: hsl(var(--info));
   }
@@ -51,7 +51,7 @@
   background: hsl(var(--success) / 0.12);
   color: hsl(var(--success));
   border: 1px solid hsl(var(--success) / 0.3);
-  
+
   mat-icon {
     color: hsl(var(--success));
   }
@@ -62,7 +62,7 @@
   background: hsl(var(--success) / 0.18);
   color: hsl(var(--success));
   border: 1px solid hsl(var(--success) / 0.34);
-  
+
   mat-icon {
     color: hsl(var(--success));
   }
@@ -73,7 +73,7 @@
   background: hsl(var(--destructive) / 0.12);
   color: hsl(var(--destructive));
   border: 1px solid hsl(var(--destructive) / 0.3);
-  
+
   mat-icon {
     color: hsl(var(--destructive));
   }
@@ -84,19 +84,8 @@
   background: hsl(var(--muted-foreground) / 0.12);
   color: hsl(var(--muted-foreground));
   border: 1px solid hsl(var(--muted-foreground) / 0.28);
-  
+
   mat-icon {
     color: hsl(var(--muted-foreground));
   }
 }
-
-// Usage example in component:
-// <div class="status-badge status-draft">
-//   <mat-icon>edit_note</mat-icon>
-//   <span>{{ 'ORDERS.STATUS.DRAFT' | translate }}</span>
-// </div>
-//
-// <div class="status-badge status-paid">
-//   <mat-icon>payment</mat-icon>
-//   <span>{{ 'ORDERS.STATUS.PAID' | translate }}</span>
-// </div>

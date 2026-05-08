@@ -53,7 +53,6 @@ It currently exports:
 - `FormsModule`
 - `ReactiveFormsModule`
 - `RouterModule`
-- `TranslatePipe`
 
 This means feature modules usually get both:
 

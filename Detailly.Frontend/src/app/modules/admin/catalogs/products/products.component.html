@@ -1,14 +1,14 @@
 <div class="container">
   <div class="header-card mat-elevation-z2">
     <div class="header-card-content">
-      <h1>{{ 'PRODUCTS.TITLE' | translate }}</h1>
+      <h1>Products</h1>
 
       <div class="actions-container">
         <mat-form-field class="search-field" appearance="fill">
-          <mat-label>{{ 'PRODUCTS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
+          <mat-label>Search products</mat-label>
           <input
             matInput
-            [placeholder]="'PRODUCTS.SEARCH_INPUT_PLACEHOLDER' | translate"
+            placeholder="Enter product name..."
             (keyup.enter)="request.paging.page = 1; loadPagedData()"
             [(ngModel)]="request.search"
           />
@@ -17,7 +17,7 @@
 
         <button mat-raised-button color="primary" (click)="onCreate()">
           <mat-icon>add</mat-icon>
-          {{ 'PRODUCTS.NEW_PRODUCT' | translate }}
+          New Product
         </button>
       </div>
     </div>
@@ -25,7 +25,7 @@
 
   @if (isLoading) {
     <div class="loading">
-      {{ 'PRODUCTS.LOADING' | translate }}
+      Loading products...
     </div>
   }
 
@@ -39,21 +39,21 @@
     <div class="mat-elevation-z8">
       <table mat-table [dataSource]="items">
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.NAME' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let product">
             <span style="font-weight: 500">{{ product.name }}</span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="categoryName">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.CATEGORY' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Category</th>
           <td mat-cell *matCellDef="let product">
             {{ product.categoryName }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.PRICE' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Price (KM)</th>
           <td mat-cell *matCellDef="let product">
             <span style="font-weight: 600; color: hsl(var(--primary))"
               >{{ product.price | number: '1.2-2' }} KM</span
@@ -62,7 +62,7 @@
         </ng-container>
 
         <ng-container matColumnDef="stockQuantity">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.STOCK' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Stock</th>
           <td mat-cell *matCellDef="let product">
             <span
               [style.color]="
@@ -76,7 +76,7 @@
         </ng-container>
 
         <ng-container matColumnDef="isEnabled">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.ACTIVE' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Active</th>
           <td mat-cell *matCellDef="let product">
             <mat-icon [ngClass]="product.isEnabled ? 'icon-enabled' : 'icon-disabled'">
               {{ product.isEnabled ? 'check_circle' : 'cancel' }}
@@ -85,13 +85,13 @@
         </ng-container>
 
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.TABLE.ACTIONS' | translate }}</th>
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let product">
             <button
               mat-icon-button
               color="primary"
               (click)="onEdit(product)"
-              [matTooltip]="'PRODUCTS.ACTIONS.EDIT_TOOLTIP' | translate"
+              matTooltip="Edit product"
             >
               <mat-icon>edit</mat-icon>
             </button>
@@ -99,7 +99,7 @@
               mat-icon-button
               color="warn"
               (click)="onDelete(product)"
-              [matTooltip]="'PRODUCTS.ACTIONS.DELETE_TOOLTIP' | translate"
+              matTooltip="Delete product"
             >
               <mat-icon>delete</mat-icon>
             </button>
@@ -128,9 +128,9 @@
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell" colspan="6">
             @if (request.search) {
-              {{ 'PRODUCTS.NO_DATA_FILTER' | translate }}
+              No results found for search
             } @else {
-              {{ 'PRODUCTS.NO_DATA' | translate }}
+              No products to display
             }
           </td>
         </tr>

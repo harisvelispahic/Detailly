@@ -5,7 +5,6 @@ import { RouterModule } from '@angular/router';
 import { PaginatorBarComponent } from './components/paginator-bar/paginator-bar.component';
 import { materialModules } from './material-modules';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { DialogHelperService } from './services/dialog-helper.service';
 import { LoadingBarComponent } from './components/loading-bar/loading-bar.component';
@@ -85,7 +84,6 @@ const UI_COMPONENTS = [
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    TranslatePipe,
     ...materialModules,
   ],
   providers: [
@@ -98,7 +96,6 @@ const UI_COMPONENTS = [
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    TranslatePipe,
     FormsModule,
     LoadingBarComponent,
     TableSkeletonComponent,

@@ -3,7 +3,7 @@
   <div class="dialog-header">
     <div class="header-left">
       <mat-icon class="header-icon">swap_horiz</mat-icon>
-      <h2 mat-dialog-title>{{ 'ORDERS.CHANGE_STATUS.TITLE' | translate }}</h2>
+      <h2 mat-dialog-title>Change Order Status</h2>
     </div>
   </div>
 
@@ -23,10 +23,10 @@
 
     <!-- Current Status -->
     <div class="current-status-section">
-      <span class="section-label">{{ 'ORDERS.CHANGE_STATUS.CURRENT_STATUS' | translate }}</span>
+      <span class="section-label">Current Status</span>
       <div class="status-badge" [ngClass]="getCurrentStatusClass()">
         <mat-icon>{{ getCurrentStatusIcon() }}</mat-icon>
-        <span>{{ getCurrentStatusLabel() | translate }}</span>
+        <span>{{ getCurrentStatusLabel() }}</span>
       </div>
     </div>
 
@@ -37,12 +37,12 @@
 
     <!-- New Status Selection -->
     <div class="new-status-section">
-      <span class="section-label">{{ 'ORDERS.CHANGE_STATUS.NEW_STATUS' | translate }}</span>
+      <span class="section-label">New Status</span>
 
       @if (availableStatuses.length === 0) {
         <div class="no-transitions">
           <mat-icon>block</mat-icon>
-          <p>{{ 'ORDERS.CHANGE_STATUS.NO_TRANSITIONS' | translate }}</p>
+          <p>No status transitions available for this order</p>
         </div>
       }
 
@@ -56,7 +56,7 @@
               class="status-radio-option">
               <div class="status-badge" [ngClass]="getStatusClass(status)">
                 <mat-icon>{{ getStatusIcon(status) }}</mat-icon>
-                <span>{{ getStatusLabel(status) | translate }}</span>
+                <span>{{ getStatusLabel(status) }}</span>
               </div>
             </mat-radio-button>
           }
@@ -68,7 +68,7 @@
     @if (selectedStatus === OrderStatusType.Cancelled) {
       <div class="warning-message">
         <mat-icon>warning</mat-icon>
-        <p>{{ 'ORDERS.CHANGE_STATUS.CANCEL_WARNING' | translate }}</p>
+        <p>Warning: Cancelling an order cannot be undone!</p>
       </div>
     }
   </div>
@@ -76,14 +76,14 @@
   <!-- Actions -->
   <div mat-dialog-actions class="dialog-actions">
     <button mat-button (click)="onCancel()">
-      {{ 'COMMON.CANCEL' | translate }}
+      Cancel
     </button>
     <button
       mat-raised-button
       color="primary"
       (click)="onConfirm()"
       [disabled]="!canConfirm()">
-      {{ 'COMMON.CONFIRM' | translate }}
+      Confirm
     </button>
   </div>
 </div>

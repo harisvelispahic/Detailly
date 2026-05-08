@@ -64,12 +64,11 @@ These files often use Angular Material directly, but styled through the same tok
 - all shared `app-*` UI components
 - Angular Material modules
 - common Angular module dependencies
-- `TranslatePipe`
 
 This means most feature modules consume UI through one import surface:
 
 ```ts
-imports: [SharedModule]
+imports: [SharedModule];
 ```
 
 Architecturally, that makes `SharedModule` the app's UI gateway rather than the `ui/` folder by itself.

@@ -7,7 +7,7 @@
         <div class="title-icon">
           <mat-icon>category</mat-icon>
         </div>
-        <h1>{{ 'PRODUCT_CATEGORIES.TITLE' | translate }}</h1>
+        <h1>Product Categories</h1>
       </div>
 
       <!-- Right: Search, Filter, Button -->
@@ -19,17 +19,17 @@
           color="primary"
           class="enabled-toggle"
         >
-          {{ 'PRODUCT_CATEGORIES.ONLY_ENABLED' | translate }}
+          Only Active
         </mat-slide-toggle>
 
         <!-- Search -->
         <mat-form-field class="search-field" appearance="fill">
-          <mat-label>{{ 'PRODUCT_CATEGORIES.SEARCH_PLACEHOLDER' | translate }}</mat-label>
+          <mat-label>Search categories</mat-label>
           <input
             matInput
             [(ngModel)]="request.search"
             (keyup.enter)="onSearchChange(request.search || '')"
-            [placeholder]="'PRODUCT_CATEGORIES.SEARCH_INPUT_PLACEHOLDER' | translate"
+            placeholder="Enter category name..."
           />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
@@ -37,7 +37,7 @@
         <!-- New Category Button -->
         <button mat-raised-button color="primary" (click)="onCreate()" class="add-button">
           <mat-icon>add</mat-icon>
-          <span>{{ 'PRODUCT_CATEGORIES.NEW_CATEGORY' | translate }}</span>
+          <span>New Category</span>
         </button>
       </div>
     </div>
@@ -47,7 +47,7 @@
   @if (isLoading) {
     <div class="loading-container">
       <mat-spinner diameter="48" color="primary"></mat-spinner>
-      <p>{{ 'PRODUCT_CATEGORIES.LOADING' | translate }}</p>
+      <p>Loading categories...</p>
     </div>
   }
 
@@ -68,7 +68,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <div class="header-cell">
               <mat-icon class="header-icon">label</mat-icon>
-              {{ 'PRODUCT_CATEGORIES.TABLE.NAME' | translate }}
+              Name
             </div>
           </th>
           <td mat-cell *matCellDef="let category">
@@ -81,7 +81,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <div class="header-cell">
               <mat-icon class="header-icon">toggle_on</mat-icon>
-              {{ 'PRODUCT_CATEGORIES.TABLE.STATUS' | translate }}
+              Status
             </div>
           </th>
           <td mat-cell *matCellDef="let category">
@@ -93,11 +93,7 @@
               class="status-toggle"
             >
               <span class="status-label" [class.enabled]="category.isEnabled">
-                {{
-                  category.isEnabled
-                    ? ('PRODUCT_CATEGORIES.TABLE.ENABLED' | translate)
-                    : ('PRODUCT_CATEGORIES.TABLE.DISABLED' | translate)
-                }}
+                {{ category.isEnabled ? 'Active' : 'Inactive' }}
               </span>
             </mat-slide-toggle>
           </td>
@@ -108,7 +104,7 @@
           <th mat-header-cell *matHeaderCellDef>
             <div class="header-cell">
               <mat-icon class="header-icon">settings</mat-icon>
-              {{ 'PRODUCT_CATEGORIES.TABLE.ACTIONS' | translate }}
+              Actions
             </div>
           </th>
           <td mat-cell *matCellDef="let category">
@@ -117,7 +113,7 @@
                 mat-icon-button
                 color="primary"
                 (click)="onEdit(category)"
-                [matTooltip]="'PRODUCT_CATEGORIES.ACTIONS.EDIT_TOOLTIP' | translate"
+                matTooltip="Edit category"
                 class="action-btn edit-btn"
               >
                 <mat-icon>edit</mat-icon>
@@ -126,7 +122,7 @@
                 mat-icon-button
                 color="warn"
                 (click)="onDelete(category)"
-                [matTooltip]="'PRODUCT_CATEGORIES.ACTIONS.DELETE_TOOLTIP' | translate"
+                matTooltip="Delete category"
                 class="action-btn delete-btn"
               >
                 <mat-icon>delete</mat-icon>
@@ -148,9 +144,9 @@
               <mat-icon>inbox</mat-icon>
               <p>
                 @if (request.search) {
-                  {{ 'PRODUCT_CATEGORIES.NO_DATA_FILTER' | translate }}
+                  No results found for search
                 } @else {
-                  {{ 'PRODUCT_CATEGORIES.NO_DATA' | translate }}
+                  No categories to display
                 }
               </p>
             </div>
