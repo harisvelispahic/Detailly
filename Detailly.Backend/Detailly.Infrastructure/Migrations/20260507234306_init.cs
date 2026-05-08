@@ -524,6 +524,7 @@ namespace Detailly.Infrastructure.Migrations
                     AltText = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsThumbnail = table.Column<bool>(type: "bit", nullable: false),
                     DisplayOrder = table.Column<int>(type: "int", nullable: false),
+                    FileHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductId = table.Column<int>(type: "int", nullable: true),
                     ServicePackageId = table.Column<int>(type: "int", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),

@@ -1,17 +1,13 @@
-﻿using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Payment;
 using Detailly.Domain.Entities.Shared;
 using Detailly.Domain.Entities.Vehicle;
 using Detailly.Domain.Entities.Sales;
+using Microsoft.AspNetCore.Identity;
 
 namespace Detailly.Infrastructure.Database.Seeders;
 
-/// <summary>
-/// Dynamic seeder koji se pokreće u runtime-u,
-/// obično pri startu aplikacije (npr. u Program.cs).
-/// Koristi se za unos demo/test podataka koji nisu dio migracije.
-/// </summary>
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
@@ -19,12 +15,17 @@ public static class DynamicDataSeeder
         await context.Database.EnsureCreatedAsync();
 
         await SeedProductCategoriesAsync(context);
-        await SeedUsersAsync(context);
         await SeedVehicleCategoriesAsync(context);
+        await SeedUsersAsync(context);
         await SeedProductsAsync(context);
-        await SeedAddressesAsync(context);
         await SeedServicePackageItemsAsync(context);
+        await SeedUserAddressesAsync(context);
+        await SeedLocationsAsync(context);
+        await SeedServicePackagesAsync(context);
+        await SeedVehiclesAsync(context);
     }
+
+    // ─────────────────────────── PRODUCT CATEGORIES ───────────────────────────
 
     private static async Task SeedProductCategoriesAsync(DatabaseContext context)
     {
@@ -65,272 +66,10 @@ public static class DynamicDataSeeder
         );
 
         await context.SaveChangesAsync();
-        Console.WriteLine("✅ Dynamic seed: product categories added.");
+        Console.WriteLine("✅ Seed: product categories.");
     }
 
-    private static async Task SeedUsersAsync(DatabaseContext context)
-    {
-        if (await context.ApplicationUsers.AnyAsync())
-            return;
-
-        var hasher = new PasswordHasher<ApplicationUserEntity>();
-        var now = DateTime.UtcNow;
-
-        var admin = new ApplicationUserEntity
-        {
-            Email = "admin@detailly.local",
-            PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            FirstName = "System",
-            LastName = "Administrator",
-            Username = "admin",
-            Phone = "+38761111000",
-            CompanyName = "Detailly",
-            IsAdmin = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        admin.Wallet = new WalletEntity
-        {
-            Balance = 1000m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 1000m,
-            PercentageAdded = 20,
-            ApplicationUser = admin,
-            CreatedAtUtc = now
-        };
-        admin.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = admin,
-            CreatedAtUtc = now
-        };
-
-        var manager = new ApplicationUserEntity
-        {
-            Email = "manager@detailly.local",
-            PasswordHash = hasher.HashPassword(null!, "Manager123!"),
-            FirstName = "Operations",
-            LastName = "Manager",
-            Username = "manager",
-            Phone = "+38761111001",
-            CompanyName = "Detailly",
-            IsManager = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        manager.Wallet = new WalletEntity
-        {
-            Balance = 750m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 750m,
-            PercentageAdded = 15,
-            ApplicationUser = manager,
-            CreatedAtUtc = now
-        };
-        manager.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = manager,
-            CreatedAtUtc = now
-        };
-
-        var employee = new ApplicationUserEntity
-        {
-            Email = "employee@detailly.local",
-            PasswordHash = hasher.HashPassword(null!, "Employee123!"),
-            FirstName = "Workshop",
-            LastName = "Technician",
-            Username = "employee",
-            Phone = "+38761111002",
-            IsEmployee = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        employee.Wallet = new WalletEntity
-        {
-            Balance = 150m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 150m,
-            PercentageAdded = 10,
-            ApplicationUser = employee,
-            CreatedAtUtc = now
-        };
-        employee.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = employee,
-            CreatedAtUtc = now
-        };
-
-        var fleetClient = new ApplicationUserEntity
-        {
-            Email = "fleet@detailly.local",
-            PasswordHash = hasher.HashPassword(null!, "Fleet123!"),
-            FirstName = "Fleet",
-            LastName = "Client",
-            Username = "fleetclient",
-            Phone = "+38761111003",
-            CompanyName = "Bosna Logistics",
-            IsFleet = true,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        fleetClient.Wallet = new WalletEntity
-        {
-            Balance = 2500m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 2500m,
-            PercentageAdded = 20,
-            ApplicationUser = fleetClient,
-            CreatedAtUtc = now
-        };
-        fleetClient.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = fleetClient,
-            CreatedAtUtc = now
-        };
-
-        var demoClient = new ApplicationUserEntity
-        {
-            Email = "client@detailly.local",
-            PasswordHash = hasher.HashPassword(null!, "Client123!"),
-            FirstName = "Demo",
-            LastName = "Customer",
-            Username = "client",
-            Phone = "+38761111004",
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        demoClient.Wallet = new WalletEntity
-        {
-            Balance = 320m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 320m,
-            PercentageAdded = 10,
-            ApplicationUser = demoClient,
-            CreatedAtUtc = now
-        };
-        demoClient.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = demoClient,
-            CreatedAtUtc = now
-        };
-
-        var swaggerDummy = new ApplicationUserEntity
-        {
-            //Email = "string@detailly.local",
-            Email = "string",
-            PasswordHash = hasher.HashPassword(null!, "string"),
-            FirstName = "Swagger",
-            LastName = "Dummy",
-            Username = "swagger-dummy",
-            Phone = "+38761111005",
-            IsAdmin = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        swaggerDummy.Wallet = new WalletEntity
-        {
-            Balance = 100m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 100m,
-            PercentageAdded = 10,
-            ApplicationUser = swaggerDummy,
-            CreatedAtUtc = now
-        };
-        swaggerDummy.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = swaggerDummy,
-            CreatedAtUtc = now
-        };
-
-        var haris = new ApplicationUserEntity
-        {
-            Email = "haris.velispahic@edu.fit.ba",
-            PasswordHash = hasher.HashPassword(null!, "haris123"),
-            FirstName = "Haris",
-            LastName = "Velispahic",
-            Username = "haris123",
-            Phone = "+38761111006",
-            IsAdmin = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        haris.Wallet = new WalletEntity
-        {
-            Balance = 1000m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 1000m,
-            PercentageAdded = 10,
-            ApplicationUser = haris,
-            CreatedAtUtc = now
-        };
-        haris.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = haris,
-            CreatedAtUtc = now
-        };
-
-        var danis = new ApplicationUserEntity
-        {
-            Email = "danis.music@edu.fit.ba",
-            PasswordHash = hasher.HashPassword(null!, "danis123"),
-            FirstName = "Danis",
-            LastName = "Music",
-            Username = "danis123",
-            Phone = "+38761111007",
-            IsAdmin = true,
-            IsFleet = false,
-            IsEnabled = true,
-            CreatedAtUtc = now
-        };
-        danis.Wallet = new WalletEntity
-        {
-            Balance = 1000m,
-            Currency = CurrencyName.BAM,
-            TotalDeposited = 1000m,
-            PercentageAdded = 10,
-            ApplicationUser = danis,
-            CreatedAtUtc = now
-        };
-        danis.Cart = new CartEntity
-        {
-            IsEmpty = true,
-            TotalAmount = 0m,
-            Status = CartStatus.Active,
-            ApplicationUser = danis,
-            CreatedAtUtc = now
-        };
-
-        context.ApplicationUsers.AddRange(admin, manager, employee, fleetClient, demoClient, swaggerDummy, haris, danis);
-        await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Dynamic seed: demo users added.");
-    }
+    // ─────────────────────────── VEHICLE CATEGORIES ───────────────────────────
 
     private static async Task SeedVehicleCategoriesAsync(DatabaseContext context)
     {
@@ -340,53 +79,105 @@ public static class DynamicDataSeeder
         var now = DateTime.UtcNow;
 
         context.VehicleCategories.AddRange(
-            new VehicleCategoryEntity
-            {
-                Name = "SUV",
-                Description = "Sport utility vehicles with larger body dimensions and moderately increased service complexity.",
-                BasePriceMultiplier = 1.15m,
-                CreatedAtUtc = now
-            },
-            new VehicleCategoryEntity
-            {
-                Name = "Sedan",
-                Description = "Standard passenger sedans used as the pricing baseline for many detailing services.",
-                BasePriceMultiplier = 1.00m,
-                CreatedAtUtc = now
-            },
-            new VehicleCategoryEntity
-            {
-                Name = "Roadster",
-                Description = "Two-seat open-top vehicles that require more delicate exterior and interior handling.",
-                BasePriceMultiplier = 1.10m,
-                CreatedAtUtc = now
-            },
-            new VehicleCategoryEntity
-            {
-                Name = "Hatchback",
-                Description = "Compact hatchback vehicles with slightly reduced detailing effort compared to sedans.",
-                BasePriceMultiplier = 0.95m,
-                CreatedAtUtc = now
-            },
-            new VehicleCategoryEntity
-            {
-                Name = "Van",
-                Description = "Larger multi-purpose vans with increased surface area and interior cleaning effort.",
-                BasePriceMultiplier = 1.25m,
-                CreatedAtUtc = now
-            },
-            new VehicleCategoryEntity
-            {
-                Name = "Sports Car",
-                Description = "Performance-oriented vehicles that often require premium handling and paint-safe processes.",
-                BasePriceMultiplier = 1.20m,
-                CreatedAtUtc = now
-            }
+            new VehicleCategoryEntity { Name = "Sedan",        Description = "Standard passenger sedans used as the pricing baseline for detailing services.",                     BasePriceMultiplier = 1.00m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Hatchback",    Description = "Compact hatchback vehicles with slightly reduced detailing effort compared to sedans.",               BasePriceMultiplier = 0.95m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "SUV",          Description = "Sport utility vehicles with larger body dimensions and moderately increased service complexity.",     BasePriceMultiplier = 1.15m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Sports Car",   Description = "Performance-oriented vehicles requiring premium handling and paint-safe processes.",                  BasePriceMultiplier = 1.20m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Coupe",        Description = "Two-door passenger vehicles with a sportier profile than a sedan.",                                  BasePriceMultiplier = 1.05m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Roadster",     Description = "Two-seat open-top vehicles requiring more delicate exterior and interior handling.",                  BasePriceMultiplier = 1.10m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Van",          Description = "Larger multi-purpose vans with increased surface area and interior cleaning effort.",                 BasePriceMultiplier = 1.25m, CreatedAtUtc = now },
+            new VehicleCategoryEntity { Name = "Pickup Truck", Description = "Full-size pickup trucks with extra surface area and bed cleaning requirements.",                      BasePriceMultiplier = 1.30m, CreatedAtUtc = now }
         );
 
         await context.SaveChangesAsync();
-        Console.WriteLine("✅ Dynamic seed: vehicle categories added.");
+        Console.WriteLine("✅ Seed: vehicle categories.");
     }
+
+    // ─────────────────────────── USERS ───────────────────────────
+
+    private static async Task SeedUsersAsync(DatabaseContext context)
+    {
+        if (await context.ApplicationUsers.AnyAsync())
+            return;
+
+        var hasher = new PasswordHasher<ApplicationUserEntity>();
+        var now = DateTime.UtcNow;
+
+        ApplicationUserEntity Make(
+            string email, string password,
+            string first, string last, string username, string phone,
+            bool isAdmin = false, bool isManager = false, bool isEmployee = false, bool isFleet = false,
+            string? company = null, decimal balance = 0m, int pct = 10)
+        {
+            var u = new ApplicationUserEntity
+            {
+                Email = email,
+                PasswordHash = hasher.HashPassword(null!, password),
+                FirstName = first,
+                LastName = last,
+                Username = username,
+                Phone = phone,
+                CompanyName = company,
+                IsAdmin = isAdmin,
+                IsManager = isManager,
+                IsEmployee = isEmployee,
+                IsFleet = isFleet,
+                IsEnabled = true,
+                CreatedAtUtc = now
+            };
+            u.Wallet = new WalletEntity
+            {
+                Balance = balance,
+                Currency = CurrencyName.BAM,
+                TotalDeposited = balance,
+                PercentageAdded = pct,
+                ApplicationUser = u,
+                CreatedAtUtc = now
+            };
+            u.Cart = new CartEntity
+            {
+                IsEmpty = true,
+                TotalAmount = 0m,
+                Status = CartStatus.Active,
+                ApplicationUser = u,
+                CreatedAtUtc = now
+            };
+            return u;
+        }
+
+        context.ApplicationUsers.AddRange(
+            // ── Administrators ──────────────────────────────────────────
+            Make("admin@detailly.local",              "Admin123!",    "System",    "Administrator", "admin",        "+38761111000", isAdmin: true,    company: "Detailly",                    balance: 1000m, pct: 20),
+            Make("haris.velispahic@edu.fit.ba",       "haris123",     "Haris",     "Velispahic",    "haris123",     "+38761111006", isAdmin: true,                                            balance: 1000m),
+            Make("danis.music@edu.fit.ba",            "danis123",     "Danis",     "Music",         "danis123",     "+38761111007", isAdmin: true,                                            balance: 1000m),
+
+            // ── Managers ────────────────────────────────────────────────
+            Make("manager@detailly.local",            "Manager123!",  "Operations","Manager",       "manager",      "+38761111001", isManager: true,  company: "Detailly",                    balance: 750m,  pct: 15),
+            Make("selma.bradaric@detailly.local",     "Manager123!",  "Selma",     "Bradaric",      "sbradaric",    "+38761222001", isManager: true,  company: "Detailly",                    balance: 600m,  pct: 15),
+
+            // ── Employees ───────────────────────────────────────────────
+            Make("employee@detailly.local",           "Employee123!", "Workshop",  "Technician",    "employee",     "+38761111002", isEmployee: true,                                         balance: 150m),
+            Make("amir.hodzic@detailly.local",        "Employee123!", "Amir",      "Hodzic",        "ahodzic",      "+38761222002", isEmployee: true,                                         balance: 120m),
+            Make("tarik.kevric@detailly.local",       "Employee123!", "Tarik",     "Kevric",        "tkevric",      "+38761222003", isEmployee: true,                                         balance: 100m),
+
+            // ── Fleet clients ────────────────────────────────────────────
+            Make("fleet@detailly.local",              "Fleet123!",    "Fleet",     "Client",        "fleetclient",  "+38761111003", isFleet: true,    company: "Bosna Logistics",              balance: 2500m, pct: 20),
+            Make("nedim.ajanovic@sarajevo-trans.ba",  "Fleet123!",    "Nedim",     "Ajanovic",      "najanovic",    "+38761333001", isFleet: true,    company: "Sarajevo Transport d.o.o.",    balance: 3000m, pct: 20),
+
+            // ── Regular clients ──────────────────────────────────────────
+            Make("client@detailly.local",             "Client123!",   "Demo",      "Customer",      "client",       "+38761111004",                                                           balance: 320m),
+            Make("lejla.kovacevic@gmail.com",         "Client123!",   "Lejla",     "Kovacevic",     "lkovacevic",   "+38761444001",                                                           balance: 150m),
+            Make("mirza.begovic@gmail.com",           "Client123!",   "Mirza",     "Begovic",       "mbegovic",     "+38761444002",                                                           balance: 80m),
+
+            // ── Swagger dummy (API testing) ──────────────────────────────
+            Make("string",                            "string",       "Swagger",   "Dummy",         "swagger-dummy","+38761111005", isAdmin: true,                                            balance: 100m)
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: users.");
+    }
+
+    // ─────────────────────────── PRODUCTS ───────────────────────────
 
     private static async Task SeedProductsAsync(DatabaseContext context)
     {
@@ -395,150 +186,109 @@ public static class DynamicDataSeeder
 
         var now = DateTime.UtcNow;
 
-        var categories = await context.ProductCategories
+        var cats = await context.ProductCategories
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Name, x => x.Id);
 
-        var exteriorCareId = categories["Exterior Care"];
-        var interiorCareId = categories["Interior Care"];
-        var accessoriesId = categories["Accessories"];
-        var paintProtectionId = categories["Paint Protection"];
+        var extId = cats["Exterior Care"];
+        var intId = cats["Interior Care"];
+        var accId = cats["Accessories"];
+        var ppId  = cats["Paint Protection"];
 
-        var products = new List<ProductEntity>
-        {
+        ProductEntity P(string name, string desc, decimal price, int catId, string tags, int stock = 30, int reorderLvl = 10, int reorderQty = 20) =>
             new ProductEntity
             {
-                Name = "pH Neutral Snow Foam",
-                Description = "A safe pre-wash foam designed to loosen traffic film, dust, and light grime without stripping existing protection layers.",
+                Name = name,
+                Description = desc,
                 ProductNumber = Guid.NewGuid().ToString("N"),
-                Price = 24.90m,
+                Price = price,
                 Currency = CurrencyName.BAM,
-                CategoryId = exteriorCareId,
+                CategoryId = catId,
                 IsEnabled = true,
-                Tags = "pre-wash,snow-foam,paint-safe",
+                Tags = tags,
                 CreatedAtUtc = now,
                 Inventory = new InventoryEntity
                 {
-                    QuantityInStock = 45,
-                    ReorderLevel = 10,
-                    ReorderQuantity = 25,
-                    IsDeleted = false,
+                    QuantityInStock = stock,
+                    ReorderLevel = reorderLvl,
+                    ReorderQuantity = reorderQty,
                     CreatedAtUtc = now
-                },
-                Images = new List<ImageEntity>
-                {
-                    new ImageEntity
-                    {
-                        ImageUrl = "https://images.detailly.local/products/ph-neutral-snow-foam-main.jpg",
-                        AltText = "Bottle of pH Neutral Snow Foam",
-                        IsThumbnail = true,
-                        DisplayOrder = 1,
-                        CreatedAtUtc = now
-                    }
                 }
-            },
-            new ProductEntity
-            {
-                Name = "Interior All-Purpose Cleaner",
-                Description = "Versatile interior cleaner for dashboards, plastics, vinyl, door panels, and general cabin maintenance.",
-                ProductNumber = Guid.NewGuid().ToString("N"),
-                Price = 19.50m,
-                Currency = CurrencyName.BAM,
-                CategoryId = interiorCareId,
-                IsEnabled = true,
-                Tags = "interior,cleaner,plastic,vinyl",
-                CreatedAtUtc = now,
-                Inventory = new InventoryEntity
-                {
-                    QuantityInStock = 38,
-                    ReorderLevel = 12,
-                    ReorderQuantity = 24,
-                    IsDeleted = false,
-                    CreatedAtUtc = now
-                },
-                Images = new List<ImageEntity>
-                {
-                    new ImageEntity
-                    {
-                        ImageUrl = "https://images.detailly.local/products/interior-apc-main.jpg",
-                        AltText = "Interior All-Purpose Cleaner spray bottle",
-                        IsThumbnail = true,
-                        DisplayOrder = 1,
-                        CreatedAtUtc = now
-                    }
-                }
-            },
-            new ProductEntity
-            {
-                Name = "Microfiber Drying Towel",
-                Description = "Large twisted-loop microfiber towel optimized for streak-free drying with high absorbency and safe paint contact.",
-                ProductNumber = Guid.NewGuid().ToString("N"),
-                Price = 29.90m,
-                Currency = CurrencyName.BAM,
-                CategoryId = accessoriesId,
-                IsEnabled = true,
-                Tags = "microfiber,drying,towel,accessory",
-                CreatedAtUtc = now,
-                Inventory = new InventoryEntity
-                {
-                    QuantityInStock = 60,
-                    ReorderLevel = 15,
-                    ReorderQuantity = 30,
-                    IsDeleted = false,
-                    CreatedAtUtc = now
-                },
-                Images = new List<ImageEntity>
-                {
-                    new ImageEntity
-                    {
-                        ImageUrl = "https://images.detailly.local/products/microfiber-drying-towel-main.jpg",
-                        AltText = "Folded microfiber drying towel",
-                        IsThumbnail = true,
-                        DisplayOrder = 1,
-                        CreatedAtUtc = now
-                    }
-                }
-            },
-            new ProductEntity
-            {
-                Name = "SiO2 Ceramic Spray Sealant",
-                Description = "Quick-application spray sealant that boosts gloss, water behavior, and short-term paint protection after maintenance washes.",
-                ProductNumber = Guid.NewGuid().ToString("N"),
-                Price = 34.90m,
-                Currency = CurrencyName.BAM,
-                CategoryId = paintProtectionId,
-                IsEnabled = true,
-                Tags = "sealant,ceramic,sio2,protection",
-                CreatedAtUtc = now,
-                Inventory = new InventoryEntity
-                {
-                    QuantityInStock = 28,
-                    ReorderLevel = 8,
-                    ReorderQuantity = 18,
-                    IsDeleted = false,
-                    CreatedAtUtc = now
-                },
-                Images = new List<ImageEntity>
-                {
-                    new ImageEntity
-                    {
-                        ImageUrl = "https://images.detailly.local/products/sio2-ceramic-spray-main.jpg",
-                        AltText = "SiO2 Ceramic Spray Sealant bottle",
-                        IsThumbnail = true,
-                        DisplayOrder = 1,
-                        CreatedAtUtc = now
-                    }
-                }
-            }
-        };
+            };
 
-        context.Products.AddRange(products);
+        context.Products.AddRange(
+            // ── Exterior Care ────────────────────────────────────────────
+            P("pH Neutral Snow Foam",         "Safe pre-wash foam that loosens traffic film and light grime without stripping existing protection layers.",                   24.90m, extId, "pre-wash,snow-foam,paint-safe",          45, 10, 25),
+            P("Citrus Pre-Wash Degreaser",    "Concentrated citrus degreaser for heavy traffic film, bugs, and road grime removal before the contact wash.",                  16.90m, extId, "pre-wash,degreaser,citrus",               35, 10, 20),
+            P("Two-Bucket Wash Shampoo",      "Highly lubricating car shampoo designed for the two-bucket method, safe on coatings and waxes.",                              18.50m, extId, "shampoo,hand-wash,safe",                  50, 12, 24),
+            P("Iron Remover Fallout Spray",   "pH-reactive iron remover that turns purple on contact and dissolves metallic contamination from paint and wheels.",            19.90m, extId, "iron-remover,decontamination,fallout",    30,  8, 18),
+            P("Bug and Tar Remover",          "Solvent-based cleaner for road tar, bug splatter, and adhesive residue — safe on painted surfaces.",                          17.90m, extId, "tar,bugs,remover,exterior",               28,  8, 16),
+            P("Waterless Car Wash Spray",     "Spray-on formula for light dust and fingerprint removal between full washes. No water required.",                              22.50m, extId, "waterless,quick-detailer,maintenance",    25,  8, 15),
+
+            // ── Interior Care ────────────────────────────────────────────
+            P("Interior All-Purpose Cleaner", "Versatile interior cleaner for dashboards, plastics, vinyl, and door panels.",                                                 19.50m, intId, "interior,cleaner,plastic,vinyl",          38, 12, 24),
+            P("Leather Cleaner & Conditioner","Two-in-one leather care product that cleans and conditions seats and trim without silicone or residue.",                        28.90m, intId, "leather,cleaner,conditioner",             30, 10, 20),
+            P("Fabric & Upholstery Cleaner",  "Water-based foam cleaner for fabric seats, carpets, and headliners. Safe on all textiles.",                                    21.50m, intId, "fabric,upholstery,carpet,interior",       25,  8, 16),
+            P("Odour Eliminator Spray",       "Enzymatic odour neutralizer for musty, smoke, or pet smells — safe to spray directly on fabrics.",                            15.90m, intId, "odour,smell,interior,fabric",             20,  5, 12),
+            P("Dashboard Protectant Spray",   "UV-blocking dashboard and trim protectant that leaves a natural, non-greasy finish.",                                          13.90m, intId, "dashboard,protectant,uv,trim",            32, 10, 18),
+
+            // ── Accessories ──────────────────────────────────────────────
+            P("Microfiber Drying Towel",      "Large twisted-loop microfiber towel for streak-free drying with high absorbency and safe paint contact.",                      29.90m, accId, "microfiber,drying,towel",                 60, 15, 30),
+            P("Clay Bar (200g)",              "Medium-grade detailing clay for removing bonded surface contamination before polishing or protection.",                         24.90m, accId, "clay,decontamination,paint-prep",         28,  8, 16),
+            P("Foam Lance (Universal)",       "Universal foam cannon compatible with standard garden hose adapters for thick snow foam application.",                          54.90m, accId, "foam-lance,pre-wash,accessory",           15,  4, 10),
+            P("Detailing Brush Set (5 pcs)",  "Five soft-bristle brushes for vents, emblems, gaps, and tight interior areas.",                                               19.90m, accId, "brushes,detailing,interior,tools",        22,  6, 12),
+            P("Foam Applicator Pads (6 pcs)", "Round foam applicator pads for waxes, sealants, and ceramic sprays applied by hand.",                                          9.90m, accId, "applicator,pads,wax,sealant",             40, 10, 20),
+            P("Wheel Woolie Brush Set",       "Long-handle and barrel brushes for safe wheel and rim cleaning without scratching.",                                           17.90m, accId, "wheel,brush,cleaning,accessory",          18,  5, 12),
+
+            // ── Paint Protection ─────────────────────────────────────────
+            P("SiO2 Ceramic Spray Sealant",   "Quick-application spray sealant that boosts gloss, hydrophobicity, and short-term paint protection.",                         34.90m, ppId,  "sealant,ceramic,sio2,protection",         28,  8, 18),
+            P("Synthetic Paste Wax",          "Long-lasting synthetic paste wax for deep gloss and durable paint protection with easy on-off application.",                  39.90m, ppId,  "wax,paste,protection,gloss",              22,  6, 14),
+            P("Carnauba Liquid Wax",          "Premium liquid carnauba wax delivering warm, rich gloss and short-term protection with minimal effort.",                      32.90m, ppId,  "carnauba,wax,liquid,gloss",               25,  8, 16),
+            P("Paint Sealant Spray",          "Polymer-based spray sealant for fast protection on freshly clayed or polished paintwork.",                                    27.90m, ppId,  "sealant,polymer,spray,protection",        30,  8, 18),
+            P("Graphene Coating Top-Up",      "Spray-on graphene-infused maintenance coat for extending the life of a base ceramic or graphene coating.",                    49.90m, ppId,  "graphene,coating,maintenance,topup",      18,  5, 10)
+        );
+
         await context.SaveChangesAsync();
-
-        Console.WriteLine("✅ Dynamic seed: products with inventory and images added.");
+        Console.WriteLine("✅ Seed: products.");
     }
 
-    private static async Task SeedAddressesAsync(DatabaseContext context)
+    // ─────────────────────────── SERVICE PACKAGE ITEMS ───────────────────────────
+
+    private static async Task SeedServicePackageItemsAsync(DatabaseContext context)
+    {
+        if (await context.ServicePackageItems.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        context.ServicePackageItems.AddRange(
+            new ServicePackageItemEntity { Name = "Pre-Wash / Snow Foam",              Price =  10.00m, Description = "Foam-based pre-wash that softens dirt and reduces contact-wash risk.",                                      DurationMinutes =  20, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Hand Wash (Two-Bucket Method)",     Price =  20.00m, Description = "Careful hand wash using the two-bucket method with safe drying techniques.",                               DurationMinutes =  35, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Iron Fallout Decontamination",      Price =  15.00m, Description = "Chemical decontamination step for removing embedded iron particles from paint and wheels.",                 DurationMinutes =  25, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Tar and Adhesive Removal",          Price =  15.00m, Description = "Targeted treatment for tar spots, road residue, and stubborn adhesive contamination.",                      DurationMinutes =  25, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Clay Bar Treatment",                Price =  25.00m, Description = "Mechanical decontamination for a smoother paint surface before polishing or protection.",                   DurationMinutes =  40, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "One-Step Machine Polishing",        Price =  80.00m, Description = "Single-stage polish that improves gloss and corrects light paint defects.",                                 DurationMinutes = 120, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Two-Step Paint Correction",         Price = 140.00m, Description = "Advanced two-stage machine polishing for deeper defect correction and a refined finish.",                   DurationMinutes = 240, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Paint Sealant Protection",          Price =  25.00m, Description = "Synthetic paint sealant that adds gloss and hydrophobic behavior for several weeks.",                       DurationMinutes =  30, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Carnauba Wax Finish",               Price =  30.00m, Description = "Warm gloss wax protection for customers who prefer a classic hand-applied finish.",                         DurationMinutes =  30, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Ceramic Coating - 1 Year",          Price = 180.00m, Description = "Entry-level ceramic protection with surface preparation and coating application.",                           DurationMinutes = 180, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Ceramic Coating - 3 Years",         Price = 320.00m, Description = "Longer-term ceramic coating with enhanced durability and gloss retention, requires two technicians.",        DurationMinutes = 300, RequiredEmployees = 2, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Wheel Deep Cleaning and Protection",Price =  30.00m, Description = "Detailed wheel treatment: barrel cleaning, face cleaning, and a protection layer.",                         DurationMinutes =  45, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Tire Dressing",                     Price =  10.00m, Description = "Finishing step for a clean, rich tire appearance.",                                                         DurationMinutes =  15, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Interior Deep Cleaning",            Price =  60.00m, Description = "Comprehensive interior service: vacuuming, plastics, fabric surfaces, and finishing wipe-down.",            DurationMinutes =  90, RequiredEmployees = 1, IsAddon = false, IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Leather Cleaning and Conditioning", Price =  45.00m, Description = "Safe leather cleansing followed by conditioning to preserve softness and appearance.",                      DurationMinutes =  60, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Engine Bay Cleaning",               Price =  35.00m, Description = "Degreasing and cleaning of the engine bay with plastic and rubber dressing.",                               DurationMinutes =  45, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Headlight Restoration",             Price =  40.00m, Description = "Wet sanding and polishing of oxidized headlight lenses, finished with UV sealant.",                         DurationMinutes =  60, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now },
+            new ServicePackageItemEntity { Name = "Glass Water Repellent Treatment",   Price =  20.00m, Description = "Hydrophobic glass coating applied to all windows and mirrors for improved wet-weather visibility.",          DurationMinutes =  20, RequiredEmployees = 1, IsAddon = true,  IsActive = true, CreatedAtUtc = now }
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: service package items.");
+    }
+
+    // ─────────────────────────── USER ADDRESSES ───────────────────────────
+
+    private static async Task SeedUserAddressesAsync(DatabaseContext context)
     {
         if (await context.Addresses.AnyAsync())
             return;
@@ -550,248 +300,245 @@ public static class DynamicDataSeeder
             .ToDictionaryAsync(x => x.Username, x => x.Id);
 
         context.Addresses.AddRange(
-            new AddressEntity
-            {
-                Street = "Zmaja od Bosne 12",
-                City = "Sarajevo",
-                PostalCode = "71000",
-                Region = "Federation of Bosnia and Herzegovina",
-                Country = "Bosnia and Herzegovina",
-                Latitude = 43.8563m,
-                Longitude = 18.4131m,
-                ApplicationUserId = users["admin"],
-                CreatedAtUtc = now
-            },
-            new AddressEntity
-            {
-                Street = "Braće Fejića 12a",
-                City = "Mostar",
-                PostalCode = "88000",
-                Region = "Federation of Bosnia and Herzegovina",
-                Country = "Bosnia and Herzegovina",
-                Latitude = 43.3438m,
-                Longitude = 17.8078m,
-                ApplicationUserId = users["manager"],
-                CreatedAtUtc = now
-            },
-            new AddressEntity
-            {
-                Street = "Mehmedalije Maka Dizdara 21",
-                City = "Tuzla",
-                PostalCode = "75000",
-                Region = "Federation of Bosnia and Herzegovina",
-                Country = "Bosnia and Herzegovina",
-                Latitude = 44.5384m,
-                Longitude = 18.6671m,
-                ApplicationUserId = users["employee"],
-                CreatedAtUtc = now
-            },
-            new AddressEntity
-            {
-                Street = "Bulevar Mira 45",
-                City = "Banja Luka",
-                PostalCode = "78000",
-                Region = "Republika Srpska",
-                Country = "Bosnia and Herzegovina",
-                Latitude = 44.7722m,
-                Longitude = 17.1910m,
-                ApplicationUserId = users["fleetclient"],
-                CreatedAtUtc = now
-            },
-            new AddressEntity
-            {
-                Street = "Titova 31",
-                City = "Zenica",
-                PostalCode = "72000",
-                Region = "Federation of Bosnia and Herzegovina",
-                Country = "Bosnia and Herzegovina",
-                Latitude = 44.2034m,
-                Longitude = 17.9077m,
-                ApplicationUserId = users["client"],
-                CreatedAtUtc = now
-            }
+            new AddressEntity { Street = "Zmaja od Bosne 12",           City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8563m, Longitude = 18.4131m, ApplicationUserId = users["admin"],        CreatedAtUtc = now },
+            new AddressEntity { Street = "Braće Fejića 12a",            City = "Mostar",     PostalCode = "88000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.3438m, Longitude = 17.8078m, ApplicationUserId = users["manager"],      CreatedAtUtc = now },
+            new AddressEntity { Street = "Grbavička 1",                 City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8497m, Longitude = 18.3985m, ApplicationUserId = users["sbradaric"],    CreatedAtUtc = now },
+            new AddressEntity { Street = "Mehmedalije Maka Dizdara 21", City = "Tuzla",      PostalCode = "75000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 44.5384m, Longitude = 18.6671m, ApplicationUserId = users["employee"],     CreatedAtUtc = now },
+            new AddressEntity { Street = "Fra Anđela Zvizdovića 1",     City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8556m, Longitude = 18.4090m, ApplicationUserId = users["ahodzic"],      CreatedAtUtc = now },
+            new AddressEntity { Street = "Hamdije Kreševljakovića 12",  City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8602m, Longitude = 18.4254m, ApplicationUserId = users["tkevric"],      CreatedAtUtc = now },
+            new AddressEntity { Street = "Bulevar Mira 45",             City = "Banja Luka", PostalCode = "78000", Region = "Republika Srpska",                     Country = "Bosnia and Herzegovina", Latitude = 44.7722m, Longitude = 17.1910m, ApplicationUserId = users["fleetclient"],  CreatedAtUtc = now },
+            new AddressEntity { Street = "Džemala Bijedića 89",         City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8452m, Longitude = 18.3884m, ApplicationUserId = users["najanovic"],    CreatedAtUtc = now },
+            new AddressEntity { Street = "Titova 31",                   City = "Zenica",     PostalCode = "72000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 44.2034m, Longitude = 17.9077m, ApplicationUserId = users["client"],       CreatedAtUtc = now },
+            new AddressEntity { Street = "Aleja Lipa 22",               City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8481m, Longitude = 18.3756m, ApplicationUserId = users["lkovacevic"],   CreatedAtUtc = now },
+            new AddressEntity { Street = "Safeta Bašića 2",             City = "Ilidža",     PostalCode = "71210", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8295m, Longitude = 18.3108m, ApplicationUserId = users["mbegovic"],     CreatedAtUtc = now },
+            new AddressEntity { Street = "Skenderija 10",               City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8577m, Longitude = 18.4200m, ApplicationUserId = users["haris123"],     CreatedAtUtc = now },
+            new AddressEntity { Street = "Ferhadija 5",                 City = "Sarajevo",   PostalCode = "71000", Region = "Federation of Bosnia and Herzegovina", Country = "Bosnia and Herzegovina", Latitude = 43.8593m, Longitude = 18.4323m, ApplicationUserId = users["danis123"],     CreatedAtUtc = now }
         );
 
         await context.SaveChangesAsync();
-        Console.WriteLine("✅ Dynamic seed: addresses added.");
+        Console.WriteLine("✅ Seed: user addresses.");
     }
 
-    private static async Task SeedServicePackageItemsAsync(DatabaseContext context)
+    // ─────────────────────────── LOCATIONS ───────────────────────────
+
+    private static async Task SeedLocationsAsync(DatabaseContext context)
     {
-        if (await context.ServicePackageItems.AnyAsync())
+        if (await context.Locations.AnyAsync())
             return;
 
         var now = DateTime.UtcNow;
 
-        context.ServicePackageItems.AddRange(
-            new ServicePackageItemEntity
+        // Shop addresses have no ApplicationUserId (they are business addresses, not user-owned)
+        var sarajevoAddr = new AddressEntity
+        {
+            Street = "Džemala Bijedića 185",
+            City = "Sarajevo",
+            PostalCode = "71000",
+            Region = "Federation of Bosnia and Herzegovina",
+            Country = "Bosnia and Herzegovina",
+            Latitude = 43.8421m,
+            Longitude = 18.3879m,
+            CreatedAtUtc = now
+        };
+        var mostarAddr = new AddressEntity
+        {
+            Street = "Bulevar Branislava Nušića 2",
+            City = "Mostar",
+            PostalCode = "88000",
+            Region = "Federation of Bosnia and Herzegovina",
+            Country = "Bosnia and Herzegovina",
+            Latitude = 43.3481m,
+            Longitude = 17.8093m,
+            CreatedAtUtc = now
+        };
+
+        context.Addresses.AddRange(sarajevoAddr, mostarAddr);
+        await context.SaveChangesAsync();
+
+        var sarajevo = new LocationEntity
+        {
+            Name = "Detailly Sarajevo",
+            Description = "Main detailing studio in Sarajevo. Three bays with full ceramic coating facilities.",
+            TotalBays = 3,
+            AddressId = sarajevoAddr.Id,
+            IsTemporarilyClosed = false,
+            CreatedAtUtc = now
+        };
+        var mostar = new LocationEntity
+        {
+            Name = "Detailly Mostar",
+            Description = "Second branch serving clients in Mostar and the wider Herzegovina region.",
+            TotalBays = 2,
+            AddressId = mostarAddr.Id,
+            IsTemporarilyClosed = false,
+            CreatedAtUtc = now
+        };
+
+        context.Locations.AddRange(sarajevo, mostar);
+        await context.SaveChangesAsync();
+
+        // Sarajevo: Mon–Sat 08:00–18:00, Sun closed  (DayOfWeek: 0=Sun … 6=Sat)
+        var sarajevoHours = Enumerable.Range(0, 7).Select(d => new LocationOpeningHoursEntity
+        {
+            ShopLocationId = sarajevo.Id,
+            DayOfWeek = d,
+            IsClosed = d == 0,
+            OpenTimeUtc  = d == 0 ? null : new TimeSpan(8, 0, 0),
+            CloseTimeUtc = d == 0 ? null : new TimeSpan(18, 0, 0),
+            CreatedAtUtc = now
+        });
+
+        // Mostar: Mon–Fri 08:00–17:00, Sat 09:00–14:00, Sun closed
+        var mostarHours = Enumerable.Range(0, 7).Select(d => new LocationOpeningHoursEntity
+        {
+            ShopLocationId = mostar.Id,
+            DayOfWeek = d,
+            IsClosed = d == 0,
+            OpenTimeUtc  = d == 0 ? null : d == 6 ? new TimeSpan(9, 0, 0)  : new TimeSpan(8, 0, 0),
+            CloseTimeUtc = d == 0 ? null : d == 6 ? new TimeSpan(14, 0, 0) : new TimeSpan(17, 0, 0),
+            CreatedAtUtc = now
+        });
+
+        context.LocationOpeningHours.AddRange(sarajevoHours.Concat(mostarHours));
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: locations + opening hours.");
+    }
+
+    // ─────────────────────────── SERVICE PACKAGES ───────────────────────────
+
+    private static async Task SeedServicePackagesAsync(DatabaseContext context)
+    {
+        if (await context.ServicePackages.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        var itemIds = await context.ServicePackageItems
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        // Save packages first so EF generates their IDs, then add assignments separately
+        // (ServicePackageItemAssignments has private set; ServicePackageId is required)
+        var packages = new[]
+        {
+            new ServicePackageEntity { Name = "Quick Exterior Wash",                    Price =  40.00m, BaseDurationMinutes =  70, BaseRequiredEmployees = 1, Description = "A fast, safe exterior wash: snow foam pre-soak, two-bucket hand wash, and tire dressing.",                                                                                           CreatedAtUtc = now },
+            new ServicePackageEntity { Name = "Exterior Detail",                        Price = 120.00m, BaseDurationMinutes = 185, BaseRequiredEmployees = 1, Description = "Complete exterior detailing with clay bar decontamination, paint sealant, deep wheel cleaning, and tire dressing.",                                                                  CreatedAtUtc = now },
+            new ServicePackageEntity { Name = "Interior Detail",                        Price = 105.00m, BaseDurationMinutes = 150, BaseRequiredEmployees = 1, Description = "In-depth interior clean: full cabin vacuuming, plastic and fabric surface treatment, leather clean and conditioning.",                                                               CreatedAtUtc = now },
+            new ServicePackageEntity { Name = "Full Detail",                            Price = 240.00m, BaseDurationMinutes = 375, BaseRequiredEmployees = 1, Description = "Our most popular package — complete exterior and interior detailing, iron fallout removal, clay bar, one-step polishing, and wheel care.",                                          CreatedAtUtc = now },
+            new ServicePackageEntity { Name = "Paint Correction & Ceramic Coating (1 yr)", Price = 375.00m, BaseDurationMinutes = 515, BaseRequiredEmployees = 1, Description = "Full decontamination, two-step paint correction, and a 1-year ceramic coating for lasting protection and showroom gloss.",                                                   CreatedAtUtc = now },
+            new ServicePackageEntity { Name = "Elite Ceramic Coating (3 yr)",           Price = 515.00m, BaseDurationMinutes = 635, BaseRequiredEmployees = 2, Description = "The ultimate protection service: two-step correction followed by our premium 3-year ceramic coating applied by two technicians.",                                                    CreatedAtUtc = now },
+        };
+
+        context.ServicePackages.AddRange(packages);
+        await context.SaveChangesAsync();
+
+        var pkgIds = await context.ServicePackages
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        int Pkg(string name) => pkgIds[name];
+        int Item(string name) => itemIds[name];
+
+        ServicePackageItemAssignmentEntity Link(string pkg, string item) =>
+            new ServicePackageItemAssignmentEntity
             {
-                Name = "Pre-Wash / Snow Foam",
-                Price = 10.00m,
-                Description = "Foam-based pre-wash step that softens dirt and reduces contact wash risk.",
-                DurationMinutes = 20,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
+                ServicePackageId = Pkg(pkg),
+                ServicePackageItemId = Item(item),
                 CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Hand Wash (Two-Bucket Method)",
-                Price = 20.00m,
-                Description = "Careful hand wash using the two-bucket method and safe drying techniques.",
-                DurationMinutes = 35,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Iron Fallout Decontamination",
-                Price = 15.00m,
-                Description = "Chemical decontamination step for removing embedded iron particles from paint and wheels.",
-                DurationMinutes = 25,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Tar and Adhesive Removal",
-                Price = 15.00m,
-                Description = "Targeted treatment for tar spots, road residue, and stubborn adhesive contamination.",
-                DurationMinutes = 25,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Clay Bar Treatment",
-                Price = 25.00m,
-                Description = "Mechanical decontamination for a smoother paint surface before polishing or protection.",
-                DurationMinutes = 40,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "One-Step Machine Polishing",
-                Price = 80.00m,
-                Description = "Single-stage polish that improves gloss and corrects light paint defects.",
-                DurationMinutes = 120,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Two-Step Paint Correction",
-                Price = 140.00m,
-                Description = "More advanced machine polishing for deeper correction and refined finishing.",
-                DurationMinutes = 240,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Paint Sealant Protection",
-                Price = 25.00m,
-                Description = "Synthetic paint sealant that adds gloss and hydrophobic behavior for several weeks.",
-                DurationMinutes = 30,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Carnauba Wax Finish",
-                Price = 30.00m,
-                Description = "Warm gloss wax protection for customers who prefer a classic finish.",
-                DurationMinutes = 30,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Ceramic Coating - 1 Year",
-                Price = 180.00m,
-                Description = "Entry-level ceramic protection package with surface preparation and coating application.",
-                DurationMinutes = 180,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Ceramic Coating - 3 Years",
-                Price = 320.00m,
-                Description = "Longer-term ceramic coating solution with enhanced durability and gloss retention.",
-                DurationMinutes = 300,
-                RequiredEmployees = 2,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Wheel Deep Cleaning and Protection",
-                Price = 30.00m,
-                Description = "Detailed wheel treatment including barrel cleaning, face cleaning, and protection layer.",
-                DurationMinutes = 45,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Tire Dressing",
-                Price = 10.00m,
-                Description = "Finishing step for restoring a clean, rich tire appearance.",
-                DurationMinutes = 15,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Interior Deep Cleaning",
-                Price = 60.00m,
-                Description = "Comprehensive interior service covering vacuuming, plastics, fabric surfaces, and finishing.",
-                DurationMinutes = 90,
-                RequiredEmployees = 1,
-                IsAddon = false,
-                IsActive = true,
-                CreatedAtUtc = now
-            },
-            new ServicePackageItemEntity
-            {
-                Name = "Leather Cleaning and Conditioning",
-                Price = 45.00m,
-                Description = "Safe leather cleansing followed by conditioning to preserve softness and appearance.",
-                DurationMinutes = 60,
-                RequiredEmployees = 1,
-                IsAddon = true,
-                IsActive = true,
-                CreatedAtUtc = now
-            }
+            };
+
+        context.ServicePackageItemAssignments.AddRange(
+            // Quick Exterior Wash
+            Link("Quick Exterior Wash", "Pre-Wash / Snow Foam"),
+            Link("Quick Exterior Wash", "Hand Wash (Two-Bucket Method)"),
+            Link("Quick Exterior Wash", "Tire Dressing"),
+
+            // Exterior Detail
+            Link("Exterior Detail", "Pre-Wash / Snow Foam"),
+            Link("Exterior Detail", "Hand Wash (Two-Bucket Method)"),
+            Link("Exterior Detail", "Clay Bar Treatment"),
+            Link("Exterior Detail", "Paint Sealant Protection"),
+            Link("Exterior Detail", "Wheel Deep Cleaning and Protection"),
+            Link("Exterior Detail", "Tire Dressing"),
+
+            // Interior Detail
+            Link("Interior Detail", "Interior Deep Cleaning"),
+            Link("Interior Detail", "Leather Cleaning and Conditioning"),
+
+            // Full Detail
+            Link("Full Detail", "Pre-Wash / Snow Foam"),
+            Link("Full Detail", "Hand Wash (Two-Bucket Method)"),
+            Link("Full Detail", "Iron Fallout Decontamination"),
+            Link("Full Detail", "Clay Bar Treatment"),
+            Link("Full Detail", "One-Step Machine Polishing"),
+            Link("Full Detail", "Interior Deep Cleaning"),
+            Link("Full Detail", "Wheel Deep Cleaning and Protection"),
+
+            // Paint Correction & Ceramic Coating (1 yr)
+            Link("Paint Correction & Ceramic Coating (1 yr)", "Pre-Wash / Snow Foam"),
+            Link("Paint Correction & Ceramic Coating (1 yr)", "Hand Wash (Two-Bucket Method)"),
+            Link("Paint Correction & Ceramic Coating (1 yr)", "Clay Bar Treatment"),
+            Link("Paint Correction & Ceramic Coating (1 yr)", "Two-Step Paint Correction"),
+            Link("Paint Correction & Ceramic Coating (1 yr)", "Ceramic Coating - 1 Year"),
+
+            // Elite Ceramic Coating (3 yr)
+            Link("Elite Ceramic Coating (3 yr)", "Pre-Wash / Snow Foam"),
+            Link("Elite Ceramic Coating (3 yr)", "Hand Wash (Two-Bucket Method)"),
+            Link("Elite Ceramic Coating (3 yr)", "Clay Bar Treatment"),
+            Link("Elite Ceramic Coating (3 yr)", "Two-Step Paint Correction"),
+            Link("Elite Ceramic Coating (3 yr)", "Ceramic Coating - 3 Years")
         );
 
         await context.SaveChangesAsync();
-        Console.WriteLine("✅ Dynamic seed: service package items added.");
+        Console.WriteLine("✅ Seed: service packages.");
+    }
+
+    // ─────────────────────────── VEHICLES ───────────────────────────
+
+    private static async Task SeedVehiclesAsync(DatabaseContext context)
+    {
+        if (await context.Vehicles.AnyAsync())
+            return;
+
+        var now = DateTime.UtcNow;
+
+        var users = await context.ApplicationUsers
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Username, x => x.Id);
+
+        var cats = await context.VehicleCategories
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.Name, x => x.Id);
+
+        int Cat(string name) => cats[name];
+
+        context.Vehicles.AddRange(
+            // ── client ──────────────────────────────────────────────────
+            new VehicleEntity { Brand = "Volkswagen",    Model = "Golf VII",       YearOfManufacture = 2018, LicencePlate = "A12-345", ApplicationUserId = users["client"],       VehicleCategoryId = Cat("Hatchback"), CreatedAtUtc = now },
+
+            // ── lkovacevic ──────────────────────────────────────────────
+            new VehicleEntity { Brand = "Toyota",        Model = "Corolla",        YearOfManufacture = 2021, LicencePlate = "E11-222", ApplicationUserId = users["lkovacevic"],   VehicleCategoryId = Cat("Sedan"),     CreatedAtUtc = now },
+
+            // ── mbegovic ────────────────────────────────────────────────
+            new VehicleEntity { Brand = "BMW",           Model = "X3 xDrive20d",   YearOfManufacture = 2020, LicencePlate = "K34-567", ApplicationUserId = users["mbegovic"],     VehicleCategoryId = Cat("SUV"),       CreatedAtUtc = now },
+
+            // ── haris123 ────────────────────────────────────────────────
+            new VehicleEntity { Brand = "Audi",          Model = "A4 2.0 TDI",     YearOfManufacture = 2019, LicencePlate = "T55-123", ApplicationUserId = users["haris123"],     VehicleCategoryId = Cat("Sedan"),     CreatedAtUtc = now },
+
+            // ── danis123 ────────────────────────────────────────────────
+            new VehicleEntity { Brand = "Skoda",         Model = "Octavia III",    YearOfManufacture = 2020, LicencePlate = "T66-456", ApplicationUserId = users["danis123"],     VehicleCategoryId = Cat("Sedan"),     CreatedAtUtc = now },
+
+            // ── fleetclient (Bosna Logistics) — three vans ──────────────
+            new VehicleEntity { Brand = "Mercedes-Benz", Model = "Sprinter 314",   YearOfManufacture = 2019, LicencePlate = "B01-001", ApplicationUserId = users["fleetclient"],  VehicleCategoryId = Cat("Van"),       CreatedAtUtc = now },
+            new VehicleEntity { Brand = "Mercedes-Benz", Model = "Sprinter 314",   YearOfManufacture = 2020, LicencePlate = "B01-002", ApplicationUserId = users["fleetclient"],  VehicleCategoryId = Cat("Van"),       CreatedAtUtc = now },
+            new VehicleEntity { Brand = "Volkswagen",    Model = "Transporter T6",  YearOfManufacture = 2021, LicencePlate = "B01-003", ApplicationUserId = users["fleetclient"],  VehicleCategoryId = Cat("Van"),       CreatedAtUtc = now },
+
+            // ── najanovic (Sarajevo Transport) — two vans ───────────────
+            new VehicleEntity { Brand = "Ford",          Model = "Transit Custom",  YearOfManufacture = 2022, LicencePlate = "C10-100", ApplicationUserId = users["najanovic"],    VehicleCategoryId = Cat("Van"),       CreatedAtUtc = now },
+            new VehicleEntity { Brand = "Ford",          Model = "Transit Custom",  YearOfManufacture = 2022, LicencePlate = "C10-101", ApplicationUserId = users["najanovic"],    VehicleCategoryId = Cat("Van"),       CreatedAtUtc = now }
+        );
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: vehicles.");
     }
 }
