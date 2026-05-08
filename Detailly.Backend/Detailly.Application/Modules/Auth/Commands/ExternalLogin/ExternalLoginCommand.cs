@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using MediatR;
 
 namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin;
 

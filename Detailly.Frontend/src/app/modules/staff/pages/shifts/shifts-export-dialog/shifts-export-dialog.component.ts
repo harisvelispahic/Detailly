@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
 import { EmployeeShiftsApiService } from '../../../../../api-services/employee-shifts/employee-shifts-api.service';
 import { EmployeeWorkMode } from '../../../../../api-services/employee-shifts/employee-shifts-api.models';
 import { ToasterService } from '../../../../../core/services/toaster.service';
@@ -8,6 +9,15 @@ export interface ShiftsExportDialogData {
   shopLocationId: number;
   locationName: string;
   workModeFilter: EmployeeWorkMode | null;
+}
+
+function endAfterStartValidator(control: AbstractControl): ValidationErrors | null {
+  const start = control.get('startDate')?.value as Date | null;
+  const end = control.get('endDate')?.value as Date | null;
+  if (start && end && start > end) {
+    return { endBeforeStart: true };
+  }
+  return null;
 }
 
 @Component({
@@ -21,31 +31,36 @@ export class ShiftsExportDialogComponent {
   private data: ShiftsExportDialogData = inject(MAT_DIALOG_DATA);
   private shiftsApi = inject(EmployeeShiftsApiService);
   private toaster = inject(ToasterService);
+  private fb = inject(FormBuilder);
 
   EmployeeWorkMode = EmployeeWorkMode;
-
-  startDate: Date | null = null;
-  endDate: Date | null = null;
-  workModeFilter: EmployeeWorkMode | null = this.data.workModeFilter;
   isExporting = false;
+
+  form = this.fb.group(
+    {
+      startDate: [null as Date | null, Validators.required],
+      endDate: [null as Date | null, Validators.required],
+      workModeFilter: [this.data.workModeFilter as EmployeeWorkMode | null],
+    },
+    { validators: endAfterStartValidator },
+  );
 
   get locationName(): string {
     return this.data.locationName;
   }
 
-  get isValid(): boolean {
-    return !!this.startDate && !!this.endDate && this.startDate <= this.endDate;
-  }
-
   export(): void {
-    if (!this.isValid || !this.startDate || !this.endDate) return;
+    if (this.form.invalid || this.isExporting) return;
+
+    const { startDate, endDate, workModeFilter } = this.form.value;
+    if (!startDate || !endDate) return;
 
     this.isExporting = true;
-    const start = this.formatDate(this.startDate);
-    const end = this.formatDate(this.endDate);
+    const start = this.formatDate(startDate);
+    const end = this.formatDate(endDate);
 
     this.shiftsApi
-      .exportShiftsPdf(start, end, this.data.shopLocationId, this.workModeFilter)
+      .exportShiftsPdf(start, end, this.data.shopLocationId, workModeFilter ?? null)
       .subscribe({
         next: (blob) => {
           this.downloadBlob(blob, `shifts-${start}-to-${end}.pdf`);

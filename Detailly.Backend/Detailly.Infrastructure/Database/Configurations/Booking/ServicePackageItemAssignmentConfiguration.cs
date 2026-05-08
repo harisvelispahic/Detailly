@@ -5,13 +5,13 @@ public class ServicePackageItemAssignmentConfiguration: IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<ServicePackageItemAssignmentEntity> builder)
     {
-        // ---------- ServicePackageItemAssignment (N:M medjutabela) ----------
+        // ---------- ServicePackageItemAssignment (N:M join table) ----------
 
         builder
-            .ToTable("ServicePackageItemAssignments"); // ime tabele
+            .ToTable("ServicePackageItemAssignments");
 
         builder
-            .HasKey(e => e.Id); // surogat ključ
+            .HasKey(e => e.Id); // surrogate key
         
         builder
             .HasOne(e => e.ServicePackage)

@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormBuilder, Validators } from '@angular/forms';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../api-services/payments/payments-api.service';
 import { environment } from '../../../../environments/environment';
@@ -11,13 +12,14 @@ import { environment } from '../../../../environments/environment';
   standalone: false,
 })
 export class WalletTopUpComponent implements OnInit {
+  private payments = inject(PaymentsService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
   readonly amountPresets = [100, 200, 500, 1000];
   readonly customMin = 1001;
 
   selectedPreset: number | null = null;
-  customAmount: number | null = null;
-
-  description: string = '';
   isLoading = false;
   isReady = false;
   paymentSucceeded = false;
@@ -25,17 +27,20 @@ export class WalletTopUpComponent implements OnInit {
   cardError?: string;
   successMessage?: string;
 
+  form = this.fb.group({
+    customAmount: [null as number | null, [Validators.min(this.customMin)]],
+    description: ['', [Validators.maxLength(500)]],
+  });
+
+  get customAmountCtrl() { return this.form.controls.customAmount; }
+
   private stripe: Stripe | null = null;
   private card!: StripeCardElement;
 
   get effectiveAmount(): number | null {
-    return this.selectedPreset ?? (this.customAmount && this.customAmount > 0 ? this.customAmount : null);
+    const custom = this.form.controls.customAmount.value;
+    return this.selectedPreset ?? (custom && custom > 0 ? custom : null);
   }
-
-  constructor(
-    private payments: PaymentsService,
-    private router: Router,
-  ) {}
 
   async ngOnInit() {
     this.stripe = await loadStripe(environment.stripePublishableKey);
@@ -69,7 +74,7 @@ export class WalletTopUpComponent implements OnInit {
 
   selectPreset(value: number): void {
     this.selectedPreset = value;
-    this.customAmount = null;
+    this.form.controls.customAmount.setValue(null);
     this.cardError = undefined;
   }
 
@@ -102,10 +107,12 @@ export class WalletTopUpComponent implements OnInit {
 
     this.isLoading = true;
 
+    const description = this.form.controls.description.value;
+
     this.payments
       .createWalletTopUpCardIntent({
         amount,
-        description: this.description || null,
+        description: description || null,
       })
       .subscribe({
         next: async (res) => {

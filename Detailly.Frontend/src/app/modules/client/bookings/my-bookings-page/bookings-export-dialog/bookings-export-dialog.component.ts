@@ -1,10 +1,20 @@
 import { Component, inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { AbstractControl, FormBuilder, ValidationErrors, Validators } from '@angular/forms';
 import { BookingsService } from '../../../../../api-services/bookings/bookings-api.service';
 import { ToasterService } from '../../../../../core/services/toaster.service';
 
 export interface BookingsExportDialogResult {
   exported: boolean;
+}
+
+function endAfterStartValidator(control: AbstractControl): ValidationErrors | null {
+  const start = control.get('startDate')?.value as Date | null;
+  const end = control.get('endDate')?.value as Date | null;
+  if (start && end && start > end) {
+    return { endBeforeStart: true };
+  }
+  return null;
 }
 
 @Component({
@@ -17,21 +27,30 @@ export class BookingsExportDialogComponent {
   private dialogRef = inject(MatDialogRef<BookingsExportDialogComponent>);
   private bookingsService = inject(BookingsService);
   private toaster = inject(ToasterService);
+  private fb = inject(FormBuilder);
 
-  startDate: Date | null = null;
-  endDate: Date | null = null;
   isExporting = false;
 
-  get isValid(): boolean {
-    return !!this.startDate && !!this.endDate && this.startDate <= this.endDate;
-  }
+  form = this.fb.group(
+    {
+      startDate: [null as Date | null, Validators.required],
+      endDate: [null as Date | null, Validators.required],
+    },
+    { validators: endAfterStartValidator },
+  );
+
+  get startDateCtrl() { return this.form.controls.startDate; }
+  get endDateCtrl() { return this.form.controls.endDate; }
 
   export(): void {
-    if (!this.isValid || !this.startDate || !this.endDate) return;
+    if (this.form.invalid || this.isExporting) return;
+
+    const { startDate, endDate } = this.form.value;
+    if (!startDate || !endDate) return;
 
     this.isExporting = true;
-    const start = this.formatDate(this.startDate);
-    const end = this.formatDate(this.endDate);
+    const start = this.formatDate(startDate);
+    const end = this.formatDate(endDate);
 
     this.bookingsService.exportMyBookingsPdf(start, end).subscribe({
       next: (blob) => {

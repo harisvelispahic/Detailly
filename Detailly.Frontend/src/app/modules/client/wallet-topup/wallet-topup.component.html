@@ -82,7 +82,7 @@
       </div>
 
       <!-- Custom amount field -->
-      <div class="field-group">
+      <div class="field-group" [formGroup]="form">
         <label class="field-label">
           Custom Amount
           <span class="field-label__note">(over 1,000 BAM only)</span>
@@ -90,16 +90,14 @@
         <div class="field-input-wrap">
           <span class="field-currency-symbol">BAM</span>
           <input
-            #customInput="ngModel"
-            name="customAmount"
+            formControlName="customAmount"
             class="field-input field-input--amount"
-            [class.field-input--invalid]="customInput.touched && customInput.invalid"
-            [class.field-input--active]="selectedPreset === null && customAmount"
+            [class.field-input--invalid]="customAmountCtrl.touched && customAmountCtrl.invalid"
+            [class.field-input--active]="selectedPreset === null && customAmountCtrl.value"
             type="number"
             [min]="customMin"
             step="1"
-            [(ngModel)]="customAmount"
-            (ngModelChange)="onCustomAmountChange()"
+            (input)="onCustomAmountChange()"
             placeholder="e.g. 1500"
           />
         </div>
@@ -109,7 +107,7 @@
           </svg>
           For standard top-ups, use the preset buttons above. Custom amounts must exceed 1,000 BAM.
         </p>
-        @if (customInput.touched && customInput.hasError('min')) {
+        @if (customAmountCtrl.touched && customAmountCtrl.hasError('min')) {
           <span class="field-error">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -130,16 +128,15 @@
       </div>
 
       <!-- Description field -->
-      <div class="field-group">
+      <div class="field-group" [formGroup]="form">
         <label class="field-label">
           Note
           <span style="color: hsl(var(--muted-foreground)); font-weight: 400">(optional)</span>
         </label>
         <input
+          formControlName="description"
           class="field-input"
           type="text"
-          [(ngModel)]="description"
-          name="description"
           placeholder="e.g. Monthly top-up"
         />
       </div>

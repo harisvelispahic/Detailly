@@ -128,11 +128,14 @@ export class RegisterComponent extends BaseComponent implements OnInit {
 
   ngOnInit(): void {
     this.form.get('isFleet')?.valueChanges.subscribe((fleet) => {
-      if (!fleet) {
-        this.form.get('companyName')?.clearValidators();
-        this.form.get('companyName')?.setValue('');
-        this.form.get('companyName')?.updateValueAndValidity();
+      const companyName = this.form.get('companyName');
+      if (fleet) {
+        companyName?.setValidators([Validators.required, Validators.maxLength(200)]);
+      } else {
+        companyName?.clearValidators();
+        companyName?.setValue('');
       }
+      companyName?.updateValueAndValidity();
     });
 
     this.countrySearchCtrl.valueChanges.subscribe((value) => {

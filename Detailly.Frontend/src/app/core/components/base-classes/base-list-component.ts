@@ -4,12 +4,12 @@ export abstract class BaseListComponent<TItem> extends BaseComponent {
   items: TItem[] = [];
 
   /**
-   * Konkretnu implementaciju punjenja podataka ostavljamo djeci.
+   * Concrete data loading implementation is left to subclasses.
    */
   protected abstract loadData(): void;
 
   /**
-   * Helper koji možeš zvati iz ngOnInit dječije komponente.
+   * Helper to call from ngOnInit of a subclass.
    */
   protected initList(): void {
     this.loadData();

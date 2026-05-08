@@ -24,7 +24,7 @@ public class ReactionsController(ISender sender) : ControllerBase
     // Get all reactions by the current user (for pre-filling the UI state)
     [HttpGet("service-packages/my")]
     [Authorize(Policy = AuthPolicies.AnyClient)]
-    public async Task<List<MyReactionDto>> GetMy(CancellationToken ct)
+    public async Task<List<GetMyReactionsQueryDto>> GetMy(CancellationToken ct)
     {
         return await sender.Send(new GetMyReactionsQuery(), ct);
     }

@@ -9,8 +9,7 @@ public class WalletEntity : BaseEntity
     public decimal Balance { get; set; } = 0m;
     public CurrencyName Currency { get; set; } = CurrencyName.BAM;
     public decimal TotalDeposited { get; set; } = 0m;
-    public int PercentageAdded { get; set; } = 10;
-    // sistem kao ACC, korisniku se na uplaceni iznos dodaje x% (npr. 10%) kao bonus
+    public int PercentageAdded { get; set; } = 10; // Bonus percentage added on top of each deposit (e.g. 10%)
 
     // Foreign keys
     public int ApplicationUserId { get; set; }   // FK to ApplicationUser

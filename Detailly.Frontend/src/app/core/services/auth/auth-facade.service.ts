@@ -20,15 +20,15 @@ import { REFRESH_TOKEN_EXPIRY_DAYS } from './auth.constants';
 import * as Sentry from '@sentry/angular';
 
 /**
- * Glavni auth servis (facade).
- * - priča sa AuthApiService (HTTP)
- * - priča sa AuthStorageService (localStorage)
- * - dekodira JWT i drži CurrentUser kao signal
+ * Main auth service (facade).
+ * - talks to AuthApiService (HTTP)
+ * - talks to AuthStorageService (localStorage)
+ * - decodes JWT and holds CurrentUser as a signal
  *
- * Koristi se u:
- * - interceptoru (getAccessToken, refresh)
- * - guardovima (isAuthenticated, isAdmin)
- * - komponentama (login, logout, navbar)
+ * Used in:
+ * - interceptor (getAccessToken, refresh)
+ * - guards (isAuthenticated, isAdmin)
+ * - components (login, logout, navbar)
  */
 @Injectable({ providedIn: 'root' })
 export class AuthFacadeService {
@@ -40,10 +40,10 @@ export class AuthFacadeService {
 
   private _currentUser = signal<CurrentUserDto | null>(null);
 
-  /** readonly signal za UI – čita se kao auth.currentUser() */
+  /** Read-only signal for the UI – consumed as auth.currentUser() */
   currentUser = this._currentUser.asReadonly();
 
-  /** computed signali nad current userom */
+  /** Computed signals derived from the current user. */
   isAuthenticated = computed(() => !!this._currentUser());
   isAdmin = computed(() => this._currentUser()?.isAdmin ?? false);
   isManager = computed(() => this._currentUser()?.isManager ?? false);
@@ -52,7 +52,7 @@ export class AuthFacadeService {
   isStandard = computed(() => this._currentUser()?.isStandard ?? false);
 
   constructor() {
-    // pokušaj inicijalizacije iz postojećeg access tokena
+    // attempt to initialize from existing access token
     this.initializeFromToken();
   }
 
@@ -61,50 +61,50 @@ export class AuthFacadeService {
   // =========================================================
 
   /**
-   * Login korisnika (email + password).
-   * Snima tokene u storage, dekodira JWT i popunjava current user state.
+   * Logs in a user (email + password).
+   * Saves tokens to storage, decodes JWT and populates current user state.
    */
   login(payload: LoginCommand): Observable<void> {
     return this.api.login(payload).pipe(
       tap((response: LoginCommandDto) => {
         this.storage.saveLogin(response); // access + refresh + expiries
-        this.decodeAndSetUser(response.accessToken); // popuni _currentUser
+        this.decodeAndSetUser(response.accessToken); // populate _currentUser
       }),
       map(() => void 0),
     );
   }
 
   /**
-   * Logout korisnika:
-   * - lokalno očisti state i tokene
-   * - pokuša invalidirati refresh token na serveru (bez drame na error)
+   * Logs out the user:
+   * - clears state and tokens locally
+   * - attempts to invalidate refresh token on the server (ignores errors)
    */
   logout(): Observable<void> {
     const refreshToken = this.storage.getRefreshToken();
 
-    // 1) lokalno očisti (optimistic logout)
+    // 1) clear locally (optimistic logout)
     this.clearUserState();
 
-    // 2) nema refresh tokena → nema ni API poziva
+    // 2) no refresh token → skip API call
     if (!refreshToken) {
       return of(void 0);
     }
 
     const payload: LogoutCommand = { refreshToken };
 
-    // 3) pokušaj server-side logout, ignoriši greške
+    // 3) attempt server-side logout, ignore errors
     return this.api.logout(payload).pipe(catchError(() => of(void 0)));
   }
 
   /**
-   * Refresh access tokena – koristi refresh token.
-   * Poziva interceptor kada dobije 401.
+   * Refreshes the access token using the refresh token.
+   * Called by the interceptor on 401 responses.
    */
   refresh(payload: RefreshTokenCommand): Observable<RefreshTokenCommandDto> {
     return this.api.refresh(payload).pipe(
       tap((response: RefreshTokenCommandDto) => {
-        this.storage.saveRefresh(response); // snimi nove tokene
-        this.decodeAndSetUser(response.accessToken); // update current usera
+        this.storage.saveRefresh(response); // save new tokens
+        this.decodeAndSetUser(response.accessToken); // update current user
       }),
     );
   }
@@ -115,7 +115,9 @@ export class AuthFacadeService {
   storeExternalLoginTokens(accessToken: string, refreshToken: string): void {
     const payload = jwtDecode<{ exp: number }>(accessToken);
     const accessExpiry = new Date(payload.exp * 1000).toISOString();
-    const refreshExpiry = new Date(Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();
+    const refreshExpiry = new Date(
+      Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+    ).toISOString();
 
     this.storage.saveLogin({
       accessToken,
@@ -128,7 +130,7 @@ export class AuthFacadeService {
   }
 
   /**
-   * Utility za guardove/interceptore – očisti auth state i prebaci na /login.
+   * Utility for guards/interceptors – clears auth state and redirects to /login.
    */
   redirectToLogin(): void {
     this.clearUserState();
@@ -136,18 +138,18 @@ export class AuthFacadeService {
   }
 
   // =========================================================
-  // GETTERI ZA INTERCEPTOR
+  // GETTERS FOR INTERCEPTOR
   // =========================================================
 
   /**
-   * Access token za Authorization header.
+   * Access token for the Authorization header.
    */
   getAccessToken(): string | null {
     return this.storage.getAccessToken();
   }
 
   /**
-   * Refresh token za refresh poziv.
+   * Refresh token for the refresh call.
    */
   getRefreshToken(): string | null {
     return this.storage.getRefreshToken();
@@ -158,7 +160,7 @@ export class AuthFacadeService {
   // =========================================================
 
   /**
-   * Na startu aplikacije (konstruktor) – pokušaj obnoviti stanje iz postojećeg tokena.
+   * On application startup (constructor) – attempt to restore state from the existing token.
    */
   private initializeFromToken(): void {
     const token = this.storage.getAccessToken();
@@ -168,7 +170,7 @@ export class AuthFacadeService {
   }
 
   /**
-   * Dekodiraj JWT i postavi current user state.
+   * Decodes a JWT and sets the current user state.
    */
   private decodeAndSetUser(token: string): void {
     try {
@@ -227,7 +229,7 @@ export class AuthFacadeService {
   }
 
   /**
-   * Očisti user state + sve tokene iz storage-a.
+   * Clears user state and all tokens from storage.
    */
   private clearUserState(): void {
     this._currentUser.set(null);

@@ -5,7 +5,7 @@ import { AuthFacadeService } from './auth-facade.service';
 export class CurrentUserService {
   private auth = inject(AuthFacadeService);
 
-  /** Signal koji UI može čitati (readonly) */
+  /** Read-only signal for the UI. */
   currentUser = computed(() => this.auth.currentUser());
 
   isAuthenticated = computed(() => this.auth.isAuthenticated());
@@ -19,7 +19,7 @@ export class CurrentUserService {
     return this.auth.currentUser();
   }
 
-  /** Pravilo: admin > ostali → client */
+  /** Priority: admin > staff > client */
   getDefaultRoute(): string {
     const user = this.snapshot;
     if (!user) return '/login';

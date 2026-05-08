@@ -11,17 +11,20 @@
       >.
     </p>
 
-    <div class="export-dialog__fields">
+    <form [formGroup]="form" class="export-dialog__fields">
       <mat-form-field appearance="outline" class="export-dialog__field">
         <mat-label>From</mat-label>
         <input
           matInput
           [matDatepicker]="startPicker"
-          [(ngModel)]="startDate"
+          formControlName="startDate"
           placeholder="DD/MM/YYYY"
         />
         <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
         <mat-datepicker #startPicker></mat-datepicker>
+        @if (form.controls.startDate.invalid && form.controls.startDate.touched) {
+          <mat-error>Start date is required.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="export-dialog__field">
@@ -29,25 +32,28 @@
         <input
           matInput
           [matDatepicker]="endPicker"
-          [(ngModel)]="endDate"
-          [min]="startDate"
+          formControlName="endDate"
+          [min]="form.controls.startDate.value"
           placeholder="DD/MM/YYYY"
         />
         <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
         <mat-datepicker #endPicker></mat-datepicker>
+        @if (form.controls.endDate.invalid && form.controls.endDate.touched) {
+          <mat-error>End date is required.</mat-error>
+        }
       </mat-form-field>
-    </div>
 
-    <mat-form-field appearance="outline" class="export-dialog__field export-dialog__field--full">
-      <mat-label>Work Mode</mat-label>
-      <mat-select [(ngModel)]="workModeFilter">
-        <mat-option [value]="null">All modes</mat-option>
-        <mat-option [value]="EmployeeWorkMode.InShop">In Shop</mat-option>
-        <mat-option [value]="EmployeeWorkMode.Mobile">Mobile</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="export-dialog__field export-dialog__field--full">
+        <mat-label>Work Mode</mat-label>
+        <mat-select formControlName="workModeFilter">
+          <mat-option [value]="null">All modes</mat-option>
+          <mat-option [value]="EmployeeWorkMode.InShop">In Shop</mat-option>
+          <mat-option [value]="EmployeeWorkMode.Mobile">Mobile</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
 
-    @if (startDate && endDate && startDate > endDate) {
+    @if (form.hasError('endBeforeStart')) {
       <p class="export-dialog__error">End date must be after start date.</p>
     }
   </mat-dialog-content>
@@ -57,7 +63,7 @@
     <button
       mat-raised-button
       color="primary"
-      [disabled]="!isValid || isExporting"
+      [disabled]="form.invalid || isExporting"
       (click)="export()"
     >
       @if (isExporting) {

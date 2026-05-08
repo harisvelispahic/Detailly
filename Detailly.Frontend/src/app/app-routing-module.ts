@@ -22,7 +22,7 @@ const routes: Routes = [
   {
     path: 'client',
     canActivate: [myAuthGuard],
-    data: myAuthData({ requireAuth: true }), // bilo ko logiran
+    data: myAuthData({ requireAuth: true }), // any authenticated user
     loadChildren: () => import('./modules/client/client-module').then((m) => m.ClientModule),
   },
   {
