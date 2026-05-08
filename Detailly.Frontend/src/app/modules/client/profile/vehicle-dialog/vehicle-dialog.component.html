@@ -46,7 +46,7 @@
 
       <mat-form-field appearance="outline" subscriptSizing="fixed">
         <mat-label>Category</mat-label>
-        <mat-select formControlName="vehicleCategoryId" [disabled]="isLoadingCategories">
+        <mat-select formControlName="vehicleCategoryId">
           @for (cat of categories; track cat.id) {
             <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
           }

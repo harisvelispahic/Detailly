@@ -54,6 +54,7 @@ export class VehicleDialogComponent implements OnInit {
 
   private loadCategories(currentCategoryName?: string): void {
     this.isLoadingCategories = true;
+    this.form.get('vehicleCategoryId')?.disable();
     this.vehicleCategories.listAll().subscribe({
       next: (cats) => {
         this.categories = cats;
@@ -62,8 +63,12 @@ export class VehicleDialogComponent implements OnInit {
           if (match) this.form.patchValue({ vehicleCategoryId: match.id });
         }
         this.isLoadingCategories = false;
+        this.form.get('vehicleCategoryId')?.enable();
       },
-      error: () => { this.isLoadingCategories = false; },
+      error: () => {
+        this.isLoadingCategories = false;
+        this.form.get('vehicleCategoryId')?.enable();
+      },
     });
   }
 
