@@ -1,4 +1,4 @@
-﻿namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Delete;
+namespace Detailly.Application.Modules.Catalog.ProductCategories.Commands.Delete;
 
 public class DeleteProductCategoryCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
       : IRequestHandler<DeleteProductCategoryCommand, Unit>
@@ -14,7 +14,15 @@ public class DeleteProductCategoryCommandHandler(IAppDbContext context, IAppCurr
         if (category is null)
             throw new DetaillyNotFoundException("Product category was not found.");
 
-        category.IsDeleted = true; // Soft delete
+        var hasActiveProducts = await context.Products
+            .AnyAsync(p => p.CategoryId == request.Id, ct);
+
+        if (hasActiveProducts)
+            throw new DetaillyBusinessRuleException(
+                "CATEGORY_HAS_PRODUCTS",
+                "Cannot delete a category that has active products assigned to it.");
+
+        category.IsDeleted = true;
         await context.SaveChangesAsync(ct);
 
         return Unit.Value;

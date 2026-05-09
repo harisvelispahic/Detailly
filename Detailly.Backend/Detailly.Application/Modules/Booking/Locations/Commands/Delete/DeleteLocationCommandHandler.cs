@@ -1,4 +1,4 @@
-﻿namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
+namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 
 public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
     : IRequestHandler<DeleteLocationCommand, Unit>
@@ -18,6 +18,44 @@ public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppCurr
 
         if (location is null)
             return Unit.Value; // idempotent
+
+        var hasBookings = await context.Bookings
+            .AnyAsync(b => b.ShopLocationId == request.Id, ct);
+
+        if (hasBookings)
+            throw new DetaillyBusinessRuleException(
+                "LOCATION_HAS_BOOKINGS",
+                "Cannot delete a location that has existing bookings.");
+
+        var shifts = await context.EmployeeShifts
+            .Where(s => s.ShopLocationId == request.Id)
+            .ToListAsync(ct);
+
+        foreach (var shift in shifts)
+        {
+            shift.IsDeleted = true;
+            shift.ModifiedAtUtc = now;
+        }
+
+        var openingHours = await context.LocationOpeningHours
+            .Where(h => h.ShopLocationId == request.Id)
+            .ToListAsync(ct);
+
+        foreach (var oh in openingHours)
+        {
+            oh.IsDeleted = true;
+            oh.ModifiedAtUtc = now;
+        }
+
+        // Address is owned 1:1 by the location
+        var address = await context.Addresses
+            .FirstOrDefaultAsync(a => a.Id == location.AddressId, ct);
+
+        if (address is not null)
+        {
+            address.IsDeleted = true;
+            address.ModifiedAtUtc = now;
+        }
 
         location.IsDeleted = true;
         location.ModifiedAtUtc = now;

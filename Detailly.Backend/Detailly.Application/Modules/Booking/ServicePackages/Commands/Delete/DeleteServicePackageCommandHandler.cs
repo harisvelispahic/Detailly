@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Abstractions;
+using Detailly.Application.Abstractions;
 
 namespace Detailly.Application.Modules.Booking.ServicePackages.Commands.Delete;
 
@@ -15,14 +15,13 @@ public class DeleteServicePackageCommandHandler(IAppDbContext context, ICloudina
         if (package is null || package.IsDeleted)
             throw new DetaillyNotFoundException("Service package not found.");
 
-        // Constraint: do not delete if used in any active booking
         var inUse = await context.Bookings
-            .AnyAsync(b => b.ServicePackageId == request.Id && !b.IsDeleted, ct);
+            .AnyAsync(b => b.ServicePackageId == request.Id, ct);
 
         if (inUse)
             throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_IN_USE", "Cannot delete service package because it is used in bookings.");
 
-        // Delete all associated images from Cloudinary, then hard-delete from DB
+        // Hard-delete images: remove from Cloudinary then from DB
         var images = await context.Images
             .Where(i => i.ServicePackageId == request.Id)
             .ToListAsync(ct);
@@ -35,20 +34,40 @@ public class DeleteServicePackageCommandHandler(IAppDbContext context, ICloudina
 
         context.Images.RemoveRange(images);
 
-        // Soft delete package
-        package.IsDeleted = true;
-        package.ModifiedAtUtc = DateTime.UtcNow;
+        var now = DateTime.UtcNow;
 
-        // Soft delete assignments too
         var assignments = await context.ServicePackageItemAssignments
-            .Where(x => x.ServicePackageId == request.Id && !x.IsDeleted)
+            .Where(x => x.ServicePackageId == request.Id)
             .ToListAsync(ct);
 
         foreach (var a in assignments)
         {
             a.IsDeleted = true;
-            a.ModifiedAtUtc = DateTime.UtcNow;
+            a.ModifiedAtUtc = now;
         }
+
+        var reviews = await context.Reviews
+            .Where(r => r.ServicePackageId == request.Id)
+            .ToListAsync(ct);
+
+        foreach (var r in reviews)
+        {
+            r.IsDeleted = true;
+            r.ModifiedAtUtc = now;
+        }
+
+        var reactions = await context.Reactions
+            .Where(r => r.ServicePackageId == request.Id)
+            .ToListAsync(ct);
+
+        foreach (var r in reactions)
+        {
+            r.IsDeleted = true;
+            r.ModifiedAtUtc = now;
+        }
+
+        package.IsDeleted = true;
+        package.ModifiedAtUtc = now;
 
         await context.SaveChangesAsync(ct);
         await transaction.CommitAsync(ct);

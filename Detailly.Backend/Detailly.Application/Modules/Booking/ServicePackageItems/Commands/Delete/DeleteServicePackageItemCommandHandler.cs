@@ -13,12 +13,19 @@ public class DeleteServicePackageItemCommandHandler(IAppDbContext context)
         if (item is null || item.IsDeleted)
             throw new DetaillyNotFoundException("Service package item not found.");
 
-        var inUse = await context.ServicePackageItemAssignments
+        var inActivePackage = await context.ServicePackageItemAssignments
             .AnyAsync(a => a.ServicePackageItemId == request.Id && !a.IsDeleted && !a.ServicePackage.IsDeleted, ct);
 
-        if (inUse)
+        if (inActivePackage)
             throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_ITEM_IN_USE",
                 "Cannot delete this item because it is assigned to one or more service packages.");
+
+        var inBooking = await context.BookingItems
+            .AnyAsync(bi => bi.ServicePackageItemId == request.Id, ct);
+
+        if (inBooking)
+            throw new DetaillyBusinessRuleException("SERVICE_PACKAGE_ITEM_IN_BOOKING",
+                "Cannot delete this item because it has been used in a booking.");
 
         item.IsDeleted = true;
         item.ModifiedAtUtc = DateTime.UtcNow;
