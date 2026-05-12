@@ -5,10 +5,11 @@ using Detailly.Domain.Entities.Booking;
 public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
     : IRequestHandler<CreateReviewCommand, int>
 {
-    private const int ReviewWindowDays = 7;
-
     public async Task<int> Handle(CreateReviewCommand request, CancellationToken ct)
     {
+        var settings = await context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+        var reviewWindowDays = settings?.ReviewWindowDays ?? 7;
+
         var booking = await context.Bookings
             .FirstOrDefaultAsync(x => x.Id == request.BookingId, ct);
 
@@ -23,10 +24,10 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
                 "BOOKING_NOT_COMPLETED",
                 "Only completed bookings can be reviewed.");
 
-        if ((DateTime.UtcNow - booking.EndUtc).TotalDays > ReviewWindowDays)
+        if ((DateTime.UtcNow - booking.EndUtc).TotalDays > reviewWindowDays)
             throw new DetaillyBusinessRuleException(
                 "REVIEW_WINDOW_EXPIRED",
-                "The 7-day review window for this booking has expired.");
+                $"The {reviewWindowDays}-day review window for this booking has expired.");
 
         var existing = await context.Reviews
             .FirstOrDefaultAsync(

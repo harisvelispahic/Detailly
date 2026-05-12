@@ -1,1 +1,102 @@
-<p>admin-settings works!</p>
+<div class="settings-page">
+  <div class="settings-page__header">
+    <h1 class="settings-page__title">System Settings</h1>
+    <p class="settings-page__subtitle">Configure global business rules for the platform.</p>
+  </div>
+
+  <div *ngIf="loading" class="settings-page__loading">
+    <mat-spinner diameter="36"></mat-spinner>
+  </div>
+
+  <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="save()" class="settings-page__form">
+
+    <!-- Wallet Bonus -->
+    <div class="settings-card">
+      <div class="settings-card__header">
+        <mat-icon class="settings-card__icon">account_balance_wallet</mat-icon>
+        <div>
+          <h2 class="settings-card__title">Wallet Top-Up Bonus</h2>
+          <p class="settings-card__desc">Percentage added on top of every wallet deposit.</p>
+        </div>
+      </div>
+      <div class="settings-card__fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Standard customers (%)</mat-label>
+          <input matInput type="number" formControlName="standardWalletBonusPercent" min="0" max="100" />
+          <mat-error *ngIf="form.get('standardWalletBonusPercent')?.invalid">Must be between 0 and 100</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fleet customers (%)</mat-label>
+          <input matInput type="number" formControlName="fleetWalletBonusPercent" min="0" max="100" />
+          <mat-error *ngIf="form.get('fleetWalletBonusPercent')?.invalid">Must be between 0 and 100</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Review Window -->
+    <div class="settings-card">
+      <div class="settings-card__header">
+        <mat-icon class="settings-card__icon">rate_review</mat-icon>
+        <div>
+          <h2 class="settings-card__title">Review Window</h2>
+          <p class="settings-card__desc">Number of days after booking completion during which a customer can submit a review.</p>
+        </div>
+      </div>
+      <div class="settings-card__fields">
+        <mat-form-field appearance="outline">
+          <mat-label>Review window (days)</mat-label>
+          <input matInput type="number" formControlName="reviewWindowDays" min="1" max="90" />
+          <mat-error *ngIf="form.get('reviewWindowDays')?.invalid">Must be between 1 and 90</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Fleet Discount -->
+    <div class="settings-card">
+      <div class="settings-card__header">
+        <mat-icon class="settings-card__icon">local_offer</mat-icon>
+        <div>
+          <h2 class="settings-card__title">Fleet Booking Discount</h2>
+          <p class="settings-card__desc">Discount applied to fleet bookings based on vehicle count.</p>
+        </div>
+      </div>
+      <div class="settings-card__fields settings-card__fields--three">
+        <mat-form-field appearance="outline">
+          <mat-label>Base discount (%)</mat-label>
+          <input matInput type="number" formControlName="baseFleetDiscountPercent" min="0" max="100" />
+          <mat-hint>Single-vehicle fleet</mat-hint>
+          <mat-error *ngIf="form.get('baseFleetDiscountPercent')?.invalid">Must be between 0 and 100</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Per additional vehicle (%)</mat-label>
+          <input matInput type="number" formControlName="perVehicleFleetDiscountPercent" min="0" max="100" />
+          <mat-hint>Added per vehicle beyond the first</mat-hint>
+          <mat-error *ngIf="form.get('perVehicleFleetDiscountPercent')?.invalid">Must be between 0 and 100</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Maximum discount (%)</mat-label>
+          <input matInput type="number" formControlName="maxFleetDiscountPercent" min="0" max="100" />
+          <mat-hint>Cap regardless of vehicle count</mat-hint>
+          <mat-error *ngIf="form.get('maxFleetDiscountPercent')?.invalid">Must be between 0 and 100</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="settings-page__actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="form.invalid || saving"
+        class="settings-page__save-btn">
+        <mat-icon *ngIf="!saving">save</mat-icon>
+        <mat-spinner *ngIf="saving" diameter="18"></mat-spinner>
+        {{ saving ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+
+  </form>
+</div>

@@ -149,9 +149,13 @@ public sealed class BookingQuoteService(
         decimal fleetDiscountPercent = 0m;
         if (isFleet)
         {
-            var discountOpts = fleetDiscountOptions.Value;
-            var raw = discountOpts.BaseDiscountPercent + (numVehicles - 1) * discountOpts.PerVehicleDiscountPercent;
-            fleetDiscountPercent = Math.Min(raw, discountOpts.MaxDiscountPercent);
+            var settings = await context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+            var baseDiscount = settings?.BaseFleetDiscountPercent ?? fleetDiscountOptions.Value.BaseDiscountPercent;
+            var perVehicleDiscount = settings?.PerVehicleFleetDiscountPercent ?? fleetDiscountOptions.Value.PerVehicleDiscountPercent;
+            var maxDiscount = settings?.MaxFleetDiscountPercent ?? fleetDiscountOptions.Value.MaxDiscountPercent;
+
+            var raw = baseDiscount + (numVehicles - 1) * perVehicleDiscount;
+            fleetDiscountPercent = Math.Min(raw, maxDiscount);
             totalPrice *= (1m - fleetDiscountPercent / 100m);
         }
 

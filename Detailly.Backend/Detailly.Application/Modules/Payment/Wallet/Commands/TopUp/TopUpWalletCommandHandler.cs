@@ -16,14 +16,19 @@ public class TopUpWalletCommandHandler
     public async Task<Unit> Handle(TopUpWalletCommand request, CancellationToken ct)
     {
         var wallet = await _context.Wallet
+            .Include(w => w.ApplicationUser)
             .FirstOrDefaultAsync(x => x.ApplicationUserId == request.UserId, ct)
             ?? throw new DetaillyNotFoundException("Wallet not found.");
 
         if (request.Amount <= 0)
             throw new DetaillyBusinessRuleException("TOPUP_INVALID_AMOUNT","Amount must be greater than zero.");
 
-        // bonus (if enabled)
-        var bonus = (wallet.PercentageAdded / 100m) * request.Amount;
+        var settings = await _context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+        var bonusPercent = (wallet.ApplicationUser.IsFleet
+            ? settings?.FleetWalletBonusPercent
+            : settings?.StandardWalletBonusPercent) ?? wallet.PercentageAdded;
+
+        var bonus = (bonusPercent / 100m) * request.Amount;
 
         wallet.Balance += request.Amount + bonus;
         wallet.TotalDeposited += request.Amount;

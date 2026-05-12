@@ -71,6 +71,7 @@ public interface IAppDbContext
     // Shared
     DbSet<AddressEntity> Addresses { get; }
     DbSet<ImageEntity> Images { get; }
+    DbSet<SystemSettingsEntity> SystemSettings { get; }
 
 
 
