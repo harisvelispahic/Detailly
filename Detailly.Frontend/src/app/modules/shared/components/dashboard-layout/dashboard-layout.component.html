@@ -120,6 +120,21 @@
         </a>
       }
 
+      <!-- ── ADMIN (admin only) ────────────────────────────────────────── -->
+      @if (auth.isAdmin()) {
+        <p class="sidebar__group-label">Admin</p>
+
+        <a
+          class="sidebar__item"
+          routerLink="/admin/settings"
+          routerLinkActive="sidebar__item--active"
+          (click)="closeSidebar()"
+        >
+          <mat-icon class="sidebar__item-icon">settings</mat-icon>
+          <span>Settings</span>
+        </a>
+      }
+
       <!-- ── ADMIN — LEGACY (admin only) ───────────────────────────────── -->
       @if (auth.isAdmin()) {
         <p class="sidebar__group-label">
@@ -160,18 +175,6 @@
         >
           <mat-icon class="sidebar__item-icon">shopping_cart</mat-icon>
           <span>Orders</span>
-          <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
-        </a>
-
-        <a
-          class="sidebar__item sidebar__item--legacy"
-          routerLink="/admin/settings"
-          routerLinkActive="sidebar__item--active"
-          (click)="closeSidebar()"
-          title="Pending reimplementation"
-        >
-          <mat-icon class="sidebar__item-icon">settings</mat-icon>
-          <span>Settings</span>
           <mat-icon class="sidebar__item-warn">warning_amber</mat-icon>
         </a>
       }
