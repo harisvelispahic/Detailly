@@ -14,6 +14,7 @@ public static class DynamicDataSeeder
     {
         await context.Database.EnsureCreatedAsync();
 
+        await SeedSystemSettingsAsync(context);
         await SeedProductCategoriesAsync(context);
         await SeedVehicleCategoriesAsync(context);
         await SeedUsersAsync(context);
@@ -27,6 +28,28 @@ public static class DynamicDataSeeder
         await SeedBookingsAsync(context);
         await SeedReviewsAsync(context);
         await SeedReactionsAsync(context);
+    }
+
+    // ─────────────────────────── SYSTEM SETTINGS ───────────────────────────
+
+    private static async Task SeedSystemSettingsAsync(DatabaseContext context)
+    {
+        if (await context.SystemSettings.AnyAsync())
+            return;
+
+        context.SystemSettings.Add(new SystemSettingsEntity
+        {
+            StandardWalletBonusPercent = 10,
+            FleetWalletBonusPercent = 15,
+            ReviewWindowDays = 7,
+            BaseFleetDiscountPercent = 2.0m,
+            PerVehicleFleetDiscountPercent = 1.0m,
+            MaxFleetDiscountPercent = 8.0m,
+            CreatedAtUtc = DateTime.UtcNow,
+        });
+
+        await context.SaveChangesAsync();
+        Console.WriteLine("✅ Seed: system settings.");
     }
 
     // ─────────────────────────── PRODUCT CATEGORIES ───────────────────────────
