@@ -1,10 +1,14 @@
-﻿using Detailly.Domain.Entities.Shared;
+﻿using Detailly.Application.Abstractions.Booking;
+using Detailly.Domain.Entities.Shared;
+using Microsoft.Extensions.Logging;
 
 namespace Detailly.Application.Modules.Shared.Address.Commands.Create;
 
 public sealed class CreateAddressCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser)
+    IAppCurrentUser appCurrentUser,
+    IRoadDistanceService roadDistanceService,
+    ILogger<CreateAddressCommandHandler> logger)
     : IRequestHandler<CreateAddressCommand, int>
 {
     public async Task<int> Handle(CreateAddressCommand request, CancellationToken ct)
@@ -12,15 +16,25 @@ public sealed class CreateAddressCommandHandler(
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
             throw new DetaillyUnauthorizedException("User is not authenticated.");
 
+        var street  = request.Street.Trim();
+        var city    = request.City.Trim();
+        var postal  = request.PostalCode.Trim();
+        var country = request.Country.Trim();
+
+        var coords = await roadDistanceService.GetCoordinatesAsync(street, city, postal, country, ct);
+
+        if (coords is null)
+            logger.LogWarning("Geocoding failed for new address ({Street}, {City}, {Country}).", street, city, country);
+
         var address = new AddressEntity
         {
-            Street = request.Street.Trim(),
-            City = request.City.Trim(),
-            PostalCode = request.PostalCode.Trim(),
-            Region = string.IsNullOrWhiteSpace(request.Region) ? null : request.Region.Trim(),
-            Country = request.Country.Trim(),
-            Latitude = request.Latitude,
-            Longitude = request.Longitude,
+            Street    = street,
+            City      = city,
+            PostalCode = postal,
+            Region    = string.IsNullOrWhiteSpace(request.Region) ? null : request.Region.Trim(),
+            Country   = country,
+            Latitude  = coords?.Latitude,
+            Longitude = coords?.Longitude,
             ApplicationUserId = appCurrentUser.ApplicationUserId.Value
         };
 
