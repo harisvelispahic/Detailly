@@ -74,6 +74,22 @@
                 }
               </span>
             </div>
+            <div class="info-row">
+              <span class="info-row__label">Location</span>
+              <span class="info-row__value">{{ booking.shopLocationName }}</span>
+            </div>
+            @if (booking.serviceMode === ServiceMode.Mobile && booking.serviceAddress) {
+              <div class="info-row">
+                <span class="info-row__label">Service Address</span>
+                <span class="info-row__value">
+                  {{ booking.serviceAddress.street }}, {{ booking.serviceAddress.city }}
+                  @if (booking.serviceAddress.postalCode) {
+                    {{ booking.serviceAddress.postalCode }},
+                  }
+                  {{ booking.serviceAddress.country }}
+                </span>
+              </div>
+            }
             @if (booking.serviceMode === ServiceMode.Mobile && booking.travelTimeMinutes) {
               <div class="info-row">
                 <span class="info-row__label">Travel Time</span>

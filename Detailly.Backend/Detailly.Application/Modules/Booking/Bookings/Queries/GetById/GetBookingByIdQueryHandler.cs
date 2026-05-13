@@ -32,6 +32,14 @@ public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurren
                 x.Notes,
                 x.ServicePackageId,
                 PackageName = x.ServicePackage.Name,
+                ShopLocationName = x.ShopLocation.Name,
+                ServiceAddress = x.ServiceAddress == null ? null : new BookingAddressDto
+                {
+                    Street = x.ServiceAddress.Street,
+                    City = x.ServiceAddress.City,
+                    PostalCode = x.ServiceAddress.PostalCode,
+                    Country = x.ServiceAddress.Country,
+                },
                 x.CustomerId
             })
             .FirstOrDefaultAsync(ct);
@@ -92,6 +100,8 @@ public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurren
             Notes = b.Notes,
             ServicePackageId = b.ServicePackageId,
             ServicePackageName = b.PackageName,
+            ShopLocationName = b.ShopLocationName,
+            ServiceAddress = b.ServiceAddress,
             Addons = addons,
             VehicleIds = vehicleIds,
             PaymentTransactionId = latestPaymentAttempt?.Id,

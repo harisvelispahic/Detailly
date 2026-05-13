@@ -40,6 +40,13 @@ export interface ListMyBookingsQueryDto {
   canRate: boolean;
 }
 
+export interface BookingAddressDto {
+  street: string;
+  city: string;
+  postalCode?: string | null;
+  country: string;
+}
+
 export interface GetBookingByIdQueryDto {
   id: number;
   status: BookingStatus;
@@ -58,6 +65,8 @@ export interface GetBookingByIdQueryDto {
   notes?: string | null;
   servicePackageId: number;
   servicePackageName: string;
+  shopLocationName: string;
+  serviceAddress?: BookingAddressDto | null;
   paymentTransactionId?: number | null;
   paymentStatus?: PaymentTransactionStatus | null;
 

@@ -83,5 +83,11 @@ export class LandingComponent implements OnInit {
     this.reviewsApi.list(reviewsReq).subscribe(result => {
       this.reviews = result.items;
     });
+
+    this.reviewsApi.getStats().subscribe(stats => {
+      if (stats.totalCount > 0) {
+        this.stats = { ...this.stats, averageRating: stats.averageRating.toFixed(1) };
+      }
+    });
   }
 }

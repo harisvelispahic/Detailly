@@ -2,6 +2,7 @@ using Detailly.Application.Modules.Booking.Reviews.Commands.Create;
 using Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
 using Detailly.Application.Modules.Booking.Reviews.Queries.GetById;
 using Detailly.Application.Modules.Booking.Reviews.Queries.GetMyReview;
+using Detailly.Application.Modules.Booking.Reviews.Queries.GetStats;
 using Detailly.Application.Modules.Booking.Reviews.Queries.List;
 using Detailly.Application.Modules.Booking.Reviews.Queries.ListMy;
 using Detailly.Shared.Constants;
@@ -35,6 +36,13 @@ public class ReviewsController(ISender sender) : ControllerBase
     public async Task<GetReviewByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         return await sender.Send(new GetReviewByIdQuery { Id = id }, ct);
+    }
+
+    [HttpGet("stats")]
+    [AllowAnonymous]
+    public async Task<GetReviewStatsQueryDto> GetStats(CancellationToken ct)
+    {
+        return await sender.Send(new GetReviewStatsQuery(), ct);
     }
 
     [HttpGet]

@@ -10,6 +10,7 @@ import {
   ListMyReviewsResponse,
   ListReviewsRequest,
   ListReviewsResponse,
+  ReviewStats,
 } from './reviews-api.models';
 
 @Injectable({ providedIn: 'root' })
@@ -40,5 +41,9 @@ export class ReviewsApiService {
     return this.http.get<GetMyReviewForServicePackageDto | null>(
       `${this.baseUrl}/my/service-package/${servicePackageId}`
     );
+  }
+
+  getStats(): Observable<ReviewStats> {
+    return this.http.get<ReviewStats>(`${this.baseUrl}/stats`);
   }
 }

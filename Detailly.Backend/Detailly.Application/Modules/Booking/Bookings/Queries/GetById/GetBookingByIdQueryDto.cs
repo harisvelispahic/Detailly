@@ -29,8 +29,19 @@ public sealed class GetBookingByIdQueryDto
     public int? PaymentTransactionId { get; set; }
     public PaymentTransactionStatus? PaymentStatus { get; set; }
 
+    public required string ShopLocationName { get; set; }
+    public BookingAddressDto? ServiceAddress { get; set; }
+
     public List<BookingAddonDto> Addons { get; set; } = new();
     public List<int> VehicleIds { get; set; } = new();
+}
+
+public sealed class BookingAddressDto
+{
+    public required string Street { get; set; }
+    public required string City { get; set; }
+    public string? PostalCode { get; set; }
+    public required string Country { get; set; }
 }
 public sealed class BookingAddonDto
 {
