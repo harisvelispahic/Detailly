@@ -1,5 +1,4 @@
 <div class="staff-home">
-
   <!-- Hero greeting -->
   <div class="staff-home__hero">
     <div class="staff-home__hero-content">
@@ -17,7 +16,6 @@
 
   <!-- Quick-action cards -->
   <div class="staff-home__grid">
-
     <!-- Employee: personal tools -->
     @if (auth.isEmployee()) {
       <a class="staff-home__card staff-home__card--accent" routerLink="/staff/my-shifts">
@@ -94,6 +92,17 @@
         </div>
         <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
       </a>
+
+      @if (auth.isAdmin()) {
+        <a class="staff-home__card staff-home__card--accent" routerLink="/admin/settings">
+          <mat-icon>settings</mat-icon>
+          <div>
+            <h3>Settings</h3>
+            <p>Configure platform preferences.</p>
+          </div>
+          <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+        </a>
+      }
     }
 
     <!-- Admin — legacy features pending reimplementation -->
@@ -105,7 +114,6 @@
         </p>
 
         <div class="staff-home__grid staff-home__grid--nested">
-
           <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/orders">
             <mat-icon>shopping_cart</mat-icon>
             <div>
@@ -124,7 +132,10 @@
             <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
           </a>
 
-          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/product-categories">
+          <a
+            class="staff-home__card staff-home__card--legacy"
+            routerLink="/admin/product-categories"
+          >
             <mat-icon>category</mat-icon>
             <div>
               <h3>Categories <span class="tag tag--legacy">Legacy</span></h3>
@@ -132,20 +143,8 @@
             </div>
             <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
           </a>
-
-          <a class="staff-home__card staff-home__card--legacy" routerLink="/admin/settings">
-            <mat-icon>settings</mat-icon>
-            <div>
-              <h3>Settings <span class="tag tag--legacy">Legacy</span></h3>
-              <p>Configure platform preferences.</p>
-            </div>
-            <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
-          </a>
-
         </div>
       </div>
     }
-
   </div>
-
 </div>
