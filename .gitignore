@@ -543,3 +543,6 @@ http-client.private.env.json
 
 appsettings.Development.json
 .claude/
+
+# C# Dev Kit update - cache files ignored
+*.lscache
