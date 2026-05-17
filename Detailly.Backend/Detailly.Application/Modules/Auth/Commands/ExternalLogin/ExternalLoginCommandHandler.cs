@@ -25,10 +25,12 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                     x.ProviderUserId == providerUserId, ct);
 
             ApplicationUserEntity user;
+            bool isSetupRequired;
 
             if (external is not null)
             {
                 user = external.ApplicationUser!;
+                isSetupRequired = !user.IsProfileComplete;
             }
             else
             {
@@ -39,10 +41,12 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                 {
                     user = CreateNewUser(request.Principal);
                     ctx.ApplicationUsers.Add(user);
+                    isSetupRequired = true;
                 }
                 else
                 {
                     user = existingUser;
+                    isSetupRequired = !user.IsProfileComplete;
                 }
 
                 ctx.UserExternalLogins.Add(new UserExternalLoginEntity
@@ -77,7 +81,8 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                 AccessToken = pair.AccessToken,
                 RefreshToken = pair.RefreshTokenRaw,
                 AccessTokenExpiresAtUtc = pair.AccessTokenExpiresAtUtc,
-                RefreshTokenExpiresAtUtc = pair.RefreshTokenExpiresAtUtc
+                RefreshTokenExpiresAtUtc = pair.RefreshTokenExpiresAtUtc,
+                IsSetupRequired = isSetupRequired
             };
         }
 
@@ -90,18 +95,22 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                 ?? (principal.FindFirstValue(ClaimTypes.Name)?.Split(' ') is { Length: > 1 } parts ? parts[^1] : "");
             var email = principal.FindFirstValue(ClaimTypes.Email)!.Trim().ToLowerInvariant();
 
+            // Generate a unique temp username — user will choose their real one during setup.
+            var tempUsername = $"user_{Guid.NewGuid().ToString("N")[..8]}";
+
             return new ApplicationUserEntity
             {
                 FirstName = firstName,
                 LastName = lastName,
                 Email = email,
-                Username = email.Split('@')[0],
+                Username = tempUsername,
                 PasswordHash = ApplicationUserEntity.ExternalOnlyPasswordHash,
                 IsEnabled = true,
                 IsAdmin = false,
                 IsEmployee = false,
                 IsManager = false,
-                IsFleet = false
+                IsFleet = false,
+                IsProfileComplete = false
             };
         }
     }

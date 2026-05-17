@@ -19,6 +19,7 @@ public sealed class ApplicationUserEntityConfiguration : IEntityTypeConfiguratio
 
         builder.Property(x => x.TokenVersion).HasDefaultValue(0);
         builder.Property(x => x.IsEnabled).HasDefaultValue(true);
+        builder.Property(x => x.IsProfileComplete).HasDefaultValue(true);
 
         // Customer → Bookings (now CustomerId)
         builder.HasMany(x => x.Bookings)

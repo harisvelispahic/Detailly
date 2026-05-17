@@ -6,4 +6,5 @@ public sealed class ExternalLoginCommandDto
     public required string RefreshToken { get; init; }
     public required DateTime AccessTokenExpiresAtUtc { get; init; }
     public required DateTime RefreshTokenExpiresAtUtc { get; init; }
+    public required bool IsSetupRequired { get; init; }
 }

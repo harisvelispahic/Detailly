@@ -7,6 +7,7 @@ import {RegisterComponent} from './register/register.component';
 import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
 import {LogoutComponent} from './logout/logout.component';
 import {GoogleCallbackComponent} from './google-callback/google-callback.component';
+import {OAuthSetupComponent} from './oauth-setup/oauth-setup.component';
 import {SharedModule} from '../shared/shared-module';
 
 
@@ -18,6 +19,7 @@ import {SharedModule} from '../shared/shared-module';
     ForgotPasswordComponent,
     LogoutComponent,
     GoogleCallbackComponent,
+    OAuthSetupComponent,
   ],
   imports: [
     AuthRoutingModule,

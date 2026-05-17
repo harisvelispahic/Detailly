@@ -19,6 +19,7 @@ public sealed class ApplicationUserEntity : BaseEntity
     public required bool IsFleet { get; set; }      // user defined
     public bool IsAdmin { get; set; } = false;
     public bool IsEmployee { get; set; } = false;
+    public bool IsProfileComplete { get; set; } = true;
 
     public required string FirstName { get; set; }
     public required string LastName { get; set; }

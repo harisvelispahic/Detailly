@@ -1,4 +1,5 @@
 using Detailly.Application.Abstractions;
+using Detailly.Application.Modules.Auth.Commands.CompleteOAuthSetup;
 using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +41,15 @@ public sealed class ExternalAuthController(
 
         return Redirect(
             $"{returnUrl}#accessToken={Uri.EscapeDataString(tokens.AccessToken)}" +
-            $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}");
+            $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}" +
+            $"&isSetupRequired={tokens.IsSetupRequired.ToString().ToLowerInvariant()}");
+    }
+
+    [HttpPost("setup")]
+    [Authorize]
+    public async Task CompleteSetup(CompleteOAuthSetupCommand command, CancellationToken ct)
+    {
+        await sender.Send(command, ct);
     }
 
     private bool IsReturnUrlAllowed(string returnUrl)

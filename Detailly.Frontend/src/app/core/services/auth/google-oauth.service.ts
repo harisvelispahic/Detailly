@@ -3,6 +3,11 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthFacadeService } from './auth-facade.service';
 
+export interface GoogleCallbackResult {
+  success: boolean;
+  isSetupRequired: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GoogleOAuthService {
   private readonly authFacade = inject(AuthFacadeService);
@@ -13,19 +18,20 @@ export class GoogleOAuthService {
     window.location.href = `${environment.apiUrl}/auth/external/google?returnUrl=${encodeURIComponent(returnUrl)}`;
   }
 
-  handleCallback(fragment: string): boolean {
+  handleCallback(fragment: string): GoogleCallbackResult {
     const params = new URLSearchParams(fragment);
 
     const accessToken = params.get('accessToken');
     const refreshToken = params.get('refreshToken');
 
     if (!accessToken || !refreshToken) {
-      return false;
+      return { success: false, isSetupRequired: false };
     }
 
     this.authFacade.storeExternalLoginTokens(accessToken, refreshToken);
     window.history.replaceState(null, '', window.location.pathname);
 
-    return true;
+    const isSetupRequired = params.get('isSetupRequired') === 'true';
+    return { success: true, isSetupRequired };
   }
 }

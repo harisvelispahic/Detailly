@@ -16,10 +16,15 @@ export class GoogleCallbackComponent implements OnInit {
 
   ngOnInit(): void {
     const fragment = this.route.snapshot.fragment ?? '';
-    const success = this.googleOAuth.handleCallback(fragment);
+    const result = this.googleOAuth.handleCallback(fragment);
 
-    if (!success) {
+    if (!result.success) {
       this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    if (result.isSetupRequired) {
+      this.router.navigate(['/auth/setup']);
       return;
     }
 

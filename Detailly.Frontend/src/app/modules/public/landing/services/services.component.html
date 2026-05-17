@@ -30,7 +30,7 @@
 
           <!-- Price -->
           <div class="price-block">
-            <span class="price-amount">${{ service.price }}</span>
+            <span class="price-amount">BAM {{ service.price }}</span>
             <span class="price-unit">/service</span>
           </div>
 
@@ -66,7 +66,7 @@
                 <li class="item-row item-row--addon">
                   <mat-icon class="item-icon item-icon--add">add_circle_outline</mat-icon>
                   <span class="addon-name">{{ addon.name }}</span>
-                  <span class="addon-price">+${{ addon.price }}</span>
+                  <span class="addon-price">+BAM {{ addon.price }}</span>
                 </li>
               }
             }

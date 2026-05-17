@@ -1,0 +1,168 @@
+<div class="auth-container">
+  <div class="auth-background">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+  </div>
+
+  <div class="auth-content">
+    <div class="auth-brand">
+      <img class="brand-logo" src="/assets/images/detailly-logo-transparent.svg" alt="Detailly" />
+    </div>
+
+    <mat-card class="auth-card">
+      <mat-card-content>
+        <div class="auth-card__header">
+          <h1 class="auth-title">Finish Setting Up</h1>
+          <p class="auth-subtitle">Just a few more details to complete your account</p>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" subscriptSizing="fixed" class="full-width">
+            <mat-label>Username</mat-label>
+            <input
+              matInput
+              formControlName="username"
+              placeholder="johndoe"
+              autocomplete="username"
+            />
+            <mat-icon matPrefix>person</mat-icon>
+            @if (form.get('username')?.hasError('required')) {
+              <mat-error>Username is required</mat-error>
+            }
+            @if (form.get('username')?.hasError('minlength')) {
+              <mat-error>At least 3 characters</mat-error>
+            }
+            @if (form.get('username')?.hasError('maxlength')) {
+              <mat-error>Too long</mat-error>
+            }
+            @if (form.get('username')?.hasError('pattern')) {
+              <mat-error>Letters, digits, dots, hyphens, and underscores only</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Phone (optional) -->
+          <div class="phone-field-group">
+            <mat-form-field
+              appearance="outline"
+              subscriptSizing="fixed"
+              class="phone-country-field"
+            >
+              <span matPrefix class="fi fi-{{ selectedCountry.iso2 }} country-flag-prefix"></span>
+              <input
+                matInput
+                [formControl]="countrySearchCtrl"
+                [matAutocomplete]="countryAuto"
+                (focus)="onCountryFocus()"
+                (blur)="onCountryBlur()"
+                class="country-input"
+                aria-label="Country dial code"
+              />
+              <mat-autocomplete
+                #countryAuto="matAutocomplete"
+                [displayWith]="displayCountry"
+                (optionSelected)="onCountrySelected($event)"
+                class="country-panel"
+              >
+                @for (country of filteredCountries; track country.iso2) {
+                  <mat-option [value]="country">
+                    <span class="fi fi-{{ country.iso2 }} option-flag"></span>
+                    <span class="option-dial">+{{ country.dialCode }}</span>
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              subscriptSizing="fixed"
+              class="phone-number-field"
+            >
+              <mat-label>Phone number (optional)</mat-label>
+              <input
+                matInput
+                type="tel"
+                inputmode="numeric"
+                [value]="phoneDisplay"
+                (input)="onPhoneInput($event)"
+                placeholder="60 555 33 33"
+              />
+              <mat-icon matPrefix>phone</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Account type -->
+          <div class="account-type-section">
+            <p class="account-type-label">Account type</p>
+            <div class="account-type-options">
+              <div
+                class="account-type-card"
+                [class.account-type-card--selected]="!isFleetChecked"
+                (click)="form.get('isFleet')?.setValue(false)"
+              >
+                <mat-icon>person</mat-icon>
+                <span class="account-type-card__name">Standard</span>
+                <span class="account-type-card__desc">Personal car detailing</span>
+              </div>
+              <div
+                class="account-type-card"
+                [class.account-type-card--selected]="isFleetChecked"
+                (click)="form.get('isFleet')?.setValue(true)"
+              >
+                <mat-icon>directions_car</mat-icon>
+                <span class="account-type-card__name">Fleet</span>
+                <span class="account-type-card__desc">Multiple vehicles for a company</span>
+              </div>
+            </div>
+          </div>
+
+          @if (isFleetChecked) {
+            <mat-form-field appearance="outline" subscriptSizing="fixed" class="full-width">
+              <mat-label>Company Name (optional)</mat-label>
+              <input matInput formControlName="companyName" placeholder="Acme Corp" />
+              <mat-icon matPrefix>business</mat-icon>
+              @if (form.get('companyName')?.hasError('maxlength')) {
+                <mat-error>Too long</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          <div class="actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-button"
+              [class.submit-button--disabled]="form.invalid || isLoading"
+              [disabled]="form.invalid || isLoading"
+            >
+              @if (!isLoading) {
+                Continue
+              }
+              @if (!isLoading) {
+                <mat-icon>arrow_forward</mat-icon>
+              }
+              @if (isLoading) {
+                <mat-progress-spinner
+                  mode="indeterminate"
+                  diameter="20"
+                  strokeWidth="3"
+                ></mat-progress-spinner>
+              }
+              @if (isLoading) {
+                <span>Saving...</span>
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
