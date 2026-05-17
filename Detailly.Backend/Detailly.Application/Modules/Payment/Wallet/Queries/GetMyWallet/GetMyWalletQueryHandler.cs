@@ -8,21 +8,29 @@ public class GetMyWalletQueryHandler(IAppDbContext context, IAppCurrentUser curr
         if (!currentUser.IsAuthenticated || currentUser.ApplicationUserId is null)
             throw new DetaillyUnauthorizedException("User is not authenticated.");
 
-        var dto = await context.Wallet
+        var wallet = await context.Wallet
             .AsNoTracking()
+            .Include(w => w.ApplicationUser)
             .Where(w => w.ApplicationUserId == currentUser.ApplicationUserId.Value)
-            .Select(w => new GetMyWalletQueryDto
-            {
-                Balance = w.Balance,
-                Currency = w.Currency.ToString(),
-                TotalDeposited = w.TotalDeposited,
-                PercentageAdded = w.PercentageAdded
-            })
             .FirstOrDefaultAsync(ct);
 
-        if (dto is null)
+        if (wallet is null)
             throw new DetaillyNotFoundException("Wallet not found.");
 
-        return dto;
+        var settings = await context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+
+        var bonusPercent = settings is null
+            ? wallet.PercentageAdded
+            : (wallet.ApplicationUser!.IsFleet
+                ? settings.FleetWalletBonusPercent
+                : settings.StandardWalletBonusPercent);
+
+        return new GetMyWalletQueryDto
+        {
+            Balance = wallet.Balance,
+            Currency = wallet.Currency.ToString(),
+            TotalDeposited = wallet.TotalDeposited,
+            PercentageAdded = bonusPercent
+        };
     }
 }

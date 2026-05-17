@@ -1,7 +1,6 @@
-using Detailly.Domain.Entities.Identity;
-using Microsoft.EntityFrameworkCore;
+using Detailly.Domain.Entities.Payment;
+using Detailly.Domain.Entities.Sales;
 using System.Security.Claims;
-using MediatR;
 
 namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
 {
@@ -40,6 +39,8 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                 if (existingUser is null)
                 {
                     user = CreateNewUser(request.Principal);
+                    user.Wallet = new WalletEntity { ApplicationUser = user };
+                    user.Cart   = new CartEntity   { ApplicationUser = user };
                     ctx.ApplicationUsers.Add(user);
                     isSetupRequired = true;
                 }
