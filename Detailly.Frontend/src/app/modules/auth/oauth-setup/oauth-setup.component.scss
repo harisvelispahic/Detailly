@@ -303,9 +303,12 @@ form {
   }
 }
 
-// --- Submit ---
+// --- Submit + logout ---
 .actions {
   margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .submit-button {
@@ -341,6 +344,27 @@ form {
     cursor: not-allowed;
 
     ::ng-deep .mat-mdc-button-persistent-ripple { display: none; }
+  }
+}
+
+.logout-button {
+  width: 100%;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: color 200ms ease;
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: hsl(var(--destructive));
   }
 }
 

@@ -51,11 +51,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 /**
- * Check if URL is an auth endpoint or an external service that should not be intercepted.
+ * Check if URL is a public auth endpoint (no token needed) or an external service.
+ * NOTE: /auth/external/setup IS authenticated — do not skip it.
  */
 function isAuthEndpoint(url: string): boolean {
   const u = url.toLowerCase();
-  return u.includes('/auth') || u.includes('api.cloudinary.com');
+  if (u.includes('api.cloudinary.com')) return true;
+  // Only skip the public credential endpoints, not protected /auth/* sub-paths
+  return (
+    u.includes('/auth/login') ||
+    u.includes('/auth/refresh') ||
+    u.includes('/auth/logout') ||
+    u.includes('/auth/external/google')   // OAuth initiation & finalize (server redirects)
+  );
 }
 
 /**

@@ -13,6 +13,7 @@ export class AuthStorageService {
   private readonly REFRESH_TOKEN_KEY = 'refreshToken';
   private readonly ACCESS_EXPIRES_KEY = 'accessTokenExpiresAtUtc';
   private readonly REFRESH_EXPIRES_KEY = 'refreshTokenExpiresAtUtc';
+  static readonly SETUP_REQUIRED_KEY = 'oauthSetupRequired';
 
   /**
    * Save login response to localStorage.
@@ -35,13 +36,14 @@ export class AuthStorageService {
   }
 
   /**
-   * Clear all auth data from localStorage.
+   * Clear all auth data from localStorage, including any pending setup flag.
    */
   clear(): void {
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
     localStorage.removeItem(this.ACCESS_EXPIRES_KEY);
     localStorage.removeItem(this.REFRESH_EXPIRES_KEY);
+    localStorage.removeItem(AuthStorageService.SETUP_REQUIRED_KEY);
   }
 
   /**

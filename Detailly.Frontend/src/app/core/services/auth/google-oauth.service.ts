@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthFacadeService } from './auth-facade.service';
+import { AuthStorageService } from './auth-storage.service';
 
 export interface GoogleCallbackResult {
   success: boolean;
@@ -11,7 +11,6 @@ export interface GoogleCallbackResult {
 @Injectable({ providedIn: 'root' })
 export class GoogleOAuthService {
   private readonly authFacade = inject(AuthFacadeService);
-  private readonly router = inject(Router);
 
   initiateLogin(): void {
     const returnUrl = `${window.location.origin}/auth/google-callback`;
@@ -32,6 +31,11 @@ export class GoogleOAuthService {
     window.history.replaceState(null, '', window.location.pathname);
 
     const isSetupRequired = params.get('isSetupRequired') === 'true';
+
+    if (isSetupRequired) {
+      localStorage.setItem(AuthStorageService.SETUP_REQUIRED_KEY, 'true');
+    }
+
     return { success: true, isSetupRequired };
   }
 }

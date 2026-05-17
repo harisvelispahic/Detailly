@@ -1,10 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { HttpClient } from '@angular/common/http';
 import { BaseComponent } from '../../../core/components/base-classes/base-component';
 import { CurrentUserService } from '../../../core/services/auth/current-user.service';
+import { AuthFacadeService } from '../../../core/services/auth/auth-facade.service';
+import { AuthStorageService } from '../../../core/services/auth/auth-storage.service';
 import { environment } from '../../../../environments/environment';
 import { PhoneCountry } from '../register/register.component';
 
@@ -19,6 +21,7 @@ export class OAuthSetupComponent extends BaseComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly http = inject(HttpClient);
   private readonly currentUser = inject(CurrentUserService);
+  private readonly authFacade = inject(AuthFacadeService);
 
   phoneCountries: PhoneCountry[] = [
     { name: 'United States',          iso2: 'us', dialCode: '1'   },
@@ -171,6 +174,7 @@ export class OAuthSetupComponent extends BaseComponent implements OnInit {
       companyName: v.companyName?.trim() || null,
     }).subscribe({
       next: () => {
+        localStorage.removeItem(AuthStorageService.SETUP_REQUIRED_KEY);
         this.stopLoading();
         const defaultRoute = this.currentUser.getDefaultRoute();
         this.router.navigate([defaultRoute]);
@@ -183,6 +187,12 @@ export class OAuthSetupComponent extends BaseComponent implements OnInit {
           'Setup failed. Please try again.';
         this.stopLoading(message);
       },
+    });
+  }
+
+  logout(): void {
+    this.authFacade.logout().subscribe(() => {
+      this.router.navigate(['/auth/login']);
     });
   }
 }
