@@ -8,7 +8,7 @@ public sealed class RemoveCartItemCommandHandler(IAppDbContext context, IAppCurr
     public async Task Handle(RemoveCartItemCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
@@ -20,10 +20,10 @@ public sealed class RemoveCartItemCommandHandler(IAppDbContext context, IAppCurr
             throw new DetaillyNotFoundException("Cart item was not found.");
 
         if (cartItem.Cart.ApplicationUserId != userId)
-            throw new UnauthorizedAccessException("You do not have access to this cart.");
+            throw new DetaillyForbiddenException("You do not have access to this cart.");
 
         if (cartItem.Cart.Status != CartStatus.Active)
-            throw new InvalidOperationException("Cart is not active.");
+            throw new DetaillyBusinessRuleException("cart.not_active", "Cart is not active.");
 
         context.CartItems.Remove(cartItem);
 

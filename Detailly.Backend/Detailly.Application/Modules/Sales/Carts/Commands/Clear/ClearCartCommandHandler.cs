@@ -9,7 +9,7 @@ public sealed class ClearCartCommandHandler(IAppDbContext context, IAppCurrentUs
     public async Task Handle(ClearCartCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
@@ -33,7 +33,7 @@ public sealed class ClearCartCommandHandler(IAppDbContext context, IAppCurrentUs
         }
 
         if (cart.Status != CartStatus.Active)
-            throw new InvalidOperationException("Cart is not active.");
+            throw new DetaillyBusinessRuleException("cart.not_active", "Cart is not active.");
 
         context.CartItems.RemoveRange(cart.CartItems);
 

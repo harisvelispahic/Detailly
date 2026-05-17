@@ -223,7 +223,6 @@ export class AuthFacadeService {
       Sentry.setTag('is_fleet', String(user.isFleet));
       Sentry.setTag('area', 'frontend');
     } catch (error) {
-      console.error('Failed to decode JWT token:', error);
       this._currentUser.set(null);
     }
   }

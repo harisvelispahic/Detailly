@@ -9,10 +9,10 @@ public sealed class AddToCartCommandHandler(IAppDbContext context, IAppCurrentUs
     public async Task Handle(AddToCartCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         if (request.Quantity <= 0)
-            throw new InvalidOperationException("Quantity must be greater than 0.");
+            throw new DetaillyBusinessRuleException("cart.invalid_quantity", "Quantity must be greater than 0.");
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
@@ -21,14 +21,14 @@ public sealed class AddToCartCommandHandler(IAppDbContext context, IAppCurrentUs
             .FirstOrDefaultAsync(p => p.Id == request.ProductId, ct);
 
         if (product is null)
-            throw new InvalidOperationException("Product does not exist.");
+            throw new DetaillyNotFoundException("Product does not exist.");
 
         if (!product.IsEnabled)
-            throw new InvalidOperationException("Product is disabled.");
+            throw new DetaillyBusinessRuleException("product.disabled", "Product is disabled.");
 
         // Validate available stock at time of add
         if (product.Inventory.QuantityInStock < request.Quantity)
-            throw new InvalidOperationException("Insufficient stock for requested quantity.");
+            throw new DetaillyBusinessRuleException("inventory.insufficient", "Insufficient stock for requested quantity.");
 
         var cart = await context.Carts
             .Include(c => c.CartItems)
@@ -49,14 +49,14 @@ public sealed class AddToCartCommandHandler(IAppDbContext context, IAppCurrentUs
         }
 
         if (cart.Status != CartStatus.Active)
-            throw new InvalidOperationException("Cart is not active.");
+            throw new DetaillyBusinessRuleException("cart.not_active", "Cart is not active.");
 
         var existingItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == product.Id);
 
         // IMPORTANT: total requested qty must also respect stock
         var newQty = (existingItem?.Quantity ?? 0) + request.Quantity;
         if (product.Inventory.QuantityInStock < newQty)
-            throw new InvalidOperationException("Insufficient stock for requested quantity.");
+            throw new DetaillyBusinessRuleException("inventory.insufficient", "Insufficient stock for requested quantity.");
 
         if (existingItem is null)
         {

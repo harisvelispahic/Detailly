@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../../api-services/payments/payments-api.service';
+import { ToasterService } from '../../../../core/services/toaster.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -24,6 +25,7 @@ export class BookingPayCardPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private payments: PaymentsService,
+    private toaster: ToasterService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -93,19 +95,19 @@ export class BookingPayCardPageComponent implements OnInit, OnDestroy {
     if (result.error) {
       const msg = result.error.message ?? 'Payment failed';
       this.cardError = msg;
-      alert(`❌ Payment failed: ${msg}`);
+      this.toaster.error(msg);
       return;
     }
 
     const status = result.paymentIntent?.status;
     if (status === 'succeeded') {
-      alert('✅ Payment successful! Booking will confirm after webhook processing.');
+      this.toaster.success('Payment successful! Booking will confirm after webhook processing.');
       // Optional: navigate back to booking details
       this.router.navigate(['/client/bookings', this.bookingId]);
       return;
     }
 
-    alert(`ℹ️ Payment submitted (status: ${status ?? 'unknown'})`);
+    this.toaster.info(`Payment submitted (status: ${status ?? 'unknown'})`);
   }
 
   back(): void {

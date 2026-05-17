@@ -8,7 +8,7 @@ public sealed class UpdateCartItemQuantityCommandHandler(IAppDbContext context, 
     public async Task Handle(UpdateCartItemQuantityCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         var userId = appCurrentUser.ApplicationUserId.Value;
 
@@ -22,13 +22,13 @@ public sealed class UpdateCartItemQuantityCommandHandler(IAppDbContext context, 
             throw new DetaillyNotFoundException("Cart item was not found.");
 
         if (cartItem.Cart.ApplicationUserId != userId)
-            throw new UnauthorizedAccessException("You do not have access to this cart.");
+            throw new DetaillyForbiddenException("You do not have access to this cart.");
 
         if (cartItem.Cart.Status != CartStatus.Active)
-            throw new InvalidOperationException("Cart is not active.");
+            throw new DetaillyBusinessRuleException("cart.not_active", "Cart is not active.");
 
         if (!cartItem.Product.IsEnabled)
-            throw new InvalidOperationException("Product is disabled.");
+            throw new DetaillyBusinessRuleException("product.disabled", "Product is disabled.");
 
         // Quantity 0 = remove item (nice UX)
         if (request.Quantity <= 0)
@@ -40,7 +40,7 @@ public sealed class UpdateCartItemQuantityCommandHandler(IAppDbContext context, 
         }
 
         if (cartItem.Product.Inventory.QuantityInStock < request.Quantity)
-            throw new InvalidOperationException("Insufficient stock for requested quantity.");
+            throw new DetaillyBusinessRuleException("inventory.insufficient", "Insufficient stock for requested quantity.");
 
         // Refresh current price (optional but common)
         cartItem.UnitPrice = cartItem.Product.Price;

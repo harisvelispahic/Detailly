@@ -9,7 +9,7 @@ public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppCurre
     public async Task Handle(MarkOrderPaidCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         await using var tx = await context.Database.BeginTransactionAsync(ct);
 
@@ -22,13 +22,13 @@ public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppCurre
 
         // Client can only pay their own order; staff can do it for testing/admin.
         if (order.ApplicationUserId != appCurrentUser.ApplicationUserId.Value && !appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new UnauthorizedAccessException("You do not have access to this order.");
+            throw new DetaillyForbiddenException("You do not have access to this order.");
 
         if (order.Status == OrderStatus.Paid)
             return; // idempotent success
 
         if (order.Status != OrderStatus.PendingPayment)
-            throw new InvalidOperationException("Only Pending orders can be marked as paid.");
+            throw new DetaillyBusinessRuleException("order.not_payable", "Only Pending orders can be marked as paid.");
 
         // Load products + inventories used by the order
         var productIds = order.OrderItems.Select(x => x.ProductId).Distinct().ToList();
@@ -44,10 +44,10 @@ public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppCurre
             var product = products.First(p => p.Id == item.ProductId);
 
             if (!product.IsEnabled)
-                throw new InvalidOperationException($"Product '{product.Name}' is disabled.");
+                throw new DetaillyBusinessRuleException("product.disabled", $"Product '{product.Name}' is disabled.");
 
             if (product.Inventory.QuantityInStock < item.Quantity)
-                throw new InvalidOperationException($"Insufficient stock for product '{product.Name}'.");
+                throw new DetaillyBusinessRuleException("inventory.insufficient", $"Insufficient stock for product '{product.Name}'.");
         }
 
         // Decrement stock (simple strategy)

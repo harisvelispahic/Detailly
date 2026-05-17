@@ -4,6 +4,9 @@ namespace Detailly.Domain.Entities.Booking;
 
 public sealed class LocationOpeningHoursEntity : BaseEntity
 {
+    public static readonly TimeSpan DefaultOpenTime  = new(8,  0, 0);
+    public static readonly TimeSpan DefaultCloseTime = new(20, 0, 0);
+
     public required int ShopLocationId { get; set; }
     public LocationEntity ShopLocation { get; set; } = null!;
 

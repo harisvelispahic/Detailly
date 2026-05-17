@@ -20,20 +20,6 @@ import * as Sentry from '@sentry/angular';
 export const errorLoggingInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Log error to console
-      // In production, send to logging service like Sentry
-      console.error('HTTP Error:', {
-        url: req.url,
-        method: req.method,
-        status: error.status,
-        statusText: error.statusText,
-        message: error.message,
-        error: error.error,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Optional: Send to external logging service
-      // logToSentry(error, req);
       const shouldReportToSentry = error.status === 0 || error.status >= 500;
 
       if (shouldReportToSentry) {

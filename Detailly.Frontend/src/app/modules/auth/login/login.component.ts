@@ -59,7 +59,6 @@ export class LoginComponent extends BaseComponent {
       },
       error: (err) => {
         this.stopLoading('Invalid credentials. Please try again.');
-        console.error('Login error:', err);
       },
     });
   }

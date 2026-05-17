@@ -8,7 +8,7 @@ public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppCurrent
     public async Task Handle(SubmitOrderCommand request, CancellationToken ct)
     {
         if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new UnauthorizedAccessException("User is not authenticated.");
+            throw new DetaillyUnauthorizedException("User is not authenticated.");
 
         var order = await context.Orders
             .Include(o => o.OrderItems)
@@ -19,13 +19,13 @@ public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppCurrent
 
         // Ownership check (client submits only their order)
         if (order.ApplicationUserId != appCurrentUser.ApplicationUserId.Value && !appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new UnauthorizedAccessException("You do not have access to this order.");
+            throw new DetaillyForbiddenException("You do not have access to this order.");
 
         //if (order.Status != OrderStatus.Draft)
-        //    throw new InvalidOperationException("Only Draft orders can be submitted.");
+        //    throw new DetaillyBusinessRuleException("order.not_draft", "Only Draft orders can be submitted.");
 
         if (order.OrderItems.Count == 0)
-            throw new InvalidOperationException("Cannot submit an empty order.");
+            throw new DetaillyBusinessRuleException("order.empty", "Cannot submit an empty order.");
 
         // Optional: re-check inventory right before payment starts (still no decrement)
         var productIds = order.OrderItems.Select(x => x.ProductId).Distinct().ToList();
@@ -40,10 +40,10 @@ public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppCurrent
             var product = products.First(p => p.Id == item.ProductId);
 
             if (!product.IsEnabled)
-                throw new InvalidOperationException($"Product '{product.Name}' is disabled.");
+                throw new DetaillyBusinessRuleException("product.disabled", $"Product '{product.Name}' is disabled.");
 
             if (product.Inventory.QuantityInStock < item.Quantity)
-                throw new InvalidOperationException($"Insufficient stock for product '{product.Name}'.");
+                throw new DetaillyBusinessRuleException("inventory.insufficient", $"Insufficient stock for product '{product.Name}'.");
         }
 
         order.Status = OrderStatus.PendingPayment;

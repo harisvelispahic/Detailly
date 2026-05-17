@@ -1,5 +1,6 @@
 using Detailly.Application.Abstractions.Booking;
 using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 
@@ -48,8 +49,8 @@ public sealed class GetAvailabilityQueryHandler(
                 MobileSurchargeFee = quote.MobileSurchargeFee,
             };
 
-        var windowStart = date.Add(opening.OpenTimeUtc  ?? new TimeSpan(8,  0, 0));
-        var windowEnd   = date.Add(opening.CloseTimeUtc ?? new TimeSpan(20, 0, 0));
+        var windowStart = date.Add(opening.OpenTimeUtc  ?? LocationOpeningHoursEntity.DefaultOpenTime);
+        var windowEnd   = date.Add(opening.CloseTimeUtc ?? LocationOpeningHoursEntity.DefaultCloseTime);
 
         if (windowEnd <= windowStart)
             return new GetAvailabilityResult

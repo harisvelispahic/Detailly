@@ -11,6 +11,7 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<OrderEntity>
         builder.HasKey(o => o.Id);
 
         builder.HasIndex(o => o.OrderNumber).IsUnique();
+        builder.HasIndex(o => o.ApplicationUserId);
 
         builder.Property(o => o.TotalAmount).HasPrecision(18, 2);
 
