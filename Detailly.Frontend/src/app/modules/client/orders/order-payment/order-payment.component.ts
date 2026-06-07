@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { loadStripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../../api-services/payments/payments-api.service';
+import { ToasterService } from '../../../../core/services/toaster.service';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -24,6 +25,7 @@ export class OrderPaymentComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private payments: PaymentsService,
+    private toaster: ToasterService,
   ) {}
 
   async ngOnInit() {
@@ -67,14 +69,14 @@ export class OrderPaymentComponent implements OnInit {
     if (result.error) {
       const msg = result.error.message ?? 'Payment failed';
       this.cardError = msg;
-      alert(`❌ Payment failed: ${msg}`);
+      this.toaster.error(msg);
       return;
     }
 
     if (result.paymentIntent?.status === 'succeeded') {
-      alert('✅ Order payment successful! Thank you.');
+      this.toaster.success('Order payment successful! Thank you.');
     } else {
-      alert(`ℹ️ Payment status: ${result.paymentIntent?.status ?? 'unknown'}`);
+      this.toaster.info(`Payment status: ${result.paymentIntent?.status ?? 'unknown'}`);
     }
   }
 }

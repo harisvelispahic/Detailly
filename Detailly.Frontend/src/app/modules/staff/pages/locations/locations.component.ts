@@ -4,14 +4,23 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { BaseListPagedComponent } from '../../../../core/components/base-classes/base-list-paged-component';
-import { ListLocationsQueryDto, ListLocationsRequest } from '../../../../api-services/locations/locations-api.models';
+import {
+  ListLocationsQueryDto,
+  ListLocationsRequest,
+} from '../../../../api-services/locations/locations-api.models';
 import { LocationsApiService } from '../../../../api-services/locations/locations-api.service';
 import { AuthFacadeService } from '../../../../core/services/auth/auth-facade.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { DialogHelperService } from '../../../shared/services/dialog-helper.service';
 import { DialogButton } from '../../../shared/models/dialog-config.model';
-import { LocationUpsertDialogComponent, LocationUpsertDialogData } from './location-upsert-dialog/location-upsert-dialog.component';
-import { LocationDetailDialogComponent, LocationDetailDialogData } from './location-detail-dialog/location-detail-dialog.component';
+import {
+  LocationUpsertDialogComponent,
+  LocationUpsertDialogData,
+} from './location-upsert-dialog/location-upsert-dialog.component';
+import {
+  LocationDetailDialogComponent,
+  LocationDetailDialogData,
+} from './location-detail-dialog/location-detail-dialog.component';
 
 @Component({
   selector: 'app-locations',
@@ -39,15 +48,13 @@ export class LocationsComponent
   }
 
   ngOnInit(): void {
-    this.searchCtrl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      takeUntil(this.destroy$),
-    ).subscribe((val) => {
-      this.request.search = val?.trim() || null;
-      this.request.paging.page = 1;
-      this.loadPagedData();
-    });
+    this.searchCtrl.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((val) => {
+        this.request.search = val?.trim() || null;
+        this.request.paging.page = 1;
+        this.loadPagedData();
+      });
 
     this.loadPagedData();
   }
@@ -59,18 +66,22 @@ export class LocationsComponent
 
   protected loadPagedData(): void {
     this.startLoading();
-    this.locationsApi.list(this.request).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        this.handlePageResult(res);
-        this.stopLoading();
-      },
-      error: () => this.stopLoading('Failed to load locations.'),
-    });
+    this.locationsApi
+      .list(this.request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.handlePageResult(res);
+          this.stopLoading();
+        },
+        error: () => this.stopLoading('Failed to load locations.'),
+      });
   }
 
   formatAddress(loc: ListLocationsQueryDto): string {
-    const parts = [loc.street, loc.city, loc.postalCode, loc.region, loc.country]
-      .filter((p): p is string => !!p);
+    const parts = [loc.street, loc.city, loc.postalCode, loc.region, loc.country].filter(
+      (p): p is string => !!p,
+    );
     return parts.join(', ') || '—';
   }
 
@@ -124,33 +135,43 @@ export class LocationsComponent
       ? `Are you sure you want to reopen "${loc.name}"?`
       : `Are you sure you want to temporarily close "${loc.name}"? Customers won't be able to book at this location.`;
 
-    this.dialogHelper.confirm(
-      loc.isTemporarilyClosed ? 'Reopen Location' : 'Close Location',
-      message,
-      loc.isTemporarilyClosed ? 'store' : 'construction',
-    ).subscribe((result) => {
-      if (result?.button !== DialogButton.YES) return;
-      this.locationsApi.toggleStatus(loc.id).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.toaster.success(loc.isTemporarilyClosed ? 'Location reopened.' : 'Location closed.');
-          this.loadPagedData();
-        },
-        error: () => this.toaster.error(`Failed to ${action} location.`),
+    this.dialogHelper
+      .confirm(
+        loc.isTemporarilyClosed ? 'Reopen Location' : 'Close Location',
+        message,
+        loc.isTemporarilyClosed ? 'store' : 'construction',
+      )
+      .subscribe((result) => {
+        if (result?.button !== DialogButton.YES) return;
+        this.locationsApi
+          .toggleStatus(loc.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: () => {
+              this.toaster.success(
+                loc.isTemporarilyClosed ? 'Location reopened.' : 'Location closed.',
+              );
+              this.loadPagedData();
+            },
+            error: () => this.toaster.error(`Failed to ${action} location.`),
+          });
       });
-    });
   }
 
   deleteLocation(loc: ListLocationsQueryDto, event: MouseEvent): void {
     event.stopPropagation();
     this.dialogHelper.confirmDelete(loc.name).subscribe((result) => {
       if (result?.button !== DialogButton.DELETE) return;
-      this.locationsApi.delete(loc.id).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => {
-          this.toaster.success('Location deleted.');
-          this.loadPagedData();
-        },
-        error: () => this.toaster.error('Failed to delete location.'),
-      });
+      this.locationsApi
+        .delete(loc.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toaster.success('Location deleted.');
+            this.loadPagedData();
+          },
+          error: (err) => this.toaster.error(err?.error?.message ?? 'Failed to delete location.'),
+        });
     });
   }
 }

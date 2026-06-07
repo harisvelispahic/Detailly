@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrdersApiService } from '../../../../api-services/orders/orders-api.service';
+import { ToasterService } from '../../../../core/services/toaster.service';
 
 @Component({
   selector: 'app-order-details',
@@ -21,6 +22,7 @@ export class OrderDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private ordersApi: OrdersApiService,
+    private toaster: ToasterService,
   ) {}
 
   ngOnInit(): void {
@@ -60,14 +62,16 @@ export class OrderDetailsComponent implements OnInit {
 
     this.ordersApi.cancelOrder(this.id, this.cancelReason || null).subscribe({
       next: () => {
-        alert('✅ Order cancelled. If eligible, refund will be processed automatically.');
+        this.toaster.success(
+          '✅ Order cancelled. If eligible, refund will be processed automatically.',
+        );
         this.cancelReason = '';
         this.isCancelling = false;
         this.load();
       },
       error: (err) => {
         this.isCancelling = false;
-        alert('❌ Cancel failed. ' + (err?.error?.message ?? ''));
+        this.toaster.error('❌ Cancel failed. ' + (err?.error?.message ?? ''));
       },
     });
   }

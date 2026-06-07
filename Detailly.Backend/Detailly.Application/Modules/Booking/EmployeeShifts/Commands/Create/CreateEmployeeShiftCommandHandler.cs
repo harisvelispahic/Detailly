@@ -45,12 +45,12 @@ public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAp
         if (openingHours?.IsClosed == true)
             throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
 
-        // Prevent overlaps for the same employee (same mode is enough, but you can block all overlaps regardless of mode)
+        // Prevent overlaps for the same employee regardless of work mode —
+        // an employee cannot physically be in two places at once.
         var overlaps = await context.EmployeeShifts
             .AnyAsync(s =>
                 !s.IsDeleted &&
                 s.EmployeeId == request.EmployeeId &&
-                s.EmployeeWorkMode == request.EmployeeWorkMode &&
                 s.StartUtc < request.EndUtc &&
                 s.EndUtc > request.StartUtc, ct);
 

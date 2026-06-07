@@ -25,7 +25,6 @@ public sealed class CreateBookingHoldCommandHandler(
             throw new DetaillyBusinessRuleException("FLEET_INSHOP_NOT_ALLOWED",
                 "Fleet customers can only book mobile (on-address) services.");
 
-        // Fix 2: explicit switch so an unknown ServiceMode surfaces immediately
         var shiftMode = request.ServiceMode switch
         {
             ServiceMode.InShop  => EmployeeWorkMode.InShop,
@@ -66,7 +65,6 @@ public sealed class CreateBookingHoldCommandHandler(
                     "The service address does not belong to your account.");
         }
 
-        // Fix 3: vehicle ownership validated before any writes
         var vehicleIds = (request.VehicleIds ?? new List<int>())
             .Distinct()
             .ToList();
@@ -320,9 +318,8 @@ public sealed class CreateBookingHoldCommandHandler(
 
         context.Bookings.Add(booking);
 
-        // Fix 4: set both BookingId = 0 (satisfies C# required) and Booking = booking (navigation
-        // reference). EF Core's relationship fixup overwrites BookingId with the real generated PK
-        // when the INSERT statements are ordered and executed — no intermediate SaveChangesAsync needed.
+        // EF Core's relationship fixup resolves BookingId from the Booking navigation property
+        // when the INSERT statements are flushed — no intermediate SaveChangesAsync needed.
         if (quote.Addons.Count > 0)
         {
             var bookingItems = quote.Addons.Select(a => new BookingItemEntity
@@ -351,7 +348,6 @@ public sealed class CreateBookingHoldCommandHandler(
             context.BookingVehicleAssignments.AddRange(assignments);
         }
 
-        // Fix 4: single save — EF Core's change tracker resolves all FKs from the navigation references
         await context.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);
 

@@ -28,8 +28,13 @@ public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppCurr
                 "Cannot delete a location that has existing bookings.");
 
         var shifts = await context.EmployeeShifts
-            .Where(s => s.ShopLocationId == request.Id)
+            .Where(s => s.ShopLocationId == request.Id && !s.IsDeleted)
             .ToListAsync(ct);
+
+        if (shifts.Any(s => s.EndUtc > now))
+            throw new DetaillyBusinessRuleException(
+                "LOCATION_HAS_FUTURE_SHIFTS",
+                "Cannot delete a location that has upcoming shifts. Remove or reassign them first.");
 
         foreach (var shift in shifts)
         {
