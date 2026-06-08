@@ -99,8 +99,8 @@ public sealed class DetaillyExceptionHandler(
                 message = ex.Message;
                 break;
 
-            case DetaillyBusinessRuleException:
-                code = "business.rule";
+            case DetaillyBusinessRuleException businessEx:
+                code = businessEx.Code;
                 message = ex.Message;
                 break;
 
