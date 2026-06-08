@@ -11,20 +11,17 @@ public class HandleStripeWebhookCommandHandler
     : IRequestHandler<HandleStripeWebhookCommand, Unit>
 {
     private readonly IAppDbContext _context;
-    private readonly IWebhookVerifier _verifier;
     private readonly IConfiguration _config;
     private readonly IStripeWebhookParser _parser;
     private readonly IMediator _mediator;
 
     public HandleStripeWebhookCommandHandler(
         IAppDbContext context,
-        IWebhookVerifier verifier,
         IConfiguration config,
         IStripeWebhookParser parser,
         IMediator mediator)
     {
         _context = context;
-        _verifier = verifier;
         _config = config;
         _parser = parser;
         _mediator = mediator;
@@ -34,21 +31,15 @@ public class HandleStripeWebhookCommandHandler
         HandleStripeWebhookCommand request,
         CancellationToken ct)
     {
-        //
-        // 0️⃣ Verify webhook signature
-        //
         var secret = _config["Stripe:WebhookSecret"];
 
         if (string.IsNullOrWhiteSpace(secret))
             return Unit.Value;
 
-        if (!_verifier.Verify(request.Payload, request.SignatureHeader ?? "", secret))
-            return Unit.Value;
-
         //
-        // 1️⃣ Parse webhook (abstracted — no Stripe SDK in Application)
+        // 0️⃣ Verify signature + parse webhook (EventUtility.ConstructEvent handles both)
         //
-        var parsed = _parser.Parse(request.Payload);
+        var parsed = _parser.Parse(request.Payload, request.SignatureHeader ?? "", secret);
 
         if (parsed is null)
             return Unit.Value;

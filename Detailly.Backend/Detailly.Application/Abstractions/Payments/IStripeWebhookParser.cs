@@ -2,5 +2,5 @@
 
 public interface IStripeWebhookParser
 {
-    (string EventId, string EventType, string PaymentIntentId)? Parse(string payload);
+    (string EventId, string EventType, string PaymentIntentId)? Parse(string payload, string signatureHeader, string webhookSecret);
 }

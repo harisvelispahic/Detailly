@@ -1,19 +1,19 @@
-﻿using Detailly.Application.Abstractions.Payments;
+using Detailly.Application.Abstractions.Payments;
 using Stripe;
 
 namespace Detailly.Infrastructure.Payments.Stripe;
 
 public class StripeWebhookParser : IStripeWebhookParser
 {
-    public (string EventId, string EventType, string PaymentIntentId)? Parse(string payload)
+    public (string EventId, string EventType, string PaymentIntentId)? Parse(string payload, string signatureHeader, string webhookSecret)
     {
         Event stripeEvent;
 
         try
         {
-            stripeEvent = EventUtility.ParseEvent(payload);
+            stripeEvent = EventUtility.ConstructEvent(payload, signatureHeader, webhookSecret);
         }
-        catch
+        catch (StripeException)
         {
             return null;
         }

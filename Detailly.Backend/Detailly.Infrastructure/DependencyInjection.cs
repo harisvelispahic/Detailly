@@ -78,9 +78,6 @@ public static class DependencyInjection
         //services.AddScoped<IStripeService, FakeStripeService>();
         services.AddScoped<IStripeService, StripeService>();
 
-        // Webhook verifier
-        services.AddScoped<IWebhookVerifier, WebhookVerifier>();
-
         // Stripe webhook parser
         services.AddScoped<IStripeWebhookParser, StripeWebhookParser>();
 
