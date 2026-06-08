@@ -54,6 +54,15 @@ public sealed class UpdateStaffMemberCommandHandler(
         if (request.Phone is not null)
             user.Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
 
+        if (request.IsManager.HasValue)
+        {
+            if (!isAdmin)
+                throw new DetaillyForbiddenException("Only admins can change a staff member's role.");
+
+            user.IsManager = request.IsManager.Value;
+            user.IsEmployee = !request.IsManager.Value;
+        }
+
         user.ModifiedAtUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return Unit.Value;

@@ -9,4 +9,5 @@ public class UpdateStaffMemberCommand : IRequest<Unit>
     public string? Username { get; set; }
     public string? Email { get; set; }
     public string? Phone { get; set; }
+    public bool? IsManager { get; set; }
 }

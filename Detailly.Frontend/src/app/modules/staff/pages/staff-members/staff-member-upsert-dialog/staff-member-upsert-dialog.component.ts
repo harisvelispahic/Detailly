@@ -245,6 +245,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
         username: v.username.trim(),
         email: v.email.trim().toLowerCase(),
         phone: this.cleanPhone,
+        isManager: v.isManager ?? false,
       };
       this.staffApi.update(this.data.member!.id, command).subscribe({
         next: () => this.dialogRef.close(true),

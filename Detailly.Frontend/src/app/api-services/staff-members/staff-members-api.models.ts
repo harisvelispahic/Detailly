@@ -34,6 +34,7 @@ export interface UpdateStaffMemberCommand {
   username?: string | null;
   email?: string | null;
   phone?: string | null;
+  isManager?: boolean | null;
 }
 
 export interface GetStaffMemberByIdQueryDto {
