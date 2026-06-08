@@ -22,4 +22,6 @@ public interface IStripeService
         string paymentIntentId,
         decimal amount,
         CancellationToken ct);
+
+    Task CancelPaymentIntentAsync(string paymentIntentId, CancellationToken ct);
 }

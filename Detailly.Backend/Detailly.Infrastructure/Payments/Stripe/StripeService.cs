@@ -70,7 +70,11 @@ public class StripeService : IStripeService
         return (intent.Id, intent.ClientSecret);
     }
 
-    // NEW: Refund Stripe PaymentIntent (partial or full)
+    public async Task CancelPaymentIntentAsync(string paymentIntentId, CancellationToken ct)
+    {
+        await _paymentIntentService.CancelAsync(paymentIntentId, cancellationToken: ct);
+    }
+
     public async Task<string> RefundPaymentIntentAsync(string paymentIntentId, decimal amount, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(paymentIntentId))

@@ -7,7 +7,7 @@ namespace Detailly.Application.Modules.Payment.Stripe.Commands.CreateOrderPaymen
 public sealed class CreateOrderPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe, IAppCurrentUser currentUser)
     : IRequestHandler<CreateOrderPaymentIntentCommand, CreateOrderPaymentIntentResult>
 {
-    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(5);
 
     public async Task<CreateOrderPaymentIntentResult> Handle(CreateOrderPaymentIntentCommand request, CancellationToken ct)
     {
@@ -52,7 +52,8 @@ public sealed class CreateOrderPaymentIntentCommandHandler(IAppDbContext context
                 if (age < PendingReplaceAfter)
                     throw new DetaillyBusinessRuleException("PAYMENT_IN_PROGRESS", "Payment is already in progress.");
 
-                // stale pending -> mark failed and allow new intent
+                // stale pending -> cancel on Stripe so it can never be completed, then mark failed locally
+                await stripe.CancelPaymentIntentAsync(existing.ProviderTransactionId, ct);
                 existing.Status = PaymentTransactionStatus.Failed;
                 existing.Description = (existing.Description ?? "Order card payment")
                                        + " (auto-failed due to stale pending intent)";

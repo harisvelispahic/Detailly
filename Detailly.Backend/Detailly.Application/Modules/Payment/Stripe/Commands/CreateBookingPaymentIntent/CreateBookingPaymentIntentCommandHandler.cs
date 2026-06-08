@@ -7,8 +7,7 @@ namespace Detailly.Application.Modules.Payment.Card.Commands.CreateBookingPaymen
 public class CreateBookingPaymentIntentCommandHandler
     : IRequestHandler<CreateBookingPaymentIntentCommand, CreateBookingPaymentIntentResult>
 {
-    // If a PaymentIntent has been Pending for longer than this, allow replacing it with a new one.
-    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(5);
 
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;
@@ -58,7 +57,8 @@ public class CreateBookingPaymentIntentCommandHandler
                 if (age < PendingReplaceAfter)
                     throw new DetaillyBusinessRuleException("PAYMENT_IN_PROGRESS", "Payment is already in progress.");
 
-                // stale pending -> mark failed and allow new intent
+                // stale pending -> cancel on Stripe so it can never be completed, then mark failed locally
+                await _stripe.CancelPaymentIntentAsync(existing.ProviderTransactionId, ct);
                 existing.Status = PaymentTransactionStatus.Failed;
                 existing.Description = (existing.Description ?? "Card payment")
                                        + " (auto-failed due to stale pending intent)";
