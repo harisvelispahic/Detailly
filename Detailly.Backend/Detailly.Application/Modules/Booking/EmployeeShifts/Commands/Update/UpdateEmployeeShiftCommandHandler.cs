@@ -1,4 +1,6 @@
-﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
+﻿using Detailly.Domain.Entities.Booking;
+
+namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 
 public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
     : IRequestHandler<UpdateEmployeeShiftCommand, Unit>
@@ -52,16 +54,21 @@ public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAp
                 throw new DetaillyBusinessRuleException("SHIFT_NOT_EMPLOYEE", "Selected user is not an employee.");
         }
 
-        // Validate the location is not closed on that day.
-        // Time-of-day bounds are enforced by the frontend (which compares in local time);
-        // comparing UTC TimeOfDay against locally-stored opening hours is unreliable without
-        // an explicit timezone, so only the IsClosed flag is checked here.
         var dayOfWeek = (int)newStart.DayOfWeek;
         var openingHours = await context.LocationOpeningHours
             .FirstOrDefaultAsync(h => h.ShopLocationId == newShopLocationId && h.DayOfWeek == dayOfWeek && !h.IsDeleted, ct);
 
         if (openingHours?.IsClosed == true)
             throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
+
+        var windowStart = newStart.Date.Add(openingHours?.OpenTimeUtc  ?? LocationOpeningHoursEntity.DefaultOpenTime);
+        var windowEnd   = newStart.Date.Add(openingHours?.CloseTimeUtc ?? LocationOpeningHoursEntity.DefaultCloseTime);
+
+        if (newStart < windowStart)
+            throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", $"Shift cannot start before the location opens at {windowStart:HH:mm} UTC.");
+
+        if (newEnd > windowEnd)
+            throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", $"Shift cannot end after the location closes at {windowEnd:HH:mm} UTC.");
 
         // If any of the properties that affect overlap are changed, check overlaps.
         var needOverlapCheck = request.EmployeeId != null
