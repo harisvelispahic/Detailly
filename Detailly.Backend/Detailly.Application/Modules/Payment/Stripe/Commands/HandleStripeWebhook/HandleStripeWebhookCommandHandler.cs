@@ -60,7 +60,7 @@ public class HandleStripeWebhookCommandHandler
         //
         var payment = await _context.PaymentTransactions
             .Include(x => x.Booking)
-            .Include(x => x.Wallet)
+            .Include(x => x.Wallet).ThenInclude(w => w!.ApplicationUser)
             .Include(x => x.Order)
             .FirstOrDefaultAsync(x => x.ProviderTransactionId == providerTransactionId && !x.IsDeleted, ct);
 
@@ -99,7 +99,12 @@ public class HandleStripeWebhookCommandHandler
                 {
                     var wallet = payment.Wallet;
 
-                    var bonus = (wallet.PercentageAdded / 100m) * payment.Amount;
+                    var settings = await _context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
+                    var bonusPercent = (wallet.ApplicationUser.IsFleet
+                        ? settings?.FleetWalletBonusPercent
+                        : settings?.StandardWalletBonusPercent) ?? 0;
+
+                    var bonus = (bonusPercent / 100m) * payment.Amount;
 
                     wallet.Balance += payment.Amount + bonus;
                     wallet.TotalDeposited += payment.Amount;

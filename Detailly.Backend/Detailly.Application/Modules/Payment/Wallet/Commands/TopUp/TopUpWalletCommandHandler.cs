@@ -26,7 +26,7 @@ public class TopUpWalletCommandHandler
         var settings = await _context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
         var bonusPercent = (wallet.ApplicationUser.IsFleet
             ? settings?.FleetWalletBonusPercent
-            : settings?.StandardWalletBonusPercent) ?? wallet.PercentageAdded;
+            : settings?.StandardWalletBonusPercent) ?? 0;
 
         var bonus = (bonusPercent / 100m) * request.Amount;
 
