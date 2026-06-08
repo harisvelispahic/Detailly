@@ -16,7 +16,7 @@ public class OrdersController(ISender sender) : ControllerBase
 {
     // Same thing, explicit "checkout" route
     [HttpPost("checkout")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<int>> Checkout([FromBody] CheckoutCartCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -24,7 +24,7 @@ public class OrdersController(ISender sender) : ControllerBase
     }
 
     [HttpPut("cancel/{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task Cancel(int id, [FromBody] CancelOrderCommand command, CancellationToken ct)
     {
         command.Id = id;
@@ -33,19 +33,19 @@ public class OrdersController(ISender sender) : ControllerBase
 
     // My order history
     [HttpGet("my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<PageResult<GetMyOrdersQueryDto>> GetMy([FromQuery] GetMyOrdersQuery query, CancellationToken ct)
         => await sender.Send(query, ct);
 
     // Ownership-enforced details
     [HttpGet("details/{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<GetOrderDetailsQueryDto> GetOrderDetails(int id, CancellationToken ct)
         => await sender.Send(new GetOrderDetailsQuery { Id = id }, ct);
 
     // Keep existing list/get endpoints (staff list)
     [HttpGet("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<GetOrderByIdQueryDto> GetById(int id, CancellationToken ct)
         => await sender.Send(new GetOrderByIdQuery { Id = id }, ct);
 

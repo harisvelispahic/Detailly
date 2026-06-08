@@ -22,7 +22,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // CREATE BOOKING HOLD (PendingPayment)
     // ---------------------------------------
     [HttpPost]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<int>> Create(CreateBookingHoldCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -34,7 +34,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // CANCEL BOOKING
     // ---------------------------------------
     [HttpPut("cancel/{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task Cancel(int id, CancelBookingCommand command, CancellationToken ct)
     {
         command.BookingId = id; // Route ID precedence
@@ -46,7 +46,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET BOOKING BY ID (ownership enforced)
     // ---------------------------------------
     [HttpGet("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<GetBookingByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var booking = await sender.Send(new GetBookingByIdQuery { Id = id }, ct);
@@ -57,7 +57,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // LIST MY BOOKINGS
     // ---------------------------------------
     [HttpGet("my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<PageResult<ListMyBookingsQueryDto>> ListMine([FromQuery] ListMyBookingsQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);
@@ -69,7 +69,7 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET /Bookings/my/export-pdf?startDate=2026-01-01&endDate=2026-12-31
     // ---------------------------------------
     [HttpGet("my/export-pdf")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<IActionResult> ExportMyBookingsPdf(
         [FromQuery] DateTime startDate,
         [FromQuery] DateTime endDate,

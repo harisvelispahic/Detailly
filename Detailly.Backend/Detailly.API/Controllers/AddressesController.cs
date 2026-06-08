@@ -13,7 +13,7 @@ namespace Detailly.API.Controllers;
 public class AddressesController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<int>> Create(
         CreateAddressCommand command,
         CancellationToken ct)
@@ -24,7 +24,7 @@ public class AddressesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<IActionResult> Update(
         int id,
         UpdateAddressCommand command,
@@ -37,7 +37,7 @@ public class AddressesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteAddressCommand { Id = id }, ct);
@@ -46,7 +46,7 @@ public class AddressesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<GetAddressByIdQueryDto>> GetById(
         int id,
         CancellationToken ct)
@@ -68,7 +68,7 @@ public class AddressesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<PageResult<ListMyAddressesQueryDto>>> ListMine(
         [FromQuery] ListMyAddressesQuery query,
         CancellationToken ct)

@@ -109,12 +109,8 @@ public static class DependencyInjection
                     ctx.User.HasClaim("is_manager", "true") ||
                     ctx.User.HasClaim("is_employee", "true")));
 
-            // "Any client" = authenticated AND (fleet true OR fleet false)
-            // Since we only store "is_fleet", this basically means "authenticated user"
-            o.AddPolicy(AuthPolicies.AnyClient,
-                p => p.RequireAssertion(ctx =>
-                    ctx.User.HasClaim("is_fleet", "true") ||
-                    ctx.User.HasClaim("is_fleet", "false")));
+            o.AddPolicy(AuthPolicies.Authenticated,
+                p => p.RequireAuthenticatedUser());
 
             // StandardClientOnly = explicitly not fleet
             o.AddPolicy(AuthPolicies.StandardClientOnly,

@@ -11,7 +11,7 @@ public class ReactionsController(ISender sender) : ControllerBase
 {
     // Toggle like/dislike for a service package: same type = remove, different type = switch
     [HttpPut("service-packages/{servicePackageId:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ReactionSummaryDto> Upsert(
         int servicePackageId,
         UpsertReactionCommand command,
@@ -23,7 +23,7 @@ public class ReactionsController(ISender sender) : ControllerBase
 
     // Get all reactions by the current user (for pre-filling the UI state)
     [HttpGet("service-packages/my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<List<GetMyReactionsQueryDto>> GetMy(CancellationToken ct)
     {
         return await sender.Send(new GetMyReactionsQuery(), ct);

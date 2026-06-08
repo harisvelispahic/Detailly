@@ -7,7 +7,7 @@ namespace Detailly.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize(Policy = AuthPolicies.AnyClient)]
+[Authorize(Policy = AuthPolicies.Authenticated)]
 public sealed class SavedProductsController(ISender sender) : ControllerBase
 {
     [HttpPost]

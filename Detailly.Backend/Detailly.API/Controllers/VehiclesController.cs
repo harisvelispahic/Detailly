@@ -13,7 +13,7 @@ namespace Detailly.API.Controllers;
 public class VehiclesController(ISender sender) : ControllerBase
 {
     [HttpPost]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<int>> Create(CreateVehicleCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -22,7 +22,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task Update(int id, UpdateVehicleCommand command, CancellationToken ct)
     {
         // ID from the route takes precedence
@@ -32,7 +32,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteVehicleCommand { Id = id }, ct);
@@ -40,7 +40,7 @@ public class VehiclesController(ISender sender) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<GetVehicleByIdQueryDto> GetById(int id, CancellationToken ct)
     {
         var category = await sender.Send(new GetVehicleByIdQuery { Id = id }, ct);
@@ -58,7 +58,7 @@ public class VehiclesController(ISender sender) : ControllerBase
 
     // --- Authenticated user's vehicles (paged) ---
     [HttpGet("my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<PageResult<ListMyVehiclesQueryDto>> ListMine([FromQuery] ListMyVehiclesQuery query, CancellationToken ct)
     {
         var result = await sender.Send(query, ct);

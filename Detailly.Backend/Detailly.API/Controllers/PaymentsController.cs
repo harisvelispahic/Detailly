@@ -19,7 +19,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 0) GET MY WALLET
     // -------------------------------
     [HttpGet("wallet/my")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<GetMyWalletQueryDto>> GetMyWallet(CancellationToken ct)
     {
         var result = await sender.Send(new GetMyWalletQuery(), ct);
@@ -41,7 +41,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 2) PAY BOOKING WITH WALLET
     // -------------------------------
     [HttpPost("bookings/wallet/{bookingId:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<IActionResult> PayBookingWithWallet(int bookingId, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
@@ -55,7 +55,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 3) CREATE CARD PAYMENT INTENT (booking)
     // -------------------------------
     [HttpPost("bookings/card-intent/{bookingId:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<CreateBookingPaymentIntentResult>> CreateCardIntent(int bookingId, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
@@ -69,7 +69,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 4) CREATE CARD PAYMENT INTENT (order)
     // -------------------------------
     [HttpPost("orders/card-intent/{orderId:int}")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<CreateOrderPaymentIntentResult>> CreateOrderCardIntent(int orderId, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
@@ -84,7 +84,7 @@ public class PaymentsController(ISender sender, IAppCurrentUser currentUser) : C
     // 5) CREATE CARD PAYMENT INTENT (wallet top-up)
     // -------------------------------
     [HttpPost("wallet/top-up/card-intent")]
-    [Authorize(Policy = AuthPolicies.AnyClient)]
+    [Authorize(Policy = AuthPolicies.Authenticated)]
     public async Task<ActionResult<CreateWalletTopUpCardIntentResult>> CreateWalletTopUpCardIntent([FromBody] WalletTopUpIntentRequest req, CancellationToken ct)
     {
         if (currentUser.ApplicationUserId is null)
