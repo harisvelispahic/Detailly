@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
 {
-    public sealed class ExternalLoginCommandHandler(IAppDbContext ctx, IJwtTokenService jwt) 
+    public sealed class ExternalLoginCommandHandler(IAppDbContext ctx, IJwtTokenService jwt)
         : IRequestHandler<ExternalLoginCommand, ExternalLoginCommandDto>
     {
         public async Task<ExternalLoginCommandDto> Handle(
@@ -16,6 +16,12 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
 
             if (email is null || providerUserId is null)
                 throw new DetaillyUnauthorizedException("External login failed: missing claims.");
+
+            // Reject unverified emails — defence against providers that allow unverified addresses.
+            // ASP.NET Core maps JSON booleans to "True"/"False" (capital), so compare case-insensitively.
+            var emailVerified = request.Principal.FindFirstValue("email_verified");
+            if (!string.Equals(emailVerified, "true", StringComparison.OrdinalIgnoreCase))
+                throw new DetaillyUnauthorizedException("External login failed: email not verified.");
 
             var external = await ctx.UserExternalLogins
                 .Include(x => x.ApplicationUser)
@@ -33,8 +39,9 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
             }
             else
             {
+                var normalizedEmail = email.Trim().ToLowerInvariant();
                 var existingUser = await ctx.ApplicationUsers
-                    .FirstOrDefaultAsync(x => x.Email == email.Trim().ToLowerInvariant() && !x.IsDeleted, ct);
+                    .FirstOrDefaultAsync(x => x.Email == normalizedEmail && !x.IsDeleted, ct);
 
                 if (existingUser is null)
                 {
@@ -44,18 +51,30 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
                     ctx.ApplicationUsers.Add(user);
                     isSetupRequired = true;
                 }
+                else if (existingUser.PasswordHash != ApplicationUserEntity.ExternalOnlyPasswordHash)
+                {
+                    // Password account exists — require the user to confirm ownership before linking.
+                    var pendingToken = jwt.IssuePendingLinkToken(request.Provider, providerUserId, normalizedEmail);
+                    return new ExternalLoginCommandDto
+                    {
+                        RequiresLinking  = true,
+                        PendingLinkToken = pendingToken
+                    };
+                }
                 else
                 {
+                    // OAuth-only account from a different provider — safe to auto-link since both
+                    // sides are provider-verified (email_verified already checked above).
                     user = existingUser;
                     isSetupRequired = !user.IsProfileComplete;
                 }
 
                 ctx.UserExternalLogins.Add(new UserExternalLoginEntity
                 {
-                    Provider = request.Provider,
-                    ProviderUserId = providerUserId,
+                    Provider        = request.Provider,
+                    ProviderUserId  = providerUserId,
                     ApplicationUser = user,
-                    Email = email
+                    Email           = email
                 });
             }
 
@@ -69,21 +88,22 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
 
             ctx.RefreshTokens.Add(new RefreshTokenEntity
             {
-                TokenHash = pair.RefreshTokenHash,
-                ExpiresAtUtc = pair.RefreshTokenExpiresAtUtc,
+                TokenHash         = pair.RefreshTokenHash,
+                ExpiresAtUtc      = pair.RefreshTokenExpiresAtUtc,
                 ApplicationUserId = user.Id,
-                Fingerprint = null
+                Fingerprint       = null
             });
 
             await ctx.SaveChangesAsync(ct);
 
             return new ExternalLoginCommandDto
             {
-                AccessToken = pair.AccessToken,
-                RefreshToken = pair.RefreshTokenRaw,
-                AccessTokenExpiresAtUtc = pair.AccessTokenExpiresAtUtc,
+                RequiresLinking          = false,
+                AccessToken              = pair.AccessToken,
+                RefreshToken             = pair.RefreshTokenRaw,
+                AccessTokenExpiresAtUtc  = pair.AccessTokenExpiresAtUtc,
                 RefreshTokenExpiresAtUtc = pair.RefreshTokenExpiresAtUtc,
-                IsSetupRequired = isSetupRequired
+                IsSetupRequired          = isSetupRequired
             };
         }
 
@@ -101,16 +121,16 @@ namespace Detailly.Application.Modules.Auth.Commands.ExternalLogin
 
             return new ApplicationUserEntity
             {
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
-                Username = tempUsername,
-                PasswordHash = ApplicationUserEntity.ExternalOnlyPasswordHash,
-                IsEnabled = true,
-                IsAdmin = false,
-                IsEmployee = false,
-                IsManager = false,
-                IsFleet = false,
+                FirstName       = firstName,
+                LastName        = lastName,
+                Email           = email,
+                Username        = tempUsername,
+                PasswordHash    = ApplicationUserEntity.ExternalOnlyPasswordHash,
+                IsEnabled       = true,
+                IsAdmin         = false,
+                IsEmployee      = false,
+                IsManager       = false,
+                IsFleet         = false,
                 IsProfileComplete = false
             };
         }

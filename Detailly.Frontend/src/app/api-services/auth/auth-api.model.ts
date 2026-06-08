@@ -63,3 +63,23 @@ export interface RefreshTokenCommandDto {
 export interface LogoutCommand {
   refreshToken: string;
 }
+
+/**
+ * Command for POST /auth/external/link
+ * Corresponds to: LinkExternalAccountCommand.cs
+ */
+export interface LinkExternalAccountCommand {
+  pendingLinkToken: string;
+  password: string;
+}
+
+/**
+ * Response for POST /auth/external/link
+ * Corresponds to: LinkExternalAccountCommandDto.cs
+ */
+export interface LinkExternalAccountCommandDto {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAtUtc: string;
+  refreshTokenExpiresAtUtc: string;
+}

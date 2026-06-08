@@ -8,6 +8,7 @@ import {ForgotPasswordComponent} from './forgot-password/forgot-password.compone
 import {LogoutComponent} from './logout/logout.component';
 import {GoogleCallbackComponent} from './google-callback/google-callback.component';
 import {OAuthSetupComponent} from './oauth-setup/oauth-setup.component';
+import {LinkAccountComponent} from './link-account/link-account.component';
 import {SharedModule} from '../shared/shared-module';
 
 
@@ -20,6 +21,7 @@ import {SharedModule} from '../shared/shared-module';
     LogoutComponent,
     GoogleCallbackComponent,
     OAuthSetupComponent,
+    LinkAccountComponent,
   ],
   imports: [
     AuthRoutingModule,

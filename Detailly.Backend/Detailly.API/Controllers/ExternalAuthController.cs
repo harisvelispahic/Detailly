@@ -1,8 +1,8 @@
 using Detailly.Application.Abstractions;
 using Detailly.Application.Modules.Auth.Commands.CompleteOAuthSetup;
 using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
+using Detailly.Application.Modules.Auth.Commands.LinkExternalAccount;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
 
 namespace Detailly.API.Controllers;
 
@@ -11,22 +11,18 @@ namespace Detailly.API.Controllers;
 public sealed class ExternalAuthController(
     ISender sender,
     IExternalAuthService externalAuthService,
-    IConfiguration configuration) : ControllerBase
+    IReturnUrlValidator returnUrlValidator,
+    IExternalAuthCallbackBuilder callbackBuilder) : ControllerBase
 {
     [HttpGet("google")]
     [AllowAnonymous]
     public IActionResult GoogleLogin([FromQuery] string returnUrl)
     {
-        if (!IsReturnUrlAllowed(returnUrl))
+        if (!returnUrlValidator.IsAllowed(returnUrl))
             return BadRequest("Invalid returnUrl.");
 
-        var finalizeUrl = Url.Action(
-            action: nameof(GoogleFinalize),
-            controller: "ExternalAuth",
-            values: new { returnUrl },
-            protocol: Request.Scheme);
-
-        return Challenge(new AuthenticationProperties { RedirectUri = finalizeUrl! }, "Google");
+        var finalizeUrl = Url.Action(nameof(GoogleFinalize), "ExternalAuth", new { returnUrl }, Request.Scheme);
+        return Challenge(new AuthenticationProperties { RedirectUri = finalizeUrl }, "Google");
     }
 
     [HttpGet("google/finalize")]
@@ -37,12 +33,18 @@ public sealed class ExternalAuthController(
         if (principal is null)
             return Unauthorized();
 
-        var tokens = await sender.Send(new ExternalLoginCommand("Google", principal), ct);
+        var result = await sender.Send(new ExternalLoginCommand("Google", principal), ct);
+        return Redirect(callbackBuilder.Build(returnUrl, result));
+    }
 
-        return Redirect(
-            $"{returnUrl}#accessToken={Uri.EscapeDataString(tokens.AccessToken)}" +
-            $"&refreshToken={Uri.EscapeDataString(tokens.RefreshToken)}" +
-            $"&isSetupRequired={tokens.IsSetupRequired.ToString().ToLowerInvariant()}");
+    [HttpPost("link")]
+    [AllowAnonymous]
+    public async Task<ActionResult<LinkExternalAccountCommandDto>> LinkAccount(
+        [FromBody] LinkExternalAccountCommand command,
+        CancellationToken ct)
+    {
+        var result = await sender.Send(command, ct);
+        return Ok(result);
     }
 
     [HttpPost("setup")]
@@ -50,17 +52,5 @@ public sealed class ExternalAuthController(
     public async Task CompleteSetup(CompleteOAuthSetupCommand command, CancellationToken ct)
     {
         await sender.Send(command, ct);
-    }
-
-    private bool IsReturnUrlAllowed(string returnUrl)
-    {
-        if (!Uri.TryCreate(returnUrl, UriKind.Absolute, out var uri))
-            return false;
-
-        var allowed = configuration
-            .GetSection("Authentication:AllowedReturnHosts")
-            .Get<string[]>() ?? [];
-
-        return allowed.Any(h => uri.Authority.Equals(h, StringComparison.OrdinalIgnoreCase));
     }
 }

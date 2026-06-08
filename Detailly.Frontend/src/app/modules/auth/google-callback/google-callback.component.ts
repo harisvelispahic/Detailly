@@ -23,6 +23,11 @@ export class GoogleCallbackComponent implements OnInit {
       return;
     }
 
+    if (result.requiresLinking) {
+      this.router.navigate(['/auth/link-account']);
+      return;
+    }
+
     if (result.isSetupRequired) {
       this.router.navigate(['/auth/setup']);
       return;

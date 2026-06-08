@@ -102,8 +102,10 @@ public static class DependencyInjection
         // Booking quote service, for calculating price and availability without creating a booking
         services.AddScoped<IBookingQuoteService, BookingQuoteService>();
 
-        // External auth (Google OAuth cookie exchange)
+        // External auth (Google OAuth cookie exchange, return-URL validation, callback URL building)
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
+        services.AddScoped<IReturnUrlValidator, ReturnUrlValidator>();
+        services.AddScoped<IExternalAuthCallbackBuilder, ExternalAuthCallbackBuilder>();
 
         // TimeProvider (if used in handlers/services)
         services.AddSingleton<TimeProvider>(TimeProvider.System);

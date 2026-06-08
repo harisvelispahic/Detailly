@@ -2,6 +2,7 @@
 using Detailly.Shared.Constants;
 using Detailly.Shared.Dtos;
 using Detailly.Shared.Options;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -73,6 +74,9 @@ public static class DependencyInjection
             options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
             options.CallbackPath = "/auth/external/google/callback";
             options.SignInScheme = "External";
+
+            // Map email_verified from the user-info JSON — not included by default.
+            options.ClaimActions.MapJsonKey("email_verified", "email_verified");
 
             // SameSite=None requires Secure — set Lax so the correlation cookie
             // survives the cross-origin redirect from Google on both HTTP and HTTPS

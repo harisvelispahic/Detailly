@@ -1,0 +1,88 @@
+<div class="auth-container">
+  <div class="auth-background">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+  </div>
+
+  <div class="auth-content">
+    <div class="auth-brand">
+      <img class="brand-logo" src="/assets/images/detailly-logo-transparent.svg" alt="Detailly" />
+    </div>
+
+    <mat-card class="auth-card">
+      <mat-card-content>
+        <div class="auth-card__header">
+          <h1 class="auth-title">Link Your Account</h1>
+          <p class="auth-subtitle">
+            A Detailly account with this email already exists.<br />
+            Enter your password to link your Google account.
+          </p>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-banner">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" subscriptSizing="fixed" class="full-width">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              formControlName="password"
+              [type]="hidePassword ? 'password' : 'text'"
+              autocomplete="current-password"
+            />
+            <mat-icon matPrefix>lock</mat-icon>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+            >
+              <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            @if (form.get('password')?.hasError('required')) {
+              <mat-error>Password is required</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="actions">
+            <button
+              mat-flat-button
+              color="primary"
+              type="submit"
+              class="submit-button"
+              [class.submit-button--disabled]="form.invalid || isLoading"
+              [disabled]="form.invalid || isLoading"
+            >
+              @if (!isLoading) {
+                <mat-icon>link</mat-icon>
+              }
+              @if (!isLoading) {
+                Link Account
+              }
+              @if (isLoading) {
+                <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+              }
+            </button>
+
+            <button
+              mat-button
+              type="button"
+              class="cancel-button"
+              (click)="cancel()"
+            >
+              <mat-icon>arrow_back</mat-icon>
+              Back to login
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

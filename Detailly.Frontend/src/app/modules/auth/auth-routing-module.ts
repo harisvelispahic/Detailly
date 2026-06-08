@@ -7,6 +7,7 @@ import {RegisterComponent} from './register/register.component';
 import {LogoutComponent} from './logout/logout.component';
 import {GoogleCallbackComponent} from './google-callback/google-callback.component';
 import {OAuthSetupComponent} from './oauth-setup/oauth-setup.component';
+import {LinkAccountComponent} from './link-account/link-account.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,7 @@ const routes: Routes = [
       { path: 'logout', component: LogoutComponent },
       { path: 'google-callback', component: GoogleCallbackComponent },
       { path: 'setup', component: OAuthSetupComponent },
+      { path: 'link-account', component: LinkAccountComponent },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]
   }
