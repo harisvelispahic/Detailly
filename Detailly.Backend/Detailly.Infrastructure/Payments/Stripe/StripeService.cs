@@ -23,6 +23,7 @@ public class StripeService : IStripeService
         {
             Amount = (long)Math.Round(amount * 100m, 0, MidpointRounding.AwayFromZero), // cents
             Currency = "bam",
+            CaptureMethod = "manual",
             Metadata = new Dictionary<string, string>
             {
                 { "bookingId", bookingId.ToString() }
@@ -68,6 +69,11 @@ public class StripeService : IStripeService
 
         var intent = await _paymentIntentService.CreateAsync(options, cancellationToken: ct);
         return (intent.Id, intent.ClientSecret);
+    }
+
+    public async Task CapturePaymentIntentAsync(string paymentIntentId, CancellationToken ct)
+    {
+        await _paymentIntentService.CaptureAsync(paymentIntentId, cancellationToken: ct);
     }
 
     public async Task CancelPaymentIntentAsync(string paymentIntentId, CancellationToken ct)

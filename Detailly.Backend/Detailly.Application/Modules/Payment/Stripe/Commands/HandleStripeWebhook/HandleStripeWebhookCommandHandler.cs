@@ -1,4 +1,5 @@
-﻿using Detailly.Application.Abstractions.Payments;
+using Detailly.Application.Abstractions.Payments;
+using Detailly.Application.Common.Exceptions;
 using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 using Detailly.Application.Modules.Sales.Orders.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
@@ -14,17 +15,20 @@ public class HandleStripeWebhookCommandHandler
     private readonly IConfiguration _config;
     private readonly IStripeWebhookParser _parser;
     private readonly IMediator _mediator;
+    private readonly IStripeService _stripeService;
 
     public HandleStripeWebhookCommandHandler(
         IAppDbContext context,
         IConfiguration config,
         IStripeWebhookParser parser,
-        IMediator mediator)
+        IMediator mediator,
+        IStripeService stripeService)
     {
         _context = context;
         _config = config;
         _parser = parser;
         _mediator = mediator;
+        _stripeService = stripeService;
     }
 
     public async Task<Unit> Handle(
@@ -75,21 +79,57 @@ public class HandleStripeWebhookCommandHandler
         //
         // 4️⃣ Apply transitions
         //
-        if (eventType == "payment_intent.succeeded")
+        if (eventType == "payment_intent.amount_capturable_updated")
+        {
+            // Card has been authorized (hold placed). Decide whether to capture or cancel.
+            // Only booking payments use manual capture; skip if already resolved.
+            if (payment.BookingId is not null && payment.Status == PaymentTransactionStatus.Pending)
+            {
+                var booking = payment.Booking!;
+                var now = DateTime.UtcNow;
+
+                var canCapture = booking.Status == BookingStatus.PendingPayment
+                    && booking.ReservationExpiresAtUtc > now;
+
+                if (canCapture)
+                {
+                    // Capture charges the card. Stripe will fire payment_intent.succeeded next,
+                    // which is where we confirm the booking.
+                    await _stripeService.CapturePaymentIntentAsync(providerTransactionId, ct);
+                }
+                else
+                {
+                    // Booking already expired — release the hold, user is never charged.
+                    await _stripeService.CancelPaymentIntentAsync(providerTransactionId, ct);
+                    payment.Status = PaymentTransactionStatus.Unpaid;
+                }
+            }
+        }
+        else if (eventType == "payment_intent.succeeded")
         {
             // prevent double-applying if already paid
             if (payment.Status != PaymentTransactionStatus.Paid)
             {
                 payment.Status = PaymentTransactionStatus.Paid;
 
-                // Booking payment: use centralized confirm logic
-                // (checks hold expiry + clears ReservationExpiresAtUtc)
-                if (payment.BookingId is not null)  // used to be payment.Booking is not null
+                if (payment.BookingId is not null)
                 {
-                    await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
+                    try
+                    {
+                        await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
+                    }
+                    catch (DetaillyBusinessRuleException ex)
+                        when (ex.Code is "BOOKING_NOT_CONFIRMABLE" or "BOOKING_EXPIRED")
+                    {
+                        // Safety net: booking expired between capture and this event (extremely rare
+                        // with manual capture, but protects against any concurrent state change).
+                        // Refund immediately so the customer is not charged for an expired booking.
+                        await _stripeService.RefundPaymentIntentAsync(providerTransactionId, payment.Amount, ct);
+                        payment.Status = PaymentTransactionStatus.Refunded;
+                    }
                 }
 
-                if (payment.OrderId is not null)    // used to be payment.Order is not null
+                if (payment.OrderId is not null)
                 {
                     await _mediator.Send(new ConfirmOrderAfterPaymentCommand(payment.Id), ct);
                 }

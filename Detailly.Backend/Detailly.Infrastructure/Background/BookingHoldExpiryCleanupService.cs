@@ -1,4 +1,5 @@
-﻿using Detailly.Domain.Common.Enums;
+﻿using Detailly.Application.Abstractions.Payments;
+using Detailly.Domain.Common.Enums;
 using Detailly.Infrastructure.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -46,6 +47,7 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        var stripeService = scope.ServiceProvider.GetRequiredService<IStripeService>();
 
         // Find holds that are still PendingPayment but expired
         var expired = await db.Bookings
@@ -69,7 +71,25 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
             foreach (var tx in b.PaymentTransactions)
             {
                 if (tx.Status == PaymentTransactionStatus.Pending)
+                {
+                    // Release the authorization hold on Stripe so the customer's card
+                    // is freed immediately rather than waiting for the 7-day auto-expiry.
+                    if (!string.IsNullOrWhiteSpace(tx.ProviderTransactionId))
+                    {
+                        try
+                        {
+                            await stripeService.CancelPaymentIntentAsync(tx.ProviderTransactionId, ct);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex,
+                                "Failed to cancel PaymentIntent {IntentId} for expired booking {BookingId}.",
+                                tx.ProviderTransactionId, b.Id);
+                        }
+                    }
+
                     tx.Status = PaymentTransactionStatus.Unpaid;
+                }
             }
         }
 
