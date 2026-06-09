@@ -2,16 +2,13 @@
 
 public sealed class ChangePasswordCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser,
+    IAppAuthorizationService authService,
     IPasswordHasher<ApplicationUserEntity> passwordHasher
 ) : IRequestHandler<ChangePasswordCommand, Unit>
 {
     public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var currentUserId = appCurrentUser.ApplicationUserId.Value;
+        var currentUserId = authService.RequireUserId();
 
         var user = await context.ApplicationUsers
             .FirstOrDefaultAsync(x => x.Id == currentUserId && !x.IsDeleted, ct);

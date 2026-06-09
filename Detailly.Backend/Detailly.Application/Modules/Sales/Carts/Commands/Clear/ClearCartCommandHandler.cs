@@ -3,15 +3,12 @@ using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Application.Modules.Sales.Carts.Commands.Clear;
 
-public sealed class ClearCartCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class ClearCartCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<ClearCartCommand>
 {
     public async Task Handle(ClearCartCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
+        var userId = authService.RequireUserId();
 
         var cart = await context.Carts
             .Include(c => c.CartItems)

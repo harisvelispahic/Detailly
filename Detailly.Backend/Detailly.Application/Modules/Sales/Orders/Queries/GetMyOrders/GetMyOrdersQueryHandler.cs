@@ -1,14 +1,11 @@
 ﻿namespace Detailly.Application.Modules.Sales.Orders.Queries.GetMyOrders;
 
-public sealed class GetMyOrdersQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class GetMyOrdersQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<GetMyOrdersQuery, PageResult<GetMyOrdersQueryDto>>
 {
     public async Task<PageResult<GetMyOrdersQueryDto>> Handle(GetMyOrdersQuery request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
+        var userId = authService.RequireUserId();
 
         var q = context.Orders
             .AsNoTracking()

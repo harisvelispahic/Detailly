@@ -1,17 +1,13 @@
 namespace Detailly.Application.Modules.Booking.Locations.Commands.Delete;
 
-public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class DeleteLocationCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<DeleteLocationCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteLocationCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only admin/manager can manage locations.");
+        authService.EnsureAdminOrManager();
 
         var location = await context.Locations
             .FirstOrDefaultAsync(l => l.Id == request.Id && !l.IsDeleted, ct);

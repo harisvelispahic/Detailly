@@ -3,18 +3,15 @@ using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Application.Modules.Sales.Carts.Commands.AddToCart;
 
-public sealed class AddToCartCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class AddToCartCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<AddToCartCommand>
 {
     public async Task Handle(AddToCartCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
+        var userId = authService.RequireUserId();
 
         if (request.Quantity <= 0)
             throw new DetaillyBusinessRuleException("cart.invalid_quantity", "Quantity must be greater than 0.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
 
         var product = await context.Products
             .Include(p => p.Inventory)

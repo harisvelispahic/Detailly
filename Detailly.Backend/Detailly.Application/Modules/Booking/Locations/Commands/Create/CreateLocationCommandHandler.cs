@@ -6,7 +6,7 @@ namespace Detailly.Application.Modules.Booking.Locations.Commands.Create;
 
 public sealed class CreateLocationCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser,
+    IAppAuthorizationService authService,
     IRoadDistanceService roadDistanceService)
     : IRequestHandler<CreateLocationCommand, int>
 {
@@ -14,11 +14,7 @@ public sealed class CreateLocationCommandHandler(
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only admin/manager can manage locations.");
+        authService.EnsureAdminOrManager();
 
         if (request.TotalBays <= 0)
             throw new DetaillyBusinessRuleException("LOCATION_BAYS_REQUIRED", "Shop locations must have TotalBays > 0.");

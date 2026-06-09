@@ -6,14 +6,13 @@ namespace Detailly.Application.Modules.Booking.Bookings.Commands.ExportMyBooking
 
 public sealed class ExportMyBookingsPdfCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser currentUser,
+    IAppAuthorizationService authService,
     IBookingsPdfGenerator pdfGenerator)
     : IRequestHandler<ExportMyBookingsPdfCommand, byte[]>
 {
     public async Task<byte[]> Handle(ExportMyBookingsPdfCommand request, CancellationToken ct)
     {
-        if (currentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
+        var userId = authService.RequireUserId();
 
         var start = request.StartDateUtc.Date;
         var end = request.EndDateUtc.Date.AddDays(1);
@@ -22,7 +21,7 @@ public sealed class ExportMyBookingsPdfCommandHandler(
             .AsNoTracking()
             .Where(b =>
                 !b.IsDeleted &&
-                b.CustomerId == currentUser.ApplicationUserId.Value &&
+                b.CustomerId == userId &&
                 b.StartUtc >= start &&
                 b.StartUtc < end &&
                 b.Status != BookingStatus.Draft)

@@ -4,17 +4,13 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.Cancel;
 
-public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser, IMediator mediator)
+public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IMediator mediator)
     : IRequestHandler<CancelBookingCommand, Unit>
 {
     public async Task<Unit> Handle(CancelBookingCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
-
-        if (appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        var customerId = appCurrentUser.ApplicationUserId.Value;
+        var customerId = authService.RequireUserId();
 
         // ✅ No explicit DB transaction here (refund handlers may start their own)
 

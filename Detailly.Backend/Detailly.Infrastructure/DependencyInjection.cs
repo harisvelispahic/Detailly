@@ -2,6 +2,7 @@
 using Detailly.Application.Abstractions.Booking;
 using Detailly.Application.Abstractions.Payments;
 using Detailly.Application.Abstractions.PDF;
+using Detailly.Infrastructure.Authorization;
 using Detailly.Infrastructure.Background;
 using Detailly.Infrastructure.Booking;
 using Detailly.Infrastructure.Cloudinary;
@@ -73,6 +74,7 @@ public static class DependencyInjection
         // HttpContext accessor + current user
         services.AddHttpContextAccessor();
         services.AddScoped<IAppCurrentUser, AppCurrentUser>();
+        services.AddScoped<IAppAuthorizationService, AppAuthorizationService>();
 
         // Stripe service
         //services.AddScoped<IStripeService, FakeStripeService>();

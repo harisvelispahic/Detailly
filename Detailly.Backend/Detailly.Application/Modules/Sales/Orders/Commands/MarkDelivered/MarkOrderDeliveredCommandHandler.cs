@@ -2,17 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.MarkDelivered;
 
-public sealed class MarkOrderDeliveredCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public sealed class MarkOrderDeliveredCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<MarkOrderDeliveredCommand>
 {
     public async Task Handle(MarkOrderDeliveredCommand request, CancellationToken ct)
     {
-        if (!currentUser.IsAuthenticated || currentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var isStaff = currentUser.IsAdmin || currentUser.IsManager || currentUser.IsEmployee;
-        if (!isStaff)
-            throw new DetaillyUnauthorizedException("Only staff can mark orders as delivered.");
+        authService.EnsureAnyStaff();
 
         var order = await context.Orders.FirstOrDefaultAsync(o => o.Id == request.Id, ct);
         if (order is null)

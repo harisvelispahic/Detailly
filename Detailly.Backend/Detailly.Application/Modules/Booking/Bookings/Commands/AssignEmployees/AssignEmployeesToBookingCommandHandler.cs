@@ -3,18 +3,14 @@ using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.AssignEmployees;
 
-public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<AssignEmployeesToBookingCommand, Unit>
 {
     public async Task<Unit> Handle(AssignEmployeesToBookingCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Manager/Admin access required.");
+        authService.EnsureAdminOrManager();
 
         var employeeIds = (request.EmployeeIds ?? new List<int>())
             .Distinct()

@@ -1,26 +1,20 @@
 ﻿namespace Detailly.Application.Modules.Vehicle.Vehicles.Commands.Update;
 
-public class UpdateVehicleCommandHandler(IAppDbContext ctx, IAppCurrentUser appCurrentUser)
+public class UpdateVehicleCommandHandler(IAppDbContext ctx, IAppAuthorizationService authService)
     : IRequestHandler<UpdateVehicleCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateVehicleCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        // Find the vehicle
         var vehicle = await ctx.Vehicles
             .FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
         if (vehicle is null)
             throw new DetaillyNotFoundException($"Vehicle (ID={request.Id}) was not found.");
 
+        authService.EnsureOwnerOrAdmin(vehicle.ApplicationUserId, "vehicle");
+
         if (vehicle.IsDeleted)
             throw new DetaillyConflictException("Cannot update a deleted vehicle.");
-
-        // Authorization: owner or admin
-        if (!appCurrentUser.IsAdmin && vehicle.ApplicationUserId != appCurrentUser.ApplicationUserId)
-            throw new DetaillyForbiddenException("You are not allowed to update this vehicle.");
 
         var newLicencePlate = request.LicencePlate?.Trim().ToUpper();
 

@@ -6,7 +6,7 @@ namespace Detailly.Application.Modules.Booking.Locations.Commands.Update;
 
 public sealed class UpdateLocationCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser,
+    IAppAuthorizationService authService,
     IRoadDistanceService roadDistanceService)
     : IRequestHandler<UpdateLocationCommand, Unit>
 {
@@ -14,11 +14,7 @@ public sealed class UpdateLocationCommandHandler(
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only admin/manager can manage locations.");
+        authService.EnsureAdminOrManager();
 
         var location = await context.Locations
             .Include(l => l.Address)

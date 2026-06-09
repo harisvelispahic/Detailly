@@ -5,17 +5,13 @@ namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.ExportShi
 
 public sealed class ExportShiftsPdfCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser currentUser,
+    IAppAuthorizationService authService,
     IShiftsPdfGenerator pdfGenerator)
     : IRequestHandler<ExportShiftsPdfCommand, byte[]>
 {
     public async Task<byte[]> Handle(ExportShiftsPdfCommand request, CancellationToken ct)
     {
-        if (currentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!currentUser.IsAdmin && !currentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only Admin/Manager can export shifts.");
+        authService.EnsureAdminOrManager();
 
         var start = request.StartDateUtc.Date;
         var end = request.EndDateUtc.Date.AddDays(1);

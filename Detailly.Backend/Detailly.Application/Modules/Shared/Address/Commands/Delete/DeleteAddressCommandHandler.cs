@@ -2,25 +2,21 @@
 
 public sealed class DeleteAddressCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser)
+    IAppAuthorizationService authService)
     : IRequestHandler<DeleteAddressCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteAddressCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
-        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
-
         var address = await context.Addresses
-            .FirstOrDefaultAsync(a =>
-                a.Id == request.Id &&
-                (isStaff || a.ApplicationUserId == userId),
-                ct);
+            .FirstOrDefaultAsync(a => a.Id == request.Id, ct);
 
         if (address is null)
             throw new DetaillyNotFoundException($"Address with Id {request.Id} was not found.");
+
+        if (address.ApplicationUserId is { } ownerId)
+            authService.EnsureOwnerOrStaff(ownerId, "address");
+        else
+            authService.EnsureAdminOrManager();
 
         var isUsedByLocation = await context.Locations
             .AnyAsync(x => x.AddressId == request.Id, ct);

@@ -1,6 +1,6 @@
 namespace Detailly.Application.Modules.Booking.Reviews.Commands.Delete;
 
-public class DeleteReviewCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public class DeleteReviewCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<DeleteReviewCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteReviewCommand request, CancellationToken ct)
@@ -12,8 +12,7 @@ public class DeleteReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         if (review is null || review.IsDeleted)
             throw new DetaillyNotFoundException("Review not found.");
 
-        if (review.CustomerId != currentUser.ApplicationUserId && !currentUser.IsAdmin)
-            throw new DetaillyForbiddenException("You are not allowed to delete this review.");
+        authService.EnsureOwnerOrAdmin(review.CustomerId, "review");
 
         review.IsDeleted = true;
         review.ModifiedAtUtc = DateTime.UtcNow;

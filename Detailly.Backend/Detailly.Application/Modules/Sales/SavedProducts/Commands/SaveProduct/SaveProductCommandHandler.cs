@@ -2,15 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.SavedProducts.Commands.SaveProduct;
 
-public sealed class SaveProductCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class SaveProductCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<SaveProductCommand>
 {
     public async Task Handle(SaveProductCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
+        var userId = authService.RequireUserId();
 
         var product = await context.Products
             .FirstOrDefaultAsync(p => p.Id == request.ProductId, ct);

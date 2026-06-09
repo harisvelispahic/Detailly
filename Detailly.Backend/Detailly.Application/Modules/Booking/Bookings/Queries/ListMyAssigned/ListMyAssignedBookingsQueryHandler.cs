@@ -2,20 +2,15 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMyAssigned;
 
-public sealed class ListMyAssignedBookingsQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class ListMyAssignedBookingsQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<ListMyAssignedBookingsQuery, PageResult<ListMyAssignedBookingsQueryDto>>
 {
     public async Task<PageResult<ListMyAssignedBookingsQueryDto>> Handle(
         ListMyAssignedBookingsQuery request,
         CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!appCurrentUser.IsEmployee)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Employee access required.");
-
-        var employeeId = appCurrentUser.ApplicationUserId.Value;
+        authService.EnsureEmployee();
+        var employeeId = authService.RequireUserId();
 
         var projectedQuery = context.BookingEmployeeAssignments
             .AsNoTracking()

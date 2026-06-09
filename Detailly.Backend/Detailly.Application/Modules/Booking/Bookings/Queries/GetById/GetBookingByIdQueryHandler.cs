@@ -2,15 +2,12 @@
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetById;
 
-public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class GetBookingByIdQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<GetBookingByIdQuery, GetBookingByIdQueryDto>
 {
     public async Task<GetBookingByIdQueryDto> Handle(GetBookingByIdQuery request, CancellationToken ct)
     {
-        if (appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        var customerId = appCurrentUser.ApplicationUserId.Value;
+        var customerId = authService.RequireUserId();
 
         var b = await context.Bookings
             .AsNoTracking()

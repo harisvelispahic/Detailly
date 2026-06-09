@@ -2,15 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.Carts.Commands.UpdateItemQuantity;
 
-public sealed class UpdateCartItemQuantityCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class UpdateCartItemQuantityCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<UpdateCartItemQuantityCommand>
 {
     public async Task Handle(UpdateCartItemQuantityCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
+        var userId = authService.RequireUserId();
 
         var cartItem = await context.CartItems
             .Include(ci => ci.Cart)

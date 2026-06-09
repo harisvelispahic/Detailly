@@ -2,17 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.MarkShipped;
 
-public sealed class MarkOrderShippedCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public sealed class MarkOrderShippedCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<MarkOrderShippedCommand>
 {
     public async Task Handle(MarkOrderShippedCommand request, CancellationToken ct)
     {
-        if (!currentUser.IsAuthenticated || currentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var isStaff = currentUser.IsAdmin || currentUser.IsManager || currentUser.IsEmployee;
-        if (!isStaff)
-            throw new DetaillyUnauthorizedException("Only staff can mark orders as shipped.");
+        authService.EnsureAnyStaff();
 
         var order = await context.Orders.FirstOrDefaultAsync(o => o.Id == request.Id, ct);
         if (order is null)

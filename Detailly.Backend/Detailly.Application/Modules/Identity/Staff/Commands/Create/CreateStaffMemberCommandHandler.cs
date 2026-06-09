@@ -6,22 +6,16 @@ namespace Detailly.Application.Modules.Identity.Staff.Commands.Create;
 public sealed class CreateStaffMemberCommandHandler(
     IAppDbContext context,
     IPasswordHasher<ApplicationUserEntity> passwordHasher,
+    IAppAuthorizationService authService,
     IAppCurrentUser appCurrentUser)
     : IRequestHandler<CreateStaffMemberCommand, int>
 {
     public async Task<int> Handle(CreateStaffMemberCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var isAdmin = appCurrentUser.IsAdmin;
-        var isManager = appCurrentUser.IsManager;
-
-        if (!isAdmin && !isManager)
-            throw new DetaillyForbiddenException("Only admins and managers can create staff members.");
+        authService.EnsureAdminOrManager();
 
         // Managers can only create employees, not other managers
-        if (!isAdmin && request.IsManager)
+        if (!appCurrentUser.IsAdmin && request.IsManager)
             throw new DetaillyForbiddenException("Managers can only create employees.");
 
         var email = request.Email.Trim().ToLower();

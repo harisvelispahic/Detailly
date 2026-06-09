@@ -1,14 +1,10 @@
 ﻿namespace Detailly.Application.Modules.Sales.Orders.Queries.GetById;
-public class GetOrderByIdQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public class GetOrderByIdQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<GetOrderByIdQuery, GetOrderByIdQueryDto>
 {
     public async Task<GetOrderByIdQueryDto> Handle(GetOrderByIdQuery request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
-        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager || appCurrentUser.IsEmployee;
+        authService.EnsureAuthenticated();
 
         var order = await context.Orders
             .Where(o => o.Id == request.Id)
@@ -63,8 +59,7 @@ public class GetOrderByIdQueryHandler(IAppDbContext context, IAppCurrentUser app
         if (order == null)
             throw new DetaillyNotFoundException($"Order with Id {request.Id} not found.");
 
-        if (!isStaff && order.ApplicationUser.Id != userId)
-            throw new DetaillyForbiddenException("You do not have access to this order.");
+        authService.EnsureOwnerOrAnyStaff(order.ApplicationUser.Id, "order");
 
         return order;
     }

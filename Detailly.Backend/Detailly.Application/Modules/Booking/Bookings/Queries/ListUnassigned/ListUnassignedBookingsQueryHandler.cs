@@ -2,18 +2,14 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListUnassigned;
 
-public sealed class ListUnassignedBookingsQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class ListUnassignedBookingsQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<ListUnassignedBookingsQuery, PageResult<ListUnassignedBookingsQueryDto>>
 {
     public async Task<PageResult<ListUnassignedBookingsQueryDto>> Handle(
         ListUnassignedBookingsQuery request,
         CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Manager/Admin access required.");
+        authService.EnsureAdminOrManager();
 
         var projectedQuery = context.Bookings
             .AsNoTracking()

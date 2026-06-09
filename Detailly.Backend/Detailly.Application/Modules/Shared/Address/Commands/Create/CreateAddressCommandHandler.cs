@@ -6,15 +6,14 @@ namespace Detailly.Application.Modules.Shared.Address.Commands.Create;
 
 public sealed class CreateAddressCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser,
+    IAppAuthorizationService authService,
     IRoadDistanceService roadDistanceService,
     ILogger<CreateAddressCommandHandler> logger)
     : IRequestHandler<CreateAddressCommand, int>
 {
     public async Task<int> Handle(CreateAddressCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
+        var userId = authService.RequireUserId();
 
         var street  = request.Street.Trim();
         var city    = request.City.Trim();
@@ -35,7 +34,7 @@ public sealed class CreateAddressCommandHandler(
             Country   = country,
             Latitude  = coords?.Latitude,
             Longitude = coords?.Longitude,
-            ApplicationUserId = appCurrentUser.ApplicationUserId.Value
+            ApplicationUserId = userId
         };
 
         context.Addresses.Add(address);

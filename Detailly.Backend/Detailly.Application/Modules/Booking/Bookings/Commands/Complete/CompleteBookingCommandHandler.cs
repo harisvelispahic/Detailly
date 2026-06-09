@@ -2,19 +2,14 @@
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.Complete;
 
-public sealed class CompleteBookingCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class CompleteBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IAppCurrentUser appCurrentUser)
     : IRequestHandler<CompleteBookingCommand, Unit>
 {
     public async Task<Unit> Handle(CompleteBookingCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        if (appCurrentUser.ApplicationUserId is null || !appCurrentUser.IsAuthenticated)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        // Staff-only: Employee OR Manager OR Admin
-        if (!appCurrentUser.IsEmployee && !appCurrentUser.IsManager && !appCurrentUser.IsAdmin)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only staff can complete bookings.");
+        authService.EnsureAnyStaff();
 
         var booking = await context.Bookings
             .Include(b => b.EmployeeAssignments)

@@ -2,15 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.Carts.Commands.RemoveItem;
 
-public sealed class RemoveCartItemCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class RemoveCartItemCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<RemoveCartItemCommand>
 {
     public async Task Handle(RemoveCartItemCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
+        var userId = authService.RequireUserId();
 
         var cartItem = await context.CartItems
             .Include(ci => ci.Cart)

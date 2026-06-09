@@ -2,20 +2,12 @@
 
 public sealed class UpdateUserCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser)
+    IAppAuthorizationService authService)
     : IRequestHandler<UpdateUserCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
-        var currentUserId = appCurrentUser.ApplicationUserId.Value;
-
-        // Only staff can update arbitrary users; normal users can only update themselves
-        if (!isStaff && request.Id != currentUserId)
-            throw new DetaillyForbiddenException("You are not allowed to update this user.");
+        authService.EnsureOwnerOrStaff(request.Id, "user");
 
         var user = await context.ApplicationUsers
             .Include(x => x.ExternalLogins)

@@ -2,11 +2,13 @@ using Detailly.Application.Modules.Booking.Reviews.Commands.Create;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 
-public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public class CreateReviewCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<CreateReviewCommand, int>
 {
     public async Task<int> Handle(CreateReviewCommand request, CancellationToken ct)
     {
+        var userId = authService.RequireUserId();
+
         var settings = await context.SystemSettings.AsNoTracking().FirstOrDefaultAsync(ct);
         var reviewWindowDays = settings?.ReviewWindowDays ?? 7;
 
@@ -16,7 +18,7 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         if (booking is null)
             throw new DetaillyNotFoundException("Booking not found.");
 
-        if (booking.CustomerId != currentUser.ApplicationUserId)
+        if (booking.CustomerId != userId)
             throw new DetaillyForbiddenException("You are not allowed to review this booking.");
 
         if (booking.Status != BookingStatus.Completed)
@@ -31,8 +33,7 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
 
         var existing = await context.Reviews
             .FirstOrDefaultAsync(
-                r => r.CustomerId == currentUser.ApplicationUserId!.Value
-                     && r.ServicePackageId == booking.ServicePackageId,
+                r => r.CustomerId == userId && r.ServicePackageId == booking.ServicePackageId,
                 ct);
 
         if (existing is not null)
@@ -51,7 +52,7 @@ public class CreateReviewCommandHandler(IAppDbContext context, IAppCurrentUser c
         {
             BookingId = request.BookingId,
             ServicePackageId = booking.ServicePackageId,
-            CustomerId = currentUser.ApplicationUserId!.Value,
+            CustomerId = userId,
             Rating = request.Rating,
             Description = request.Description?.Trim(),
             CreatedAtUtc = DateTime.UtcNow,

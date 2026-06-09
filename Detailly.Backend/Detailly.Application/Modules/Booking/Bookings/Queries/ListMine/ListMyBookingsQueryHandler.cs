@@ -2,21 +2,20 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
 
-public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<ListMyBookingsQuery, PageResult<ListMyBookingsQueryDto>>
 {
     private const int ReviewWindowDays = 7;
 
     public async Task<PageResult<ListMyBookingsQueryDto>> Handle(ListMyBookingsQuery request, CancellationToken ct)
     {
-        if (appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
+        var userId = authService.RequireUserId();
 
         var cutoff = DateTime.UtcNow.AddDays(-ReviewWindowDays);
 
         var projectedQuery = context.Bookings
             .AsNoTracking()
-            .Where(b => !b.IsDeleted && b.CustomerId == appCurrentUser.ApplicationUserId.Value)
+            .Where(b => !b.IsDeleted && b.CustomerId == userId)
             .OrderByDescending(b => b.StartUtc)
             .Select(b => new ListMyBookingsQueryDto
             {

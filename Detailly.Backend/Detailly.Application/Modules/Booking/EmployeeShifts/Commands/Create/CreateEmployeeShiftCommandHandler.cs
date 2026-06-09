@@ -2,16 +2,12 @@
 
 namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 
-public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<CreateEmployeeShiftCommand, int>
 {
     public async Task<int> Handle(CreateEmployeeShiftCommand request, CancellationToken ct)
     {
-        if (currentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        if (!currentUser.IsAdmin && !currentUser.IsManager)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Only Admin/Manager can manage shifts.");
+        authService.EnsureAdminOrManager();
 
         if (request.EndUtc <= request.StartUtc)
             throw new DetaillyBusinessRuleException("SHIFT_INVALID", "Shift end must be after shift start.");

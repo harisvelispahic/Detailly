@@ -2,19 +2,15 @@ namespace Detailly.Application.Modules.Identity.Staff.Commands.Update;
 
 public sealed class UpdateStaffMemberCommandHandler(
     IAppDbContext context,
+    IAppAuthorizationService authService,
     IAppCurrentUser appCurrentUser)
     : IRequestHandler<UpdateStaffMemberCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateStaffMemberCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
+        authService.EnsureAdminOrManager();
 
         var isAdmin = appCurrentUser.IsAdmin;
-        var isManager = appCurrentUser.IsManager;
-
-        if (!isAdmin && !isManager)
-            throw new DetaillyForbiddenException("Only admins and managers can update staff members.");
 
         var user = await context.ApplicationUsers
             .FirstOrDefaultAsync(x => x.Id == request.Id && !x.IsDeleted, ct);

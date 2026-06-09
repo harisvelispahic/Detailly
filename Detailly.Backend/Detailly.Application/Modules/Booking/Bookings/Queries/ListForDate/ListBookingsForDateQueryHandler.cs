@@ -2,19 +2,14 @@
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListForDate;
 
-public sealed class ListBookingsForDateQueryHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class ListBookingsForDateQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<ListBookingsForDateQuery, PageResult<ListBookingsForDateQueryDto>>
 {
     public async Task<PageResult<ListBookingsForDateQueryDto>> Handle(ListBookingsForDateQuery request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");
-
-        // Staff-only (simple gate for now). Tighten later with policies/locations if you want.
-        if (!appCurrentUser.IsAdmin && !appCurrentUser.IsManager && !appCurrentUser.IsEmployee)
-            throw new DetaillyBusinessRuleException("FORBIDDEN", "Staff access required.");
+        authService.EnsureAnyStaff();
 
         var date = request.DateUtc.Date;
         var dayStart = date;

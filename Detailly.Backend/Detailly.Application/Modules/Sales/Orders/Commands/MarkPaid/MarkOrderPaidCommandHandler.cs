@@ -3,13 +3,12 @@ using Detailly.Domain.Entities.Payment;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.MarkPaid;
 
-public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<MarkOrderPaidCommand>
 {
     public async Task Handle(MarkOrderPaidCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
+        authService.EnsureAuthenticated();
 
         await using var tx = await context.Database.BeginTransactionAsync(ct);
 
@@ -20,9 +19,7 @@ public sealed class MarkOrderPaidCommandHandler(IAppDbContext context, IAppCurre
         if (order is null)
             throw new DetaillyNotFoundException("Order was not found.");
 
-        // Client can only pay their own order; staff can do it for testing/admin.
-        if (order.ApplicationUserId != appCurrentUser.ApplicationUserId.Value && !appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyForbiddenException("You do not have access to this order.");
+        authService.EnsureOwnerOrStaff(order.ApplicationUserId, "order");
 
         if (order.Status == OrderStatus.Paid)
             return; // idempotent success

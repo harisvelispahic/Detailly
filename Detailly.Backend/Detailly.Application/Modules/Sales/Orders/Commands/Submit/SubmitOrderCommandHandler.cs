@@ -2,13 +2,12 @@
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.Submit;
 
-public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
     : IRequestHandler<SubmitOrderCommand>
 {
     public async Task Handle(SubmitOrderCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
+        authService.EnsureAuthenticated();
 
         var order = await context.Orders
             .Include(o => o.OrderItems)
@@ -17,9 +16,7 @@ public sealed class SubmitOrderCommandHandler(IAppDbContext context, IAppCurrent
         if (order is null)
             throw new DetaillyNotFoundException("Order was not found.");
 
-        // Ownership check (client submits only their order)
-        if (order.ApplicationUserId != appCurrentUser.ApplicationUserId.Value && !appCurrentUser.IsAdmin && !appCurrentUser.IsManager)
-            throw new DetaillyForbiddenException("You do not have access to this order.");
+        authService.EnsureOwnerOrStaff(order.ApplicationUserId, "order");
 
         //if (order.Status != OrderStatus.Draft)
         //    throw new DetaillyBusinessRuleException("order.not_draft", "Only Draft orders can be submitted.");

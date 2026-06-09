@@ -5,27 +5,23 @@ namespace Detailly.Application.Modules.Shared.Address.Commands.Update;
 
 public sealed class UpdateAddressCommandHandler(
     IAppDbContext context,
-    IAppCurrentUser appCurrentUser,
+    IAppAuthorizationService authService,
     IRoadDistanceService roadDistanceService,
     ILogger<UpdateAddressCommandHandler> logger)
     : IRequestHandler<UpdateAddressCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateAddressCommand request, CancellationToken ct)
     {
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId  = appCurrentUser.ApplicationUserId.Value;
-        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager;
-
         var address = await context.Addresses
-            .FirstOrDefaultAsync(a =>
-                a.Id == request.Id &&
-                (isStaff || a.ApplicationUserId == userId),
-                ct);
+            .FirstOrDefaultAsync(a => a.Id == request.Id, ct);
 
         if (address is null)
             throw new DetaillyNotFoundException($"Address with Id {request.Id} not found.");
+
+        if (address.ApplicationUserId is { } ownerId)
+            authService.EnsureOwnerOrStaff(ownerId, "address");
+        else
+            authService.EnsureAdminOrManager();
 
         var locationChanged = false;
 

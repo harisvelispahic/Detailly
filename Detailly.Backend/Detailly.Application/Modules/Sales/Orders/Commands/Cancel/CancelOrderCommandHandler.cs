@@ -3,18 +3,14 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
 
-public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser, IMediator mediator)
+public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IMediator mediator)
     : IRequestHandler<CancelOrderCommand>
 {
     public async Task Handle(CancelOrderCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
 
-        if (!appCurrentUser.IsAuthenticated || appCurrentUser.ApplicationUserId is null)
-            throw new DetaillyUnauthorizedException("User is not authenticated.");
-
-        var userId = appCurrentUser.ApplicationUserId.Value;
-        var isStaff = appCurrentUser.IsAdmin || appCurrentUser.IsManager || appCurrentUser.IsEmployee;
+        authService.EnsureAuthenticated();
 
         var order = await context.Orders
             .FirstOrDefaultAsync(o => o.Id == request.Id && !o.IsDeleted, ct);
@@ -22,8 +18,7 @@ public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppCurrent
         if (order is null)
             throw new DetaillyNotFoundException("Order was not found.");
 
-        if (!isStaff && order.ApplicationUserId != userId)
-            throw new DetaillyUnauthorizedException("You do not have access to this order.");
+        authService.EnsureOwnerOrAnyStaff(order.ApplicationUserId, "order");
 
         // Idempotent
         if (order.Status == OrderStatus.Cancelled)
