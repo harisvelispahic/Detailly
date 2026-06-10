@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { ServicePackagesApiService, ImageUploadProgress } from '../../../../../api-services/service-packages/service-packages-api.service';
+import { ServicePackagesApiService } from '../../../../../api-services/service-packages/service-packages-api.service';
+import { ServicePackageImageUploadService, ImageUploadProgress } from '../../../../../api-services/service-packages/service-package-image-upload.service';
 import { ServicePackageImageDto } from '../../../../../api-services/service-packages/service-packages-api.models';
 import { ToasterService } from '../../../../../core/services/toaster.service';
 
@@ -21,6 +22,7 @@ export class ServicePackageImagesComponent implements OnInit {
   @Input({ required: true }) packageId!: number;
 
   private api = inject(ServicePackagesApiService);
+  private imageUpload = inject(ServicePackageImageUploadService);
   private toaster = inject(ToasterService);
 
   images: ServicePackageImageDto[] = [];
@@ -115,7 +117,7 @@ export class ServicePackageImagesComponent implements OnInit {
     const item: UploadItem = { file, preview, progress: 0, status: 'uploading' };
     this.uploads.push(item);
 
-    this.api.uploadImage(this.packageId, compressed).subscribe({
+    this.imageUpload.uploadImage(this.packageId, compressed).subscribe({
       next: (evt: ImageUploadProgress) => {
         item.progress = evt.progress;
         if (!evt.done && evt.progress >= 90) {

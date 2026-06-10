@@ -74,3 +74,17 @@ export interface GetAvailableAddonsQueryDto {
 
 export type ListServicePackagesResponse = PageResult<ListServicePackagesQueryDto>;
 export type GetAvailableAddonsResponse = PageResult<GetAvailableAddonsQueryDto>;
+
+export interface CloudinaryUploadParams {
+  cloudName: string;
+  apiKey: string;
+  timestamp: number;
+  signature: string;
+  folder: string;
+}
+
+export interface ConfirmImageRequest {
+  publicId: string;
+  secureUrl: string;
+  fileHash: string;
+}
