@@ -1,5 +1,6 @@
 using Detailly.Application.Abstractions;
 using Detailly.Application.Modules.Auth.Commands.CompleteOAuthSetup;
+using Detailly.Application.Modules.Auth.Commands.ExchangeOAuthCode;
 using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
 using Detailly.Application.Modules.Auth.Commands.LinkExternalAccount;
 using Microsoft.AspNetCore.Authentication;
@@ -34,7 +35,18 @@ public sealed class ExternalAuthController(
             return Unauthorized();
 
         var result = await sender.Send(new ExternalLoginCommand("Google", principal), ct);
-        return Redirect(callbackBuilder.Build(returnUrl, result));
+        var redirectUrl = await callbackBuilder.BuildAsync(returnUrl, result, ct);
+        return Redirect(redirectUrl);
+    }
+
+    [HttpPost("exchange")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ExternalLoginCommandDto>> Exchange(
+        [FromBody] ExchangeOAuthCodeCommand command,
+        CancellationToken ct)
+    {
+        var result = await sender.Send(command, ct);
+        return Ok(result);
     }
 
     [HttpPost("link")]

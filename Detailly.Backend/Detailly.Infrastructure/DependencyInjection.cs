@@ -105,6 +105,8 @@ public static class DependencyInjection
         services.AddScoped<IBookingQuoteService, BookingQuoteService>();
 
         // External auth (Google OAuth cookie exchange, return-URL validation, callback URL building)
+        services.AddMemoryCache();
+        services.AddSingleton<IOAuthCodeStore, OAuthCodeStore>();
         services.AddScoped<IExternalAuthService, ExternalAuthService>();
         services.AddScoped<IReturnUrlValidator, ReturnUrlValidator>();
         services.AddScoped<IExternalAuthCallbackBuilder, ExternalAuthCallbackBuilder>();

@@ -1,5 +1,7 @@
 import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { AuthApiService } from '../../../api-services/auth/auth-api.service';
 import { AuthFacadeService } from './auth-facade.service';
 import { AuthStorageService } from './auth-storage.service';
 
@@ -15,43 +17,36 @@ export const PENDING_LINK_TOKEN_KEY = 'pending_link_token';
 @Injectable({ providedIn: 'root' })
 export class GoogleOAuthService {
   private readonly authFacade = inject(AuthFacadeService);
+  private readonly authApi = inject(AuthApiService);
 
   initiateLogin(): void {
     const returnUrl = `${window.location.origin}/auth/google-callback`;
     window.location.href = `${environment.apiUrl}/auth/external/google?returnUrl=${encodeURIComponent(returnUrl)}`;
   }
 
-  handleCallback(fragment: string): GoogleCallbackResult {
-    const params = new URLSearchParams(fragment);
+  handleCallback(code: string): Observable<GoogleCallbackResult> {
+    return this.authApi.exchangeOAuthCode({ code }).pipe(
+      map(result => {
+        if (result.requiresLinking) {
+          if (!result.pendingLinkToken) {
+            return { success: false, isSetupRequired: false, requiresLinking: false, pendingLinkToken: null };
+          }
+          sessionStorage.setItem(PENDING_LINK_TOKEN_KEY, result.pendingLinkToken);
+          return { success: true, isSetupRequired: false, requiresLinking: true, pendingLinkToken: result.pendingLinkToken };
+        }
 
-    if (params.get('requiresLinking') === 'true') {
-      const pendingLinkToken = params.get('pendingLinkToken');
-      window.history.replaceState(null, '', window.location.pathname);
+        if (!result.accessToken || !result.refreshToken) {
+          return { success: false, isSetupRequired: false, requiresLinking: false, pendingLinkToken: null };
+        }
 
-      if (!pendingLinkToken) {
-        return { success: false, isSetupRequired: false, requiresLinking: false, pendingLinkToken: null };
-      }
+        this.authFacade.storeExternalLoginTokens(result.accessToken, result.refreshToken);
 
-      sessionStorage.setItem(PENDING_LINK_TOKEN_KEY, pendingLinkToken);
-      return { success: true, isSetupRequired: false, requiresLinking: true, pendingLinkToken };
-    }
+        if (result.isSetupRequired) {
+          localStorage.setItem(AuthStorageService.SETUP_REQUIRED_KEY, 'true');
+        }
 
-    const accessToken = params.get('accessToken');
-    const refreshToken = params.get('refreshToken');
-
-    if (!accessToken || !refreshToken) {
-      return { success: false, isSetupRequired: false, requiresLinking: false, pendingLinkToken: null };
-    }
-
-    this.authFacade.storeExternalLoginTokens(accessToken, refreshToken);
-    window.history.replaceState(null, '', window.location.pathname);
-
-    const isSetupRequired = params.get('isSetupRequired') === 'true';
-
-    if (isSetupRequired) {
-      localStorage.setItem(AuthStorageService.SETUP_REQUIRED_KEY, 'true');
-    }
-
-    return { success: true, isSetupRequired, requiresLinking: false, pendingLinkToken: null };
+        return { success: true, isSetupRequired: result.isSetupRequired, requiresLinking: false, pendingLinkToken: null };
+      })
+    );
   }
 }

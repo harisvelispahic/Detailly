@@ -3,6 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
+  ExchangeOAuthCodeCommand,
+  ExchangeOAuthCodeCommandDto,
   LinkExternalAccountCommand,
   LinkExternalAccountCommandDto,
   LoginCommand,
@@ -30,6 +32,10 @@ export class AuthApiService {
 
   logout(payload: LogoutCommand): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/logout`, payload);
+  }
+
+  exchangeOAuthCode(payload: ExchangeOAuthCodeCommand): Observable<ExchangeOAuthCodeCommandDto> {
+    return this.http.post<ExchangeOAuthCodeCommandDto>(`${this.externalBaseUrl}/exchange`, payload);
   }
 
   linkExternalAccount(payload: LinkExternalAccountCommand): Observable<LinkExternalAccountCommandDto> {

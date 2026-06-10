@@ -13,9 +13,5 @@ public sealed class CompleteOAuthSetupCommandValidator : AbstractValidator<Compl
         RuleFor(x => x.Phone)
             .MaximumLength(20).WithMessage("Phone number is too long.")
             .When(x => x.Phone != null);
-
-        RuleFor(x => x.CompanyName)
-            .MaximumLength(200).WithMessage("Company name cannot exceed 200 characters.")
-            .When(x => x.CompanyName != null);
     }
 }

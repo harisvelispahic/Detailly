@@ -4,5 +4,5 @@ namespace Detailly.Application.Abstractions;
 
 public interface IExternalAuthCallbackBuilder
 {
-    string Build(string returnUrl, ExternalLoginCommandDto result);
+    Task<string> BuildAsync(string returnUrl, ExternalLoginCommandDto result, CancellationToken ct = default);
 }

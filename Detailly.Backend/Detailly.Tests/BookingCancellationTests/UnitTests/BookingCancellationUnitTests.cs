@@ -25,6 +25,7 @@ public class BookingCancellationUnitTests
         }
 
         public void EnsureOwnerOrStaff(int resourceOwnerId, string resourceName = "resource") => throw new NotImplementedException();
+        public void EnsureAdmin() => throw new NotImplementedException();
         public void EnsureOwnerOrAdmin(int resourceOwnerId, string resourceName = "resource") => throw new NotImplementedException();
         public void EnsureAdminOrManager() => throw new NotImplementedException();
         public void EnsureAnyStaff() => throw new NotImplementedException();

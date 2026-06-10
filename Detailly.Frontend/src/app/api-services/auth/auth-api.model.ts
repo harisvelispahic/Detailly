@@ -83,3 +83,25 @@ export interface LinkExternalAccountCommandDto {
   accessTokenExpiresAtUtc: string;
   refreshTokenExpiresAtUtc: string;
 }
+
+/**
+ * Command for POST /auth/external/exchange
+ * Corresponds to: ExchangeOAuthCodeCommand.cs
+ */
+export interface ExchangeOAuthCodeCommand {
+  code: string;
+}
+
+/**
+ * Response for POST /auth/external/exchange
+ * Corresponds to: ExternalLoginCommandDto.cs
+ */
+export interface ExchangeOAuthCodeCommandDto {
+  requiresLinking: boolean;
+  pendingLinkToken: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  accessTokenExpiresAtUtc: string | null;
+  refreshTokenExpiresAtUtc: string | null;
+  isSetupRequired: boolean;
+}

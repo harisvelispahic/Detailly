@@ -3,18 +3,14 @@ using Detailly.Application.Modules.Auth.Commands.ExternalLogin;
 
 namespace Detailly.Infrastructure.ExternalAuth;
 
-public sealed class ExternalAuthCallbackBuilder : IExternalAuthCallbackBuilder
+public sealed class ExternalAuthCallbackBuilder(IOAuthCodeStore codeStore) : IExternalAuthCallbackBuilder
 {
-    public string Build(string returnUrl, ExternalLoginCommandDto result)
-    {
-        if (result.RequiresLinking)
-        {
-            return $"{returnUrl}#requiresLinking=true" +
-                   $"&pendingLinkToken={Uri.EscapeDataString(result.PendingLinkToken!)}";
-        }
+    private static readonly TimeSpan CodeTtl = TimeSpan.FromSeconds(60);
 
-        return $"{returnUrl}#accessToken={Uri.EscapeDataString(result.AccessToken!)}" +
-               $"&refreshToken={Uri.EscapeDataString(result.RefreshToken!)}" +
-               $"&isSetupRequired={result.IsSetupRequired.ToString().ToLowerInvariant()}";
+    public async Task<string> BuildAsync(string returnUrl, ExternalLoginCommandDto result, CancellationToken ct = default)
+    {
+        var code = Guid.NewGuid().ToString("N");
+        await codeStore.StoreAsync(code, result, CodeTtl, ct);
+        return $"{returnUrl}?code={Uri.EscapeDataString(code)}";
     }
 }
