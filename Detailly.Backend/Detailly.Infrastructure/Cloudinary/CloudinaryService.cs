@@ -13,9 +13,12 @@ public sealed class CloudinaryService : ICloudinaryService
     private readonly CloudinaryDotNet.Cloudinary _cloudinary;
     private readonly CloudinaryOptions _options;
 
-    public CloudinaryService(IOptions<CloudinaryOptions> options)
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public CloudinaryService(IOptions<CloudinaryOptions> options, IHttpClientFactory httpClientFactory)
     {
         _options = options.Value;
+        _httpClientFactory = httpClientFactory;
         _cloudinary = new CloudinaryDotNet.Cloudinary(new Account(_options.CloudName, _options.ApiKey, _options.ApiSecret));
         _cloudinary.Api.Secure = true;
     }
@@ -45,6 +48,18 @@ public sealed class CloudinaryService : ICloudinaryService
 
         if (result.Error != null)
             throw new InvalidOperationException($"Cloudinary deletion failed: {result.Error.Message}");
+    }
+
+    public async Task<CloudinaryDownloadResult> DownloadAsync(string imageUrl, CancellationToken cancellationToken = default)
+    {
+        var client = _httpClientFactory.CreateClient();
+        var response = await client.GetAsync(imageUrl, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var contentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg";
+        var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+
+        return new CloudinaryDownloadResult(bytes, contentType);
     }
 
     public CloudinaryDirectUploadParams GenerateDirectUploadParams(string folder)

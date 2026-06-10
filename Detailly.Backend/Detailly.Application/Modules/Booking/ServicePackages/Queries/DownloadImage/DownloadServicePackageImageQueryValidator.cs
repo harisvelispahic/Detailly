@@ -1,8 +1,8 @@
-namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.GetImage;
+namespace Detailly.Application.Modules.Booking.ServicePackages.Queries.DownloadImage;
 
-public sealed class GetServicePackageImageQueryValidator : AbstractValidator<GetServicePackageImageQuery>
+public sealed class DownloadServicePackageImageQueryValidator : AbstractValidator<DownloadServicePackageImageQuery>
 {
-    public GetServicePackageImageQueryValidator()
+    public DownloadServicePackageImageQueryValidator()
     {
         RuleFor(x => x.ServicePackageId)
             .GreaterThan(0)

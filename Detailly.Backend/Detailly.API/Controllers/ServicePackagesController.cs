@@ -7,7 +7,7 @@ using Detailly.Application.Modules.Booking.ServicePackages.Commands.Image.Upload
 using Detailly.Application.Modules.Booking.ServicePackages.Commands.Update;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetAvailableAddons;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetById;
-using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetImage;
+using Detailly.Application.Modules.Booking.ServicePackages.Queries.DownloadImage;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.GetUploadParams;
 using Detailly.Application.Modules.Booking.ServicePackages.Queries.List;
 using Detailly.Application.Modules.Booking.ServicePackages.Shared;
@@ -17,7 +17,7 @@ namespace Detailly.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ServicePackagesController(ISender sender, IHttpClientFactory httpClientFactory) : ControllerBase
+public class ServicePackagesController(ISender sender) : ControllerBase
 {
     [HttpPost]
     [Authorize(Policy = AuthPolicies.AdminOrManager)]
@@ -117,16 +117,9 @@ public class ServicePackagesController(ISender sender, IHttpClientFactory httpCl
     [AllowAnonymous]
     public async Task<IActionResult> DownloadImage(int id, int imageId, CancellationToken ct)
     {
-        var info = await sender.Send(
-            new GetServicePackageImageQuery { ServicePackageId = id, ImageId = imageId }, ct);
+        var result = await sender.Send(
+            new DownloadServicePackageImageQuery { ServicePackageId = id, ImageId = imageId }, ct);
 
-        var client = httpClientFactory.CreateClient();
-        var response = await client.GetAsync(info.ImageUrl, ct);
-        response.EnsureSuccessStatusCode();
-
-        var contentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg";
-        var bytes = await response.Content.ReadAsByteArrayAsync(ct);
-
-        return File(bytes, contentType, info.FileName);
+        return File(result.Bytes, result.ContentType, result.FileName);
     }
 }

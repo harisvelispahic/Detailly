@@ -5,7 +5,10 @@ public interface ICloudinaryService
     Task<CloudinaryUploadResult> UploadAsync(Stream imageStream, string fileName, CancellationToken cancellationToken = default);
     Task DeleteAsync(string publicId, CancellationToken cancellationToken = default);
     CloudinaryDirectUploadParams GenerateDirectUploadParams(string folder);
+    Task<CloudinaryDownloadResult> DownloadAsync(string imageUrl, CancellationToken cancellationToken = default);
 }
+
+public record CloudinaryDownloadResult(byte[] Bytes, string ContentType);
 
 public record CloudinaryUploadResult(string SecureUrl, string PublicId);
 
