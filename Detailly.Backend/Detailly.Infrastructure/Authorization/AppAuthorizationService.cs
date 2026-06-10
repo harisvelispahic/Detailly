@@ -19,6 +19,13 @@ public sealed class AppAuthorizationService(IAppCurrentUser currentUser) : IAppA
             throw new DetaillyForbiddenException($"You are not allowed to access this {resourceName}.");
     }
 
+    public void EnsureAdmin()
+    {
+        EnsureAuthenticated();
+        if (!currentUser.IsAdmin)
+            throw new DetaillyForbiddenException("This action requires admin access.");
+    }
+
     public void EnsureOwnerOrAdmin(int resourceOwnerId, string resourceName = "resource")
     {
         EnsureAuthenticated();

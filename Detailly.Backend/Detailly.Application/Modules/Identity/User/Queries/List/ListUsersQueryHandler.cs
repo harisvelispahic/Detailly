@@ -1,18 +1,20 @@
-﻿namespace Detailly.Application.Modules.Identity.User.Queries.List;
+using Detailly.Application.Abstractions;
+
+namespace Detailly.Application.Modules.Identity.User.Queries.List;
 
 public class ListUsersQueryHandler(
     IAppDbContext ctx,
-    IAppCurrentUser appCurrentUser)
+    IAppAuthorizationService authService)
     : IRequestHandler<ListUsersQuery, PageResult<ListUsersQueryDto>>
 {
     public async Task<PageResult<ListUsersQueryDto>> Handle(
         ListUsersQuery request, CancellationToken ct)
     {
-        // Controller already restricts listing to admins, but enforce in handler as well
-        if (!appCurrentUser.IsAuthenticated || !appCurrentUser.IsAdmin)
-            throw new DetaillyForbiddenException("Only admins can list users.");
+        authService.EnsureAdmin();
 
-        var q = ctx.ApplicationUsers.AsNoTracking();
+        var q = ctx.ApplicationUsers
+            .AsNoTracking()
+            .Where(x => !x.IsAdmin && !x.IsManager && !x.IsEmployee && !x.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
@@ -34,7 +36,8 @@ public class ListUsersQueryHandler(
                 LastName = x.LastName,
                 Username = x.Username,
                 Email = x.Email,
-                CompanyName = x.CompanyName
+                CompanyName = x.CompanyName,
+                IsFleet = x.IsFleet
             });
 
         return await PageResult<ListUsersQueryDto>.FromQueryableAsync(projectedQuery, request.Paging, ct);

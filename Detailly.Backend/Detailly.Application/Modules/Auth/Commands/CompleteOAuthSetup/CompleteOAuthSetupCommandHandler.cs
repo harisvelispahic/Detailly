@@ -31,8 +31,7 @@ public sealed class CompleteOAuthSetupCommandHandler(
 
         user.Username = normalizedUsername;
         user.Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
-        user.IsFleet = request.IsFleet;
-        user.CompanyName = string.IsNullOrWhiteSpace(request.CompanyName) ? null : request.CompanyName.Trim();
+        user.IsFleet = false;
         user.IsProfileComplete = true;
         user.ModifiedAtUtc = DateTime.UtcNow;
 

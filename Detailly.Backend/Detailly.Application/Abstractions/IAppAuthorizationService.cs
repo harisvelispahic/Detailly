@@ -8,6 +8,9 @@ public interface IAppAuthorizationService
     /// <summary>Throws if not authenticated, and throws DetaillyForbiddenException if the user is neither the resource owner nor admin or manager.</summary>
     void EnsureOwnerOrStaff(int resourceOwnerId, string resourceName = "resource");
 
+    /// <summary>Throws if not authenticated, and throws DetaillyForbiddenException if the user is not admin.</summary>
+    void EnsureAdmin();
+
     /// <summary>Throws if not authenticated, and throws DetaillyForbiddenException if the user is neither the resource owner nor admin.</summary>
     void EnsureOwnerOrAdmin(int resourceOwnerId, string resourceName = "resource");
 

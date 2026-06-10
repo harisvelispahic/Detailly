@@ -94,6 +94,15 @@
       </a>
 
       @if (auth.isAdmin()) {
+        <a class="staff-home__card staff-home__card--accent" routerLink="/admin/users">
+          <mat-icon>manage_accounts</mat-icon>
+          <div>
+            <h3>Users</h3>
+            <p>Manage client accounts and fleet status.</p>
+          </div>
+          <mat-icon class="staff-home__card-arrow">arrow_forward</mat-icon>
+        </a>
+
         <a class="staff-home__card staff-home__card--accent" routerLink="/admin/settings">
           <mat-icon>settings</mat-icon>
           <div>

@@ -8,6 +8,7 @@ import { ProductsEditComponent } from './catalogs/products/products-edit/product
 import { ProductCategoriesComponent } from './catalogs/product-categories/product-categories.component';
 import { AdminOrdersComponent } from './orders/admin-orders.component';
 import { AdminSettingsComponent } from './admin-settings/admin-settings.component';
+import { AdminUsersComponent } from './users/admin-users.component';
 
 const routes: Routes = [
   {
@@ -20,6 +21,7 @@ const routes: Routes = [
       { path: 'product-categories', component: ProductCategoriesComponent },
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'settings', component: AdminSettingsComponent },
+      { path: 'users', component: AdminUsersComponent },
       { path: '', redirectTo: '/staff', pathMatch: 'full' },
     ],
   },

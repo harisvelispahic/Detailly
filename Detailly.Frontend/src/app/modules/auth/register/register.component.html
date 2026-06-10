@@ -231,27 +231,6 @@
               </mat-form-field>
             </div>
 
-            <!-- Fleet checkbox -->
-            <div class="fleet-section">
-              <mat-checkbox formControlName="isFleet" color="primary" class="fleet-checkbox">
-                I'm registering as a <strong>fleet customer</strong>
-              </mat-checkbox>
-              <p class="fleet-hint">
-                Fleet customers manage multiple vehicles for a company or organisation.
-              </p>
-            </div>
-
-            @if (isFleetChecked) {
-              <mat-form-field appearance="outline" subscriptSizing="fixed" class="full-width">
-                <mat-label>Company Name (optional)</mat-label>
-                <input matInput formControlName="companyName" placeholder="Acme Corp" />
-                <mat-icon matPrefix>business</mat-icon>
-                @if (form.get('companyName')?.hasError('maxlength')) {
-                  <mat-error>Too long</mat-error>
-                }
-              </mat-form-field>
-            }
-
             <!-- Submit — each projectable node in its own @if to satisfy MatButton slot projection -->
             <div class="actions">
               <button

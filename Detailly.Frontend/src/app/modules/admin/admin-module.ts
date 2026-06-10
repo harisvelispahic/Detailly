@@ -8,6 +8,7 @@ import { ProductCategoriesComponent } from './catalogs/product-categories/produc
 import { ProductCategoryUpsertComponent } from './catalogs/product-categories/product-category-upsert/product-category-upsert.component';
 import { AdminOrdersComponent } from './orders/admin-orders.component';
 import { AdminSettingsComponent } from './admin-settings/admin-settings.component';
+import { AdminUsersComponent } from './users/admin-users.component';
 import { SharedModule } from '../shared/shared-module';
 import { OrderDetailsDialogComponent } from './orders/admin-orders-details-dialog/order-details-dialog.component';
 import { ChangeStatusDialogComponent } from './orders/change-status-dialog/change-status-dialog.component';
@@ -21,6 +22,7 @@ import { ChangeStatusDialogComponent } from './orders/change-status-dialog/chang
     ProductCategoryUpsertComponent,
     AdminOrdersComponent,
     AdminSettingsComponent,
+    AdminUsersComponent,
     OrderDetailsDialogComponent,
     ChangeStatusDialogComponent,
   ],

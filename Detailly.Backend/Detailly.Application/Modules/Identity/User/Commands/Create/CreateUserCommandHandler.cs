@@ -37,9 +37,8 @@ public sealed class CreateUserCommandHandler
             Username = username,
             Email = email,
             Phone = request.Phone?.Trim(),
-            CompanyName = request.CompanyName?.Trim(),
 
-            IsFleet = request.IsFleet,
+            IsFleet = false,
 
             // Defaults
             IsAdmin = false,

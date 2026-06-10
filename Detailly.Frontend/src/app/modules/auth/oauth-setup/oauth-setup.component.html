@@ -98,42 +98,6 @@
             </mat-form-field>
           </div>
 
-          <!-- Account type -->
-          <div class="account-type-section">
-            <p class="account-type-label">Account type</p>
-            <div class="account-type-options">
-              <div
-                class="account-type-card"
-                [class.account-type-card--selected]="!isFleetChecked"
-                (click)="form.get('isFleet')?.setValue(false)"
-              >
-                <mat-icon>person</mat-icon>
-                <span class="account-type-card__name">Standard</span>
-                <span class="account-type-card__desc">Personal car detailing</span>
-              </div>
-              <div
-                class="account-type-card"
-                [class.account-type-card--selected]="isFleetChecked"
-                (click)="form.get('isFleet')?.setValue(true)"
-              >
-                <mat-icon>directions_car</mat-icon>
-                <span class="account-type-card__name">Fleet</span>
-                <span class="account-type-card__desc">Multiple vehicles for a company</span>
-              </div>
-            </div>
-          </div>
-
-          @if (isFleetChecked) {
-            <mat-form-field appearance="outline" subscriptSizing="fixed" class="full-width">
-              <mat-label>Company Name (optional)</mat-label>
-              <input matInput formControlName="companyName" placeholder="Acme Corp" />
-              <mat-icon matPrefix>business</mat-icon>
-              @if (form.get('companyName')?.hasError('maxlength')) {
-                <mat-error>Too long</mat-error>
-              }
-            </mat-form-field>
-          }
-
           <div class="actions">
             <button
               mat-raised-button

@@ -104,15 +104,9 @@ export class RegisterComponent extends BaseComponent implements OnInit {
       email:           ['', [Validators.required, Validators.email]],
       password:        ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]],
-      isFleet:         [false],
-      companyName:     [''],
     },
     { validators: passwordMatchValidator },
   );
-
-  get isFleetChecked(): boolean {
-    return !!this.form.get('isFleet')?.value;
-  }
 
   get passwordMismatch(): boolean {
     const ctrl = this.form.get('confirmPassword');
@@ -127,17 +121,6 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.form.get('isFleet')?.valueChanges.subscribe((fleet) => {
-      const companyName = this.form.get('companyName');
-      if (fleet) {
-        companyName?.setValidators([Validators.required, Validators.maxLength(200)]);
-      } else {
-        companyName?.clearValidators();
-        companyName?.setValue('');
-      }
-      companyName?.updateValueAndValidity();
-    });
-
     this.countrySearchCtrl.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const search = value.replace(/^\+/, '').trim();
@@ -219,8 +202,6 @@ export class RegisterComponent extends BaseComponent implements OnInit {
         email:       v.email!.trim().toLowerCase(),
         password:    v.password!,
         phone:       this.cleanPhoneValue,
-        isFleet:     v.isFleet ?? false,
-        companyName: v.companyName?.trim() || null,
       })
       .subscribe({
         next: () => {

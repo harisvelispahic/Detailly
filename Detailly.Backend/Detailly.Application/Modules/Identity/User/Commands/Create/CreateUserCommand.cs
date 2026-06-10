@@ -7,6 +7,4 @@ public class CreateUserCommand : IRequest<int>
     public required string Email { get; set; }
     public required string Password { get; set; }
     public string? Phone { get; set; }
-    public required bool IsFleet { get; set; }
-    public string? CompanyName { get; set; }
 }

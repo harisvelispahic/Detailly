@@ -8,4 +8,5 @@ public class ListUsersQueryDto
     public required string Username { get; init; }
     public required string Email { get; init; }
     public string? CompanyName { get; init; }
+    public required bool IsFleet { get; init; }
 }

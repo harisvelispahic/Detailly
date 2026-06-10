@@ -41,13 +41,5 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
             .When(x => !string.IsNullOrEmpty(x.Phone))
             .WithMessage("Phone can be at most 30 characters long.");
 
-        RuleFor(x => x.CompanyName)
-            .MaximumLength(200)
-            .When(x => !string.IsNullOrEmpty(x.CompanyName))
-            .WithMessage("Company name can be at most 200 characters long.");
-
-        RuleFor(x => x.IsFleet)
-            .NotNull()
-            .WithMessage("Fleet flag is required.");
     }
 }

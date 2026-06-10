@@ -1,6 +1,7 @@
 ﻿using Detailly.Application.Modules.Identity.User.Commands.Create;
 using Detailly.Application.Modules.Identity.User.Commands.Update;
 using Detailly.Application.Modules.Identity.User.Commands.Delete;
+using Detailly.Application.Modules.Identity.User.Commands.SetFleetStatus;
 using Detailly.Application.Modules.Identity.User.Queries.GetById;
 using Detailly.Application.Modules.Identity.User.Queries.List;
 using Detailly.Application.Modules.Identity.User.Commands.ChangePassword;
@@ -53,6 +54,14 @@ public class UsersController(ISender sender) : ControllerBase
     {
         var result = await sender.Send(query, ct);
         return result;
+    }
+
+    [HttpPatch("{id:int}/fleet-status")]
+    [Authorize(Policy = AuthPolicies.AdminOnly)]
+    public async Task SetFleetStatus(int id, SetFleetStatusCommand command, CancellationToken ct)
+    {
+        command.UserId = id;
+        await sender.Send(command, ct);
     }
 
     [HttpPut("change-password")]
