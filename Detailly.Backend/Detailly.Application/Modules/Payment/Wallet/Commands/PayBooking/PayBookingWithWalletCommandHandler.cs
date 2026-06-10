@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
+using Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 
@@ -20,7 +20,7 @@ public class PayBookingWithWalletCommandHandler
     {
         var now = DateTime.UtcNow;
 
-        // ✅ No explicit tx here (ConfirmAfterPayment may start its own)
+        await using var tx = await _context.Database.BeginTransactionAsync(ct);
 
         var booking = await _context.Bookings
             .FirstOrDefaultAsync(x => x.Id == request.BookingId && !x.IsDeleted, ct)
@@ -39,7 +39,6 @@ public class PayBookingWithWalletCommandHandler
         if (booking.ReservationExpiresAtUtc is null || booking.ReservationExpiresAtUtc <= now)
             throw new DetaillyBusinessRuleException("BOOKING_RESERVATION_EXPIRED", "Booking reservation expired.");
 
-        // ✅ Check existing latest PAYMENT attempt
         var latestAttempt = await _context.PaymentTransactions
             .Where(x =>
                 !x.IsDeleted &&
@@ -52,11 +51,10 @@ public class PayBookingWithWalletCommandHandler
         if (latestAttempt is not null)
         {
             if (latestAttempt.Status == PaymentTransactionStatus.Paid)
-                return Unit.Value; // already paid, treat as idempotent
+                return Unit.Value;
 
             if (latestAttempt.Status == PaymentTransactionStatus.Pending)
                 throw new DetaillyBusinessRuleException("PAYMENT_IN_PROGRESS", "Payment is already in progress.");
-            // Failed/Unpaid -> allow wallet payment
         }
 
         var wallet = await _context.Wallet
@@ -74,10 +72,8 @@ public class PayBookingWithWalletCommandHandler
             TransactionType = TransactionType.Payment,
             Status = PaymentTransactionStatus.Paid,
             TransactionDate = now,
-
             Provider = "Wallet",
             Description = "Booking paid with wallet",
-
             WalletId = wallet.Id,
             BookingId = booking.Id
         };
@@ -85,8 +81,9 @@ public class PayBookingWithWalletCommandHandler
         _context.PaymentTransactions.Add(payment);
         await _context.SaveChangesAsync(ct);
 
-        // Centralized confirmation (clears expiry, enforces hold rules, idempotent)
         await _mediator.Send(new ConfirmBookingAfterPaymentCommand(payment.Id), ct);
+
+        await tx.CommitAsync(ct);
 
         return Unit.Value;
     }

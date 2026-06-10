@@ -1,4 +1,4 @@
-﻿using Detailly.Domain.Common.Enums;
+using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
 
 namespace Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
@@ -16,35 +16,39 @@ public class RefundWalletPaymentCommandHandler
     public async Task<Unit> Handle(RefundWalletPaymentCommand request, CancellationToken ct)
     {
         var now = DateTime.UtcNow;
+        var idempotencyKey = $"refund:{request.PaymentTransactionId}";
 
         if (request.Amount <= 0)
             throw new DetaillyBusinessRuleException("INVALID_REFUND_AMOUNT", "Refund amount must be greater than zero.");
 
+        var existingRefund = await _context.PaymentTransactions
+            .FirstOrDefaultAsync(x => x.IdempotencyKey == idempotencyKey, ct);
+        if (existingRefund is not null)
+            return Unit.Value;
+
         var payment = await _context.PaymentTransactions
             .Include(x => x.Wallet)
             .FirstOrDefaultAsync(x => x.Id == request.PaymentTransactionId && !x.IsDeleted, ct)
-            ?? throw new DetaillyBusinessRuleException("PAYMENT_NOT_FOUND","Payment not found.");
+            ?? throw new DetaillyBusinessRuleException("PAYMENT_NOT_FOUND", "Payment not found.");
 
         if (payment.Status != PaymentTransactionStatus.Paid)
             throw new DetaillyBusinessRuleException("ONLY_PAID_REFUNDABLE", "Only paid transactions can be refunded.");
 
         if (payment.Wallet is null && payment.WalletId is null)
-            throw new DetaillyBusinessRuleException("PAYMENT_NOT_WALLET","This payment is not a wallet payment.");
+            throw new DetaillyBusinessRuleException("PAYMENT_NOT_WALLET", "This payment is not a wallet payment.");
 
         if (request.Amount > payment.Amount)
             throw new DetaillyBusinessRuleException("REFUND_AMOUNT_INVALID", "Refund amount cannot exceed original payment amount.");
 
-        // Create a separate REFUND transaction (audit-safe)
         var refundTx = new PaymentTransactionEntity
         {
             Amount = request.Amount,
             TransactionType = TransactionType.Refund,
             Status = PaymentTransactionStatus.Refunded,
             TransactionDate = now,
-
+            IdempotencyKey = idempotencyKey,
             Provider = "Wallet",
             Description = $"Refund ({request.Amount:0.00}) for payment #{payment.Id}",
-
             WalletId = payment.WalletId,
             BookingId = payment.BookingId,
             OrderId = payment.OrderId
@@ -52,8 +56,8 @@ public class RefundWalletPaymentCommandHandler
 
         _context.PaymentTransactions.Add(refundTx);
 
-        // Credit wallet
         payment.Wallet!.Balance += request.Amount;
+        payment.Status = PaymentTransactionStatus.Refunded;
 
         await _context.SaveChangesAsync(ct);
 

@@ -855,6 +855,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -885,6 +889,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasFilter("[IdempotencyKey] IS NOT NULL");
 
                     b.HasIndex("OrderId");
 

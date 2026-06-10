@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Detailly.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class init_test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,6 +23,7 @@ namespace Detailly.Infrastructure.Migrations
                     IsFleet = table.Column<bool>(type: "bit", nullable: false),
                     IsAdmin = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     IsEmployee = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    IsProfileComplete = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -116,6 +117,27 @@ namespace Detailly.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SystemSettings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StandardWalletBonusPercent = table.Column<int>(type: "int", nullable: false),
+                    FleetWalletBonusPercent = table.Column<int>(type: "int", nullable: false),
+                    ReviewWindowDays = table.Column<int>(type: "int", nullable: false),
+                    BaseFleetDiscountPercent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    PerVehicleFleetDiscountPercent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MaxFleetDiscountPercent = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemSettings", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VehicleCategories",
                 columns: table => new
                 {
@@ -185,36 +207,6 @@ namespace Detailly.Infrastructure.Migrations
                     table.PrimaryKey("PK_Carts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Carts_ApplicationUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "ApplicationUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Notifications",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserEntityId = table.Column<int>(type: "int", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Notifications", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Notifications_ApplicationUsers_ApplicationUserEntityId",
-                        column: x => x.ApplicationUserEntityId,
-                        principalTable: "ApplicationUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Notifications_ApplicationUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "ApplicationUsers",
                         principalColumn: "Id",
@@ -853,6 +845,7 @@ namespace Detailly.Infrastructure.Migrations
                     Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProviderTransactionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdempotencyKey = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     WalletId = table.Column<int>(type: "int", nullable: true),
                     BookingId = table.Column<int>(type: "int", nullable: true),
                     OrderId = table.Column<int>(type: "int", nullable: true),
@@ -920,6 +913,11 @@ namespace Detailly.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "SystemSettings",
+                columns: new[] { "Id", "BaseFleetDiscountPercent", "CreatedAtUtc", "FleetWalletBonusPercent", "IsDeleted", "MaxFleetDiscountPercent", "ModifiedAtUtc", "PerVehicleFleetDiscountPercent", "ReviewWindowDays", "StandardWalletBonusPercent" },
+                values: new object[] { 1, 2.0m, new DateTime(2026, 5, 12, 0, 0, 0, 0, DateTimeKind.Utc), 15, false, 8.0m, null, 1.0m, 7, 10 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Addresses_ApplicationUserId",
@@ -1064,16 +1062,6 @@ namespace Detailly.Infrastructure.Migrations
                 column: "Name");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notifications_ApplicationUserEntityId",
-                table: "Notifications",
-                column: "ApplicationUserEntityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Notifications_ApplicationUserId",
-                table: "Notifications",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderId",
                 table: "OrderItems",
                 column: "OrderId");
@@ -1103,6 +1091,13 @@ namespace Detailly.Infrastructure.Migrations
                 name: "IX_PaymentTransactions_BookingId",
                 table: "PaymentTransactions",
                 column: "BookingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_IdempotencyKey",
+                table: "PaymentTransactions",
+                column: "IdempotencyKey",
+                unique: true,
+                filter: "[IdempotencyKey] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentTransactions_OrderId",
@@ -1231,9 +1226,6 @@ namespace Detailly.Infrastructure.Migrations
                 name: "LocationOpeningHours");
 
             migrationBuilder.DropTable(
-                name: "Notifications");
-
-            migrationBuilder.DropTable(
                 name: "OrderItems");
 
             migrationBuilder.DropTable(
@@ -1256,6 +1248,9 @@ namespace Detailly.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ServicePackageItemAssignments");
+
+            migrationBuilder.DropTable(
+                name: "SystemSettings");
 
             migrationBuilder.DropTable(
                 name: "UserExternalLogins");

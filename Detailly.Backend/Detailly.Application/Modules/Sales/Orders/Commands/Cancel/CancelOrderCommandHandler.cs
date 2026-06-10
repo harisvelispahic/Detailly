@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
+using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
@@ -30,10 +30,11 @@ public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppAuthori
         if (order.Status is not (OrderStatus.PendingPayment or OrderStatus.Paid or OrderStatus.Shipped))
             throw new DetaillyBusinessRuleException("order.not_cancellable", "Order cannot be cancelled in its current state.");
 
+        await using var tx = await context.Database.BeginTransactionAsync(ct);
+
         decimal refundAmount = 0m;
         string? originalState = order.Status.ToString();
 
-        // Refund logic only if Paid or Shipped
         if (order.Status is OrderStatus.Paid or OrderStatus.Shipped)
         {
             var paidPayment = await context.PaymentTransactions
@@ -65,30 +66,23 @@ public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppAuthori
         order.Status = OrderStatus.Cancelled;
         order.ModifiedAtUtc = now;
 
-        // Enhanced audit notes
         var userReason = request.Reason?.Trim();
-
         var cancellationMessage = $"[CANCELLED] Order was in state '{originalState}'.";
 
         if (refundAmount > 0)
-        {
             cancellationMessage += $" Refunded {refundAmount:0.00} BAM according to refund policy.";
-        }
         else if (order.Status == OrderStatus.PendingPayment)
-        {
             cancellationMessage += " No refund issued (payment not completed).";
-        }
 
         if (!string.IsNullOrWhiteSpace(userReason))
-        {
             cancellationMessage += $" Reason: {userReason}";
-        }
 
         order.Notes = string.IsNullOrWhiteSpace(order.Notes)
             ? cancellationMessage
             : order.Notes + Environment.NewLine + cancellationMessage;
 
         await context.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
     }
 
     private static decimal GetRefundPercent(OrderStatus status)

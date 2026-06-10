@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Detailly.Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260508130244_init")]
-    partial class init
+    [Migration("20260610002625_init_test")]
+    partial class init_test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -714,6 +714,11 @@ namespace Detailly.Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<bool>("IsProfileComplete")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -853,6 +858,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("IdempotencyKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -883,6 +892,10 @@ namespace Detailly.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique()
+                        .HasFilter("[IdempotencyKey] IS NOT NULL");
 
                     b.HasIndex("OrderId");
 
@@ -1305,7 +1318,7 @@ namespace Detailly.Infrastructure.Migrations
                     b.ToTable("Images", (string)null);
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Shared.NotificationEntity", b =>
+            modelBuilder.Entity("Detailly.Domain.Entities.Shared.SystemSettingsEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1313,38 +1326,53 @@ namespace Detailly.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ApplicationUserEntityId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ApplicationUserId")
-                        .HasColumnType("int");
+                    b.Property<decimal>("BaseFleetDiscountPercent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("FleetWalletBonusPercent")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                    b.Property<decimal>("MaxFleetDiscountPercent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<decimal>("PerVehicleFleetDiscountPercent")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ReviewWindowDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StandardWalletBonusPercent")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserEntityId");
+                    b.ToTable("SystemSettings", (string)null);
 
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Notifications", (string)null);
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BaseFleetDiscountPercent = 2.0m,
+                            CreatedAtUtc = new DateTime(2026, 5, 12, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FleetWalletBonusPercent = 15,
+                            IsDeleted = false,
+                            MaxFleetDiscountPercent = 8.0m,
+                            PerVehicleFleetDiscountPercent = 1.0m,
+                            ReviewWindowDays = 7,
+                            StandardWalletBonusPercent = 10
+                        });
                 });
 
             modelBuilder.Entity("Detailly.Domain.Entities.Vehicle.VehicleCategoryEntity", b =>
@@ -1821,21 +1849,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("ServicePackage");
                 });
 
-            modelBuilder.Entity("Detailly.Domain.Entities.Shared.NotificationEntity", b =>
-                {
-                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("ApplicationUserEntityId");
-
-                    b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("Detailly.Domain.Entities.Vehicle.VehicleEntity", b =>
                 {
                     b.HasOne("Detailly.Domain.Entities.Identity.ApplicationUserEntity", "ApplicationUser")
@@ -1915,8 +1928,6 @@ namespace Detailly.Infrastructure.Migrations
                     b.Navigation("Cart");
 
                     b.Navigation("ExternalLogins");
-
-                    b.Navigation("Notifications");
 
                     b.Navigation("Orders");
 

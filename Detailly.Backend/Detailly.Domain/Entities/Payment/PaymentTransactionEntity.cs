@@ -18,6 +18,9 @@ public class PaymentTransactionEntity : BaseEntity
     public string? ProviderTransactionId { get; set; }  // External reference
     public string? Description { get; set; }
 
+    // Refund idempotency — set to "refund:{originalPaymentId}" on refund rows; unique filtered index prevents double-refunds under concurrent requests
+    public string? IdempotencyKey { get; set; }
+
     // OPTIONAL foreign keys (by design)
     public int? WalletId { get; set; }
     public WalletEntity? Wallet { get; set; }

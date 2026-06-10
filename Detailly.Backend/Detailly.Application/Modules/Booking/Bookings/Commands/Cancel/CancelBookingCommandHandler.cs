@@ -1,4 +1,4 @@
-﻿using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
+using Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 using Detailly.Application.Modules.Payment.Wallet.Commands.RefundWalletPayment;
 using Detailly.Domain.Common.Enums;
 
@@ -11,8 +11,6 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAutho
     {
         var now = DateTime.UtcNow;
         var customerId = authService.RequireUserId();
-
-        // ✅ No explicit DB transaction here (refund handlers may start their own)
 
         var booking = await context.Bookings
             .FirstOrDefaultAsync(b => b.Id == request.BookingId && !b.IsDeleted, ct);
@@ -31,10 +29,10 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAutho
         if (booking.Status is not (BookingStatus.Draft or BookingStatus.PendingPayment or BookingStatus.Confirmed))
             throw new DetaillyBusinessRuleException("BOOKING_NOT_CANCELLABLE", "Booking cannot be cancelled in its current state.");
 
-        // Refund policy applies ONLY if already paid/confirmed
+        await using var tx = await context.Database.BeginTransactionAsync(ct);
+
         if (booking.Status == BookingStatus.Confirmed)
         {
-            // ✅ Find the latest PAID PAYMENT attempt for this booking (not refund rows)
             var paidPayment = await context.PaymentTransactions
                 .AsNoTracking()
                 .Where(x =>
@@ -55,12 +53,10 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAutho
 
             if (refundAmount > 0)
             {
-                // Wallet payment
                 if (paidPayment.WalletId is not null || string.Equals(paidPayment.Provider, "Wallet", StringComparison.OrdinalIgnoreCase))
                 {
                     await mediator.Send(new RefundWalletPaymentCommand(paidPayment.Id, refundAmount), ct);
                 }
-                // Stripe payment
                 else if (string.Equals(paidPayment.Provider, "Stripe", StringComparison.OrdinalIgnoreCase))
                 {
                     await mediator.Send(new RefundStripePaymentCommand(paidPayment.Id, refundAmount), ct);
@@ -78,6 +74,7 @@ public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAutho
         booking.ModifiedAtUtc = now;
 
         await context.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
 
         return Unit.Value;
     }

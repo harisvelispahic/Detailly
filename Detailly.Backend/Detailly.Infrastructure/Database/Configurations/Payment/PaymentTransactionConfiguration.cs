@@ -41,5 +41,12 @@ public sealed class PaymentTransactionConfiguration
         builder.HasIndex(x => x.ProviderTransactionId)
             .IsUnique()
             .HasFilter("[ProviderTransactionId] IS NOT NULL");
+
+        builder.Property(x => x.IdempotencyKey)
+            .HasMaxLength(100);
+
+        builder.HasIndex(x => x.IdempotencyKey)
+            .IsUnique()
+            .HasFilter("[IdempotencyKey] IS NOT NULL");
     }
 }

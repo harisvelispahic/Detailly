@@ -6,6 +6,7 @@ using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 using Detailly.Domain.Entities.Payment;
 using MediatR;
+using Microsoft.Data.Sqlite;
 
 namespace Detailly.Tests.BookingCancellationTests.UnitTests;
 
@@ -13,26 +14,22 @@ public class BookingCancellationUnitTests
 {
     // ---- Test doubles ----
 
-    private sealed class FakeCurrentUser(int userId) : IAppCurrentUser
+    private sealed class FakeAuthorizationService(int? userId) : IAppAuthorizationService
     {
-        public int? ApplicationUserId => userId;
-        public string? Email => null;
-        public bool IsAuthenticated => true;
-        public bool IsAdmin => false;
-        public bool IsManager => false;
-        public bool IsEmployee => false;
-        public bool IsFleet => false;
-    }
+        public int RequireUserId() =>
+            userId ?? throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Not authenticated.");
 
-    private sealed class UnauthenticatedUser : IAppCurrentUser
-    {
-        public int? ApplicationUserId => null;
-        public string? Email => null;
-        public bool IsAuthenticated => false;
-        public bool IsAdmin => false;
-        public bool IsManager => false;
-        public bool IsEmployee => false;
-        public bool IsFleet => false;
+        public void EnsureAuthenticated()
+        {
+            if (userId is null) throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Not authenticated.");
+        }
+
+        public void EnsureOwnerOrStaff(int resourceOwnerId, string resourceName = "resource") => throw new NotImplementedException();
+        public void EnsureOwnerOrAdmin(int resourceOwnerId, string resourceName = "resource") => throw new NotImplementedException();
+        public void EnsureAdminOrManager() => throw new NotImplementedException();
+        public void EnsureAnyStaff() => throw new NotImplementedException();
+        public void EnsureOwnerOrAnyStaff(int resourceOwnerId, string resourceName = "resource") => throw new NotImplementedException();
+        public void EnsureEmployee() => throw new NotImplementedException();
     }
 
     private sealed class SpyMediator : IMediator
@@ -69,16 +66,42 @@ public class BookingCancellationUnitTests
             => Task.CompletedTask;
     }
 
+    // ---- SQLite in-memory context (supports transactions) ----
+
+    private sealed class TestDbContext : DatabaseContext
+    {
+        private readonly SqliteConnection _connection;
+
+        public TestDbContext() : this(OpenConnection()) { }
+
+        private TestDbContext(SqliteConnection connection)
+            : base(
+                new DbContextOptionsBuilder<DatabaseContext>()
+                    .UseSqlite(connection)
+                    .Options,
+                new Microsoft.Extensions.Time.Testing.FakeTimeProvider())
+        {
+            _connection = connection;
+            Database.EnsureCreated();
+        }
+
+        private static SqliteConnection OpenConnection()
+        {
+            var conn = new SqliteConnection("DataSource=:memory:");
+            conn.Open();
+            return conn;
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _connection.Dispose();
+        }
+    }
+
     // ---- Helpers ----
 
-    private static DatabaseContext GetInMemoryDbContext()
-    {
-        var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
-            .Options;
-        var clock = new Microsoft.Extensions.Time.Testing.FakeTimeProvider();
-        return new DatabaseContext(options, clock);
-    }
+    private static TestDbContext GetInMemoryDbContext() => new();
 
     private static async Task<BookingEntity> CreateBookingAsync(
         DatabaseContext context,
@@ -119,7 +142,6 @@ public class BookingCancellationUnitTests
             BookingId = bookingId,
             WalletId = 1,
             Provider = "Wallet",
-            // Unique value avoids InMemory unique-index collision across tests that share a database name
             ProviderTransactionId = Guid.NewGuid().ToString(),
         };
         context.PaymentTransactions.Add(payment);
@@ -129,9 +151,9 @@ public class BookingCancellationUnitTests
 
     private static CancelBookingCommandHandler MakeHandler(
         DatabaseContext context,
-        IAppCurrentUser user,
+        IAppAuthorizationService authService,
         SpyMediator mediator)
-        => new(context, user, mediator);
+        => new(context, authService, mediator);
 
     // =====================
     // Refund tier tests
@@ -145,11 +167,11 @@ public class BookingCancellationUnitTests
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         var refund = spy.SentRequests.OfType<RefundWalletPaymentCommand>().Single();
-        Assert.Equal(100m, refund.Amount); // 100% of 100 m
+        Assert.Equal(100m, refund.Amount);
         Assert.Equal(BookingStatus.Cancelled, booking.Status);
     }
 
@@ -161,11 +183,11 @@ public class BookingCancellationUnitTests
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         var refund = spy.SentRequests.OfType<RefundWalletPaymentCommand>().Single();
-        Assert.Equal(50m, refund.Amount); // 50% of 100 m
+        Assert.Equal(50m, refund.Amount);
     }
 
     [Fact]
@@ -176,30 +198,28 @@ public class BookingCancellationUnitTests
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         var refund = spy.SentRequests.OfType<RefundWalletPaymentCommand>().Single();
-        Assert.Equal(25m, refund.Amount); // 25% of 100 m
+        Assert.Equal(25m, refund.Amount);
     }
 
     [Fact]
     public async Task Handle_ShouldSkipRefund_WhenBookingAlreadyStarted()
     {
         using var context = GetInMemoryDbContext();
-        // StartUtc is in the past → 0% refund → no mediator call
         var booking = await CreateBookingAsync(context, BookingStatus.Confirmed, 1, DateTime.UtcNow.AddHours(-1));
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Empty(spy.SentRequests);
         Assert.Equal(BookingStatus.Cancelled, booking.Status);
     }
 
-    // Boundary: just over 48 h falls into the ≥ 48 h tier → 100% of TotalPrice (100m)
     [Fact]
     public async Task Handle_ShouldRefund100Percent_WhenStartIsJustOver48Hours()
     {
@@ -208,14 +228,13 @@ public class BookingCancellationUnitTests
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         var refund = spy.SentRequests.OfType<RefundWalletPaymentCommand>().Single();
-        Assert.Equal(100m, refund.Amount); // 100% of booking.TotalPrice (100m)
+        Assert.Equal(100m, refund.Amount);
     }
 
-    // Boundary: just over 24 h falls into the 24–48 h tier → 50% of TotalPrice (100m)
     [Fact]
     public async Task Handle_ShouldRefund50Percent_WhenStartIsJustOver24Hours()
     {
@@ -224,11 +243,11 @@ public class BookingCancellationUnitTests
         await CreatePaidWalletPaymentAsync(context, booking.Id, 100m);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         var refund = spy.SentRequests.OfType<RefundWalletPaymentCommand>().Single();
-        Assert.Equal(50m, refund.Amount); // 50% of booking.TotalPrice (100m)
+        Assert.Equal(50m, refund.Amount);
     }
 
     // ========================
@@ -242,7 +261,7 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.Draft, 1);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Equal(BookingStatus.Cancelled, booking.Status);
@@ -256,7 +275,7 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.PendingPayment, 1);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Equal(BookingStatus.Cancelled, booking.Status);
@@ -270,11 +289,11 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.Cancelled, 1);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Empty(spy.SentRequests);
-        Assert.Equal(BookingStatus.Cancelled, booking.Status); // unchanged
+        Assert.Equal(BookingStatus.Cancelled, booking.Status);
     }
 
     [Fact]
@@ -284,11 +303,11 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.Completed, 1);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Empty(spy.SentRequests);
-        Assert.Equal(BookingStatus.Completed, booking.Status); // unchanged
+        Assert.Equal(BookingStatus.Completed, booking.Status);
     }
 
     [Fact]
@@ -298,11 +317,11 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.Expired, 1);
 
         var spy = new SpyMediator();
-        await MakeHandler(context, new FakeCurrentUser(1), spy)
+        await MakeHandler(context, new FakeAuthorizationService(1), spy)
             .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None);
 
         Assert.Empty(spy.SentRequests);
-        Assert.Equal(BookingStatus.Expired, booking.Status); // unchanged
+        Assert.Equal(BookingStatus.Expired, booking.Status);
     }
 
     // ========================
@@ -316,7 +335,7 @@ public class BookingCancellationUnitTests
         var booking = await CreateBookingAsync(context, BookingStatus.Draft, 1);
 
         var ex = await Assert.ThrowsAsync<DetaillyBusinessRuleException>(
-            () => MakeHandler(context, new UnauthenticatedUser(), new SpyMediator())
+            () => MakeHandler(context, new FakeAuthorizationService(null), new SpyMediator())
                 .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None));
 
         Assert.Equal("AUTH_REQUIRED", ex.Code);
@@ -326,11 +345,10 @@ public class BookingCancellationUnitTests
     public async Task Handle_ShouldThrow_WhenUserDoesNotOwnBooking()
     {
         using var context = GetInMemoryDbContext();
-        // Booking owned by user 1, attempting cancellation as user 2
         var booking = await CreateBookingAsync(context, BookingStatus.Draft, customerId: 1);
 
         var ex = await Assert.ThrowsAsync<DetaillyBusinessRuleException>(
-            () => MakeHandler(context, new FakeCurrentUser(2), new SpyMediator())
+            () => MakeHandler(context, new FakeAuthorizationService(2), new SpyMediator())
                 .Handle(new CancelBookingCommand { BookingId = booking.Id }, CancellationToken.None));
 
         Assert.Equal("BOOKING_FORBIDDEN", ex.Code);
