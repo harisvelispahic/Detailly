@@ -11,16 +11,18 @@ public class CreateBookingPaymentIntentCommandHandler
 
     private readonly IAppDbContext _context;
     private readonly IStripeService _stripe;
+    private readonly TimeProvider _timeProvider;
 
-    public CreateBookingPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe)
+    public CreateBookingPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe, TimeProvider timeProvider)
     {
         _context = context;
         _stripe = stripe;
+        _timeProvider = timeProvider;
     }
 
     public async Task<CreateBookingPaymentIntentResult> Handle(CreateBookingPaymentIntentCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
 
         var booking = await _context.Bookings
             .FirstOrDefaultAsync(b => b.Id == request.BookingId && !b.IsDeleted, ct)

@@ -3,12 +3,15 @@ using Detailly.Domain.Entities.Booking;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.AssignEmployees;
 
-public sealed class AssignEmployeesToBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
+public sealed class AssignEmployeesToBookingCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    TimeProvider timeProvider)
     : IRequestHandler<AssignEmployeesToBookingCommand, Unit>
 {
     public async Task<Unit> Handle(AssignEmployeesToBookingCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         authService.EnsureAdminOrManager();
 

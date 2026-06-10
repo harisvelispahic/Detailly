@@ -7,14 +7,15 @@ namespace Detailly.Application.Modules.Booking.Bookings.Commands.CreateHold;
 public sealed class CreateBookingHoldCommandHandler(
     IAppDbContext context,
     IAppCurrentUser appCurrentUser,
-    IBookingQuoteService quoteService)
+    IBookingQuoteService quoteService,
+    TimeProvider timeProvider)
     : IRequestHandler<CreateBookingHoldCommand, int>
 {
     private static readonly TimeSpan HoldDuration = TimeSpan.FromMinutes(10);
 
     public async Task<int> Handle(CreateBookingHoldCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         if (appCurrentUser.ApplicationUserId is null)
             throw new DetaillyBusinessRuleException("AUTH_REQUIRED", "Authentication required.");

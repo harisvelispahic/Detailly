@@ -16,19 +16,22 @@ public class HandleStripeWebhookCommandHandler
     private readonly IStripeWebhookParser _parser;
     private readonly IMediator _mediator;
     private readonly IStripeService _stripeService;
+    private readonly TimeProvider _timeProvider;
 
     public HandleStripeWebhookCommandHandler(
         IAppDbContext context,
         IConfiguration config,
         IStripeWebhookParser parser,
         IMediator mediator,
-        IStripeService stripeService)
+        IStripeService stripeService,
+        TimeProvider timeProvider)
     {
         _context = context;
         _config = config;
         _parser = parser;
         _mediator = mediator;
         _stripeService = stripeService;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Unit> Handle(
@@ -86,7 +89,7 @@ public class HandleStripeWebhookCommandHandler
             if (payment.BookingId is not null && payment.Status == PaymentTransactionStatus.Pending)
             {
                 var booking = payment.Booking!;
-                var now = DateTime.UtcNow;
+                var now = _timeProvider.GetUtcNow().UtcDateTime;
 
                 var canCapture = booking.Status == BookingStatus.PendingPayment
                     && booking.ReservationExpiresAtUtc > now;

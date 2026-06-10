@@ -154,7 +154,7 @@ public class BookingCancellationUnitTests
         DatabaseContext context,
         IAppAuthorizationService authService,
         SpyMediator mediator)
-        => new(context, authService, mediator);
+        => new(context, authService, mediator, TimeProvider.System);
 
     // =====================
     // Refund tier tests

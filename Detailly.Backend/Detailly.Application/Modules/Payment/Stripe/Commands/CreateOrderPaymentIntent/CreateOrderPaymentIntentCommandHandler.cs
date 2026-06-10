@@ -4,7 +4,11 @@ using Detailly.Domain.Entities.Payment;
 
 namespace Detailly.Application.Modules.Payment.Stripe.Commands.CreateOrderPaymentIntent;
 
-public sealed class CreateOrderPaymentIntentCommandHandler(IAppDbContext context, IStripeService stripe, IAppCurrentUser currentUser)
+public sealed class CreateOrderPaymentIntentCommandHandler(
+    IAppDbContext context,
+    IStripeService stripe,
+    IAppCurrentUser currentUser,
+    TimeProvider timeProvider)
     : IRequestHandler<CreateOrderPaymentIntentCommand, CreateOrderPaymentIntentResult>
 {
     private static readonly TimeSpan PendingReplaceAfter = TimeSpan.FromMinutes(5);
@@ -14,7 +18,7 @@ public sealed class CreateOrderPaymentIntentCommandHandler(IAppDbContext context
         if (!currentUser.IsAuthenticated || currentUser.ApplicationUserId is null)
             throw new DetaillyUnauthorizedException("Authentication required.");
 
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
         var userId = currentUser.ApplicationUserId.Value;
 
         var order = await context.Orders

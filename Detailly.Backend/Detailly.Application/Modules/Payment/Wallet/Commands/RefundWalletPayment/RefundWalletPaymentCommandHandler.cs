@@ -7,15 +7,17 @@ public class RefundWalletPaymentCommandHandler
     : IRequestHandler<RefundWalletPaymentCommand, Unit>
 {
     private readonly IAppDbContext _context;
+    private readonly TimeProvider _timeProvider;
 
-    public RefundWalletPaymentCommandHandler(IAppDbContext context)
+    public RefundWalletPaymentCommandHandler(IAppDbContext context, TimeProvider timeProvider)
     {
         _context = context;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Unit> Handle(RefundWalletPaymentCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
         var idempotencyKey = $"refund:{request.PaymentTransactionId}";
 
         if (request.Amount <= 0)

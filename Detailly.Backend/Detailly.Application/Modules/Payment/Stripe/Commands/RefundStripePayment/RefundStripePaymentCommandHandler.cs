@@ -4,12 +4,15 @@ using Detailly.Domain.Entities.Payment;
 
 namespace Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 
-public sealed class RefundStripePaymentCommandHandler(IAppDbContext context, IStripeService stripe)
+public sealed class RefundStripePaymentCommandHandler(
+    IAppDbContext context,
+    IStripeService stripe,
+    TimeProvider timeProvider)
     : IRequestHandler<RefundStripePaymentCommand, Unit>
 {
     public async Task<Unit> Handle(RefundStripePaymentCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
         var idempotencyKey = $"refund:{request.PaymentTransactionId}";
 
         if (request.Amount <= 0)

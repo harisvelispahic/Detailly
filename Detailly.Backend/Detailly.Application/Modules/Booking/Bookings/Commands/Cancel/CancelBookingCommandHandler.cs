@@ -4,12 +4,16 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.Cancel;
 
-public sealed class CancelBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IMediator mediator)
+public sealed class CancelBookingCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    IMediator mediator,
+    TimeProvider timeProvider)
     : IRequestHandler<CancelBookingCommand, Unit>
 {
     public async Task<Unit> Handle(CancelBookingCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
         var customerId = authService.RequireUserId();
 
         var booking = await context.Bookings

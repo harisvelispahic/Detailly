@@ -2,7 +2,10 @@
 
 namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Create;
 
-public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
+public sealed class CreateEmployeeShiftCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    TimeProvider timeProvider)
     : IRequestHandler<CreateEmployeeShiftCommand, int>
 {
     public async Task<int> Handle(CreateEmployeeShiftCommand request, CancellationToken ct)
@@ -65,7 +68,7 @@ public sealed class CreateEmployeeShiftCommandHandler(IAppDbContext context, IAp
             EmployeeWorkMode = request.EmployeeWorkMode,
             StartUtc = request.StartUtc,
             EndUtc = request.EndUtc,
-            CreatedAtUtc = DateTime.UtcNow
+            CreatedAtUtc = timeProvider.GetUtcNow().UtcDateTime
         };
 
         context.EmployeeShifts.Add(shift);

@@ -6,12 +6,13 @@ namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 
 public sealed class GetAvailabilityQueryHandler(
     IAppDbContext context,
-    IBookingQuoteService quoteService)
+    IBookingQuoteService quoteService,
+    TimeProvider timeProvider)
     : IRequestHandler<GetAvailabilityQuery, GetAvailabilityResult>
 {
     public async Task<GetAvailabilityResult> Handle(GetAvailabilityQuery request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         // 1) Quote — now includes travel time when serviceAddressId is provided for mobile
         var quote = await quoteService.CalculateAsync(

@@ -2,7 +2,10 @@
 
 namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Update;
 
-public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
+public sealed class UpdateEmployeeShiftCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    TimeProvider timeProvider)
     : IRequestHandler<UpdateEmployeeShiftCommand, Unit>
 {
     public async Task<Unit> Handle(UpdateEmployeeShiftCommand request, CancellationToken ct)
@@ -103,7 +106,7 @@ public sealed class UpdateEmployeeShiftCommandHandler(IAppDbContext context, IAp
         if (request.EndUtc != null)
             shift.EndUtc = request.EndUtc.Value;
 
-        shift.ModifiedAtUtc = DateTime.UtcNow;
+        shift.ModifiedAtUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         await context.SaveChangesAsync(ct);
         return Unit.Value;

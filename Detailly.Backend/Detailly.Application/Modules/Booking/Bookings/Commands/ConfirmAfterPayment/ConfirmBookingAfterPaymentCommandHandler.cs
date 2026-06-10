@@ -3,12 +3,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.ConfirmAfterPayment;
 
-public sealed class ConfirmBookingAfterPaymentCommandHandler(IAppDbContext context)
+public sealed class ConfirmBookingAfterPaymentCommandHandler(
+    IAppDbContext context,
+    TimeProvider timeProvider)
     : IRequestHandler<ConfirmBookingAfterPaymentCommand, Unit>
 {
     public async Task<Unit> Handle(ConfirmBookingAfterPaymentCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         var ownTx = context.Database.CurrentTransaction is null;
         IDbContextTransaction? tx = ownTx ? await context.Database.BeginTransactionAsync(ct) : null;

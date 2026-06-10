@@ -1,6 +1,9 @@
 ﻿namespace Detailly.Application.Modules.Booking.EmployeeShifts.Commands.Delete;
 
-public sealed class DeleteEmployeeShiftCommandHandler(IAppDbContext context, IAppAuthorizationService authService)
+public sealed class DeleteEmployeeShiftCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    TimeProvider timeProvider)
     : IRequestHandler<DeleteEmployeeShiftCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteEmployeeShiftCommand request, CancellationToken ct)
@@ -14,7 +17,7 @@ public sealed class DeleteEmployeeShiftCommandHandler(IAppDbContext context, IAp
             return Unit.Value; // idempotent
 
         shift.IsDeleted = true;
-        shift.ModifiedAtUtc = DateTime.UtcNow;
+        shift.ModifiedAtUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         await context.SaveChangesAsync(ct);
         return Unit.Value;

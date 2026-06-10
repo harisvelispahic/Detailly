@@ -3,12 +3,16 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.Cancel;
 
-public sealed class CancelOrderCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IMediator mediator)
+public sealed class CancelOrderCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    IMediator mediator,
+    TimeProvider timeProvider)
     : IRequestHandler<CancelOrderCommand>
 {
     public async Task Handle(CancelOrderCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         authService.EnsureAuthenticated();
 

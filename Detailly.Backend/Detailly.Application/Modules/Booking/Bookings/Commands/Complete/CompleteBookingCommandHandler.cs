@@ -2,12 +2,16 @@
 
 namespace Detailly.Application.Modules.Booking.Bookings.Commands.Complete;
 
-public sealed class CompleteBookingCommandHandler(IAppDbContext context, IAppAuthorizationService authService, IAppCurrentUser appCurrentUser)
+public sealed class CompleteBookingCommandHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    IAppCurrentUser appCurrentUser,
+    TimeProvider timeProvider)
     : IRequestHandler<CompleteBookingCommand, Unit>
 {
     public async Task<Unit> Handle(CompleteBookingCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
         authService.EnsureAnyStaff();
 

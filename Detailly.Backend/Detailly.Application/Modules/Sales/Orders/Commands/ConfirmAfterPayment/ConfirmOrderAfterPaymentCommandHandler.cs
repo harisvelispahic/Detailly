@@ -2,7 +2,9 @@
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.ConfirmAfterPayment;
 
-public sealed class ConfirmOrderAfterPaymentCommandHandler(IAppDbContext context)
+public sealed class ConfirmOrderAfterPaymentCommandHandler(
+    IAppDbContext context,
+    TimeProvider timeProvider)
     : IRequestHandler<ConfirmOrderAfterPaymentCommand, Unit>
 {
     public async Task<Unit> Handle(ConfirmOrderAfterPaymentCommand request, CancellationToken ct)
@@ -60,7 +62,7 @@ public sealed class ConfirmOrderAfterPaymentCommandHandler(IAppDbContext context
         }
 
         order.Status = OrderStatus.Paid;
-        order.ModifiedAtUtc = DateTime.UtcNow;
+        order.ModifiedAtUtc = timeProvider.GetUtcNow().UtcDateTime;
 
         await context.SaveChangesAsync(ct);
         await tx.CommitAsync(ct);

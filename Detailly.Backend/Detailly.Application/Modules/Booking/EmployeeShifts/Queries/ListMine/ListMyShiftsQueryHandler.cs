@@ -1,6 +1,9 @@
 namespace Detailly.Application.Modules.Booking.EmployeeShifts.Queries.ListMine;
 
-public sealed class ListMyShiftsQueryHandler(IAppDbContext context, IAppCurrentUser currentUser)
+public sealed class ListMyShiftsQueryHandler(
+    IAppDbContext context,
+    IAppCurrentUser currentUser,
+    TimeProvider timeProvider)
     : IRequestHandler<ListMyShiftsQuery, List<ListMyShiftsQueryDto>>
 {
     public async Task<List<ListMyShiftsQueryDto>> Handle(ListMyShiftsQuery request, CancellationToken ct)
@@ -11,7 +14,7 @@ public sealed class ListMyShiftsQueryHandler(IAppDbContext context, IAppCurrentU
         if (!currentUser.IsEmployee)
             throw new DetaillyBusinessRuleException("FORBIDDEN", "Only employees can view their own shifts.");
 
-        var today = DateTime.UtcNow.Date;
+        var today = timeProvider.GetUtcNow().UtcDateTime.Date;
         var rangeStart = today.AddDays(-request.Days);
         var rangeEnd = today.AddDays(request.Days + 1);
 

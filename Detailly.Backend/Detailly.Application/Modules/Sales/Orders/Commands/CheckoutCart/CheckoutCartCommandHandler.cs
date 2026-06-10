@@ -3,7 +3,10 @@ using Detailly.Domain.Entities.Sales;
 
 namespace Detailly.Application.Modules.Sales.Orders.Commands.CheckoutCart;
 
-public sealed class CheckoutCartCommandHandler(IAppDbContext context, IAppCurrentUser appCurrentUser)
+public sealed class CheckoutCartCommandHandler(
+    IAppDbContext context,
+    IAppCurrentUser appCurrentUser,
+    TimeProvider timeProvider)
     : IRequestHandler<CheckoutCartCommand, int>
 {
     public async Task<int> Handle(CheckoutCartCommand request, CancellationToken ct)
@@ -75,7 +78,7 @@ public sealed class CheckoutCartCommandHandler(IAppDbContext context, IAppCurren
         var order = new OrderEntity
         {
             OrderNumber = Guid.NewGuid().ToString("N"),
-            OrderDate = DateTime.UtcNow,
+            OrderDate = timeProvider.GetUtcNow().UtcDateTime,
             Notes = request.Notes?.Trim(),
             ShipToAddressId = request.ShipToAddressId,
             ApplicationUserId = userId,

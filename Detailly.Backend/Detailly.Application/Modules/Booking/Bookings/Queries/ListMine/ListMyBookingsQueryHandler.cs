@@ -2,7 +2,10 @@ using Detailly.Domain.Common.Enums;
 
 namespace Detailly.Application.Modules.Booking.Bookings.Queries.ListMine;
 
-public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppAuthorizationService authService)
+public sealed class ListMyBookingsQueryHandler(
+    IAppDbContext context,
+    IAppAuthorizationService authService,
+    TimeProvider timeProvider)
     : IRequestHandler<ListMyBookingsQuery, PageResult<ListMyBookingsQueryDto>>
 {
     private const int ReviewWindowDays = 7;
@@ -11,7 +14,7 @@ public sealed class ListMyBookingsQueryHandler(IAppDbContext context, IAppAuthor
     {
         var userId = authService.RequireUserId();
 
-        var cutoff = DateTime.UtcNow.AddDays(-ReviewWindowDays);
+        var cutoff = timeProvider.GetUtcNow().UtcDateTime.AddDays(-ReviewWindowDays);
 
         var projectedQuery = context.Bookings
             .AsNoTracking()

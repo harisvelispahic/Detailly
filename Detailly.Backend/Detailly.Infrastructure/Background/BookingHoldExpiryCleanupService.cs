@@ -13,11 +13,13 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
 
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<BookingHoldExpiryCleanupService> _logger;
+    private readonly TimeProvider _timeProvider;
 
-    public BookingHoldExpiryCleanupService(IServiceScopeFactory scopeFactory, ILogger<BookingHoldExpiryCleanupService> logger)
+    public BookingHoldExpiryCleanupService(IServiceScopeFactory scopeFactory, ILogger<BookingHoldExpiryCleanupService> logger, TimeProvider timeProvider)
     {
         _scopeFactory = scopeFactory;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -43,7 +45,7 @@ public sealed class BookingHoldExpiryCleanupService : BackgroundService
 
     private async Task ExpireHoldsAsync(CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
 
         using var scope = _scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();

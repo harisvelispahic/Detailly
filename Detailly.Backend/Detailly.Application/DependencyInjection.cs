@@ -19,9 +19,6 @@ public static class DependencyInjection
         // Pipeline behaviors (npr. ValidationBehavior)
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        // TimeProvider — if used by handlers
-        services.AddSingleton(TimeProvider.System);
-
         return services;
     }
 }
