@@ -7,6 +7,7 @@ import {
   UpdateServicePackageItemCommand,
 } from '../../../../../../api-services/service-package-items/service-package-items-api.models';
 import { ServicePackageItemsApiService } from '../../../../../../api-services/service-package-items/service-package-items-api.service';
+import { extractHttpError } from '../../../../../../core/utils/http-error.util';
 
 export interface ServicePackageItemUpsertDialogData {
   item: ListServicePackageItemsQueryDto | null;
@@ -68,7 +69,7 @@ export class ServicePackageItemUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to update service package item.';
+          this.serverError = extractHttpError(err) ?? 'Failed to update service package item.';
         },
       });
     } else {
@@ -84,7 +85,7 @@ export class ServicePackageItemUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to create service package item.';
+          this.serverError = extractHttpError(err) ?? 'Failed to create service package item.';
         },
       });
     }
@@ -94,7 +95,4 @@ export class ServicePackageItemUpsertDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  private extractError(err: any): string | null {
-    return err?.error?.message ?? err?.error?.title ?? err?.message ?? null;
-  }
 }

@@ -7,6 +7,7 @@ import {
   UpdateVehicleCategoryCommand,
 } from '../../../../../api-services/vehicle-categories/vehicle-categories-api.model';
 import { VehicleCategoriesApiService } from '../../../../../api-services/vehicle-categories/vehicle-categories-api.service';
+import { extractHttpError } from '../../../../../core/utils/http-error.util';
 
 export interface VehicleCategoryUpsertDialogData {
   category: ListVehicleCategoriesQueryDto | null;
@@ -63,7 +64,7 @@ export class VehicleCategoryUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to update vehicle category.';
+          this.serverError = extractHttpError(err) ?? 'Failed to update vehicle category.';
         },
       });
     } else {
@@ -76,7 +77,7 @@ export class VehicleCategoryUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to create vehicle category.';
+          this.serverError = extractHttpError(err) ?? 'Failed to create vehicle category.';
         },
       });
     }
@@ -86,7 +87,4 @@ export class VehicleCategoryUpsertDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  private extractError(err: any): string | null {
-    return err?.error?.message ?? err?.error?.title ?? err?.message ?? null;
-  }
 }

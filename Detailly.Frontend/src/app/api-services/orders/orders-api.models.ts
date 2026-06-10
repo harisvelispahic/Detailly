@@ -175,6 +175,49 @@ export type ListOrdersResponse = PageResult<ListOrdersQueryDto>;
  */
 export type ListOrdersWithItemsResponse = PageResult<ListOrdersWithItemsQueryDto>;
 
+// === GetOrderDetails ===
+
+export interface GetOrderDetailsItemDto {
+  orderItemId: number;
+  productId: number;
+  productName: string;
+  unitPrice: number;
+  currency: string;
+  quantity: number;
+  lineTotal: number;
+}
+
+export interface GetOrderDetailsDto {
+  id: number;
+  orderNumber: string;
+  orderDate: string;
+  totalAmount: number;
+  status: string;
+  notes: string | null;
+  shipToAddressId: number;
+  items: GetOrderDetailsItemDto[];
+}
+
+// === GetMyOrders ===
+
+export interface GetMyOrdersDto {
+  id: number;
+  orderNumber: string;
+  orderDate: string;
+  totalAmount: number;
+  status: string;
+}
+
+export class GetMyOrdersRequest extends BasePagedQuery {
+  search?: string | null;
+  status?: string | null;
+  constructor() {
+    super();
+  }
+}
+
+export type GetMyOrdersResponse = PageResult<GetMyOrdersDto>;
+
 // === COMMANDS (WRITE) ===
 
 /**

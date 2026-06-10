@@ -15,6 +15,7 @@ import {
   UpdateStaffMemberCommand,
 } from '../../../../../api-services/staff-members/staff-members-api.models';
 import { StaffMembersApiService } from '../../../../../api-services/staff-members/staff-members-api.service';
+import { extractHttpError } from '../../../../../core/utils/http-error.util';
 export interface PhoneCountry {
   name: string;
   iso2: string;
@@ -251,7 +252,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to update staff member.';
+          this.serverError = extractHttpError(err) ?? 'Failed to update staff member.';
         },
       });
     } else {
@@ -268,7 +269,7 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.serverError = this.extractError(err) ?? 'Failed to create staff member.';
+          this.serverError = extractHttpError(err) ?? 'Failed to create staff member.';
         },
       });
     }
@@ -278,7 +279,4 @@ export class StaffMemberUpsertDialogComponent implements OnInit {
     this.dialogRef.close(false);
   }
 
-  private extractError(err: any): string | null {
-    return err?.error?.message ?? err?.error?.title ?? err?.message ?? null;
-  }
 }

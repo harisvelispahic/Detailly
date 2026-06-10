@@ -11,6 +11,9 @@ import {
   CreateOrderCommand,
   UpdateOrderCommand,
   OrderStatusType,
+  GetMyOrdersRequest,
+  GetMyOrdersResponse,
+  GetOrderDetailsDto,
 } from './orders-api.models';
 import { buildHttpParams } from '../../core/models/build-http-params';
 
@@ -27,7 +30,7 @@ export class OrdersApiService {
    * Returns basic order info without items.
    */
   list(request?: ListOrdersRequest): Observable<ListOrdersResponse> {
-    const params = request ? buildHttpParams(request as any) : undefined;
+    const params = request ? buildHttpParams(request as unknown as Record<string, unknown>) : undefined;
 
     return this.http.get<ListOrdersResponse>(this.baseUrl, {
       params,
@@ -40,7 +43,7 @@ export class OrdersApiService {
    * Use this when you need to display order items in the list.
    */
   listWithItems(request?: ListOrdersWithItemsRequest): Observable<ListOrdersWithItemsResponse> {
-    const params = request ? buildHttpParams(request as any) : undefined;
+    const params = request ? buildHttpParams(request as unknown as Record<string, unknown>) : undefined;
 
     return this.http.get<ListOrdersWithItemsResponse>(`${this.baseUrl}/with-items`, {
       params,
@@ -90,12 +93,12 @@ export class OrdersApiService {
     });
   }
 
-  getMy(request?: any): Observable<any> {
-    const params = request ? buildHttpParams(request as any) : undefined;
-    return this.http.get<any>(`${this.baseUrl}/my`, { params });
+  getMy(request?: GetMyOrdersRequest): Observable<GetMyOrdersResponse> {
+    const params = request ? buildHttpParams(request as unknown as Record<string, unknown>) : undefined;
+    return this.http.get<GetMyOrdersResponse>(`${this.baseUrl}/my`, { params });
   }
 
-  getDetails(id: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/details/${id}`);
+  getDetails(id: number): Observable<GetOrderDetailsDto> {
+    return this.http.get<GetOrderDetailsDto>(`${this.baseUrl}/details/${id}`);
   }
 }

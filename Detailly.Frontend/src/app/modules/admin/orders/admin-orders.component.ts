@@ -14,6 +14,7 @@ import { ToasterService } from '../../../core/services/toaster.service';
 import { OrderStatusHelper } from '../../../api-services/orders/order-status.helper';
 import { ChangeStatusDialogComponent } from './change-status-dialog/change-status-dialog.component';
 import { OrderDetailsDialogComponent } from './admin-orders-details-dialog/order-details-dialog.component';
+import { extractHttpError } from '../../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-admin-orders',
@@ -178,8 +179,7 @@ export class AdminOrdersComponent
       error: (err) => {
         this.stopLoading();
 
-        // Extract error message
-        const errorMessage = this.extractErrorMessage(err);
+        const errorMessage = extractHttpError(err);
         this.toaster.error(errorMessage || 'Failed to update order status');
 
         console.error('Change status error:', err);
@@ -216,28 +216,4 @@ export class AdminOrdersComponent
     return `${order.user.userAddress}, ${order.user.userCity}`;
   }
 
-  /**
-   * Extract user-friendly error message from HTTP error response
-   */
-  private extractErrorMessage(err: any): string | null {
-    if (err?.error) {
-      if (typeof err.error === 'string') {
-        return err.error;
-      }
-
-      if (err.error.message) {
-        return err.error.message;
-      }
-
-      if (err.error.title) {
-        return err.error.title;
-      }
-    }
-
-    if (err?.message) {
-      return err.message;
-    }
-
-    return null;
-  }
 }

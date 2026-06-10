@@ -26,6 +26,7 @@ import {
 } from '../../../../../api-services/staff-members/staff-members-api.models';
 import { StaffMembersApiService } from '../../../../../api-services/staff-members/staff-members-api.service';
 import { ToasterService } from '../../../../../core/services/toaster.service';
+import { extractHttpError } from '../../../../../core/utils/http-error.util';
 
 export interface ShiftUpsertDialogData {
   shift: EmployeeShiftDto | null;
@@ -281,7 +282,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.toaster.error(this.extractError(err) ?? 'Failed to update shift');
+          this.toaster.error(extractHttpError(err) ?? 'Failed to update shift');
         },
       });
     } else {
@@ -296,7 +297,7 @@ export class ShiftUpsertDialogComponent implements OnInit {
         next: () => this.dialogRef.close(true),
         error: (err) => {
           this.isSubmitting = false;
-          this.toaster.error(this.extractError(err) ?? 'Failed to create shift');
+          this.toaster.error(extractHttpError(err) ?? 'Failed to create shift');
         },
       });
     }
@@ -326,7 +327,4 @@ export class ShiftUpsertDialogComponent implements OnInit {
     return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   }
 
-  private extractError(err: any): string | null {
-    return err?.error?.message ?? err?.error?.title ?? err?.message ?? null;
-  }
 }

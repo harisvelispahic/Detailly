@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { loadStripe, StripeCardElement } from '@stripe/stripe-js';
+import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 import { PaymentsService } from '../../../../api-services/payments/payments-api.service';
 import { ToasterService } from '../../../../core/services/toaster.service';
 import { environment } from '../../../../../environments/environment';
@@ -17,7 +17,7 @@ export class OrderPaymentComponent implements OnInit {
   isLoading = false;
   cardError?: string;
 
-  private stripe: any;
+  private stripe: Stripe | null = null;
   private card!: StripeCardElement;
 
   private stripePublicKey = environment.stripePublishableKey;
@@ -38,7 +38,7 @@ export class OrderPaymentComponent implements OnInit {
         this.clientSecret = res.clientSecret;
 
         this.stripe = await loadStripe(this.stripePublicKey);
-        const elements = this.stripe!.elements();
+        const elements = this.stripe!.elements(); // guarded: loadStripe succeeded
 
         this.card = elements.create('card');
         this.card.mount('#card-element');
@@ -58,7 +58,7 @@ export class OrderPaymentComponent implements OnInit {
     this.isLoading = true;
     this.cardError = undefined;
 
-    const result = await this.stripe.confirmCardPayment(this.clientSecret, {
+    const result = await this.stripe!.confirmCardPayment(this.clientSecret, {
       payment_method: {
         card: this.card,
       },

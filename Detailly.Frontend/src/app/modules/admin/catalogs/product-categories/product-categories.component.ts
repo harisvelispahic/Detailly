@@ -10,6 +10,7 @@ import {
   ListProductCategoriesQueryDto,
 } from '../../../../api-services/product-categories/product-categories-api.model';
 import { ProductCategoryUpsertComponent } from './product-category-upsert/product-category-upsert.component';
+import { extractHttpError } from '../../../../core/utils/http-error.util';
 
 @Component({
   selector: 'app-product-categories',
@@ -131,7 +132,7 @@ export class ProductCategoriesComponent
       error: (err) => {
         this.stopLoading();
 
-        const errorMessage = this.extractErrorMessage(err);
+        const errorMessage = extractHttpError(err);
 
         // Show error dialog instead of toast
         this.dialogHelper.showError('Error', 'Error deleting category.').subscribe();
@@ -157,7 +158,7 @@ export class ProductCategoriesComponent
       error: (err) => {
         this.stopLoading();
 
-        const errorMessage = this.extractErrorMessage(err);
+        const errorMessage = extractHttpError(err);
 
         if (err.status === 409) {
           // Business rule conflict - show dialog for important errors
@@ -178,39 +179,4 @@ export class ProductCategoriesComponent
     });
   }
 
-  /**
-   * Extract user-friendly error message from HTTP error response
-   */
-  private extractErrorMessage(err: any): string | null {
-    if (err?.error) {
-      if (typeof err.error === 'string') {
-        return err.error;
-      }
-
-      if (err.error.message) {
-        return err.error.message;
-      }
-
-      if (err.error.title) {
-        return err.error.title;
-      }
-
-      if (err.error.errors && typeof err.error.errors === 'object') {
-        const errors = Object.values(err.error.errors).flat();
-        if (errors.length > 0) {
-          return errors.join(', ');
-        }
-      }
-    }
-
-    if (err?.message) {
-      return err.message;
-    }
-
-    if (err?.statusText && err.statusText !== 'Unknown Error') {
-      return err.statusText;
-    }
-
-    return null;
-  }
 }

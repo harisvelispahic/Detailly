@@ -22,25 +22,25 @@ export interface DialogButtonConfig {
   label?: string;
   translationKey?: string;
   color?: 'primary' | 'accent' | 'warn';
-  result?: any;
+  result?: unknown;
 }
 
 export interface DialogConfig {
   type: DialogType;
   title?: string;
   titleKey?: string;
-  titleParams?: any;
+  titleParams?: Record<string, string | number>;
   message?: string;
   messageKey?: string;
-  messageParams?: any;
+  messageParams?: Record<string, string | number>;
   icon?: string;
   buttons?: DialogButtonConfig[];
   width?: string;
   disableClose?: boolean;
-  data?: any;
+  data?: unknown;
 }
 
 export interface DialogResult {
   button: DialogButton;
-  data?: any;
+  data?: unknown;
 }

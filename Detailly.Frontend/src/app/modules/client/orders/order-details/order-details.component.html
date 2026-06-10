@@ -13,7 +13,7 @@
 
   @if (order && !isLoading) {
     <div>
-      <p><b>Order #:</b> {{ order.orderNumber ?? order.id }}</p>
+      <p><b>Order #:</b> {{ order.orderNumber }}</p>
       <p><b>Date:</b> {{ order.orderDate }}</p>
       <p><b>Status:</b> {{ order.status }}</p>
       <p><b>Total:</b> {{ order.totalAmount }}</p>
@@ -21,7 +21,7 @@
       <hr />
 
       <h3 class="title is-6">Items</h3>
-      @if (order.items?.length) {
+      @if (order.items.length) {
         <table class="table is-fullwidth is-striped">
           <thead>
             <tr>
@@ -34,7 +34,7 @@
           <tbody>
             @for (it of order.items; track $index) {
               <tr>
-                <td>{{ it.productName ?? it.productId }}</td>
+                <td>{{ it.productName }}</td>
                 <td>{{ it.quantity }}</td>
                 <td>{{ it.unitPrice }}</td>
                 <td>{{ it.lineTotal }}</td>
@@ -44,7 +44,7 @@
         </table>
       }
 
-      @if (!order.items?.length) {
+      @if (!order.items.length) {
         <div class="has-text-grey">No items found.</div>
       }
 

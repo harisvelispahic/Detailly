@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrdersApiService } from '../../../../api-services/orders/orders-api.service';
+import { GetOrderDetailsDto } from '../../../../api-services/orders/orders-api.models';
 import { ToasterService } from '../../../../core/services/toaster.service';
 
 @Component({
@@ -14,7 +15,7 @@ export class OrderDetailsComponent implements OnInit {
   isLoading = false;
   error?: string;
 
-  order: any;
+  order?: GetOrderDetailsDto;
 
   cancelReason = '';
   isCancelling = false;
