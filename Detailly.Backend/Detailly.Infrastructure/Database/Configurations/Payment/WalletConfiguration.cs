@@ -12,7 +12,12 @@ public sealed class WalletConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Balance)
-            .IsRequired();
+            .IsRequired()
+            .HasPrecision(18, 2);
+
+        builder.Property(x => x.TotalDeposited)
+            .IsRequired()
+            .HasPrecision(18, 2);
 
         builder.HasOne(x => x.ApplicationUser)
             .WithOne(x => x.Wallet)

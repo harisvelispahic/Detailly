@@ -12,7 +12,8 @@ public sealed class PaymentTransactionConfiguration
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Amount)
-            .IsRequired();
+            .IsRequired()
+            .HasPrecision(18, 2);
 
         builder.Property(x => x.TransactionType)
             .IsRequired();
