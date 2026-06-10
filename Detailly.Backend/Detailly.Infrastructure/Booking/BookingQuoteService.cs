@@ -293,8 +293,8 @@ public sealed class BookingQuoteService(
 
     private MobileTravelResult ApplyFallback(OpenRouteServiceOptions opts, string reason)
     {
-        logger.LogWarning("Mobile travel fallback applied ({Reason}). Using fixed fee {Fee}, travel time 0.", reason, opts.FallbackSurcharge);
-        return new MobileTravelResult(opts.FallbackSurcharge, 0);
+        logger.LogWarning("Mobile travel fallback applied ({Reason}). Using fixed fee {Fee}, travel time {TravelTime} min.", reason, opts.FallbackSurcharge, opts.FallbackTravelTimeMinutes);
+        return new MobileTravelResult(opts.FallbackSurcharge, opts.FallbackTravelTimeMinutes);
     }
 
     private static decimal ComputeSurcharge(decimal distanceKm, OpenRouteServiceOptions opts)

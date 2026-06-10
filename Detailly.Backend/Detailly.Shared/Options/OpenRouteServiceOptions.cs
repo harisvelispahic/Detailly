@@ -16,4 +16,7 @@ public sealed class OpenRouteServiceOptions
 
     [Range(0, double.MaxValue)]
     public decimal FallbackSurcharge { get; init; } = 5.00m;
+
+    [Range(0, int.MaxValue)]
+    public int FallbackTravelTimeMinutes { get; init; } = 45;
 }
