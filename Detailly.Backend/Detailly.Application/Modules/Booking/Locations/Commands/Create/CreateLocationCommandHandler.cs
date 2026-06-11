@@ -62,8 +62,8 @@ public sealed class CreateLocationCommandHandler(
                     ShopLocationId = location.Id,
                     DayOfWeek      = h.DayOfWeek,
                     IsClosed       = h.IsClosed,
-                    OpenTimeUtc    = h.IsClosed ? null : (h.OpenHour is not null ? new TimeSpan(h.OpenHour.Value, h.OpenMinute ?? 0, 0) : null),
-                    CloseTimeUtc   = h.IsClosed ? null : (h.CloseHour is not null ? new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0) : null),
+                    OpenTime    = h.IsClosed ? null : (h.OpenHour is not null ? new TimeSpan(h.OpenHour.Value, h.OpenMinute ?? 0, 0) : null),
+                    CloseTime   = h.IsClosed ? null : (h.CloseHour is not null ? new TimeSpan(h.CloseHour.Value, h.CloseMinute ?? 0, 0) : null),
                     CreatedAtUtc   = now
                 });
             }

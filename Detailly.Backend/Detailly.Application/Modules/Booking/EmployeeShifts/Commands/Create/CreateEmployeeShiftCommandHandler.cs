@@ -33,21 +33,26 @@ public sealed class CreateEmployeeShiftCommandHandler(
         if (!employee.IsEmployee)
             throw new DetaillyBusinessRuleException("SHIFT_NOT_EMPLOYEE", "Selected user is not an employee.");
 
-        var dayOfWeek = (int)request.StartUtc.DayOfWeek;
+        var localStart = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(request.StartUtc, DateTimeKind.Utc), LocationOpeningHoursEntity.LocalZone);
+        var localEnd = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(request.EndUtc, DateTimeKind.Utc), LocationOpeningHoursEntity.LocalZone);
+
+        var dayOfWeek = (int)localStart.DayOfWeek;
         var openingHours = await context.LocationOpeningHours
             .FirstOrDefaultAsync(h => h.ShopLocationId == request.ShopLocationId && h.DayOfWeek == dayOfWeek && !h.IsDeleted, ct);
 
         if (openingHours?.IsClosed == true)
             throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
 
-        var windowStart = request.StartUtc.Date.Add(openingHours?.OpenTimeUtc  ?? LocationOpeningHoursEntity.DefaultOpenTime);
-        var windowEnd   = request.StartUtc.Date.Add(openingHours?.CloseTimeUtc ?? LocationOpeningHoursEntity.DefaultCloseTime);
+        var openTime  = openingHours?.OpenTime  ?? LocationOpeningHoursEntity.DefaultOpenTime;
+        var closeTime = openingHours?.CloseTime ?? LocationOpeningHoursEntity.DefaultCloseTime;
 
-        if (request.StartUtc < windowStart)
-            throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", $"Shift cannot start before the location opens at {windowStart:HH:mm} UTC.");
+        if (localStart.TimeOfDay < openTime)
+            throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", $"Shift cannot start before the location opens at {openTime:hh\\:mm}.");
 
-        if (request.EndUtc > windowEnd)
-            throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", $"Shift cannot end after the location closes at {windowEnd:HH:mm} UTC.");
+        if (localEnd.TimeOfDay > closeTime)
+            throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", $"Shift cannot end after the location closes at {closeTime:hh\\:mm}.");
 
         // Prevent overlaps for the same employee regardless of work mode —
         // an employee cannot physically be in two places at once.

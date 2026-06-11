@@ -18,8 +18,8 @@ public sealed class GetLocationOpeningHoursQueryHandler(IAppDbContext context, I
             {
                 h.DayOfWeek,
                 h.IsClosed,
-                h.OpenTimeUtc,
-                h.CloseTimeUtc,
+                h.OpenTime,
+                h.CloseTime,
             })
             .ToListAsync(ct);
 
@@ -27,10 +27,10 @@ public sealed class GetLocationOpeningHoursQueryHandler(IAppDbContext context, I
         {
             DayOfWeek   = h.DayOfWeek,
             IsClosed    = h.IsClosed,
-            OpenHour    = h.OpenTimeUtc?.Hours,
-            OpenMinute  = h.OpenTimeUtc?.Minutes,
-            CloseHour   = h.CloseTimeUtc?.Hours,
-            CloseMinute = h.CloseTimeUtc?.Minutes,
+            OpenHour    = h.OpenTime?.Hours,
+            OpenMinute  = h.OpenTime?.Minutes,
+            CloseHour   = h.CloseTime?.Hours,
+            CloseMinute = h.CloseTime?.Minutes,
         }).ToList();
     }
 }

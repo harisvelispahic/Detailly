@@ -417,8 +417,8 @@ public static class DynamicDataSeeder
             ShopLocationId = sarajevo.Id,
             DayOfWeek = d,
             IsClosed = d == 0,
-            OpenTimeUtc  = d == 0 ? null : new TimeSpan(8, 0, 0),
-            CloseTimeUtc = d == 0 ? null : new TimeSpan(18, 0, 0),
+            OpenTime  = d == 0 ? null : new TimeSpan(8, 0, 0),
+            CloseTime = d == 0 ? null : new TimeSpan(18, 0, 0),
             CreatedAtUtc = now
         });
 
@@ -428,8 +428,8 @@ public static class DynamicDataSeeder
             ShopLocationId = mostar.Id,
             DayOfWeek = d,
             IsClosed = d == 0,
-            OpenTimeUtc  = d == 0 ? null : d == 6 ? new TimeSpan(9, 0, 0)  : new TimeSpan(8, 0, 0),
-            CloseTimeUtc = d == 0 ? null : d == 6 ? new TimeSpan(14, 0, 0) : new TimeSpan(17, 0, 0),
+            OpenTime  = d == 0 ? null : d == 6 ? new TimeSpan(9, 0, 0)  : new TimeSpan(8, 0, 0),
+            CloseTime = d == 0 ? null : d == 6 ? new TimeSpan(14, 0, 0) : new TimeSpan(17, 0, 0),
             CreatedAtUtc = now
         });
 

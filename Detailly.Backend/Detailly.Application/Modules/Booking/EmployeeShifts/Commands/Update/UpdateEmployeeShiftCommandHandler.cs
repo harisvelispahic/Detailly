@@ -53,21 +53,26 @@ public sealed class UpdateEmployeeShiftCommandHandler(
                 throw new DetaillyBusinessRuleException("SHIFT_NOT_EMPLOYEE", "Selected user is not an employee.");
         }
 
-        var dayOfWeek = (int)newStart.DayOfWeek;
+        var localStart = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(newStart, DateTimeKind.Utc), LocationOpeningHoursEntity.LocalZone);
+        var localEnd = TimeZoneInfo.ConvertTimeFromUtc(
+            DateTime.SpecifyKind(newEnd, DateTimeKind.Utc), LocationOpeningHoursEntity.LocalZone);
+
+        var dayOfWeek = (int)localStart.DayOfWeek;
         var openingHours = await context.LocationOpeningHours
             .FirstOrDefaultAsync(h => h.ShopLocationId == newShopLocationId && h.DayOfWeek == dayOfWeek && !h.IsDeleted, ct);
 
         if (openingHours?.IsClosed == true)
             throw new DetaillyBusinessRuleException("SHIFT_LOCATION_CLOSED", "The location is closed on the selected day.");
 
-        var windowStart = newStart.Date.Add(openingHours?.OpenTimeUtc  ?? LocationOpeningHoursEntity.DefaultOpenTime);
-        var windowEnd   = newStart.Date.Add(openingHours?.CloseTimeUtc ?? LocationOpeningHoursEntity.DefaultCloseTime);
+        var openTime  = openingHours?.OpenTime  ?? LocationOpeningHoursEntity.DefaultOpenTime;
+        var closeTime = openingHours?.CloseTime ?? LocationOpeningHoursEntity.DefaultCloseTime;
 
-        if (newStart < windowStart)
-            throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", $"Shift cannot start before the location opens at {windowStart:HH:mm} UTC.");
+        if (localStart.TimeOfDay < openTime)
+            throw new DetaillyBusinessRuleException("SHIFT_BEFORE_OPEN", $"Shift cannot start before the location opens at {openTime:hh\\:mm}.");
 
-        if (newEnd > windowEnd)
-            throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", $"Shift cannot end after the location closes at {windowEnd:HH:mm} UTC.");
+        if (localEnd.TimeOfDay > closeTime)
+            throw new DetaillyBusinessRuleException("SHIFT_AFTER_CLOSE", $"Shift cannot end after the location closes at {closeTime:hh\\:mm}.");
 
         // If any of the properties that affect overlap are changed, check overlaps.
         var needOverlapCheck = request.EmployeeId != null

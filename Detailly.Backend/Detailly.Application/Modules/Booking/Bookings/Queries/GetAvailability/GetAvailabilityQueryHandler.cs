@@ -46,7 +46,8 @@ public sealed class GetAvailabilityQueryHandler(
 
         // 2) Opening hours (per location + day)
         var date      = request.DateUtc.Date;
-        var dayOfWeek = (int)date.DayOfWeek; // Sunday=0 ... Saturday=6
+        var localDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(date, DateTimeKind.Utc), LocationOpeningHoursEntity.LocalZone).Date;
+        var dayOfWeek = (int)localDate.DayOfWeek; // Sunday=0 ... Saturday=6
 
         var opening = await context.LocationOpeningHours
             .AsNoTracking()
@@ -63,8 +64,12 @@ public sealed class GetAvailabilityQueryHandler(
                 MobileSurchargeFee = quote.MobileSurchargeFee,
             };
 
-        var windowStart = date.Add(opening.OpenTimeUtc  ?? LocationOpeningHoursEntity.DefaultOpenTime);
-        var windowEnd   = date.Add(opening.CloseTimeUtc ?? LocationOpeningHoursEntity.DefaultCloseTime);
+        var openTime  = opening.OpenTime  ?? LocationOpeningHoursEntity.DefaultOpenTime;
+        var closeTime = opening.CloseTime ?? LocationOpeningHoursEntity.DefaultCloseTime;
+
+        // Opening hours are local time; convert to UTC for slot generation.
+        var windowStart = TimeZoneInfo.ConvertTimeToUtc(localDate.Add(openTime),  LocationOpeningHoursEntity.LocalZone);
+        var windowEnd   = TimeZoneInfo.ConvertTimeToUtc(localDate.Add(closeTime), LocationOpeningHoursEntity.LocalZone);
 
         if (windowEnd <= windowStart)
             return new GetAvailabilityResult

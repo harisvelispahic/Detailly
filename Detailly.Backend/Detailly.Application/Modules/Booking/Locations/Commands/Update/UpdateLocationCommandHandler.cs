@@ -88,8 +88,8 @@ public sealed class UpdateLocationCommandHandler(
                     {
                         row.IsDeleted     = false;
                         row.IsClosed      = h.IsClosed;
-                        row.OpenTimeUtc   = openTime;
-                        row.CloseTimeUtc  = closeTime;
+                        row.OpenTime   = openTime;
+                        row.CloseTime  = closeTime;
                         row.ModifiedAtUtc = now;
                     }
                     else
@@ -99,8 +99,8 @@ public sealed class UpdateLocationCommandHandler(
                             ShopLocationId = location.Id,
                             DayOfWeek      = h.DayOfWeek,
                             IsClosed       = h.IsClosed,
-                            OpenTimeUtc    = openTime,
-                            CloseTimeUtc   = closeTime,
+                            OpenTime    = openTime,
+                            CloseTime   = closeTime,
                             CreatedAtUtc   = now,
                         });
                     }
@@ -132,8 +132,8 @@ public sealed class UpdateLocationCommandHandler(
             var row = existing.FirstOrDefault(e => e.DayOfWeek == h.DayOfWeek);
             if (row is null || row.IsDeleted)    return true;
             if (row.IsClosed    != h.IsClosed)   return true;
-            if (row.OpenTimeUtc  != openTime)    return true;
-            if (row.CloseTimeUtc != closeTime)   return true;
+            if (row.OpenTime  != openTime)    return true;
+            if (row.CloseTime != closeTime)   return true;
         }
 
         var incomingDays = incoming.Select(h => h.DayOfWeek).ToHashSet();
