@@ -24,7 +24,7 @@ These entities are permanent records and deletion is always blocked:
 
 | Child | Rule |
 |---|---|
-| `EmployeeShift` (ShopLocationId) | Cascade soft-delete |
+| `EmployeeShift` (ShopLocationId) | **Prevent deletion** if any future shifts exist (`LOCATION_HAS_FUTURE_SHIFTS`); past (ended) shifts are cascade soft-deleted |
 | `LocationOpeningHours` (ShopLocationId) | Cascade soft-delete |
 | `Address` (AddressId — 1:1) | Cascade soft-delete |
 | `Booking` (ShopLocationId) | **Prevent deletion** if any exist |

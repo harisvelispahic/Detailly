@@ -47,7 +47,7 @@ SharedModule   → Reusable UI components, Material setup, pipes, services
 
 - Service packages with image galleries (Cloudinary), tiered pricing, and line-item composition
 - In-shop and mobile service modes; mobile jobs calculate a distance surcharge via OpenRoute Service
-- Booking lifecycle: `PendingPayment → Confirmed → InProgress → Completed / Cancelled`
+- Booking lifecycle: `PendingPayment → Confirmed → Completed / Cancelled / Expired`; automated hold expiry with Stripe authorization release via background service
 - Time-slot availability engine with employee shift scheduling
 - Fleet customer support with tiered discounts (2–8% based on vehicle count)
 - Staff assignment to bookings with role-based access
@@ -68,7 +68,7 @@ SharedModule   → Reusable UI components, Material setup, pipes, services
 ### Product E-Commerce
 
 - Product catalog with categories, inventory tracking, and enable/disable controls
-- Shopping cart → checkout → order lifecycle (`Pending → Paid → Shipped → Delivered / Cancelled`)
+- Shopping cart → checkout → order lifecycle (`PendingPayment → Paid → Shipped → Delivered / Cancelled`)
 - Wishlist (saved products)
 - Product search page
 
@@ -82,7 +82,7 @@ SharedModule   → Reusable UI components, Material setup, pipes, services
 ### User & Profile
 
 - JWT authentication (20-minute access tokens, 14-day refresh tokens, token versioning for revocation)
-- Google OAuth external login
+- Google OAuth external login (tokens delivered via short-lived exchange code, not URL fragment)
 - Profile management: personal info, saved addresses, registered vehicles, wallet balance, change password
 - Role hierarchy: Admin, Manager/Staff, Client
 

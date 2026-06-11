@@ -595,23 +595,40 @@ POST /Payments/bookings/{bookingId}/wallet
   6. Calls ConfirmBookingAfterPaymentCommand → Status = Confirmed
 ```
 
-### Stripe payment (asynchronous)
+### Stripe payment (asynchronous, manual capture)
+
+Booking PaymentIntents are created with `CaptureMethod = "manual"`. The card is
+authorized (hold placed) when the customer confirms, but not charged until the
+webhook handler verifies the booking is still valid.
 
 ```
 POST /Payments/bookings/{bookingId}/card-intent
 → CreateBookingPaymentIntentCommandHandler
   1. Validates PendingPayment and hold not expired
-  2. If stale Pending intent (> 10s old) → marks it Failed, allows new intent
-  3. Calls IStripeService.CreateBookingPaymentIntentAsync
+  2. If stale Pending intent (> 5 min old) → cancels it via Stripe API, marks it Failed,
+     allows a new intent
+  3. Calls IStripeService.CreateBookingPaymentIntentAsync (CaptureMethod = "manual")
   4. Creates PaymentTransaction (Provider="Stripe", Status=Pending)
   5. Returns { ClientSecret }
 
-Client confirms payment via Stripe SDK.
+Customer confirms payment via Stripe.js (card is authorized, not yet charged).
 
-Stripe fires webhook →
+Stripe fires payment_intent.amount_capturable_updated →
+→ HandleStripeWebhookCommandHandler
+  → If booking is still PendingPayment and hold not expired:
+      → Calls IStripeService.CapturePaymentIntentAsync (card is now charged)
+  → If booking is expired:
+      → Calls IStripeService.CancelPaymentIntentAsync (authorization released, customer not charged)
+      → Sets PaymentTransaction.Status = Unpaid
+
+Stripe fires payment_intent.succeeded (only after a successful capture) →
 → HandleStripeWebhookCommandHandler
   → Marks PaymentTransaction.Status = Paid
   → Calls ConfirmBookingAfterPaymentCommand → Status = Confirmed
+  → If booking is no longer confirmable (BOOKING_NOT_CONFIRMABLE / BOOKING_EXPIRED):
+      → Immediately refunds via IStripeService.RefundPaymentIntentAsync
+      → Sets PaymentTransaction.Status = Refunded
+      → Records webhook event as processed (Stripe will not retry)
 ```
 
 ### PaymentTransaction schema
@@ -771,10 +788,23 @@ For mobile bookings, use `DepartureUtc` and `ReturnUtc` to show when the team le
 
 ---
 
+## Background Services
+
+### BookingHoldExpiryCleanupService
+
+Runs every 60 seconds. Finds all bookings in `PendingPayment` status where `ReservationExpiresAtUtc <= now`:
+
+1. Transitions the booking to `Expired`
+2. For each associated `Pending` PaymentTransaction that has a Stripe `ProviderTransactionId`: cancels the PaymentIntent via `IStripeService.CancelPaymentIntentAsync` (releases the authorization hold immediately rather than waiting for Stripe's 7-day auto-expiry)
+3. Marks that PaymentTransaction as `Unpaid`
+
+Stripe cancellation failures are caught, logged, and swallowed — the booking is still expired locally. The cleanup runs in a scoped DI scope so it has a dedicated `DbContext` per execution.
+
+---
+
 ## What Is Intentionally Not Automated
 
 - **Employee scheduling for mobile** — the system reserves `k` employee _slots_ during hold creation, but which specific employees go is a manual manager decision via `AssignEmployeesToBookingCommand`. There is no automatic assignment.
-- **Hold expiry** — `ReservationExpiresAtUtc` is set and respected in all queries, but no background job currently soft-deletes or transitions expired holds. Availability and capacity checks filter them out dynamically.
 - **Holidays** — opening hours are per day-of-week only. No holiday table exists yet.
 - **Per-location timezones** — all times are UTC throughout.
 - **Vehicle-specific availability pricing** — `GetAvailabilityQuery` always uses vehicle multiplier = 1.0 and `isFleet: false`. Slots are capacity-correct but the displayed price is approximate until the hold is created with real vehicle data.
