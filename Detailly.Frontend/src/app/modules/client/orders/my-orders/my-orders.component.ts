@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OrdersApiService } from '../../../../api-services/orders/orders-api.service';
+import { GetMyOrdersDto, GetMyOrdersRequest, GetMyOrdersResponse } from '../../../../api-services/orders/orders-api.models';
 
 @Component({
   selector: 'app-my-orders',
@@ -13,7 +14,7 @@ export class MyOrdersComponent implements OnInit {
 
   // backend returns PageResult<T>
   total = 0;
-  items: any[] = [];
+  items: GetMyOrdersDto[] = [];
 
   // basic paging
   page = 1;
@@ -32,14 +33,12 @@ export class MyOrdersComponent implements OnInit {
     this.isLoading = true;
     this.error = undefined;
 
-    // Your GetMyOrdersQuery expects ?Paging.PageNumber & Paging.PageSize usually.
-    // buildHttpParams will flatten objects; we’ll pass in the common shape:
-    const request: any = {
-      paging: { pageNumber: this.page, pageSize: this.pageSize },
-    };
+    const request = new GetMyOrdersRequest();
+    request.paging.page = this.page;
+    request.paging.pageSize = this.pageSize;
 
     this.ordersApi.getMy(request).subscribe({
-      next: (res: any) => {
+      next: (res: GetMyOrdersResponse) => {
         this.total = res.total ?? 0;
         this.items = res.items ?? [];
         this.isLoading = false;

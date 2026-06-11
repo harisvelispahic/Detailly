@@ -9,16 +9,21 @@ public class PayBookingWithWalletCommandHandler
 {
     private readonly IAppDbContext _context;
     private readonly IMediator _mediator;
+    private readonly TimeProvider _timeProvider;
 
-    public PayBookingWithWalletCommandHandler(IAppDbContext context, IMediator mediator)
+    public PayBookingWithWalletCommandHandler(
+        IAppDbContext context,
+        IMediator mediator,
+        TimeProvider timeProvider)
     {
         _context = context;
         _mediator = mediator;
+        _timeProvider = timeProvider;
     }
 
     public async Task<Unit> Handle(PayBookingWithWalletCommand request, CancellationToken ct)
     {
-        var now = DateTime.UtcNow;
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
 
         await using var tx = await _context.Database.BeginTransactionAsync(ct);
 

@@ -194,9 +194,9 @@ Only runs when both `serviceAddressId` and `shopLocationId` are provided:
 
 1. Load `AddressEntity` for the service address
 2. Load shop's `Address` coordinates via the `Location` navigation
-3. **Cache check:** if `AddressEntity.TravelMetadataLocationId == shopLocationId` and both `DistanceFromShopKm` and `TravelTimeFromShopMinutes` are populated, use cached values (skip ORS call)
-4. Otherwise: call `IRoadDistanceService.GetRoadTravelAsync(shopLat, shopLng, addrLat, addrLng)` and persist the result back to the address entity (`DistanceFromShopKm`, `TravelTimeFromShopMinutes`, `TravelMetadataLocationId`) as a best-effort cache write (failures are logged and swallowed)
-5. If ORS returns null or coordinates are missing: apply fallback (`OpenRouteServiceOptions.FallbackSurcharge`, `TravelTimeMinutes = 0`)
+3. **Cache check:** look up `"travel:{serviceAddressId}:{shopLocationId}"` in `IMemoryCache` (TTL = 7 days). If hit, use cached `MobileTravelResult` (skip ORS call)
+4. Otherwise: call `IRoadDistanceService.GetRoadTravelAsync(shopLat, shopLng, addrLat, addrLng)` and store the result in `IMemoryCache` for future calls
+5. If ORS returns null or coordinates are missing: apply fallback — `OpenRouteServiceOptions.FallbackSurcharge` and `TravelTimeMinutes = FallbackTravelTimeMinutes` (default **45 min**); a warning is logged
 
 Surcharge formula:
 
@@ -435,14 +435,15 @@ AddonItemIds      List<int>?
 ServiceMode       enum
 ShopLocationId    int
 ServiceAddressId  int?       — optional; when provided for Mobile, enables real travel time
+VehicleIds        List<int>? — optional; when provided, fleet/multi-vehicle capacity is applied
 ```
 
-The quote is always called with `vehicleIds: null`, `isFleet: false`. `ServiceAddressId` and `ShopLocationId` are forwarded to `IBookingQuoteService` only when `ServiceAddressId` is provided:
+When `VehicleIds` is provided the handler forwards them to `IBookingQuoteService` along with `customerId` and `isFleet = true` (if the caller is a fleet user). When omitted, the quote falls back to single-vehicle pricing (`vehicleIds: null`, `isFleet: false`).
 
 - If `ServiceAddressId` is null → travel time = 0, mobile surcharge = 0 (approximate for mobile)
 - If `ServiceAddressId` is provided → real ORS travel time and surcharge are computed and returned; slot windows are widened accordingly (accurate for mobile)
 
-In all cases, vehicle multiplier = 1.0 (no vehicle-specific pricing without a vehicle selection).
+For fleet callers, the per-slot capacity check mirrors the k-optimization logic from `CreateBookingHoldCommandHandler` so the displayed slots match what will actually succeed at hold creation.
 
 **Algorithm:**
 
@@ -707,15 +708,7 @@ record RoadTravelInfo(decimal DistanceKm, int TravelTimeMinutes);
 
 Implementation calls OpenRouteService (ORS). Returns `null` on failure — callers apply a configured fallback.
 
-Results are cached on `AddressEntity`:
-
-```
-DistanceFromShopKm          decimal?
-TravelTimeFromShopMinutes   int?
-TravelMetadataLocationId    int?   — which shop the cached values are for
-```
-
-Cache is per-address-per-shop. If the shop changes, the cache is stale and ORS is called again.
+Results are cached in-memory (`IMemoryCache`) with a 7-day TTL, keyed as `"travel:{serviceAddressId}:{shopLocationId}"`. This is a pure in-memory cache (no DB write), so it does not violate CQRS when called from query handlers. The cache is per-address-per-shop; if either changes a new ORS call is made.
 
 ---
 
@@ -726,11 +719,12 @@ Cache is per-address-per-shop. If the shop changes, the cache is stale and ORS i
   "ApiKey": "",
   "FreeRadiusKm": 10.0,
   "PricePerKm": 0.50,
-  "FallbackSurcharge": 5.00
+  "FallbackSurcharge": 5.00,
+  "FallbackTravelTimeMinutes": 45
 }
 ```
 
-Bound to `OpenRouteServiceOptions`. Used only by `BookingQuoteService`.
+Bound to `OpenRouteServiceOptions`. Used only by `BookingQuoteService`. `FallbackTravelTimeMinutes` (default 45) is applied when ORS is unreachable or returns no result — ensures mobile slots are not shown as if travel time were zero.
 
 ---
 

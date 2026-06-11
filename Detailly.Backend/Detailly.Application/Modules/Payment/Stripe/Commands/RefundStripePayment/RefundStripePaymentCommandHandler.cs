@@ -1,6 +1,7 @@
 using Detailly.Application.Abstractions.Payments;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Payment;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Detailly.Application.Modules.Payment.Card.Commands.RefundStripePayment;
 
@@ -41,27 +42,33 @@ public sealed class RefundStripePaymentCommandHandler(
         if (request.Amount > payment.Amount)
             throw new DetaillyBusinessRuleException("refund.exceeds_amount", "Refund amount cannot exceed original payment amount.");
 
-        var refundId = await stripe.RefundPaymentIntentAsync(payment.ProviderTransactionId!, request.Amount, ct);
-
-        var refundTx = new PaymentTransactionEntity
+        var ownTx = context.Database.CurrentTransaction is null;
+        IDbContextTransaction? tx = ownTx ? await context.Database.BeginTransactionAsync(ct) : null;
+        await using (tx)
         {
-            Amount = request.Amount,
-            TransactionType = TransactionType.Refund,
-            Status = PaymentTransactionStatus.Refunded,
-            TransactionDate = now,
-            IdempotencyKey = idempotencyKey,
-            Provider = "Stripe",
-            ProviderTransactionId = refundId,
-            Description = $"Stripe refund ({request.Amount:0.00}) for payment #{payment.Id}",
-            BookingId = payment.BookingId,
-            OrderId = payment.OrderId
-        };
+            var refundId = await stripe.RefundPaymentIntentAsync(payment.ProviderTransactionId!, request.Amount, ct);
 
-        context.PaymentTransactions.Add(refundTx);
-        payment.Status = PaymentTransactionStatus.Refunded;
+            var refundTx = new PaymentTransactionEntity
+            {
+                Amount = request.Amount,
+                TransactionType = TransactionType.Refund,
+                Status = PaymentTransactionStatus.Refunded,
+                TransactionDate = now,
+                IdempotencyKey = idempotencyKey,
+                Provider = "Stripe",
+                ProviderTransactionId = refundId,
+                Description = $"Stripe refund ({request.Amount:0.00}) for payment #{payment.Id}",
+                BookingId = payment.BookingId,
+                OrderId = payment.OrderId
+            };
 
-        await context.SaveChangesAsync(ct);
+            context.PaymentTransactions.Add(refundTx);
+            payment.Status = PaymentTransactionStatus.Refunded;
 
-        return Unit.Value;
+            await context.SaveChangesAsync(ct);
+            if (ownTx) await tx!.CommitAsync(ct);
+
+            return Unit.Value;
+        }
     }
 }
