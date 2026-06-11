@@ -156,7 +156,7 @@ export class BookingPaymentPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.showSuccessDialog('Your booking will be confirmed shortly after payment processing.');
+    this.showSuccessDialog('Your booking will be confirmed shortly after payment processing.', true);
   }
 
   payWithWallet(): void {
@@ -175,7 +175,7 @@ export class BookingPaymentPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  private showSuccessDialog(message: string): void {
+  private showSuccessDialog(message: string, awaitConfirmation = false): void {
     this.dialogHelper
       .open({
         type: DialogType.SUCCESS,
@@ -185,7 +185,10 @@ export class BookingPaymentPageComponent implements OnInit, OnDestroy {
         buttons: [{ type: DialogButton.OK }],
       })
       .subscribe(() => {
-        this.router.navigate(['/client/bookings', this.id]);
+        this.router.navigate(
+          ['/client/bookings', this.id],
+          awaitConfirmation ? { queryParams: { awaitConfirmation: 'true' } } : {},
+        );
       });
   }
 

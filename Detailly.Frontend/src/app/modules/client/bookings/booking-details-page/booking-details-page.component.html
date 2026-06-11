@@ -199,8 +199,16 @@
           </div>
         </div>
 
-        <!-- Reservation expiry banner (PendingPayment only) -->
-        @if (booking.status === BookingStatus.PendingPayment && booking.reservationExpiresAtUtc) {
+        <!-- Confirmation polling banner (shown after returning from payment page) -->
+        @if (isAwaitingConfirmation) {
+          <div class="confirmation-banner">
+            <mat-spinner diameter="20"></mat-spinner>
+            <span>Confirming your payment&hellip;</span>
+          </div>
+        }
+
+        <!-- Reservation expiry banner (PendingPayment only, hidden while confirmation is in progress) -->
+        @if (!isAwaitingConfirmation && booking.status === BookingStatus.PendingPayment && booking.reservationExpiresAtUtc) {
           <div class="expiry-banner">
             <mat-icon>timer</mat-icon>
             <span>

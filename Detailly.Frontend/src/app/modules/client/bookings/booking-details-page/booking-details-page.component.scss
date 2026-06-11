@@ -377,6 +377,30 @@
   line-height: 1.6;
 }
 
+// ---- Confirmation banner ----
+
+.confirmation-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: hsl(var(--info) / 0.1);
+  border: 1px solid hsl(var(--info) / 0.3);
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: hsl(var(--info));
+  margin-bottom: 1.25rem;
+
+  mat-spinner {
+    flex-shrink: 0;
+
+    ::ng-deep circle {
+      stroke: hsl(var(--info));
+    }
+  }
+}
+
 // ---- Expiry banner ----
 
 .expiry-banner {

@@ -28,7 +28,11 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
   cancelReason = '';
 
   secondsRemaining: number | null = null;
+  isAwaitingConfirmation = false;
+
   private countdownInterval?: ReturnType<typeof setInterval>;
+  private pollInterval?: ReturnType<typeof setInterval>;
+  private pollTimeoutHandle?: ReturnType<typeof setTimeout>;
 
   BookingStatus = BookingStatus;
   ServiceMode = ServiceMode;
@@ -43,14 +47,19 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
-    this.load();
+    const awaitConfirmation = this.route.snapshot.queryParamMap.get('awaitConfirmation') === 'true';
+    if (awaitConfirmation) {
+      this.router.navigate([], { relativeTo: this.route, queryParams: {}, replaceUrl: true });
+    }
+    this.load(awaitConfirmation);
   }
 
   ngOnDestroy(): void {
     clearInterval(this.countdownInterval);
+    this.stopPolling();
   }
 
-  load(): void {
+  load(awaitConfirmation = false): void {
     this.isLoading = true;
     this.error = undefined;
 
@@ -59,12 +68,47 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
         this.booking = res;
         this.isLoading = false;
         this.startCountdown();
+        if (awaitConfirmation && res.status === BookingStatus.PendingPayment) {
+          this.startConfirmationPolling();
+        }
       },
       error: () => {
         this.error = 'Failed to load booking details.';
         this.isLoading = false;
       },
     });
+  }
+
+  private startConfirmationPolling(): void {
+    this.isAwaitingConfirmation = true;
+
+    this.pollInterval = setInterval(() => {
+      this.bookingsService.getById(this.id).subscribe({
+        next: (res) => {
+          if (res.status !== BookingStatus.PendingPayment) {
+            this.stopPolling();
+            this.booking = res;
+            this.startCountdown();
+          }
+        },
+      });
+    }, 2000);
+
+    this.pollTimeoutHandle = setTimeout(() => {
+      this.stopPolling();
+      this.bookingsService.getById(this.id).subscribe({
+        next: (res) => {
+          this.booking = res;
+          this.startCountdown();
+        },
+      });
+    }, 15000);
+  }
+
+  private stopPolling(): void {
+    clearInterval(this.pollInterval);
+    clearTimeout(this.pollTimeoutHandle);
+    this.isAwaitingConfirmation = false;
   }
 
   private startCountdown(): void {
