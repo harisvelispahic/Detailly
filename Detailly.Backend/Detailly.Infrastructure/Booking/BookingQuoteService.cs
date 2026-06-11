@@ -4,6 +4,7 @@ using Detailly.Application.Common.Exceptions;
 using Detailly.Domain.Common.Enums;
 using Detailly.Domain.Entities.Booking;
 using Detailly.Shared.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +15,7 @@ public sealed class BookingQuoteService(
     IRoadDistanceService roadDistanceService,
     IOptions<OpenRouteServiceOptions> pricingOptions,
     IOptions<FleetDiscountOptions> fleetDiscountOptions,
+    IMemoryCache memoryCache,
     ILogger<BookingQuoteService> logger) : IBookingQuoteService
 {
     public async Task<BookingQuoteResult> CalculateAsync(
@@ -231,9 +233,16 @@ public sealed class BookingQuoteService(
         CancellationToken ct)
     {
         var opts = pricingOptions.Value;
+        var cacheKey = $"travel:{serviceAddressId}:{shopLocationId}";
+
+        if (memoryCache.TryGetValue(cacheKey, out MobileTravelResult? cached) && cached is not null)
+            return cached;
 
         var serviceAddress = await context.Addresses
-            .FirstOrDefaultAsync(a => a.Id == serviceAddressId && !a.IsDeleted, ct);
+            .AsNoTracking()
+            .Where(a => a.Id == serviceAddressId && !a.IsDeleted)
+            .Select(a => new { a.Latitude, a.Longitude })
+            .FirstOrDefaultAsync(ct);
 
         if (serviceAddress is null)
             return ApplyFallback(opts, "Service address not found.");
@@ -250,45 +259,21 @@ public sealed class BookingQuoteService(
         if (shopAddress is null || shopAddress.Latitude is null || shopAddress.Longitude is null)
             return ApplyFallback(opts, $"Shop location {shopLocationId} has no coordinates — cannot calculate road distance.");
 
-        decimal distanceKm;
-        int travelTimeMinutes;
+        var apiResult = await roadDistanceService.GetRoadTravelAsync(
+            shopAddress.Latitude.Value, shopAddress.Longitude.Value,
+            serviceAddress.Latitude.Value, serviceAddress.Longitude.Value,
+            ct);
 
-        // Use cached values when they were computed for the same shop
-        if (serviceAddress.DistanceFromShopKm is not null &&
-            serviceAddress.TravelTimeFromShopMinutes is not null &&
-            serviceAddress.TravelMetadataLocationId == shopLocationId)
-        {
-            distanceKm = serviceAddress.DistanceFromShopKm.Value;
-            travelTimeMinutes = serviceAddress.TravelTimeFromShopMinutes.Value;
-        }
-        else
-        {
-            var apiResult = await roadDistanceService.GetRoadTravelAsync(
-                shopAddress.Latitude.Value, shopAddress.Longitude.Value,
-                serviceAddress.Latitude.Value, serviceAddress.Longitude.Value,
-                ct);
+        if (apiResult is null)
+            return ApplyFallback(opts, "Road travel API returned no result.");
 
-            if (apiResult is null)
-                return ApplyFallback(opts, "Road travel API returned no result.");
+        var result = new MobileTravelResult(
+            ComputeSurcharge(apiResult.DistanceKm, opts),
+            apiResult.TravelTimeMinutes);
 
-            distanceKm = apiResult.DistanceKm;
-            travelTimeMinutes = apiResult.TravelTimeMinutes;
+        memoryCache.Set(cacheKey, result, TimeSpan.FromDays(7));
 
-            // Persist cache (best-effort — don't fail the quote if this save fails)
-            try
-            {
-                serviceAddress.DistanceFromShopKm = distanceKm;
-                serviceAddress.TravelTimeFromShopMinutes = travelTimeMinutes;
-                serviceAddress.TravelMetadataLocationId = shopLocationId;
-                await context.SaveChangesAsync(ct);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "Failed to cache travel info for address {AddressId}.", serviceAddressId);
-            }
-        }
-
-        return new MobileTravelResult(ComputeSurcharge(distanceKm, opts), travelTimeMinutes);
+        return result;
     }
 
     private MobileTravelResult ApplyFallback(OpenRouteServiceOptions opts, string reason)

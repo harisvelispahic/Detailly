@@ -61,11 +61,8 @@ public sealed class UpdateAddressCommandHandler(
                 logger.LogWarning("Geocoding failed for updated address {AddressId} ({Street}, {City}, {Country}).",
                     address.Id, address.Street, address.City, address.Country);
 
-            address.Latitude                = coords?.Latitude;
-            address.Longitude               = coords?.Longitude;
-            address.DistanceFromShopKm      = null;
-            address.TravelTimeFromShopMinutes = null;
-            address.TravelMetadataLocationId  = null;
+            address.Latitude  = coords?.Latitude;
+            address.Longitude = coords?.Longitude;
         }
 
         await context.SaveChangesAsync(ct);
