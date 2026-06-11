@@ -490,6 +490,7 @@ export class BookingWizardComponent implements OnInit {
         serviceMode: this.selectedServiceMode,
         shopLocationId: this.selectedLocationId,
         serviceAddressId: this.selectedAddressId,
+        vehicleIds: Array.from(this.selectedVehicleIds),
       })
       .subscribe({
         next: (response) => {

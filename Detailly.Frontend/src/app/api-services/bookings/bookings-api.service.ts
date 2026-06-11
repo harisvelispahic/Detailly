@@ -60,6 +60,12 @@ export class BookingsService {
       params = params.set('serviceAddressId', request.serviceAddressId.toString());
     }
 
+    if (request.vehicleIds && request.vehicleIds.length > 0) {
+      request.vehicleIds.forEach(id => {
+        params = params.append('vehicleIds', id.toString());
+      });
+    }
+
     return this.http.get<GetAvailabilityResponse>(`${this.baseUrl}/availability`, { params });
   }
 

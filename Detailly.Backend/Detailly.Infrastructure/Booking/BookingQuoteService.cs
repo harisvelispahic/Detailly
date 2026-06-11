@@ -225,6 +225,41 @@ public sealed class BookingQuoteService(
         };
     }
 
+    public FleetMobileCapacityResult? ComputeFleetMobileCapacity(
+        int vehicleCount,
+        int baseEmployeesPerVehicle,
+        int perVehicleDurationMinutes,
+        DateTime slotStartUtc,
+        int travelTimeMinutes,
+        DateTime maxShiftEnd)
+    {
+        var availableWorkMinutes = (int)(maxShiftEnd - slotStartUtc).TotalMinutes - travelTimeMinutes;
+        if (availableWorkMinutes <= 0)
+            return null;
+
+        var maxK = vehicleCount * baseEmployeesPerVehicle;
+
+        for (var k = 1; k <= maxK; k++)
+        {
+            int candidateDuration;
+            if (k < baseEmployeesPerVehicle)
+            {
+                var timePerVehicle = (int)Math.Ceiling((double)(baseEmployeesPerVehicle * perVehicleDurationMinutes) / k);
+                candidateDuration = vehicleCount * timePerVehicle;
+            }
+            else
+            {
+                var teams = k / baseEmployeesPerVehicle;
+                candidateDuration = (int)Math.Ceiling((double)vehicleCount / teams) * perVehicleDurationMinutes;
+            }
+
+            if (candidateDuration <= availableWorkMinutes)
+                return new FleetMobileCapacityResult(k, candidateDuration);
+        }
+
+        return null;
+    }
+
     private record MobileTravelResult(decimal SurchargeFee, int TravelTimeMinutes);
 
     private async Task<MobileTravelResult> CalculateMobileTravelAsync(

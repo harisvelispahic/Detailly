@@ -6,6 +6,7 @@ namespace Detailly.Application.Modules.Booking.Bookings.Queries.GetAvailability;
 
 public sealed class GetAvailabilityQueryHandler(
     IAppDbContext context,
+    IAppCurrentUser appCurrentUser,
     IBookingQuoteService quoteService,
     TimeProvider timeProvider)
     : IRequestHandler<GetAvailabilityQuery, GetAvailabilityResult>
@@ -14,22 +15,34 @@ public sealed class GetAvailabilityQueryHandler(
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
 
-        // 1) Quote — now includes travel time when serviceAddressId is provided for mobile
+        var vehicleIds = (request.VehicleIds ?? new List<int>())
+            .Distinct()
+            .ToList();
+
+        var hasVehicles = vehicleIds.Count > 0;
+        var customerId  = hasVehicles ? appCurrentUser.ApplicationUserId : (int?)null;
+        var isFleet     = hasVehicles && appCurrentUser.IsFleet;
+
+        // 1) Quote — drives duration, employee base, bays, travel time, price
         var quote = await quoteService.CalculateAsync(
             request.ServicePackageId,
             request.AddonItemIds,
             request.ServiceMode,
-            vehicleIds: null,
-            customerId: null,
-            isFleet: false,
+            hasVehicles ? vehicleIds : null,
+            customerId,
+            isFleet,
             ct,
             serviceAddressId: request.ServiceAddressId,
             shopLocationId: request.ServiceAddressId.HasValue ? request.ShopLocationId : null);
 
-        var travelTimeMinutes   = quote.TravelTimeMinutes;
+        var travelTimeMinutes    = quote.TravelTimeMinutes;
         var totalDurationMinutes = quote.TotalDurationMinutes;
-        var requiredEmployees   = quote.RequiredEmployees;
-        var requiredBays        = quote.RequiredBays;
+        var requiredEmployees    = quote.RequiredEmployees;
+        var requiredBays         = quote.RequiredBays;
+
+        // Fleet mobile multi-vehicle: k-optimisation runs per slot (maxShiftEnd varies).
+        var vehicleCount             = Math.Max(1, vehicleIds.Count);
+        var isFleetMobileMultiVehicle = isFleet && request.ServiceMode == ServiceMode.Mobile && vehicleCount > 1;
 
         // 2) Opening hours (per location + day)
         var date      = request.DateUtc.Date;
@@ -131,12 +144,50 @@ public sealed class GetAvailabilityQueryHandler(
         {
             if (start < now) continue;
 
-            var end = start.AddMinutes(totalDurationMinutes);
-            if (end > windowEnd) break;
+            var departure = start.AddMinutes(-travelTimeMinutes);
 
-            // Effective window for this slot, widened by travel time for mobile
-            var departure   = start.AddMinutes(-travelTimeMinutes);
-            var returnTime  = end.AddMinutes(travelTimeMinutes);
+            var slotRequiredEmployees    = requiredEmployees;
+            var slotTotalDurationMinutes = totalDurationMinutes;
+
+            // For fleet mobile multi-vehicle, recompute capacity per slot because maxShiftEnd
+            // (and therefore optimal k and duration) differs for each candidate start time.
+            if (isFleetMobileMultiVehicle)
+            {
+                var maxShiftEnd = shifts
+                    .Where(s => s.StartUtc <= departure && s.EndUtc > start)
+                    .Select(s => s.EndUtc)
+                    .DefaultIfEmpty()
+                    .Max();
+
+                if (maxShiftEnd == default) continue;
+
+                var capacity = quoteService.ComputeFleetMobileCapacity(
+                    vehicleCount,
+                    quote.RequiredEmployees,
+                    quote.PerVehicleDurationMinutes,
+                    start,
+                    travelTimeMinutes,
+                    maxShiftEnd);
+
+                if (capacity is null) continue;
+
+                slotRequiredEmployees    = capacity.RequiredEmployees;
+                slotTotalDurationMinutes = capacity.TotalDurationMinutes;
+            }
+
+            var end = start.AddMinutes(slotTotalDurationMinutes);
+
+            if (end > windowEnd)
+            {
+                // For fleet mobile, duration can shrink for later slots (more employees fit the remaining window),
+                // so continue rather than break. For fixed-duration cases, break is safe.
+                if (isFleetMobileMultiVehicle)
+                    continue;
+                else
+                    break;
+            }
+
+            var returnTime = end.AddMinutes(travelTimeMinutes);
 
             // Supply: employees whose shift fully covers the effective window [departure, returnTime]
             var availableEmployees = shifts
@@ -155,7 +206,7 @@ public sealed class GetAvailabilityQueryHandler(
                 })
                 .Sum(b => b.RequiredEmployees);
 
-            if (availableEmployees - usedEmployees < requiredEmployees)
+            if (availableEmployees - usedEmployees < slotRequiredEmployees)
                 continue;
 
             if (request.ServiceMode == ServiceMode.InShop)

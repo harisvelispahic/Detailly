@@ -139,61 +139,20 @@ public sealed class CreateBookingHoldCommandHandler(
                 throw new DetaillyBusinessRuleException("BOOKING_NO_CAPACITY",
                     "No mobile employees are available for the selected time.");
 
-            // Time employees can spend working on-site before needing to leave to return in time
-            var availableWorkMinutes =
-                (int)(maxShiftEnd.Value - request.StartUtc).TotalMinutes - travelTimeMinutes;
+            var capacity = quoteService.ComputeFleetMobileCapacity(
+                vehicleCount,
+                quote.RequiredEmployees,
+                perVehicleDuration,
+                request.StartUtc,
+                travelTimeMinutes,
+                maxShiftEnd.Value);
 
-            if (availableWorkMinutes <= 0)
-                throw new DetaillyBusinessRuleException("BOOKING_NO_TIME",
-                    "Employees cannot complete any work and return before closing.");
-
-            // baseEmployeesPerVehicle = how many employees are needed to service one vehicle
-            // in perVehicleDuration minutes (the package's rated staffing).
-            //
-            // Two regimes depending on how many employees k we send:
-            //
-            //   k < base → partial team; work scales inversely with headcount:
-            //     timePerVehicle = ceil(base × duration / k)
-            //     totalDuration  = N × timePerVehicle
-            //
-            //   k >= base → form floor(k/base) full teams working in parallel:
-            //     totalDuration  = ceil(N / teams) × duration
-            //
-            // We iterate from k=1 upward and take the first k whose total fits the window.
-            var baseEmployeesPerVehicle = quote.RequiredEmployees;
-            var maxK = vehicleCount * baseEmployeesPerVehicle;
-
-            int? optimalK = null;
-            int optimalDuration = 0;
-
-            for (var k = 1; k <= maxK; k++)
-            {
-                int candidateDuration;
-                if (k < baseEmployeesPerVehicle)
-                {
-                    var timePerVehicle = (int)Math.Ceiling((double)(baseEmployeesPerVehicle * perVehicleDuration) / k);
-                    candidateDuration = vehicleCount * timePerVehicle;
-                }
-                else
-                {
-                    var teams = k / baseEmployeesPerVehicle;
-                    candidateDuration = (int)Math.Ceiling((double)vehicleCount / teams) * perVehicleDuration;
-                }
-
-                if (candidateDuration <= availableWorkMinutes)
-                {
-                    optimalK = k;
-                    optimalDuration = candidateDuration;
-                    break;
-                }
-            }
-
-            if (optimalK is null)
+            if (capacity is null)
                 throw new DetaillyBusinessRuleException("BOOKING_NO_TIME",
                     "Not enough time to complete all vehicles before employees must return.");
 
-            requiredEmployees = optimalK.Value;
-            totalDurationMinutes = optimalDuration;
+            requiredEmployees    = capacity.RequiredEmployees;
+            totalDurationMinutes = capacity.TotalDurationMinutes;
         }
 
         var endUtc = request.StartUtc.AddMinutes(totalDurationMinutes);

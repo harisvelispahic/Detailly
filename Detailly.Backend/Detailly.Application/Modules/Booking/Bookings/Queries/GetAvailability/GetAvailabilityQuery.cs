@@ -15,4 +15,7 @@ public sealed class GetAvailabilityQuery : IRequest<GetAvailabilityResult>
 
     // For mobile bookings: used to calculate real travel time and filter impossible slots
     public int? ServiceAddressId { get; set; }
+
+    // Required for fleet customers: drives multi-vehicle capacity and k-optimisation
+    public List<int>? VehicleIds { get; set; }
 }

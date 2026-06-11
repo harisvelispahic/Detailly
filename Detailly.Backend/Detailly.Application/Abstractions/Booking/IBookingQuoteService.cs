@@ -14,4 +14,18 @@ public interface IBookingQuoteService
         CancellationToken ct,
         int? serviceAddressId = null,
         int? shopLocationId = null);
+
+    /// <summary>
+    /// Pure k-optimisation for fleet mobile multi-vehicle slots.
+    /// Returns null when the slot cannot accommodate any valid schedule.
+    /// </summary>
+    FleetMobileCapacityResult? ComputeFleetMobileCapacity(
+        int vehicleCount,
+        int baseEmployeesPerVehicle,
+        int perVehicleDurationMinutes,
+        DateTime slotStartUtc,
+        int travelTimeMinutes,
+        DateTime maxShiftEnd);
 }
+
+public sealed record FleetMobileCapacityResult(int RequiredEmployees, int TotalDurationMinutes);

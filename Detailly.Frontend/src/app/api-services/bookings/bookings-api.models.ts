@@ -115,6 +115,7 @@ export interface GetAvailabilityRequest {
   serviceMode: ServiceMode;
   shopLocationId: number;
   serviceAddressId?: number;
+  vehicleIds?: number[];
 }
 
 // ---- Staff: Unassigned confirmed bookings (admin/manager) ----

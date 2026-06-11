@@ -93,7 +93,6 @@ public class BookingsController(ISender sender) : ControllerBase
     // GET AVAILABILITY
     // ---------------------------------------
     [HttpGet("availability")]
-    [AllowAnonymous]
     public async Task<GetAvailabilityResult> GetAvailability(
         [FromQuery] GetAvailabilityQuery query,
         CancellationToken ct)
