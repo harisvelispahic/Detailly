@@ -255,6 +255,8 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
         return 'Failed';
       case PaymentTransactionStatus.Refunded:
         return 'Refunded';
+      case PaymentTransactionStatus.PartiallyRefunded:
+        return 'Partially refunded';
       default:
         return 'Unknown';
     }
@@ -269,6 +271,7 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
       case PaymentTransactionStatus.Failed:
         return 'payment-badge--failed';
       case PaymentTransactionStatus.Refunded:
+      case PaymentTransactionStatus.PartiallyRefunded:
         return 'payment-badge--refunded';
       default:
         return 'payment-badge--unpaid';
@@ -277,7 +280,6 @@ export class BookingDetailsPageComponent implements OnInit, OnDestroy {
 
   get effectivePaymentStatus(): PaymentTransactionStatus | null {
     if (this.booking?.paymentStatus == null) return null;
-    if (this.booking.status === BookingStatus.Cancelled) return PaymentTransactionStatus.Refunded;
     return this.booking.paymentStatus;
   }
 

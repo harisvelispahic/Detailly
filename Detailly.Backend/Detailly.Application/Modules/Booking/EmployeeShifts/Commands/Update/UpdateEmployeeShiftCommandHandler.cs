@@ -21,7 +21,6 @@ public sealed class UpdateEmployeeShiftCommandHandler(
         // Compose candidate values (existing + provided)
         var newEmployeeId = request.EmployeeId ?? shift.EmployeeId;
         var newShopLocationId = request.ShopLocationId ?? shift.ShopLocationId;
-        var newWorkMode = request.EmployeeWorkMode ?? shift.EmployeeWorkMode;
         var newStart = request.StartUtc ?? shift.StartUtc;
         var newEnd = request.EndUtc ?? shift.EndUtc;
 
@@ -82,12 +81,13 @@ public sealed class UpdateEmployeeShiftCommandHandler(
 
         if (needOverlapCheck)
         {
+            // Overlaps are checked regardless of work mode —
+            // an employee cannot physically be in two places at once.
             var overlaps = await context.EmployeeShifts
                 .AnyAsync(s =>
                     !s.IsDeleted &&
                     s.Id != request.Id &&
                     s.EmployeeId == newEmployeeId &&
-                    s.EmployeeWorkMode == newWorkMode &&
                     s.StartUtc < newEnd &&
                     s.EndUtc > newStart, ct);
 

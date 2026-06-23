@@ -63,7 +63,13 @@ public sealed class RefundStripePaymentCommandHandler(
             };
 
             context.PaymentTransactions.Add(refundTx);
-            payment.Status = PaymentTransactionStatus.Refunded;
+
+            // One refund per payment (enforced by the idempotency key above).
+            // Reflect the original payment honestly: only a full-amount refund is
+            // "Refunded"; anything less is "PartiallyRefunded".
+            payment.Status = request.Amount < payment.Amount
+                ? PaymentTransactionStatus.PartiallyRefunded
+                : PaymentTransactionStatus.Refunded;
 
             await context.SaveChangesAsync(ct);
             if (ownTx) await tx!.CommitAsync(ct);

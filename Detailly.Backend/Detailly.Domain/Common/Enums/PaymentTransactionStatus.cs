@@ -5,7 +5,8 @@ public enum PaymentTransactionStatus
     Pending = 1,   // External provider processing
     Paid = 2,      // Fully paid (atomic success)
     Failed = 3,    // Payment failed
-    Refunded = 4   // Full refund issued
+    Refunded = 4,  // Full refund issued
+    PartiallyRefunded = 5 // Refund issued for less than the full amount
 }
 
 
@@ -28,10 +29,14 @@ public enum PaymentTransactionStatus
 //  └─→ Failed
    
 // Paid
-//  └─→ Refunded
-   
+//  ├─→ Refunded          (full-amount refund)
+//  └─→ PartiallyRefunded (refund for less than the full amount)
+
 // Failed
 //  └─→ (no transitions)
-   
+
 // Refunded
 //  └─→ (no transitions)
+
+// PartiallyRefunded
+//  └─→ (no transitions — system allows one refund per payment)

@@ -26,6 +26,7 @@ export enum PaymentTransactionStatus {
   Paid = 2, // Fully paid (atomic success)
   Failed = 3, // Payment failed
   Refunded = 4, // Full refund issued
+  PartiallyRefunded = 5, // Refund issued for less than the full amount
 }
 
 // ---- Minimal DTOs (adjust fields to match your backend DTOs) ----
